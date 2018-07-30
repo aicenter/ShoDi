@@ -27,6 +27,7 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
         const DijkstraNode & current = q.top();
 
         if (current.ID == target) {
+            delete [] distance;
             return current.weight;
         }
 
@@ -43,6 +44,7 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
 
     }
 
+    delete [] distance;
     return ULLONG_MAX;
 
 }
