@@ -24,7 +24,7 @@ Graph * Loader::loadGraph() {
     graphLoadTimer.begin();
 
     unsigned int nodes, edges;
-    parseProblemLine(input, nodes, edges);
+    parseGraphProblemLine(input, nodes, edges);
     //printf("Nodes: %u, edges: %u.\n", nodes, edges);
 
     Graph * graph = new Graph(nodes);
@@ -49,19 +49,33 @@ void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
 }
 
 //______________________________________________________________________________________________________________________
-void Loader::parseProblemLine(ifstream  & input, unsigned int & nodes, unsigned int & edges) {
+void Loader::loadCoordinates(vector < pair < int, int > > & x) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    unsigned int nodes;
+    parseCoordinatesProblemLine(input, nodes);
+    x.resize(nodes);
+    parseNodesCoordinates(input, x, nodes);
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, unsigned int &edges) {
     while (true) {
         string buffer;
         getline(input, buffer);
         if (buffer[0] == 'p') {
-            processProblemLine(buffer, nodes, edges);
+            processGraphProblemLine(buffer, nodes, edges);
             return;
         }
     }
 }
 
 //______________________________________________________________________________________________________________________
-void Loader::processProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges) {
+void Loader::processGraphProblemLine(string &buffer, unsigned int &nodes, unsigned int &edges) {
     unsigned int position = 5;
     unsigned int tmpnodes = 0;
     while (buffer[position] != ' ') {
@@ -137,4 +151,98 @@ void Loader::parseTrips(ifstream & input, vector < pair < unsigned int, unsigned
     for (unsigned int i = 0; i < tripscnt; i++) {
         input >> x.at(i).first >> x.at(i).second;
     }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseCoordinatesProblemLine(ifstream & input, unsigned int & nodes) {
+    while (true) {
+        string buffer;
+        getline(input, buffer);
+        if (buffer[0] == 'p') {
+            processCoordinatesProblemLine(buffer, nodes);
+            return;
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseNodesCoordinates(ifstream & input, vector < pair < int, int > > & x, unsigned int nodes) {
+    unsigned int loadednodescnt = 0;
+    while (loadednodescnt < nodes) {
+        string buffer;
+        getline(input, buffer);
+        if (buffer[0] == 'v') {
+            unsigned int node;
+            int coord1, coord2;
+            getNodeCoordinates(buffer, node, coord1, coord2);
+            x.at(node).first = coord1;
+            x.at(node).second = coord2;
+            loadednodescnt++;
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::processCoordinatesProblemLine(string & buffer, unsigned int & nodes) {
+    unsigned int position = 12;
+    unsigned int tmpnodes = 0;
+    while (position < buffer.size()) {
+        tmpnodes *= 10;
+        tmpnodes += (buffer[position] - 48);
+        position++;
+    }
+
+    nodes = tmpnodes;
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::getNodeCoordinates(string & buffer, unsigned int & node, int & coord1, int & coord2) {
+    unsigned int position = 2;
+    unsigned int tmpnode = 0;
+    while (buffer[position] != ' ') {
+        tmpnode *= 10;
+        tmpnode += (buffer[position] - 48);
+        position++;
+    }
+
+    position++;
+    int tmpcoord1 = 0;
+    bool coord1lessthanzero;
+    if (buffer[position] == '-') {
+        coord1lessthanzero = true;
+        position++;
+    } else {
+        coord1lessthanzero = false;
+    }
+    while(buffer[position] != ' ') {
+        tmpcoord1 *= 10;
+        tmpcoord1 += (buffer[position] - 48);
+        position++;
+    }
+
+    position++;
+    int tmpcoord2 = 0;
+    bool coord2lessthanzero;
+    if (buffer[position] == '-') {
+        coord2lessthanzero = true;
+        position++;
+    } else {
+        coord2lessthanzero = false;
+    }
+    while(position < buffer.size()) {
+        coord2 *= 10;
+        coord2 += (buffer[position] - 48);
+        position++;
+    }
+
+    if(coord1lessthanzero) {
+        coord1 = -coord1;
+    }
+    if(coord2lessthanzero) {
+        coord2 = -coord2;
+    }
+
+    node = tmpnode - 1;
+    coord1 = tmpcoord1;
+    coord2 = tmpcoord2;
 }
