@@ -230,16 +230,16 @@ void Loader::getNodeCoordinates(string & buffer, unsigned int & node, int & coor
         coord2lessthanzero = false;
     }
     while(position < buffer.size()) {
-        coord2 *= 10;
-        coord2 += (buffer[position] - 48);
+        tmpcoord2 *= 10;
+        tmpcoord2 += (buffer[position] - 48);
         position++;
     }
 
     if(coord1lessthanzero) {
-        coord1 = -coord1;
+        tmpcoord1 = -tmpcoord1;
     }
     if(coord2lessthanzero) {
-        coord2 = -coord2;
+        tmpcoord2 = -tmpcoord2;
     }
 
     node = tmpnode - 1;
