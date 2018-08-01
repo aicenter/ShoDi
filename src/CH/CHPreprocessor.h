@@ -17,7 +17,7 @@ class CHPreprocessor {
 public:
     static void preprocessAndSave(string filePath, Graph & graph);
 private:
-    static void initializePriorityQueue(priority_queue<CHNode, vector<CHNode>, bool (*)(CHNode, CHNode)> priorityQueue, Graph & graph);
+    static void initializePriorityQueue(priority_queue<CHNode, vector<CHNode>, bool (*)(CHNode, CHNode)> & priorityQueue, Graph & graph);
     static unsigned int calculatePossibleShortcuts(const unsigned int i, Graph & graph);
     static long long unsigned int runRestrictedDijkstra(const unsigned int source, const unsigned int target, const long long unsigned int shortcutLength, const Graph & graph);
     static vector<bool> contracted;

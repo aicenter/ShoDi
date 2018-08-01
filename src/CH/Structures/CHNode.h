@@ -9,8 +9,9 @@
 
 class CHNode {
 public:
+    CHNode(const unsigned int x, const int y);
     unsigned int id;
-    unsigned int weight;
+    int weight;
 private:
 };
 

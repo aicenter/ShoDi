@@ -7,6 +7,7 @@
 #include <climits>
 #include "../Dijkstra/DijkstraNode.h"
 #include "CHPreprocessor.h"
+#include "EdgeDifferenceManager.h"
 
 using namespace std;
 
@@ -16,19 +17,28 @@ vector<bool> CHPreprocessor::contracted(0);
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::preprocessAndSave(string filePath, Graph & graph) {
-    auto cmp = [](CHNode left, CHNode right) { return (left.weight) < (right.weight);};
+    auto cmp = [](CHNode left, CHNode right) { return (left.weight) > (right.weight);};
     priority_queue<CHNode, vector<CHNode>, bool (*)(CHNode, CHNode)> priorityQueue(cmp);
 
     CHPreprocessor::contracted.resize(graph.nodes(), false);
+    EdgeDifferenceManager::init(graph.nodes());
 
     initializePriorityQueue(priorityQueue, graph);
+
+    for(unsigned int i = 0; i < 20; i++) {
+        CHNode t = priorityQueue.top();
+        printf("At position %u in priority queue: (priority: %i) node %u\n", i, t.weight, t.id);
+        priorityQueue.pop();
+    }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::initializePriorityQueue(priority_queue<CHNode, vector<CHNode>, bool (*)(CHNode, CHNode)> priorityQueue, Graph & graph) {
+void CHPreprocessor::initializePriorityQueue(priority_queue<CHNode, vector<CHNode>, bool (*)(CHNode, CHNode)> & priorityQueue, Graph & graph) {
     for(unsigned int i = 0; i < 20/*graph.nodes()*/; i++) {
         unsigned int shortcuts = calculatePossibleShortcuts(i, graph);
-        printf("Amount of possible shortcuts for node %u: %u\n", i, shortcuts);
+        int edgeDifference = EdgeDifferenceManager::difference(UINT_MAX, i, shortcuts, graph.degree(i));
+        printf("Amount of possible shortcuts for node %u: %u, edge difference: %i\n", i, shortcuts, edgeDifference);
+        priorityQueue.push(CHNode(i, edgeDifference));
     }
 }
 

@@ -12,12 +12,12 @@
 #include "CH/CHPreprocessor.h"
 
 int main() {
-    Loader graphLoader = Loader("../input/USA-road-t.USA.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
     Graph * graph = graphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/100trips1");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-    DijkstraBenchmark::runAndMeasure(trips, *graph);
+    //Loader tripsLoader = Loader("../input/100trips1");
+    //vector< pair < unsigned int, unsigned int > > trips;
+    //tripsLoader.loadTrips(trips);
+    //DijkstraBenchmark::runAndMeasure(trips, *graph);
     //Loader coordsLoader = Loader("../input/USA-road-d.USA.co");
     //vector< pair < int, int > > coords;
     //coordsLoader.loadCoordinates(coords);
