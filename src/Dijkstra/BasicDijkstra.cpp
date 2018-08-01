@@ -31,7 +31,7 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
             return current.weight;
         }
 
-        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.neighnours(current.ID);
+        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
             long long unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distance[neighbours.at(i).first]) {
