@@ -6,8 +6,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define NODES_CNT 23947347
-#define TRIPS_AMOUNT 100
+#define NODES_CNT 435666 //23947347
+#define TRIPS_AMOUNT 10000
 
 int main() {
     printf("%u\n", TRIPS_AMOUNT);
