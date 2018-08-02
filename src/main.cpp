@@ -14,30 +14,14 @@
 int main() {
     Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
     Graph * graph = graphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/COL10000randomTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-    DijkstraBenchmark::runAndMeasure(trips, *graph);
-    //Loader coordsLoader = Loader("../input/USA-road-d.USA.co");
-    //vector< pair < int, int > > coords;
-    //coordsLoader.loadCoordinates(coords);
-    //Grid grid(128);
-    //MinMaxCoordsFinder::setMinMaxCoords(coords, grid);
-    //printf("Min coord1: %i, max coord1: %i, min coord2: %i, max coord2: %i.\n", grid.getMincoord1(), grid.getMaxcoord1(), grid.getMincoord2(), grid.getMaxcoord2());
+    //Loader tripsLoader = Loader("../input/COL10000randomTrips");
+    //vector< pair < unsigned int, unsigned int > > trips;
+    //tripsLoader.loadTrips(trips);
+    //DijkstraBenchmark::runAndMeasure(trips, *graph);
 
-    //Timer gridCreationTimer("Grid creation from nodes");
-    //gridCreationTimer.begin();
+    //graph->printFirst100NodesDegrees();
 
-    //grid.createGridFromNodes(coords);
-
-    //gridCreationTimer.finish();
-    //gridCreationTimer.printMeasuredTime();
-
-    //grid.printSomeGridInfo();
-
-    graph->printFirst100NodesDegrees();
-
-    CHPreprocessor::preprocessAndSave("topkek", *graph);
+    CHPreprocessor::preprocessAndSave("../input/USA.COL.CH", *graph);
 
     delete graph;
     return 0;

@@ -20,6 +20,8 @@ Graph * Loader::loadGraph() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
+    printf("Started loading graph!\n");
+
     Timer graphLoadTimer("Graph loading");
     graphLoadTimer.begin();
 
@@ -32,6 +34,8 @@ Graph * Loader::loadGraph() {
 
     graphLoadTimer.finish();
     graphLoadTimer.printMeasuredTime();
+
+    input.close();
 
     return graph;
 
@@ -46,6 +50,8 @@ void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     }
 
     parseTrips(input, x);
+
+    input.close();
 }
 
 //______________________________________________________________________________________________________________________
@@ -60,6 +66,8 @@ void Loader::loadCoordinates(vector < pair < int, int > > & x) {
     parseCoordinatesProblemLine(input, nodes);
     x.resize(nodes);
     parseNodesCoordinates(input, x, nodes);
+
+    input.close();
 }
 
 //______________________________________________________________________________________________________________________
