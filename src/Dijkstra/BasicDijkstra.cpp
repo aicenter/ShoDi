@@ -19,7 +19,7 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
 
     distance[source] = 0;
 
-    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) < (right.weight);};
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(source, 0));
 

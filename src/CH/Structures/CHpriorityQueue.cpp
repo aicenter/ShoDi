@@ -4,7 +4,13 @@
 //
 
 #include <climits>
+#include <cstdio>
 #include "CHpriorityQueue.h"
+
+//______________________________________________________________________________________________________________________
+void CHpriorityQueue::printSomeInfo() {
+    printf("Queue size: %lu, top: %u (%i)\n", content.size(), content[0].id, content[0].weight);
+}
 
 //______________________________________________________________________________________________________________________
 CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {

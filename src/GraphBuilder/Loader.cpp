@@ -71,6 +71,19 @@ void Loader::loadCoordinates(vector < pair < int, int > > & x) {
 }
 
 //______________________________________________________________________________________________________________________
+void Loader::loadRanks(vector < unsigned int > & x) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    parseRanks(input, x);
+
+    input.close();
+}
+
+//______________________________________________________________________________________________________________________
 void Loader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, unsigned int &edges) {
     while (true) {
         string buffer;
@@ -111,7 +124,8 @@ void Loader::parseEdges(ifstream & input, Graph & graph, unsigned int edges) {
         string buffer;
         getline(input, buffer);
         if (buffer[0] == 'a') {
-            unsigned int from, to, weight;
+            unsigned int from, to;
+            long long unsigned int weight;
             getEdge(buffer, from, to, weight);
             graph.addEdge(from, to, weight);
             //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
@@ -121,7 +135,7 @@ void Loader::parseEdges(ifstream & input, Graph & graph, unsigned int edges) {
 }
 
 //______________________________________________________________________________________________________________________
-void Loader::getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight) {
+void Loader::getEdge(string & buffer, unsigned int & from, unsigned int & to, long long unsigned int & weight) {
     unsigned int position = 2;
     unsigned int tmpfrom = 0;
     while (buffer[position] != ' ') {
@@ -139,7 +153,7 @@ void Loader::getEdge(string & buffer, unsigned int & from, unsigned int & to, un
     }
 
     position++;
-    unsigned int tmpweight = 0;
+    long long unsigned int tmpweight = 0;
     while(position < buffer.size()) {
         tmpweight *= 10;
         tmpweight += (buffer[position] - 48);
@@ -158,6 +172,16 @@ void Loader::parseTrips(ifstream & input, vector < pair < unsigned int, unsigned
     x.resize(tripscnt);
     for (unsigned int i = 0; i < tripscnt; i++) {
         input >> x.at(i).first >> x.at(i).second;
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseRanks(ifstream & input, vector < unsigned int > & x) {
+    unsigned int nodes;
+    input >> nodes;
+    x.resize(nodes);
+    for (unsigned int i = 0; i < nodes; i++) {
+        input >> x[i];
     }
 }
 

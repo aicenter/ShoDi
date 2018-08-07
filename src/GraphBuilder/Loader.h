@@ -20,14 +20,16 @@ private:
     void parseNodesCoordinates(ifstream & input, vector < pair < int, int > > & x, unsigned int nodes);
     void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
     void processCoordinatesProblemLine(string & buffer, unsigned int & nodes);
-    void getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight);
+    void getEdge(string & buffer, unsigned int & from, unsigned int & to, long long unsigned int & weight);
     void parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x);
     void getNodeCoordinates(string & buffer, unsigned int & node, int & coord1, int & coord2);
+    void parseRanks(ifstream & input, vector < unsigned int > & x);
 public:
     Loader(string inputFile);
     Graph * loadGraph();
     void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
     void loadCoordinates(vector < pair <int, int > > & x);
+    void loadRanks(vector < unsigned int > & x);
 };
 
 #endif //TRANSIT_NODE_ROUTING_LOADER_H

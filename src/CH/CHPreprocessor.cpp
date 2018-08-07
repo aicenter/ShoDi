@@ -8,6 +8,7 @@
 #include <fstream>
 #include "../Timer/Timer.h"
 #include "../Dijkstra/DijkstraNode.h"
+#include "Structures/HopsDijkstraNode.h"
 #include "CHPreprocessor.h"
 #include "EdgeDifferenceManager.h"
 
@@ -125,11 +126,14 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, Graph & grap
     unsigned int CHrank = 1;
 
     while( ! priorityQueue.empty() ) {
+        priorityQueue.printSomeInfo();
         CHNode current = priorityQueue.front();
+        priorityQueue.pop();
         contractOneNode(current.id, graph);
         updateNeighboursPriorities(current.id, graph, priorityQueue);
         nodeRanks[current.id] = CHrank++;
-        priorityQueue.pop();
+
+
 
         if(CHrank % 1000 == 0) {
             printf("Contracted %u nodes!\n", CHrank);
@@ -140,7 +144,7 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, Graph & grap
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::contractOneNode(const unsigned int x, Graph & graph) {
     contracted[x] = true;
-
+    //printf("Contracting node %u!\n", x);
     adjustNeighbourgDegrees(x, graph);
 
     map<pair<unsigned int, unsigned int>, long long unsigned int> distances;
@@ -151,7 +155,7 @@ void CHPreprocessor::contractOneNode(const unsigned int x, Graph & graph) {
     for (auto iter = sourcesAndTargets.begin(); iter != sourcesAndTargets.end(); ++iter) {
         long long unsigned int upperBound = longestPossibleShortcut((*iter).first, (*iter).second, distances);
         map<pair<unsigned int, unsigned int>, long long unsigned int> distancesWithoutX;
-        oneToManyRestrictedDijkstra((*iter).first, (*iter).second, upperBound, graph, distancesWithoutX);
+        oneToManyRestrictedDijkstraWithHopLimit((*iter).first, (*iter).second, upperBound, graph, distancesWithoutX);
 
         for(auto iter2 = (*iter).second.begin(); iter2 != (*iter).second.end(); ++iter2) {
             if (distancesWithoutX.at(make_pair((*iter).first, *iter2)) > distances.at(make_pair((*iter).first, *iter2))) {
@@ -169,6 +173,7 @@ void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, Graph & graph
     vector < pair < unsigned int, long long unsigned int > > previousNodes = graph.incomingEdges(x);
     vector < pair < unsigned int, long long unsigned int > > nextNodes = graph.outgoingEdges(x);
 
+    printf("Contracting node %u, has %lu/%lu neigbours.\n", x, previousNodes.size(), nextNodes.size());
     for(unsigned int i = 0; i < previousNodes.size(); i++) {
         if (! contracted[previousNodes.at(i).first]) {
             preprocessingDegrees[previousNodes.at(i).first]--;
@@ -220,7 +225,7 @@ unsigned int CHPreprocessor::calculatePossibleShortcuts(const unsigned int i, Gr
     for (auto iter = sourcesAndTargets.begin(); iter != sourcesAndTargets.end(); ++iter) {
         long long unsigned int upperBound = longestPossibleShortcut((*iter).first, (*iter).second, distances);
         map<pair<unsigned int, unsigned int>, long long unsigned int> distancesWithoutX;
-        oneToManyRestrictedDijkstra((*iter).first, (*iter).second, upperBound, graph, distancesWithoutX);
+        oneToManyRestrictedDijkstraWithHopLimit((*iter).first, (*iter).second, upperBound, graph, distancesWithoutX);
 
         for(auto iter2 = (*iter).second.begin(); iter2 != (*iter).second.end(); ++iter2) {
             if (distancesWithoutX.at(make_pair((*iter).first, *iter2)) > distances.at(make_pair((*iter).first, *iter2))) {
@@ -272,6 +277,67 @@ unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned in
 }
 
 //______________________________________________________________________________________________________________________
+void CHPreprocessor::oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, unsigned int hoplimit, unsigned int maxexpanded) {
+    vector<unsigned int> nodesWithChangedDistances;
+    unsigned int targetsAmount = targets.size();
+    unsigned int targetsFound = 0;
+    unsigned int expanded = 0;
+
+    dijkstraDistance[source] = 0;
+    nodesWithChangedDistances.push_back(source);
+
+    auto cmp = [](HopsDijkstraNode left, HopsDijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<HopsDijkstraNode, vector<HopsDijkstraNode>, decltype(cmp)> q(cmp);
+    q.push(HopsDijkstraNode(source, 0, 0));
+
+    while(! q.empty() ) {
+        const HopsDijkstraNode & current = q.top();
+        expanded++;
+        if (expanded > maxexpanded) {
+            break;
+        }
+
+        if (current.weight > upperBound) {
+            break;
+        }
+
+        if (current.hops > hoplimit) {
+            q.pop();
+            continue;
+        }
+
+        if (targets.count(current.ID) == 1) {
+            targetsFound++;
+            if (targetsFound == targetsAmount) {
+                break;
+            }
+        }
+
+        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
+            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            if ( ! CHPreprocessor::contracted[neighbours.at(i).first] && newDistance < dijkstraDistance[neighbours.at(i).first]) {
+                dijkstraDistance[neighbours.at(i).first] = newDistance;
+                nodesWithChangedDistances.push_back(neighbours.at(i).first);
+                q.push(HopsDijkstraNode(neighbours.at(i).first, newDistance, current.hops + 1));
+            }
+        }
+
+        q.pop();
+
+    }
+
+    for(auto iter = targets.begin(); iter != targets.end(); ++iter) {
+        distancesWithoutX.insert(make_pair(make_pair(source, *iter), dijkstraDistance[*iter]));
+    }
+
+    for(unsigned int i = 0; i < nodesWithChangedDistances.size(); i++) {
+        dijkstraDistance[nodesWithChangedDistances[i]] = ULLONG_MAX;
+    }
+
+}
+
+//______________________________________________________________________________________________________________________
 void CHPreprocessor::oneToManyRestrictedDijkstra(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX) {
     vector<unsigned int> nodesWithChangedDistances;
     unsigned int targetsAmount = targets.size();
@@ -280,7 +346,7 @@ void CHPreprocessor::oneToManyRestrictedDijkstra(const unsigned int source, set<
     dijkstraDistance[source] = 0;
     nodesWithChangedDistances.push_back(source);
 
-    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) < (right.weight);};
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(source, 0));
 
@@ -333,7 +399,7 @@ long long unsigned int CHPreprocessor::runRestrictedDijkstra(const unsigned int 
 
     distance[source] = 0;
 
-    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) < (right.weight);};
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(source, 0));
 

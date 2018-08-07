@@ -20,3 +20,30 @@ void DijkstraBenchmark::runAndMeasure(const vector < pair < unsigned int, unsign
     dijkstraTimer.finish();
     dijkstraTimer.printMeasuredTime();
 }
+
+//______________________________________________________________________________________________________________________
+void DijkstraBenchmark::runAndMeasureWithOutput(const vector<pair<unsigned int, unsigned int> > &trips, const Graph &graph, vector<long long unsigned int> &distances) {
+    Timer dijkstraTimer("Dijkstra trips benchmark");
+    dijkstraTimer.begin();
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        distances[i] = BasicDijkstra::run(trips.at(i).first, trips.at(i).second, graph);
+    }
+
+    dijkstraTimer.finish();
+    dijkstraTimer.printMeasuredTime();
+}
+
+//______________________________________________________________________________________________________________________
+double DijkstraBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances) {
+    Timer dijkstraTimer("Dijkstra trips benchmark");
+    dijkstraTimer.begin();
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        distances[i] = BasicDijkstra::run(trips.at(i).first, trips.at(i).second, graph);
+    }
+
+    dijkstraTimer.finish();
+    dijkstraTimer.printMeasuredTime();
+    return dijkstraTimer.getMeasuredTimeInSeconds();
+}

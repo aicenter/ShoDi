@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define NODES_CNT 435666 //23947347
+#define NODES_CNT 100 //23947347
 #define TRIPS_AMOUNT 10000
 
 int main() {
@@ -17,4 +17,5 @@ int main() {
         printf("%u %u\n", source, target);
     }
 
+    return 0;
 }
