@@ -13,7 +13,6 @@ using namespace std;
 
 class CHpriorityQueue {
 public:
-    void printSomeInfo();
     CHpriorityQueue(const unsigned int nodes);
     void insert(const unsigned int x, const int y);
     void pushOnly(const unsigned int x, const int y);

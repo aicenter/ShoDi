@@ -23,10 +23,9 @@ bool CorectnessValidator::validateVerbose(vector < long long unsigned int > & a,
         if (a.at(i) != b.at(i)) {
             printf("Found mismatch at trip %u (indexing trips from 0).\n", i);
             printf("Vector 'a' contains: %llu, while vector 'b' contains: %llu.\n", a.at(i), b.at(i));
-            mmcnt++;//return false;
+            return false;
         }
     }
-    printf("%u mismatches found!\n", mmcnt);
-    //printf("Validated returned distances, vectors are similar.\n");
+    printf("Validated returned distances, vectors are similar.\n");
     return true;
 }

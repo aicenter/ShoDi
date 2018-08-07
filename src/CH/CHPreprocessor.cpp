@@ -177,14 +177,11 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, Graph & grap
     unsigned int CHrank = 1;
 
     while( ! priorityQueue.empty() ) {
-        //priorityQueue.printSomeInfo();
         CHNode current = priorityQueue.front();
         priorityQueue.pop();
         contractOneNode(current.id, graph);
         updateNeighboursPriorities(current.id, graph, priorityQueue);
         nodeRanks[current.id] = CHrank++;
-
-
 
         if(CHrank % 1000 == 0) {
             printf("Contracted %u nodes!\n", CHrank);
@@ -197,14 +194,11 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
     unsigned int CHrank = 1;
 
     while( ! priorityQueue.empty() ) {
-        //priorityQueue.printSomeInfo();
         CHNode current = priorityQueue.front();
         priorityQueue.pop();
         contractOneNodeWithUnpackingData(current.id, graph);
         updateNeighboursPriorities(current.id, graph, priorityQueue);
         nodeRanks[current.id] = CHrank++;
-
-
 
         if(CHrank % 1000 == 0) {
             printf("Contracted %u nodes!\n", CHrank);
@@ -215,7 +209,6 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::contractOneNode(const unsigned int x, Graph & graph) {
     contracted[x] = true;
-    //printf("Contracting node %u!\n", x);
     adjustNeighbourgDegrees(x, graph);
 
     map<pair<unsigned int, unsigned int>, long long unsigned int> distances;
@@ -242,7 +235,6 @@ void CHPreprocessor::contractOneNode(const unsigned int x, Graph & graph) {
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::contractOneNodeWithUnpackingData(const unsigned int x, Graph &graph) {
     contracted[x] = true;
-    //printf("Contracting node %u!\n", x);
     adjustNeighbourgDegrees(x, graph);
 
     map<pair<unsigned int, unsigned int>, long long unsigned int> distances;
@@ -272,7 +264,6 @@ void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, Graph & graph
     vector < pair < unsigned int, long long unsigned int > > previousNodes = graph.incomingEdges(x);
     vector < pair < unsigned int, long long unsigned int > > nextNodes = graph.outgoingEdges(x);
 
-    //printf("Contracting node %u, has %lu/%lu neigbours.\n", x, previousNodes.size(), nextNodes.size());
     for(unsigned int i = 0; i < previousNodes.size(); i++) {
         if (! contracted[previousNodes.at(i).first]) {
             preprocessingDegrees[previousNodes.at(i).first]--;

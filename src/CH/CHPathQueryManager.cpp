@@ -46,7 +46,6 @@ long long unsigned int CHPathQueryManager::findPath(const unsigned int source, c
     long long unsigned int shortestFound = ULLONG_MAX;
     unsigned int meetingNode = UINT_MAX;
     while (! fromQueue.empty() || ! toQueue.empty()) {
-        //printf("From queue size: %lu, to queue size: %lu\n", fromQueue.size(), toQueue.size());
 
         if (! fromQueue.empty()) {
             unsigned int current = fromQueue.top().ID;

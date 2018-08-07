@@ -37,12 +37,3 @@ const vector<pair<unsigned int, long long unsigned int>> & Graph::outgoingEdges(
 const unsigned int Graph::degree(unsigned int node)const {
     return followingNodes.at(node).size() + previousNodes.at(node).size();
 }
-
-//______________________________________________________________________________________________________________________
-void Graph::printFirst100NodesDegrees() {
-    printf("~~~ First 100 nodes degrees: ~~~\n");
-    for (unsigned int i = 0; i < 100; i++ ) {
-        printf("Node %u degree: %u\n", i, degree(i));
-    }
-    printf("~~~ End of degrees print ~~~\n");
-}

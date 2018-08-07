@@ -22,7 +22,6 @@ public:
     const vector<pair<unsigned int, long long unsigned int>> & incomingEdges(const unsigned int x)const;
     const vector<pair<unsigned int, long long unsigned int>> & outgoingEdges(const unsigned int x)const;
     const unsigned int degree(unsigned int node)const;
-    void printFirst100NodesDegrees();
 };
 
 #endif //TRANSIT_NODE_ROUTING_GRAPH_H

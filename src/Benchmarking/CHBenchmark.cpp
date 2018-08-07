@@ -47,7 +47,6 @@ double CHBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned 
 
     for(unsigned int i = 0; i < trips.size(); i++) {
         distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second, graph);
-        //printf("Found distance for trip %u (indexing from 0).\n", i);
     }
 
     chTimer.finish();
