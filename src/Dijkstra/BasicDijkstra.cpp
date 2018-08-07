@@ -25,7 +25,7 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
     q.push(DijkstraNode(source, 0));
 
     while(! q.empty() ) {
-        const DijkstraNode & current = q.top();
+        const DijkstraNode current = q.top();
 
         if (current.ID == target) {
             delete [] distance;

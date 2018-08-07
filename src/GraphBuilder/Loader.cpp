@@ -84,6 +84,19 @@ void Loader::loadRanks(vector < unsigned int > & x) {
 }
 
 //______________________________________________________________________________________________________________________
+void Loader::loadUnpackingData(map < pair < unsigned int, unsigned int >, unsigned int > & x) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    parseUnpackingData(input, x);
+
+    input.close();
+}
+
+//______________________________________________________________________________________________________________________
 void Loader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, unsigned int &edges) {
     while (true) {
         string buffer;
@@ -182,6 +195,17 @@ void Loader::parseRanks(ifstream & input, vector < unsigned int > & x) {
     x.resize(nodes);
     for (unsigned int i = 0; i < nodes; i++) {
         input >> x[i];
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseUnpackingData(ifstream & input, map < pair < unsigned int, unsigned int >, unsigned int > & x) {
+    unsigned int shortcutsCnt;
+    input >> shortcutsCnt;
+    for (unsigned int i = 0; i < shortcutsCnt; i++) {
+        unsigned int s, t, m;
+        input >> s >> t >> m;
+        x.insert(make_pair(make_pair(s, t), m));
     }
 }
 

@@ -20,6 +20,7 @@ vector<bool> CHPreprocessor::contracted(0);
 vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
 vector<unsigned int> CHPreprocessor::nodeRanks(0);
 vector<long long unsigned int> CHPreprocessor::dijkstraDistance(0);
+vector<pair<pair<unsigned int, unsigned int>, unsigned int>> CHPreprocessor::unpacking(0);
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::preprocessAndSave(string filePath, Graph & graph) {
@@ -47,6 +48,38 @@ void CHPreprocessor::preprocessAndSave(string filePath, Graph & graph) {
     writeTimer.begin();
 
     flushCHgraph(filePath, graph);
+
+    writeTimer.finish();
+    writeTimer.printMeasuredTime();
+}
+
+//______________________________________________________________________________________________________________________
+void CHPreprocessor::preprocessAndSaveWithUnpackingData(string filePath, Graph & graph) {
+    printf("Started preprocessing!\n");
+    Timer preprocessTimer("Contraction Hierarchies preprocessing timer");
+    preprocessTimer.begin();
+
+    CHpriorityQueue priorityQueue(graph.nodes());
+
+    CHPreprocessor::contracted.resize(graph.nodes(), false);
+    CHPreprocessor::preprocessingDegrees.resize(graph.nodes());
+    CHPreprocessor::nodeRanks.resize(graph.nodes());
+    CHPreprocessor::dijkstraDistance.resize(graph.nodes(), ULLONG_MAX);
+    EdgeDifferenceManager::init(graph.nodes());
+
+    initializePriorityQueue(priorityQueue, graph);
+    printf("Initialized priority queue!\n");
+    contractNodesWithUnpackingData(priorityQueue, graph);
+
+    preprocessTimer.finish();
+    preprocessTimer.printMeasuredTime();
+
+    printf("Now writing preprocessed data into files.\n");
+    Timer writeTimer("Contraction Hierarchies file writing timer");
+    writeTimer.begin();
+
+    flushCHgraph(filePath, graph);
+    flushUnpackingData(filePath);
 
     writeTimer.finish();
     writeTimer.printMeasuredTime();
@@ -105,6 +138,24 @@ void CHPreprocessor::flushCHRanks(string & filePath) {
 }
 
 //______________________________________________________________________________________________________________________
+void CHPreprocessor::flushUnpackingData(string & filePath) {
+    ofstream output;
+    output.open(filePath + "_unpacking");
+    if( ! output.is_open() ) {
+        printf("Couldn't open file '%s'!", (filePath + "_ranks").c_str());
+    }
+
+    output << unpacking.size() << endl;
+    for ( unsigned int i = 0; i < unpacking.size(); i++ ) {
+        output << unpacking[i].first.first << " " << unpacking[i].first.second << " " << unpacking[i].second << endl;
+    }
+
+    output.close();
+
+
+}
+
+//______________________________________________________________________________________________________________________
 void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Graph & graph) {
     Timer priorityQTimer("Priority queue initialization");
     priorityQTimer.begin();
@@ -142,6 +193,26 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, Graph & grap
 }
 
 //______________________________________________________________________________________________________________________
+void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQueue, Graph &graph) {
+    unsigned int CHrank = 1;
+
+    while( ! priorityQueue.empty() ) {
+        //priorityQueue.printSomeInfo();
+        CHNode current = priorityQueue.front();
+        priorityQueue.pop();
+        contractOneNodeWithUnpackingData(current.id, graph);
+        updateNeighboursPriorities(current.id, graph, priorityQueue);
+        nodeRanks[current.id] = CHrank++;
+
+
+
+        if(CHrank % 1000 == 0) {
+            printf("Contracted %u nodes!\n", CHrank);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
 void CHPreprocessor::contractOneNode(const unsigned int x, Graph & graph) {
     contracted[x] = true;
     //printf("Contracting node %u!\n", x);
@@ -162,6 +233,34 @@ void CHPreprocessor::contractOneNode(const unsigned int x, Graph & graph) {
                 preprocessingDegrees[(*iter).first]++;
                 preprocessingDegrees[*iter2]++;
                 graph.addEdge((*iter).first, *iter2, distances.at(make_pair((*iter).first, *iter2)));
+            }
+        }
+    }
+
+}
+
+//______________________________________________________________________________________________________________________
+void CHPreprocessor::contractOneNodeWithUnpackingData(const unsigned int x, Graph &graph) {
+    contracted[x] = true;
+    //printf("Contracting node %u!\n", x);
+    adjustNeighbourgDegrees(x, graph);
+
+    map<pair<unsigned int, unsigned int>, long long unsigned int> distances;
+    map<unsigned int, set<unsigned int> > sourcesAndTargets;
+    getDistancesUsingNode(x, graph, distances, sourcesAndTargets);
+
+    // actually add shortcuts
+    for (auto iter = sourcesAndTargets.begin(); iter != sourcesAndTargets.end(); ++iter) {
+        long long unsigned int upperBound = longestPossibleShortcut((*iter).first, (*iter).second, distances);
+        map<pair<unsigned int, unsigned int>, long long unsigned int> distancesWithoutX;
+        oneToManyRestrictedDijkstraWithHopLimit((*iter).first, (*iter).second, upperBound, graph, distancesWithoutX);
+
+        for(auto iter2 = (*iter).second.begin(); iter2 != (*iter).second.end(); ++iter2) {
+            if (distancesWithoutX.at(make_pair((*iter).first, *iter2)) > distances.at(make_pair((*iter).first, *iter2))) {
+                preprocessingDegrees[(*iter).first]++;
+                preprocessingDegrees[*iter2]++;
+                graph.addEdge((*iter).first, *iter2, distances.at(make_pair((*iter).first, *iter2)));
+                unpacking.push_back(make_pair(make_pair((*iter).first, *iter2), x));
             }
         }
     }

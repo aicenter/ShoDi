@@ -7,6 +7,7 @@
 #define TRANSIT_NODE_ROUTING_LOADER_H
 
 #include <string>
+#include <map>
 #include "Graph.h"
 
 using namespace std;
@@ -24,12 +25,14 @@ private:
     void parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x);
     void getNodeCoordinates(string & buffer, unsigned int & node, int & coord1, int & coord2);
     void parseRanks(ifstream & input, vector < unsigned int > & x);
+    void parseUnpackingData(ifstream & input, map < pair < unsigned int, unsigned int >, unsigned int > & x);
 public:
     Loader(string inputFile);
     Graph * loadGraph();
     void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
     void loadCoordinates(vector < pair <int, int > > & x);
     void loadRanks(vector < unsigned int > & x);
+    void loadUnpackingData(map < pair < unsigned int, unsigned int >, unsigned int > & x);
 };
 
 #endif //TRANSIT_NODE_ROUTING_LOADER_H
