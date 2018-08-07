@@ -36,7 +36,7 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
     }
 
     fromDistance[source] = 0;
-    toDistance[source] = 0;
+    toDistance[target] = 0;
 
     fromQueue.push(DijkstraNode(source, 0));
     toQueue.push(DijkstraNode(target, 0));

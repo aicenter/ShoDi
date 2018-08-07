@@ -126,7 +126,7 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, Graph & grap
     unsigned int CHrank = 1;
 
     while( ! priorityQueue.empty() ) {
-        priorityQueue.printSomeInfo();
+        //priorityQueue.printSomeInfo();
         CHNode current = priorityQueue.front();
         priorityQueue.pop();
         contractOneNode(current.id, graph);
@@ -173,7 +173,7 @@ void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, Graph & graph
     vector < pair < unsigned int, long long unsigned int > > previousNodes = graph.incomingEdges(x);
     vector < pair < unsigned int, long long unsigned int > > nextNodes = graph.outgoingEdges(x);
 
-    printf("Contracting node %u, has %lu/%lu neigbours.\n", x, previousNodes.size(), nextNodes.size());
+    //printf("Contracting node %u, has %lu/%lu neigbours.\n", x, previousNodes.size(), nextNodes.size());
     for(unsigned int i = 0; i < previousNodes.size(); i++) {
         if (! contracted[previousNodes.at(i).first]) {
             preprocessingDegrees[previousNodes.at(i).first]--;
