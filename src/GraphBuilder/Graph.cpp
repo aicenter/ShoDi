@@ -13,6 +13,20 @@ Graph::Graph(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
+Graph::Graph(SimpleGraph & x) {
+    const unsigned int nodes = x.nodes();
+    this->followingNodes.resize(nodes);
+    this->previousNodes.resize(nodes);
+
+    for(unsigned int i = 0; i < nodes; i++) {
+        for(auto iter = x.edges(i).begin(); iter != x.edges(i).end(); ++iter) {
+            this->addEdge(i, (*iter).first, (*iter).second);
+        }
+    }
+
+}
+
+//______________________________________________________________________________________________________________________
 void Graph::addEdge(unsigned int from, unsigned int to, long long unsigned int weight) {
     this->followingNodes.at(from).push_back(make_pair(to, weight));
     this->previousNodes.at(to).push_back(make_pair(from, weight));

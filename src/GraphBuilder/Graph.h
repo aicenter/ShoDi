@@ -8,6 +8,7 @@
 
 #include <utility>
 #include <vector>
+#include "SimpleGraph.h"
 
 using namespace std;
 
@@ -17,6 +18,7 @@ private:
     vector< vector < pair< unsigned int, long long unsigned int > > > previousNodes;
 public:
     Graph(unsigned int n);
+    Graph(SimpleGraph & x);
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight);
     const unsigned int nodes() const;
     const vector<pair<unsigned int, long long unsigned int>> & incomingEdges(const unsigned int x)const;

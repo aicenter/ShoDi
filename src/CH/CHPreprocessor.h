@@ -30,13 +30,17 @@ private:
     static void contractOneNode(const unsigned int x, Graph & graph);
     static void contractOneNodeWithUnpackingData(const unsigned int x, Graph & graph);
     static void adjustNeighbourgDegrees(const unsigned int x, Graph & graph);
-    static unsigned int calculatePossibleShortcuts(const unsigned int i, Graph & graph);
-    static void getDistancesUsingNode(const unsigned int i, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distances, map<unsigned int, set<unsigned int> > & souAndTar);
-    static unsigned long long int longestPossibleShortcut(const unsigned int source, set < unsigned int > & targets, map < pair < unsigned int, unsigned int >, unsigned long long int > & distances);
+    static unsigned int calculatePossibleShortcuts(const unsigned int i, Graph & graph, bool deep);
+    static void getDistancesUsingNode(const unsigned int i, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distances, vector<unsigned int> & s, vector<unsigned int> & t);
+    static unsigned long long int longestPossibleShortcut(const unsigned int source, vector < unsigned int > & targets, map < pair < unsigned int, unsigned int >, unsigned long long int > & distances);
     static void updateNeighboursPriorities(const unsigned int x, Graph & graph, CHpriorityQueue & priorityQueue);
     static long long unsigned int runRestrictedDijkstra(const unsigned int source, const unsigned int target, const long long unsigned int shortcutLength, const Graph & graph);
     static void oneToManyRestrictedDijkstra(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX);
-    static void oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, unsigned int hoplimit = 5, unsigned int maxexpanded = 1000);
+    static void oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, unsigned int hoplimit = 5, unsigned int maxexpanded = 100);
+    static void manyToManyWithBuckets(vector < unsigned int > & sources, vector < unsigned int > & targets, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distances, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, bool deep);
+    static void initBuckets(const unsigned int x, Graph & graph, map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > & buckets, long long unsigned int & lowestBucketVal);
+    static void oneToManyWithBuckets(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > & buckets, unsigned int hoplimit = 5, unsigned int maxexpanded = 1000);
+
     static vector<bool> contracted;
     static vector<unsigned int> preprocessingDegrees;
     static vector<unsigned int> nodeRanks;

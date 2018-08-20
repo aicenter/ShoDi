@@ -18,23 +18,23 @@
 
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.NY.gr");
     Graph * graph = graphLoader.loadGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.COL.CH", *graph);
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.NY.CHv2", *graph);
     delete graph;
 }
 
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCH() {
-    Loader dijkstraGraphLoader = Loader("../input/artifGraph1.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.NY.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader chGraphLoader = Loader("../input/artifGraph1.CH_graph");
+    Loader chGraphLoader = Loader("../input/USA.NY.CHv2_graph");
     Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/artifGraph1.CH_ranks");
+    Loader ranksLoader = Loader("../input/USA.NY.CHv2_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
-    Loader tripsLoader = Loader("../input/artif1_1000randomTrips");
+    Loader tripsLoader = Loader("../input/NY100randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -62,7 +62,7 @@ void getDijkstraPathForTrip() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 2;
+    unsigned int chosenTrip = 4;
     unsigned long long int distance = BasicDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
 
     delete dijkstraGraph;
@@ -71,12 +71,12 @@ void getDijkstraPathForTrip() {
 
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
-    Loader chGraphLoader = Loader("../input/artifGraph1.CH_graph");
+    Loader chGraphLoader = Loader("../input/artifGraph1.CHv2_graph");
     Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/artifGraph1.CH_ranks");
+    Loader ranksLoader = Loader("../input/artifGraph1.CHv2_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
-    Loader unpackingDataLoader = Loader("../input/artifGraph1.CH_unpacking");
+    Loader unpackingDataLoader = Loader("../input/artifGraph1.CHv2_unpacking");
     map < pair < unsigned int, unsigned int >, unsigned int > unpackingData;
     unpackingDataLoader.loadUnpackingData(unpackingData);
 
@@ -84,7 +84,7 @@ void getCHPathForTrip() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 2;
+    unsigned int chosenTrip = 4;
 
     CHPathQueryManager qm(ranks, unpackingData);
     long long unsigned int distance = qm.findPath(trips.at(chosenTrip).first, trips.at(chosenTrip).second, *chGraph);
@@ -116,8 +116,8 @@ void runOneCHQuery() {
 
 //______________________________________________________________________________________________________________________
 int main() {
-    constructCH();
-    //compareDijkstraWithCH();
+    //constructCH();
+    compareDijkstraWithCH();
     //runOneCHQuery();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();

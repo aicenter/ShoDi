@@ -17,7 +17,7 @@ private:
     string inputFile;
     void parseGraphProblemLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
     void parseCoordinatesProblemLine(ifstream & input, unsigned int & nodes);
-    void parseEdges(ifstream & input, Graph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
     void parseNodesCoordinates(ifstream & input, vector < pair < int, int > > & x, unsigned int nodes);
     void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
     void processCoordinatesProblemLine(string & buffer, unsigned int & nodes);

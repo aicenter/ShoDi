@@ -29,15 +29,19 @@ Graph * Loader::loadGraph() {
     parseGraphProblemLine(input, nodes, edges);
     //printf("Nodes: %u, edges: %u.\n", nodes, edges);
 
-    Graph * graph = new Graph(nodes);
+    SimpleGraph * graph = new SimpleGraph(nodes);
     parseEdges(input, *graph, edges);
+
+    Graph * retvalGraph = new Graph(*graph);
+
+    delete graph;
 
     graphLoadTimer.finish();
     graphLoadTimer.printMeasuredTime();
 
     input.close();
 
-    return graph;
+    return retvalGraph;
 
 }
 
@@ -131,7 +135,7 @@ void Loader::processGraphProblemLine(string &buffer, unsigned int &nodes, unsign
 }
 
 //______________________________________________________________________________________________________________________
-void Loader::parseEdges(ifstream & input, Graph & graph, unsigned int edges) {
+void Loader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges) {
     unsigned int loadededgescnt = 0;
     while (loadededgescnt < edges) {
         string buffer;
