@@ -18,23 +18,23 @@
 
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.NY.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.BAY.gr");
     Graph * graph = graphLoader.loadGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.NY.CHv2", *graph);
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.BAY.CH", *graph);
     delete graph;
 }
 
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCH() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.NY.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.BAY.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader chGraphLoader = Loader("../input/USA.NY.CHv2_graph");
+    Loader chGraphLoader = Loader("../input/USA.BAY.CH_graph");
     Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/USA.NY.CHv2_ranks");
+    Loader ranksLoader = Loader("../input/USA.BAY.CH_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
-    Loader tripsLoader = Loader("../input/NY100randomTrips");
+    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
