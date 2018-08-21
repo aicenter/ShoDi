@@ -11,6 +11,9 @@
 
 using namespace std;
 
+// This class is responsible for the Contraction Hierarchies 'path' queries - when we require the actual path and not
+// only the distance between two points.
+//______________________________________________________________________________________________________________________
 class CHPathQueryManager : public CHQueryManager {
 public:
     CHPathQueryManager(vector<unsigned int> & x, map < pair < unsigned int, unsigned int >, unsigned int > & y);

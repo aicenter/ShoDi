@@ -12,6 +12,8 @@
 
 using namespace std;
 
+// Class representing a graph.
+//______________________________________________________________________________________________________________________
 class Graph{
 private:
     vector< vector < pair< unsigned int, long long unsigned int > > > followingNodes;

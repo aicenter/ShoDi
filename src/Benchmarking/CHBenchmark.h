@@ -11,6 +11,9 @@
 
 using namespace std;
 
+// A class that allows us to run Contraction Hierarchies over a vector of trips. The time of the queries is recorded
+// and returned.
+//______________________________________________________________________________________________________________________
 class CHBenchmark {
 public:
     static void runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks);

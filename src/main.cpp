@@ -16,6 +16,8 @@
 #include "CH/CHPathQueryManager.h"
 
 
+// This function will construct Contraction Hierarchies from a given graph. This means preprocessing the graph and
+// and saving the structures into a file.
 //______________________________________________________________________________________________________________________
 void constructCH() {
     Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
@@ -26,6 +28,8 @@ void constructCH() {
     delete graph;
 }
 
+// Runs Dijkstra and Contraction Hierarchies over some set of trips and compares the run times. Dijkstra and CH are run
+// one after each other.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCHMemoryEconomical() {
     Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
@@ -56,6 +60,10 @@ void compareDijkstraWithCHMemoryEconomical() {
 
 }
 
+// Runs Dijkstra and Contraction Hierarchies over some set of trips and compares the run times. Dijkstra and CH are run
+// basically together, which increases memory requirements by a fair amount, because there will be two copies of the
+// graph at the same time in the memory - one for the Dijkstra and second with shortcuts and additional information
+// (such as node ranks) for CH. For this reason the compareDijkstraWithCHMemoryEconomical() should be preferred.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCH() {
     Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
@@ -85,6 +93,7 @@ void compareDijkstraWithCH() {
 
 }
 
+// Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip() {
     Loader dijkstraGraphLoader = Loader("../input/artifGraph1.gr");
@@ -101,6 +110,8 @@ void getDijkstraPathForTrip() {
 
 }
 
+// Will print the node sequence on a certain path computed by Contraction Hierarchies - this means that the paths will
+// be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
     Loader chGraphLoader = Loader("../input/artifGraph1.CHv2_graph");
@@ -125,6 +136,7 @@ void getCHPathForTrip() {
     delete chGraph;
 }
 
+// Runs one CH query, but doesn't print the path, only the distance.
 //______________________________________________________________________________________________________________________
 void runOneCHQuery() {
     Loader chGraphLoader = Loader("../input/artifGraph1.CH_graph");
@@ -146,6 +158,7 @@ void runOneCHQuery() {
     delete chGraph;
 }
 
+// Simple mainfunction, uncomment the function you want to use.
 //______________________________________________________________________________________________________________________
 int main() {
     //constructCH();

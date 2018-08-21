@@ -6,7 +6,7 @@
 #ifndef TRANSIT_NODE_ROUTING_DIJKSTRANODE_H
 #define TRANSIT_NODE_ROUTING_DIJKSTRANODE_H
 
-
+//______________________________________________________________________________________________________________________
 class DijkstraNode {
 public:
     DijkstraNode(unsigned int x, long long unsigned int y);

@@ -6,7 +6,7 @@
 #ifndef TRANSIT_NODE_ROUTING_CHNODE_H
 #define TRANSIT_NODE_ROUTING_CHNODE_H
 
-
+//______________________________________________________________________________________________________________________
 class CHNode {
 public:
     CHNode(const unsigned int x, const int y);

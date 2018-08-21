@@ -12,6 +12,12 @@
 
 using namespace std;
 
+// This function is responsible for loading all the input files. It can load graphs, trips, data for Contraction
+// Hierarchies (node ranks, unpacking data)...
+// For graphs, the 9th DIMACS Implementation Challenge format is used. Information about the format along with some
+// sample graphs that can be directly used with this program can be found here:
+// http://www.dis.uniroma1.it/challenge9/download.shtml
+//______________________________________________________________________________________________________________________
 class Loader{
 private:
     string inputFile;

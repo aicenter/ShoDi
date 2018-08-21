@@ -15,6 +15,10 @@
 
 using namespace std;
 
+// Auxiliary function for validating whether the graph is connected. This is managed by a simple BFS search.
+// We run a BFS from one node and after it ends, we check if all nodes were visited. If they weren't, we add more random
+// edges and then check again.
+//______________________________________________________________________________________________________________________
 bool validateConnected( vector<vector<pair<unsigned int, unsigned int> > > & graph) {
     vector<bool> visited(NODES_CNT, false);
 
@@ -43,6 +47,12 @@ bool validateConnected( vector<vector<pair<unsigned int, unsigned int> > > & gra
     return true;
 }
 
+// This program can generate a random graph with a certain amount of nodes. The graph is guaranteed to be connected.
+// The generated graph is undirected (more precisely for every edge v->u an edge u->v with the same weight is also
+// added). The graph is then printed out in a format which can be loaded by the Loader class. There is no guaranteed
+// average degree of the generated graph and generated graphs tend to have a higher average degree than real world
+// road graphs.
+//______________________________________________________________________________________________________________________
 int main() {
     vector<vector<pair<unsigned int, unsigned int> > > graph;
 

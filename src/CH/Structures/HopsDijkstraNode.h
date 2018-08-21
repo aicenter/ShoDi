@@ -8,6 +8,7 @@
 
 #include "../../Dijkstra/DijkstraNode.h"
 
+//______________________________________________________________________________________________________________________
 class HopsDijkstraNode : public DijkstraNode {
 public:
     HopsDijkstraNode(unsigned int x, long long unsigned int y, unsigned int z);

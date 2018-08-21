@@ -9,6 +9,9 @@
 #define NODES_CNT 435666 //23947347
 #define TRIPS_AMOUNT 100
 
+// Auxiliary program for generating random trips with source and target nodes in a certain range.
+// Using rand() isn't generally the best way to generate truly random numbers, but it's random enough for our needs.
+//______________________________________________________________________________________________________________________
 int main() {
     printf("%u\n", TRIPS_AMOUNT);
     for (unsigned int i = 0; i < TRIPS_AMOUNT; i++) {

@@ -13,6 +13,9 @@ CHPathQueryManager::CHPathQueryManager(vector<unsigned int> & x, map < pair < un
 
 }
 
+// The query algorithm is already described briefly in the 'CHQueryManager.cpp' file. Here it works exactly the same,
+// only we have to store some additional information such as previous nodes, which can be later used to reconstruct the
+// path. After we find the shortest path, we call the outputPath() function which does the actual path reconstruction.
 //______________________________________________________________________________________________________________________
 long long unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();
@@ -128,6 +131,9 @@ long long unsigned int CHPathQueryManager::findPath(const unsigned int source, c
     return shortestFound;
 }
 
+// This function fills the nodes on the path in the Contraction Hierarchies graph from the fromPrev and toPrev arrays
+// by calling the fillFromPath() and fillToPath() functions and then calls the unpackPrevious() and unpackFollowing()
+// functions which print the actual path by unpacking the shortcuts and printing only edges in the original graph.
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::outputPath(const unsigned int meetingNode, const unsigned int * fromPrev, const unsigned int * toPrev) {
     printf("~~~ Outputting shortest path (unpacked from CH) ~~~\n");

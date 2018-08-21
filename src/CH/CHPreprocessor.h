@@ -6,7 +6,6 @@
 #ifndef TRANSIT_NODE_ROUTING_CHPREPROCESSOR_H
 #define TRANSIT_NODE_ROUTING_CHPREPROCESSOR_H
 
-#include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
@@ -16,6 +15,8 @@
 
 using namespace std;
 
+// This class is responsible for preprocessing a given graph for the Contraction Hierarchies.
+//______________________________________________________________________________________________________________________
 class CHPreprocessor {
 public:
     static void preprocessAndSave(string filePath, Graph & graph);
@@ -33,8 +34,8 @@ private:
     static unsigned long long int longestPossibleShortcut(const unsigned int source);
     static void updateNeighboursPriorities(const unsigned int x, Graph & graph, CHpriorityQueue & priorityQueue);
     static long long unsigned int runRestrictedDijkstra(const unsigned int source, const unsigned int target, const long long unsigned int shortcutLength, const Graph & graph);
-    static void oneToManyRestrictedDijkstra(const unsigned int source, unordered_set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX);
-    static void oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, unordered_set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, unsigned int hoplimit = 5, unsigned int maxexpanded = 100);
+    static void oneToManyRestrictedDijkstra(const unsigned int source, const long long unsigned int upperBound, Graph & graph);
+    static void oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, const long long unsigned int upperBound, Graph & graph, unsigned int hoplimit = 5, unsigned int maxexpanded = 100);
     static void manyToManyWithBuckets(Graph & graph, bool deep);
     static void initBuckets(const unsigned int x, Graph & graph, long long unsigned int & lowestBucketVal);
     static void oneToManyWithBuckets(const unsigned int source, const long long unsigned int upperBound, Graph & graph, unsigned int hoplimit = 5, unsigned int maxexpanded = 1000);

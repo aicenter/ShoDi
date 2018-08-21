@@ -9,12 +9,17 @@
 #include "CHQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
 
-
 //______________________________________________________________________________________________________________________
 CHQueryManager::CHQueryManager(vector<unsigned int> & x) : ranks(x) {
 
 }
 
+// We use the query algorithm that was described in the "Contraction Hierarchies: Faster and Simpler Hierarchical
+// Routing in Road Networks" article by Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
+// Basically, the query is a modified bidirectional Dijkstra query, where from the source node we only expand following
+// nodes with higher contraction rank than the current node and from the target we only expand previous nodes with
+// higher contraction rank than the current node. Both scopes will eventually meet in the node with the highest
+// contraction rank from all nodes in the path.
 //______________________________________________________________________________________________________________________
 long long unsigned int CHQueryManager::findDistance(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();

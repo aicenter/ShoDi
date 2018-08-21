@@ -10,6 +10,10 @@
 
 using namespace std;
 
+// This class provides tools for validation whether the Dijkstra and Contraction Hierarchies provide the same results.
+// Since Dijkstra is pretty simple, it serves us as a reference - if Contraction Hierarchies results differ from the
+// Dijkstra, something is probably wrong with the Contraction Hierarchies implementation.
+//______________________________________________________________________________________________________________________
 class CorectnessValidator {
 public:
     static bool validate(vector < long long unsigned int > & a, vector < long long unsigned int > & b);

@@ -11,6 +11,10 @@
 
 using namespace std;
 
+// Class representing a simple graph - Simple graph is a graph where there only exists at most one edge between each
+// pair of nodes. Simple graph doesn't contain multiple edges (parallel edges). In our case, if there are more edges
+// than one between two nodes in the original graph, we only preserve the one with the lowest weight.
+//______________________________________________________________________________________________________________________
 class SimpleGraph{
 private:
     vector< map < unsigned int, long long unsigned int > > followingNodes;

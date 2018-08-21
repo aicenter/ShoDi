@@ -9,6 +9,8 @@
 
 #include "../GraphBuilder/Graph.h"
 
+// A simple implementation of a basic Dijkstra's algorithm, which we compare the CH with.
+//______________________________________________________________________________________________________________________
 class BasicDijkstra {
 public:
     static long long unsigned int run(const unsigned int source, const unsigned int target, const Graph & graph);

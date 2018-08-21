@@ -7,9 +7,12 @@
 #define TRANSIT_NODE_ROUTING_TIMER_H
 
 #include <chrono>
+#include <string>
 
 using namespace std;
 
+// Auxiliary class used for measurement. Each instance serves as a separate timer.
+//______________________________________________________________________________________________________________________
 class Timer {
 public:
     Timer(const string x);
