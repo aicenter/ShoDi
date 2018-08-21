@@ -210,7 +210,7 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, UpdateableGr
         } else {
             contracted[current.id] = true;
             adjustNeighbourgDegrees(current.id, graph);
-            actuallyAddShortcuts(graph);
+            actuallyAddShortcuts(graph, current.id);
             clearStructures();
             updateNeighboursPriorities(current.id, graph, priorityQueue);
             nodeRanks[current.id] = CHrank++;
@@ -350,11 +350,12 @@ unsigned int CHPreprocessor::calculateShortcutsAmount() {
 // only calculating it's weight. The shortcuts are only added if they are necessary, that means only if we didn't find
 // a shorter or equal length path without the contracted node.
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::actuallyAddShortcuts(UpdateableGraph & graph) {
+void CHPreprocessor::actuallyAddShortcuts(UpdateableGraph & graph, unsigned int x) {
     for(auto iter1 = sources.begin(); iter1 != sources.end(); ++iter1) {
+        graph.removeEdge((*iter1), x);
         for(auto iter2 = targets.begin(); iter2 != targets.end(); ++iter2) {
+            graph.removeEdge(x, (*iter2));
             if(*iter1 != *iter2) {
-                graph.removeEdge((*iter1), (*iter2));
                 if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;
@@ -374,9 +375,10 @@ void CHPreprocessor::actuallyAddShortcuts(UpdateableGraph & graph) {
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::actuallyAddShortcutsWithUnpackingData(UpdateableGraph & graph, unsigned int x) {
     for(auto iter1 = sources.begin(); iter1 != sources.end(); ++iter1) {
+        graph.removeEdge((*iter1), x);
         for(auto iter2 = targets.begin(); iter2 != targets.end(); ++iter2) {
+            graph.removeEdge(x, (*iter2));
             if(*iter1 != *iter2) {
-                graph.removeEdge((*iter1), (*iter2));
                 if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;

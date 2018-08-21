@@ -45,6 +45,7 @@ Graph * Loader::loadGraph() {
 
 }
 
+//______________________________________________________________________________________________________________________
 Graph * Loader::loadCHGraphWithShortcuts(string shortcutsFile) {
     ifstream input, shortcutsInput;
     input.open(this->inputFile);
@@ -77,6 +78,7 @@ Graph * Loader::loadCHGraphWithShortcuts(string shortcutsFile) {
     graphLoadTimer.printMeasuredTime();
 
     input.close();
+    shortcutsInput.close();
 
     return retvalGraph;
 }

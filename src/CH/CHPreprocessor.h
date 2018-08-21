@@ -42,7 +42,7 @@ private:
 
     static void getPossibleShortcuts(const unsigned int i, UpdateableGraph & graph, bool deep);
     static unsigned int calculateShortcutsAmount();
-    static void actuallyAddShortcuts(UpdateableGraph & graph);
+    static void actuallyAddShortcuts(UpdateableGraph & graph, unsigned int x);
     static void actuallyAddShortcutsWithUnpackingData(UpdateableGraph & graph, unsigned int x);
     static void clearStructures();
 

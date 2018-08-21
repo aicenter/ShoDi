@@ -20,10 +20,12 @@
 // and saving the structures into a file.
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.FLA.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.NY.gr");
+    //Loader graphLoader = Loader("../input/Rome-road.gr");
     //Loader graphLoader = Loader("input/Rome-road.gr");
     UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.FLA.CH_test", *graph);
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.NY.CH_measure", *graph);
+    //CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/Rome_debug3", *graph);
     //CHPreprocessor::preprocessAndSaveWithUnpackingData("input/Rome_test", *graph);
     delete graph;
 }
@@ -32,9 +34,9 @@ void constructCH() {
 // one after each other.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCHMemoryEconomical() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.FLA.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.NY.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/FLA100randomTrips");
+    Loader tripsLoader = Loader("../input/NY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -42,9 +44,9 @@ void compareDijkstraWithCHMemoryEconomical() {
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
     delete dijkstraGraph;
 
-    Loader chGraphLoader = Loader("../input/USA.FLA.CH_graph");
-    Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/USA.FLA.CH_ranks");
+    Loader chGraphLoader = Loader("../input/USA-road-t.NY.gr");
+    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.NY.CH_measure_shortcuts");
+    Loader ranksLoader = Loader("../input/USA.NY.CH_measure_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
@@ -68,9 +70,9 @@ void compareDijkstraWithCHMemoryEconomical() {
 void compareDijkstraWithCH() {
     Loader dijkstraGraphLoader = Loader("../input/Rome-road.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader chGraphLoader = Loader("../input/Rome-road.CH_graph");
-    Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/Rome-road.CH_ranks");
+    Loader chGraphLoader = Loader("../input/Rome-road.gr");
+    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/Rome_debug3_shortcuts");
+    Loader ranksLoader = Loader("../input/Rome_debug3_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
@@ -96,14 +98,14 @@ void compareDijkstraWithCH() {
 // Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip() {
-    Loader dijkstraGraphLoader = Loader("../input/artifGraph1.gr");
+    Loader dijkstraGraphLoader = Loader("../input/Rome-road.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
-    Loader tripsLoader = Loader("../input/artif1_1000randomTrips");
+    Loader tripsLoader = Loader("../input/rome_1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 4;
+    unsigned int chosenTrip = 0;
     unsigned long long int distance = BasicDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
 
     delete dijkstraGraph;
@@ -114,20 +116,20 @@ void getDijkstraPathForTrip() {
 // be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
-    Loader chGraphLoader = Loader("../input/artifGraph1.CHv2_graph");
-    Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/artifGraph1.CHv2_ranks");
+    Loader chGraphLoader = Loader("../input/Rome-road.gr");
+    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/Rome_debug3_shortcuts");
+    Loader ranksLoader = Loader("../input/Rome_debug3_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
-    Loader unpackingDataLoader = Loader("../input/artifGraph1.CHv2_unpacking");
+    Loader unpackingDataLoader = Loader("../input/Rome_debug3_unpacking");
     map < pair < unsigned int, unsigned int >, unsigned int > unpackingData;
     unpackingDataLoader.loadUnpackingData(unpackingData);
 
-    Loader tripsLoader = Loader("../input/artif1_1000randomTrips");
+    Loader tripsLoader = Loader("../input/rome_1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 4;
+    unsigned int chosenTrip = 0;
 
     CHPathQueryManager qm(ranks, unpackingData);
     long long unsigned int distance = qm.findPath(trips.at(chosenTrip).first, trips.at(chosenTrip).second, *chGraph);
@@ -161,9 +163,9 @@ void runOneCHQuery() {
 // Simple mainfunction, uncomment the function you want to use.
 //______________________________________________________________________________________________________________________
 int main() {
-    constructCH();
+    //constructCH();
     //compareDijkstraWithCH();
-    //compareDijkstraWithCHMemoryEconomical();
+    compareDijkstraWithCHMemoryEconomical();
     //runOneCHQuery();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
