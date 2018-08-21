@@ -18,23 +18,55 @@
 
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.BAY.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
+    //Loader graphLoader = Loader("input/Rome-road.gr");
     Graph * graph = graphLoader.loadGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.BAY.CH", *graph);
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.COL.CH_test", *graph);
+    //CHPreprocessor::preprocessAndSaveWithUnpackingData("input/Rome_test", *graph);
     delete graph;
 }
 
 //______________________________________________________________________________________________________________________
-void compareDijkstraWithCH() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.BAY.gr");
+void compareDijkstraWithCHMemoryEconomical() {
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader chGraphLoader = Loader("../input/USA.BAY.CH_graph");
+    Loader tripsLoader = Loader("../input/COL1000randomTrips");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    vector<long long unsigned int> dijkstraDistanes(trips.size());
+    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
+    delete dijkstraGraph;
+
+    Loader chGraphLoader = Loader("../input/USA.COL.CH_test_graph");
     Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/USA.BAY.CH_ranks");
+    Loader ranksLoader = Loader("../input/USA.COL.CH_test_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
-    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    vector<long long unsigned int> chDistances(trips.size());
+    double chTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, ranks, chDistances);
+    //for (unsigned int i = 0; i < 20; i++) {
+    //    printf("Dijkstra / ch for trip %i: %llu / %llu (trips index from 0)\n", i, dijkstraDistanes[i], chDistances[i]);
+    //}
+    CorectnessValidator::validateVerbose(dijkstraDistanes, chDistances);
+    printf("CH were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete chGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void compareDijkstraWithCH() {
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    Loader chGraphLoader = Loader("../input/USA.COL.CH_graph");
+    Graph * chGraph = chGraphLoader.loadGraph();
+    Loader ranksLoader = Loader("../input/USA.COL.CH_ranks");
+    vector<unsigned int> ranks;
+    ranksLoader.loadRanks(ranks);
+
+    Loader tripsLoader = Loader("../input/COL1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -117,7 +149,8 @@ void runOneCHQuery() {
 //______________________________________________________________________________________________________________________
 int main() {
     //constructCH();
-    compareDijkstraWithCH();
+    //compareDijkstraWithCH();
+    compareDijkstraWithCHMemoryEconomical();
     //runOneCHQuery();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();

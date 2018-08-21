@@ -14,6 +14,7 @@
 
 using namespace std;
 
+
 // Initialization only
 //______________________________________________________________________________________________________________________
 vector<bool> CHPreprocessor::contracted(0);
@@ -21,10 +22,12 @@ vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
 vector<unsigned int> CHPreprocessor::nodeRanks(0);
 vector<long long unsigned int> CHPreprocessor::dijkstraDistance(0);
 vector<pair<pair<unsigned int, unsigned int>, unsigned int>> CHPreprocessor::unpacking(0);
-map<pair<unsigned int, unsigned int>, long long unsigned int> CHPreprocessor::distances;
-map<pair<unsigned int, unsigned int>, long long unsigned int> CHPreprocessor::distancesWithoutX;
+unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distances;
+unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distancesWithoutX;
 vector<unsigned int> CHPreprocessor::sources(0);
 vector<unsigned int> CHPreprocessor::targets(0);
+unordered_set<unsigned int> CHPreprocessor::targetsSet;
+unordered_map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > CHPreprocessor::buckets;
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::preprocessAndSave(string filePath, Graph & graph) {
@@ -270,7 +273,7 @@ void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, Graph & gr
     vector < pair < unsigned int, long long unsigned int > > previousNodes = graph.incomingEdges(x);
     vector < pair < unsigned int, long long unsigned int > > nextNodes = graph.outgoingEdges(x);
 
-    set < unsigned int > alreadyUpdated;
+    unordered_set < unsigned int > alreadyUpdated;
     for(unsigned int i = 0; i < previousNodes.size(); i++) {
         if (alreadyUpdated.count(previousNodes.at(i).first) == 0 && ! contracted[previousNodes.at(i).first]) {
             getPossibleShortcuts(previousNodes.at(i).first, graph, true);
@@ -294,9 +297,9 @@ void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, Graph & gr
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::getPossibleShortcuts(const unsigned int i, Graph & graph, bool deep) {
-    getDistancesUsingNode(i, graph, distances, sources, targets);
+    getDistancesUsingNode(i, graph);
     CHPreprocessor::contracted[i] = true;
-    manyToManyWithBuckets(sources, targets, graph, distances, distancesWithoutX, deep);
+    manyToManyWithBuckets(graph, deep);
     CHPreprocessor::contracted[i] = false;
 }
 
@@ -353,41 +356,45 @@ void CHPreprocessor::clearStructures() {
     distancesWithoutX.clear();
     sources.clear();
     targets.clear();
+    targetsSet.clear();
+    buckets.clear();
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::getDistancesUsingNode(const unsigned int i, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distances, vector<unsigned int> & s, vector<unsigned int> & t ) {
-    vector< pair <unsigned int, long long unsigned int> > sources = graph.incomingEdges(i);
-    vector< pair <unsigned int, long long unsigned int> > targets = graph.outgoingEdges(i);
-    for(unsigned int j = 0; j < sources.size(); j++) {
-        for(unsigned int k = 0; k < targets.size(); k++) {
-            if(sources.at(j).first != targets.at(k).first && ! contracted[sources.at(j).first] && ! contracted[targets.at(k).first]) {
-                if (distances.count(make_pair(sources.at(j).first, targets.at(k).first))  == 1) {
-                    if(sources.at(j).second + targets.at(k).second < distances.at(make_pair(sources.at(j).first, targets.at(k).first))) {
-                        distances[(make_pair(sources.at(j).first, targets.at(k).first))] = sources.at(j).second + targets.at(k).second;
+void CHPreprocessor::getDistancesUsingNode(const unsigned int i, Graph & graph ) {
+    vector< pair <unsigned int, long long unsigned int> > i_sources = graph.incomingEdges(i);
+    vector< pair <unsigned int, long long unsigned int> > i_targets = graph.outgoingEdges(i);
+    for(unsigned int j = 0; j < i_sources.size(); j++) {
+        for(unsigned int k = 0; k < i_targets.size(); k++) {
+            if(i_sources.at(j).first != i_targets.at(k).first && ! contracted[i_sources.at(j).first] && ! contracted[i_targets.at(k).first]) {
+                if (distances.count(make_pair(i_sources.at(j).first, i_targets.at(k).first))  == 1) {
+                    if(i_sources.at(j).second + i_targets.at(k).second < distances.at(make_pair(i_sources.at(j).first, i_targets.at(k).first))) {
+                        distances[(make_pair(i_sources.at(j).first, i_targets.at(k).first))] = i_sources.at(j).second + i_targets.at(k).second;
                     }
                 } else {
-                    distances.insert(make_pair(make_pair(sources.at(j).first, targets.at(k).first),
-                                               sources.at(j).second + targets.at(k).second));
+                    distances.insert(make_pair(make_pair(i_sources.at(j).first, i_targets.at(k).first),
+                                               i_sources.at(j).second + i_targets.at(k).second));
                 }
             }
         }
     }
 
-    for(unsigned int i = 0; i < sources.size(); i++) {
-        if (! contracted[sources[i].first]) {
-            s.push_back(sources[i].first);
+    for(unsigned int i = 0; i < i_sources.size(); i++) {
+        if (! contracted[i_sources[i].first]) {
+            sources.push_back(i_sources[i].first);
         }
     }
-    for(unsigned int i = 0; i < targets.size(); i++) {
-        if (! contracted[targets[i].first]) {
-            t.push_back(targets[i].first);
+    for(unsigned int i = 0; i < i_targets.size(); i++) {
+        if (! contracted[i_targets[i].first]) {
+            targets.push_back(i_targets[i].first);
         }
     }
+
+    targetsSet.insert(targets.begin(), targets.end());
 }
 
 //______________________________________________________________________________________________________________________
-unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned int source, vector < unsigned int > & targets, map < pair < unsigned int, unsigned int >, unsigned long long int > & distances) {
+unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned int source) {
     long long unsigned int longest = 0;
     for(auto iter = targets.begin(); iter != targets.end(); ++iter) {
         //printf("Will find distance for: %u -> %u\n", source, *iter);
@@ -401,11 +408,10 @@ unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned in
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::manyToManyWithBuckets(vector < unsigned int > & sources, vector < unsigned int > & targets, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distances, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, bool deep) {
-    map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > buckets;
+void CHPreprocessor::manyToManyWithBuckets(Graph & graph, bool deep) {
     long long unsigned int lowestBucketVal = ULLONG_MAX;
     for(unsigned int i = 0; i < targets.size(); i++) {
-        initBuckets(targets[i], graph, buckets, lowestBucketVal);
+        initBuckets(targets[i], graph, lowestBucketVal);
     }
 
     unsigned int searchspace = 1000;
@@ -415,15 +421,14 @@ void CHPreprocessor::manyToManyWithBuckets(vector < unsigned int > & sources, ve
         hops = 2;
     }
 
-    set <unsigned int> targetsSet(targets.begin(), targets.end());
     for(unsigned int i = 0; i < sources.size(); i++) {
-        long long unsigned int longestShortcut = longestPossibleShortcut(sources[i], targets, distances);
-        oneToManyWithBuckets(sources[i], targetsSet, longestShortcut - lowestBucketVal, graph, distancesWithoutX, buckets, hops, searchspace);
+        long long unsigned int longestShortcut = longestPossibleShortcut(sources[i]);
+        oneToManyWithBuckets(sources[i], longestShortcut - lowestBucketVal, graph, hops, searchspace);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::initBuckets(const unsigned int x, Graph & graph, map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > & buckets, long long unsigned int & lowestBucketVal) {
+void CHPreprocessor::initBuckets(const unsigned int x, Graph & graph, long long unsigned int & lowestBucketVal) {
     const vector<pair<unsigned int, long long unsigned int>> neighbours = graph.incomingEdges(x);
     for(unsigned int i = 0; i < neighbours.size(); i++) {
         if (! contracted[neighbours[i].first]) {
@@ -440,7 +445,7 @@ void CHPreprocessor::initBuckets(const unsigned int x, Graph & graph, map<unsign
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > & buckets, unsigned int hoplimit, unsigned int maxexpanded) {
+void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const long long unsigned int upperBound, Graph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
     vector<unsigned int> nodesWithChangedDistances;
     unsigned int targetsAmount = targets.size();
     unsigned int targetsFound = 0;
@@ -469,7 +474,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, set<unsigne
             continue;
         }
 
-        if (targets.count(current.ID) == 1) {
+        if (targetsSet.count(current.ID) == 1) {
             targetsFound++;
             if (targetsFound == targetsAmount) {
                 break;
@@ -511,7 +516,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, set<unsigne
 
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, unsigned int hoplimit, unsigned int maxexpanded) {
+void CHPreprocessor::oneToManyRestrictedDijkstraWithHopLimit(const unsigned int source, unordered_set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX, unsigned int hoplimit, unsigned int maxexpanded) {
     vector<unsigned int> nodesWithChangedDistances;
     unsigned int targetsAmount = targets.size();
     unsigned int targetsFound = 0;
@@ -572,7 +577,7 @@ void CHPreprocessor::oneToManyRestrictedDijkstraWithHopLimit(const unsigned int 
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::oneToManyRestrictedDijkstra(const unsigned int source, set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX) {
+void CHPreprocessor::oneToManyRestrictedDijkstra(const unsigned int source, unordered_set<unsigned int> & targets, const long long unsigned int upperBound, Graph & graph, map<pair<unsigned int, unsigned int>, long long unsigned int> & distancesWithoutX) {
     vector<unsigned int> nodesWithChangedDistances;
     unsigned int targetsAmount = targets.size();
     unsigned int targetsFound = 0;

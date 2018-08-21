@@ -4,7 +4,7 @@
 //
 
 #include <string>
-#include <BasicDijkstra.h>
+#include "../Dijkstra/BasicDijkstra.h"
 #include "../Timer/Timer.h"
 #include "DijkstraBenchmark.h"
 
