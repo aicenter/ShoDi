@@ -358,8 +358,9 @@ void CHPreprocessor::actuallyAddShortcuts(UpdateableGraph & graph) {
                 if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;
-                    graph.addEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2)));
-                    allShortcuts.push_back(make_pair(make_pair(*iter1, *iter2), distances.at(make_pair(*iter1, *iter2))));
+                    if ( graph.addEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2))) ) {
+                        allShortcuts.push_back(make_pair(make_pair(*iter1, *iter2), distances.at(make_pair(*iter1, *iter2))));
+                    }
                 }
             }
         }
@@ -379,9 +380,10 @@ void CHPreprocessor::actuallyAddShortcutsWithUnpackingData(UpdateableGraph & gra
                 if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;
-                    graph.addEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2)));
-                    unpacking.push_back(make_pair(make_pair(*iter1, *iter2), x));
-                    allShortcuts.push_back(make_pair(make_pair(*iter1, *iter2), distances.at(make_pair(*iter1, *iter2))));
+                    if( graph.addEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2))) ) {
+                        unpacking.push_back(make_pair(make_pair(*iter1, *iter2), x));
+                        allShortcuts.push_back(make_pair(make_pair(*iter1, *iter2), distances.at(make_pair(*iter1, *iter2))));
+                    }
                 }
             }
         }
