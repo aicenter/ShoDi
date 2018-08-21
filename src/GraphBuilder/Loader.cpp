@@ -46,6 +46,34 @@ Graph * Loader::loadGraph() {
 }
 
 //______________________________________________________________________________________________________________________
+UpdateableGraph * Loader::loadUpdateableGraph() {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Started loading graph!\n");
+
+    Timer graphLoadTimer("Graph loading");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges;
+    parseGraphProblemLine(input, nodes, edges);
+    //printf("Nodes: %u, edges: %u.\n", nodes, edges);
+
+    UpdateableGraph * graph = new UpdateableGraph(nodes);
+    parseEdges(input, *graph, edges);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+
+    return graph;
+}
+
+//______________________________________________________________________________________________________________________
 void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     ifstream input;
     input.open(this->inputFile);
@@ -136,6 +164,23 @@ void Loader::processGraphProblemLine(string &buffer, unsigned int &nodes, unsign
 
 //______________________________________________________________________________________________________________________
 void Loader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges) {
+    unsigned int loadededgescnt = 0;
+    while (loadededgescnt < edges) {
+        string buffer;
+        getline(input, buffer);
+        if (buffer[0] == 'a') {
+            unsigned int from, to;
+            long long unsigned int weight;
+            getEdge(buffer, from, to, weight);
+            graph.addEdge(from, to, weight);
+            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
+            loadededgescnt++;
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges) {
     unsigned int loadededgescnt = 0;
     while (loadededgescnt < edges) {
         string buffer;

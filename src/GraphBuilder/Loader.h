@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include "Graph.h"
+#include "UpdateableGraph.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ private:
     void parseGraphProblemLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
     void parseCoordinatesProblemLine(ifstream & input, unsigned int & nodes);
     void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges);
     void parseNodesCoordinates(ifstream & input, vector < pair < int, int > > & x, unsigned int nodes);
     void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
     void processCoordinatesProblemLine(string & buffer, unsigned int & nodes);
@@ -35,6 +37,7 @@ private:
 public:
     Loader(string inputFile);
     Graph * loadGraph();
+    UpdateableGraph * loadUpdateableGraph();
     void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
     void loadCoordinates(vector < pair <int, int > > & x);
     void loadRanks(vector < unsigned int > & x);

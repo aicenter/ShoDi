@@ -20,10 +20,10 @@
 // and saving the structures into a file.
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.FLA.gr");
     //Loader graphLoader = Loader("input/Rome-road.gr");
-    Graph * graph = graphLoader.loadGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.COL.CH_test", *graph);
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.FLA.CH_test", *graph);
     //CHPreprocessor::preprocessAndSaveWithUnpackingData("input/Rome_test", *graph);
     delete graph;
 }
@@ -32,9 +32,9 @@ void constructCH() {
 // one after each other.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCHMemoryEconomical() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.FLA.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/COL1000randomTrips");
+    Loader tripsLoader = Loader("../input/FLA100randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -42,9 +42,9 @@ void compareDijkstraWithCHMemoryEconomical() {
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
     delete dijkstraGraph;
 
-    Loader chGraphLoader = Loader("../input/USA.COL.CH_test_graph");
+    Loader chGraphLoader = Loader("../input/USA.FLA.CH_graph");
     Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/USA.COL.CH_test_ranks");
+    Loader ranksLoader = Loader("../input/USA.FLA.CH_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
@@ -66,15 +66,15 @@ void compareDijkstraWithCHMemoryEconomical() {
 // (such as node ranks) for CH. For this reason the compareDijkstraWithCHMemoryEconomical() should be preferred.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCH() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
+    Loader dijkstraGraphLoader = Loader("../input/Rome-road.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader chGraphLoader = Loader("../input/USA.COL.CH_graph");
+    Loader chGraphLoader = Loader("../input/Rome-road.CH_graph");
     Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/USA.COL.CH_ranks");
+    Loader ranksLoader = Loader("../input/Rome-road.CH_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
-    Loader tripsLoader = Loader("../input/COL1000randomTrips");
+    Loader tripsLoader = Loader("../input/rome_1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -161,9 +161,9 @@ void runOneCHQuery() {
 // Simple mainfunction, uncomment the function you want to use.
 //______________________________________________________________________________________________________________________
 int main() {
-    //constructCH();
+    constructCH();
     //compareDijkstraWithCH();
-    compareDijkstraWithCHMemoryEconomical();
+    //compareDijkstraWithCHMemoryEconomical();
     //runOneCHQuery();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
