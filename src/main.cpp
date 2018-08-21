@@ -20,11 +20,11 @@
 // and saving the structures into a file.
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.NY.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
     //Loader graphLoader = Loader("../input/Rome-road.gr");
     //Loader graphLoader = Loader("input/Rome-road.gr");
     UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.NY.CH_measure", *graph);
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.COL.CH_measure2", *graph);
     //CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/Rome_debug3", *graph);
     //CHPreprocessor::preprocessAndSaveWithUnpackingData("input/Rome_test", *graph);
     delete graph;
@@ -34,9 +34,9 @@ void constructCH() {
 // one after each other.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCHMemoryEconomical() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.NY.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/NY1000randomTrips");
+    Loader tripsLoader = Loader("../input/COL100randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -44,9 +44,9 @@ void compareDijkstraWithCHMemoryEconomical() {
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
     delete dijkstraGraph;
 
-    Loader chGraphLoader = Loader("../input/USA-road-t.NY.gr");
-    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.NY.CH_measure_shortcuts");
-    Loader ranksLoader = Loader("../input/USA.NY.CH_measure_ranks");
+    Loader chGraphLoader = Loader("../input/USA-road-t.COL.gr");
+    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.COL.CH_measure2_shortcuts");
+    Loader ranksLoader = Loader("../input/USA.COL.CH_measure2_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
