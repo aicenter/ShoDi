@@ -102,37 +102,28 @@ void CHPreprocessor::preprocessAndSaveWithUnpackingData(string filePath, Updatea
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::flushCHgraph(string & filePath, UpdateableGraph & graph) {
-    flushGraph(filePath, graph);
+    flushShortcuts(filePath, graph);
     flushCHRanks(filePath);
 }
 
 // Simply saves the graph with the shortcuts to a file in a format so that it could be later loaded again.
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::flushGraph(string & filePath, UpdateableGraph & graph) {
-  /*  long long unsigned int edges = 0;
-    for(unsigned int i = 0; i < graph.nodes(); i++) {
-        edges += graph.outgoingEdges(i).size();
-    }
+void CHPreprocessor::flushShortcuts(string & filePath, UpdateableGraph & graph) {
+    long long unsigned int shortcuts = allShortcuts.size();
 
     ofstream output;
-    output.open(filePath + "_graph");
+    output.open(filePath + "_shortcuts");
     if( ! output.is_open() ) {
-        printf("Couldn't open file '%s'!", (filePath + "_graph").c_str());
+        printf("Couldn't open file '%s'!", (filePath + "_shortcuts").c_str());
     }
 
-    output << "c This file was created by the preprocessing process of Contraction Hiearchies." << endl;
-    output << "c This graph file contains original edges plus CH generated shortcuts." << endl;
-    output << "c This file should be used in pair with the _ranks file for expected results." << endl;
-    output << "p sp " << graph.nodes() << " " << edges << endl;
-    for(unsigned int i = 0; i < graph.nodes(); i++) {
-        vector < pair < unsigned int, long long unsigned int > > edges = graph.outgoingEdges(i);
-        for(unsigned int j = 0; j < edges.size(); j++) {
-            output << "a " << i+1 << " " << edges.at(j).first + 1 << " " << edges.at(j).second << endl;
-        }
+    output << shortcuts << endl;
+    for(long long unsigned int i = 0; i < shortcuts; i++) {
+        output << allShortcuts[i].first.first << " " <<  allShortcuts[i].first.second << " " << allShortcuts[i].second << endl;
     }
 
     output.close();
-*/
+
 }
 
 // Saves the Contraction Hierarchies node ranks to a file.

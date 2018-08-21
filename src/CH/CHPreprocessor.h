@@ -23,7 +23,7 @@ public:
     static void preprocessAndSaveWithUnpackingData(string filePath, UpdateableGraph & graph);
 private:
     static void flushCHgraph(string & filePath, UpdateableGraph & graph);
-    static void flushGraph(string & filePath, UpdateableGraph & graph);
+    static void flushShortcuts(string & filePath, UpdateableGraph & graph);
     static void flushCHRanks(string & filePath);
     static void flushUnpackingData(string & filePath);
     static void initializePriorityQueue(CHpriorityQueue & priorityQueue, UpdateableGraph & graph);
