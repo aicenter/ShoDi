@@ -20,14 +20,29 @@
 // and saving the structures into a file.
 //______________________________________________________________________________________________________________________
 void constructCH() {
-    Loader graphLoader = Loader("../input/USA-road-t.COL.gr");
+    Loader graphLoader = Loader("../input/USA-road-t.USA.gr");
     //Loader graphLoader = Loader("../input/Rome-road.gr");
     //Loader graphLoader = Loader("input/Rome-road.gr");
     UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.COL.CH_measure2", *graph);
+    CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/USA.USA.CH_new", *graph);
     //CHPreprocessor::preprocessAndSaveWithUnpackingData("../input/Rome_debug3", *graph);
     //CHPreprocessor::preprocessAndSaveWithUnpackingData("input/Rome_test", *graph);
     delete graph;
+}
+
+//______________________________________________________________________________________________________________________
+void additionalCHPreprocess() {
+    Loader chGraphLoader = Loader("../input/USA-road-t.COL.gr");
+    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.COL.CH_measure2_shortcuts");
+    Loader ranksLoader = Loader("../input/USA.COL.CH_measure2_ranks");
+    vector<unsigned int> ranks;
+    ranksLoader.loadRanks(ranks);
+
+    chGraph->removeUnnecesarryEdges(ranks);
+    chGraph->flushGraph("../input/USA.COL.CH_add");
+
+    delete chGraph;
+
 }
 
 // Runs Dijkstra and Contraction Hierarchies over some set of trips and compares the run times. Dijkstra and CH are run
@@ -44,8 +59,9 @@ void compareDijkstraWithCHMemoryEconomical() {
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
     delete dijkstraGraph;
 
-    Loader chGraphLoader = Loader("../input/USA-road-t.COL.gr");
-    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.COL.CH_measure2_shortcuts");
+    Loader chGraphLoader = Loader("../input/USA.COL.CH_add_ch_graph");
+    Graph * chGraph = chGraphLoader.loadCHGraph();
+    //Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.USA.CH_new_shortcuts");
     Loader ranksLoader = Loader("../input/USA.COL.CH_measure2_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
@@ -164,6 +180,7 @@ void runOneCHQuery() {
 //______________________________________________________________________________________________________________________
 int main() {
     //constructCH();
+    //additionalCHPreprocess();
     //compareDijkstraWithCH();
     compareDijkstraWithCHMemoryEconomical();
     //runOneCHQuery();

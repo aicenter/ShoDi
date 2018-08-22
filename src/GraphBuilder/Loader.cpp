@@ -46,6 +46,68 @@ Graph * Loader::loadGraph() {
 }
 
 //______________________________________________________________________________________________________________________
+Graph * Loader::loadCHGraph() {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Started loading CH graph!\n");
+
+    Timer graphLoadTimer("CH Graph loading");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges;
+    parseGraphProblemLine(input, nodes, edges);
+
+    Graph * graph = new Graph(nodes);
+    parseCHEdges(input, *graph, edges);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+
+    return graph;
+
+}
+
+//______________________________________________________________________________________________________________________
+ShrinkingGraph * Loader::loadCHWithShortcutsIntoShrinkingGraph(string shortcutsFile) {
+    ifstream input, shortcutsInput;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+    shortcutsInput.open(shortcutsFile);
+    if( ! shortcutsInput.is_open() ) {
+        printf("Couldn't open file '%s'!", shortcutsFile.c_str());
+    }
+
+    printf("Started loading graph!\n");
+
+    Timer graphLoadTimer("Graph loading");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges;
+    parseGraphProblemLine(input, nodes, edges);
+    //printf("Nodes: %u, edges: %u.\n", nodes, edges);
+
+    ShrinkingGraph * graph = new ShrinkingGraph(nodes);
+    parseEdges(input, *graph, edges);
+    parseShortcuts(shortcutsInput, *graph);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+    shortcutsInput.close();
+
+    return graph;
+}
+
+//______________________________________________________________________________________________________________________
 Graph * Loader::loadCHGraphWithShortcuts(string shortcutsFile) {
     ifstream input, shortcutsInput;
     input.open(this->inputFile);
@@ -235,6 +297,31 @@ void Loader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int 
 }
 
 //______________________________________________________________________________________________________________________
+void Loader::parseCHEdges(ifstream & input, Graph & graph, unsigned int edges) {
+    unsigned int loadededgescnt = 0;
+    while (loadededgescnt < edges) {
+        string buffer;
+        getline(input, buffer);
+        if (buffer[0] == 'b') {
+            unsigned int from, to;
+            long long unsigned int weight;
+            getEdge(buffer, from, to, weight);
+            graph.addFollowingNode(from, to, weight);
+            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
+            loadededgescnt++;
+        }
+        if (buffer[0] == 'c') {
+            unsigned int from, to;
+            long long unsigned int weight;
+            getEdge(buffer, from, to, weight);
+            graph.addPreviousNode(from, to, weight);
+            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
+            loadededgescnt++;
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
 void Loader::getEdge(string & buffer, unsigned int & from, unsigned int & to, long long unsigned int & weight) {
     unsigned int position = 2;
     unsigned int tmpfrom = 0;
@@ -277,6 +364,18 @@ void Loader::parseTrips(ifstream & input, vector < pair < unsigned int, unsigned
 
 //______________________________________________________________________________________________________________________
 void Loader::parseShortcuts(ifstream & input, SimpleGraph & graph) {
+    long long unsigned int shortcuts;
+    input >> shortcuts;
+    for(long long unsigned int i = 0; i < shortcuts; i++) {
+        unsigned int from, to;
+        long long unsigned int weight;
+        input >> from >> to >> weight;
+        graph.addEdge(from, to, weight);
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::parseShortcuts(ifstream & input, UpdateableGraph & graph) {
     long long unsigned int shortcuts;
     input >> shortcuts;
     for(long long unsigned int i = 0; i < shortcuts; i++) {

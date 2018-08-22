@@ -12,7 +12,7 @@
 using namespace std;
 
 class UpdateableGraph{
-private:
+protected:
     vector< unordered_map < unsigned int, long long unsigned int > > followingNodes;
     vector< unordered_map < unsigned int, long long unsigned int > > previousNodes;
 public:

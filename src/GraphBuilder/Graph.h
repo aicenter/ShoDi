@@ -22,6 +22,8 @@ public:
     Graph(unsigned int n);
     Graph(SimpleGraph & x);
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight);
+    void addFollowingNode(unsigned int x, unsigned int y, long long unsigned int weight);
+    void addPreviousNode(unsigned int x, unsigned int y, long long unsigned int weight);
     const unsigned int nodes() const;
     const vector<pair<unsigned int, long long unsigned int>> & incomingEdges(const unsigned int x)const;
     const vector<pair<unsigned int, long long unsigned int>> & outgoingEdges(const unsigned int x)const;

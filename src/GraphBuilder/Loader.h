@@ -10,6 +10,7 @@
 #include <map>
 #include "Graph.h"
 #include "UpdateableGraph.h"
+#include "ShrinkingGraph.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ private:
     void parseCoordinatesProblemLine(ifstream & input, unsigned int & nodes);
     void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
     void parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges);
+    void parseCHEdges(ifstream & input, Graph & graph, unsigned int edges);
     void parseNodesCoordinates(ifstream & input, vector < pair < int, int > > & x, unsigned int nodes);
     void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
     void processCoordinatesProblemLine(string & buffer, unsigned int & nodes);
@@ -33,12 +35,15 @@ private:
     void parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x);
     void getNodeCoordinates(string & buffer, unsigned int & node, int & coord1, int & coord2);
     void parseShortcuts(ifstream & input, SimpleGraph & graph);
+    void parseShortcuts(ifstream & input, UpdateableGraph & graph);
     void parseRanks(ifstream & input, vector < unsigned int > & x);
     void parseUnpackingData(ifstream & input, map < pair < unsigned int, unsigned int >, unsigned int > & x);
 public:
     Loader(string inputFile);
     Graph * loadGraph();
     UpdateableGraph * loadUpdateableGraph();
+    ShrinkingGraph * loadCHWithShortcutsIntoShrinkingGraph(string shortcutsFile);
+    Graph * loadCHGraph();
     Graph * loadCHGraphWithShortcuts(string shortcutsFile);
     void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
     void loadCoordinates(vector < pair <int, int > > & x);

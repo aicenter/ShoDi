@@ -33,6 +33,16 @@ void Graph::addEdge(unsigned int from, unsigned int to, long long unsigned int w
 }
 
 //______________________________________________________________________________________________________________________
+void Graph::addFollowingNode(unsigned int x, unsigned int y, long long unsigned int weight) {
+    this->followingNodes.at(x).push_back(make_pair(y, weight));
+}
+
+//______________________________________________________________________________________________________________________
+void Graph::addPreviousNode(unsigned int x, unsigned int y, long long unsigned int weight) {
+    this->previousNodes.at(x).push_back(make_pair(y, weight));
+}
+
+//______________________________________________________________________________________________________________________
 const unsigned int Graph::nodes()const {
     return this->followingNodes.size();
 }
