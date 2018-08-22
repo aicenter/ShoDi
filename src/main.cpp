@@ -62,12 +62,9 @@ void compareDijkstraWithCHMemoryEconomical() {
     Loader chGraphLoader = Loader("../input/USA.FLA.CH_add_ch_graph");
     Graph * chGraph = chGraphLoader.loadCHGraph();
     //Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.USA.CH_new_shortcuts");
-    Loader ranksLoader = Loader("../input/USA.FLA.CH_measure_ranks");
-    vector<unsigned int> ranks;
-    ranksLoader.loadRanks(ranks);
 
     vector<long long unsigned int> chDistances(trips.size());
-    double chTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, ranks, chDistances);
+    double chTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, chDistances);
     //for (unsigned int i = 0; i < 20; i++) {
     //    printf("Dijkstra / ch for trip %i: %llu / %llu (trips index from 0)\n", i, dijkstraDistanes[i], chDistances[i]);
     //}
@@ -88,9 +85,6 @@ void compareDijkstraWithCH() {
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
     Loader chGraphLoader = Loader("../input/Rome-road.gr");
     Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/Rome_debug3_shortcuts");
-    Loader ranksLoader = Loader("../input/Rome_debug3_ranks");
-    vector<unsigned int> ranks;
-    ranksLoader.loadRanks(ranks);
 
     Loader tripsLoader = Loader("../input/rome_1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
@@ -99,7 +93,7 @@ void compareDijkstraWithCH() {
     vector<long long unsigned int> dijkstraDistanes(trips.size());
     vector<long long unsigned int> chDistances(trips.size());
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
-    double chTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, ranks, chDistances);
+    double chTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, chDistances);
     //for (unsigned int i = 0; i < 20; i++) {
     //    printf("Dijkstra / ch for trip %i: %llu / %llu (trips index from 0)\n", i, dijkstraDistanes[i], chDistances[i]);
     //}

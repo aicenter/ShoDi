@@ -59,14 +59,12 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
 
                 const vector < pair < unsigned int, long long unsigned int > > & following = graph.outgoingEdges(current);
                 for (unsigned int i = 0; i < following.size(); i++) {
-                    //if (ranks[following.at(i).first] > ranks[current]) {
                         long long unsigned int newDist = currentDist + following.at(i).second;
 
                         if (newDist < fromDistance[following.at(i).first]) {
                             fromDistance[following.at(i).first] = newDist;
                             fromQueue.push(DijkstraNode(following.at(i).first, newDist));
                         }
-                    //}
                 }
 
                 fromQueue.pop();
@@ -91,14 +89,12 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
 
                 const vector < pair < unsigned int, long long unsigned int > > & previous = graph.incomingEdges(current);
                 for (unsigned int i = 0; i < previous.size(); i++) {
-                    //if (ranks[previous.at(i).first] > ranks[current]) {
                         long long unsigned int newDist = currentDist + previous.at(i).second;
 
                         if (newDist < toDistance[previous.at(i).first]) {
                             toDistance[previous.at(i).first] = newDist;
                             toQueue.push(DijkstraNode(previous.at(i).first, newDist));
                         }
-                    //}
                 }
 
                 toQueue.pop();

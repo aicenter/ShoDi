@@ -9,7 +9,7 @@
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-void CHBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks) {
+void CHBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph) {
     CHQueryManager queryManager;
 
     Timer chTimer("Contraction hierarchies trips benchmark");
@@ -24,7 +24,7 @@ void CHBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int
 }
 
 //______________________________________________________________________________________________________________________
-void CHBenchmark::runAndMeasureWithOutput(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances) {
+void CHBenchmark::runAndMeasureWithOutput(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances) {
     CHQueryManager queryManager;
 
     Timer chTimer("Contraction hierarchies trips benchmark");
@@ -39,7 +39,7 @@ void CHBenchmark::runAndMeasureWithOutput(const vector < pair < unsigned int, un
 }
 
 //______________________________________________________________________________________________________________________
-double CHBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances) {
+double CHBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances) {
     CHQueryManager queryManager;
 
     Timer chTimer("Contraction hierarchies trips benchmark");
