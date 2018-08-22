@@ -32,14 +32,14 @@ void constructCH() {
 
 //______________________________________________________________________________________________________________________
 void additionalCHPreprocess() {
-    Loader chGraphLoader = Loader("../input/USA-road-t.COL.gr");
-    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.COL.CH_measure2_shortcuts");
-    Loader ranksLoader = Loader("../input/USA.COL.CH_measure2_ranks");
+    Loader chGraphLoader = Loader("../input/USA-road-t.FLA.gr");
+    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.FLA.CH_measure_shortcuts");
+    Loader ranksLoader = Loader("../input/USA.FLA.CH_measure_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
     chGraph->removeUnnecesarryEdges(ranks);
-    chGraph->flushGraph("../input/USA.COL.CH_add");
+    chGraph->flushGraph("../input/USA.FLA.CH_add");
 
     delete chGraph;
 
@@ -49,9 +49,9 @@ void additionalCHPreprocess() {
 // one after each other.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCHMemoryEconomical() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.COL.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.FLA.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/COL100randomTrips");
+    Loader tripsLoader = Loader("../input/FLA100randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -59,10 +59,10 @@ void compareDijkstraWithCHMemoryEconomical() {
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
     delete dijkstraGraph;
 
-    Loader chGraphLoader = Loader("../input/USA.COL.CH_add_ch_graph");
+    Loader chGraphLoader = Loader("../input/USA.FLA.CH_add_ch_graph");
     Graph * chGraph = chGraphLoader.loadCHGraph();
     //Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.USA.CH_new_shortcuts");
-    Loader ranksLoader = Loader("../input/USA.COL.CH_measure2_ranks");
+    Loader ranksLoader = Loader("../input/USA.FLA.CH_measure_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
@@ -169,7 +169,7 @@ void runOneCHQuery() {
 
     unsigned int chosenTrip = 0;
 
-    CHQueryManager qm(ranks);
+    CHQueryManager qm;
     long long unsigned int distance = qm.findDistance(trips.at(chosenTrip).first, trips.at(chosenTrip).second, *chGraph);
     printf("Returned distance: %llu\n", distance);
 

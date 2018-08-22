@@ -10,7 +10,7 @@
 
 //______________________________________________________________________________________________________________________
 void CHBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks) {
-    CHQueryManager queryManager(ranks);
+    CHQueryManager queryManager;
 
     Timer chTimer("Contraction hierarchies trips benchmark");
     chTimer.begin();
@@ -25,7 +25,7 @@ void CHBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int
 
 //______________________________________________________________________________________________________________________
 void CHBenchmark::runAndMeasureWithOutput(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances) {
-    CHQueryManager queryManager(ranks);
+    CHQueryManager queryManager;
 
     Timer chTimer("Contraction hierarchies trips benchmark");
     chTimer.begin();
@@ -40,7 +40,7 @@ void CHBenchmark::runAndMeasureWithOutput(const vector < pair < unsigned int, un
 
 //______________________________________________________________________________________________________________________
 double CHBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances) {
-    CHQueryManager queryManager(ranks);
+    CHQueryManager queryManager;
 
     Timer chTimer("Contraction hierarchies trips benchmark");
     chTimer.begin();

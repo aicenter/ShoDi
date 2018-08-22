@@ -26,6 +26,7 @@ private:
     void unpackFollowing(vector<pair<unsigned int, unsigned int> > & fromPath);
     void unpackEdge(unsigned int s, unsigned int t);
     map < pair < unsigned int, unsigned int >, unsigned int > & unpackingData;
+    vector < unsigned int > & ranks;
 };
 
 

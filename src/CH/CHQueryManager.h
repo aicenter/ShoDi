@@ -16,10 +16,8 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class CHQueryManager {
 public:
-    CHQueryManager(vector<unsigned int> & x);
     long long unsigned int findDistance(const unsigned int source, const unsigned int target, const Graph & graph);
 protected:
-    vector<unsigned int> & ranks;
 };
 
 
