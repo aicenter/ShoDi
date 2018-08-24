@@ -174,6 +174,31 @@ UpdateableGraph * Loader::loadUpdateableGraph() {
 }
 
 //______________________________________________________________________________________________________________________
+void Loader::transformToDDSG(string DIMACSfile) {
+    ifstream input;
+    ofstream output;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+    output.open(DIMACSfile);
+    if( ! output.is_open() ) {
+        printf("Couldn't open file '%s'!", DIMACSfile.c_str());
+    }
+
+    unsigned int nodes, edges;
+    parseGraphProblemLine(input, nodes, edges);
+
+    output << "d" << endl;
+    output << nodes << " " << edges << endl;
+
+    transformEdges(input, output, edges);
+
+    input.close();
+    output.close();
+}
+
+//______________________________________________________________________________________________________________________
 void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     ifstream input;
     input.open(this->inputFile);
@@ -260,6 +285,23 @@ void Loader::processGraphProblemLine(string &buffer, unsigned int &nodes, unsign
 
     nodes = tmpnodes;
     edges = tmpedges;
+}
+
+//______________________________________________________________________________________________________________________
+void Loader::transformEdges(ifstream & input, ofstream & output, unsigned int edges) {
+    unsigned int loadededgescnt = 0;
+    while (loadededgescnt < edges) {
+        string buffer;
+        getline(input, buffer);
+        if (buffer[0] == 'a') {
+            unsigned int from, to;
+            long long unsigned int weight;
+            getEdge(buffer, from, to, weight);
+            output << from << " " << to << " " << weight << " 1" << endl;
+            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
+            loadededgescnt++;
+        }
+    }
 }
 
 //______________________________________________________________________________________________________________________

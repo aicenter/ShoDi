@@ -38,6 +38,7 @@ private:
     void parseShortcuts(ifstream & input, UpdateableGraph & graph);
     void parseRanks(ifstream & input, vector < unsigned int > & x);
     void parseUnpackingData(ifstream & input, map < pair < unsigned int, unsigned int >, unsigned int > & x);
+    void transformEdges(ifstream & input, ofstream & output, unsigned int edges);
 public:
     Loader(string inputFile);
     Graph * loadGraph();
@@ -49,6 +50,7 @@ public:
     void loadCoordinates(vector < pair <int, int > > & x);
     void loadRanks(vector < unsigned int > & x);
     void loadUnpackingData(map < pair < unsigned int, unsigned int >, unsigned int > & x);
+    void transformToDDSG(string DIMACSfile);
 
 };
 

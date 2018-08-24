@@ -3,9 +3,11 @@
 // Created on: 25.7.18
 //
 
+#include "GraphBuilder/DDSGLoader.h"
 #include "GraphBuilder/Loader.h"
 #include "Dijkstra/BasicDijkstra.h"
 #include "Benchmarking/CHBenchmark.h"
+#include "Benchmarking/CHBenchmarkWithRanks.h"
 #include "Benchmarking/CorectnessValidator.h"
 #include "Benchmarking/DijkstraBenchmark.h"
 #include "Timer/Timer.h"
@@ -32,14 +34,14 @@ void constructCH() {
 
 //______________________________________________________________________________________________________________________
 void additionalCHPreprocess() {
-    Loader chGraphLoader = Loader("../input/USA-road-t.FLA.gr");
-    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.FLA.CH_measure_shortcuts");
-    Loader ranksLoader = Loader("../input/USA.FLA.CH_measure_ranks");
+    Loader chGraphLoader = Loader("../input/USA-road-t.USA.gr");
+    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.USA.CH_new_shortcuts");
+    Loader ranksLoader = Loader("../input/USA.USA.CH_new_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
     chGraph->removeUnnecesarryEdges(ranks);
-    chGraph->flushGraph("../input/USA.FLA.CH_add");
+    chGraph->flushGraph("../input/USA.USA.CH_add");
 
     delete chGraph;
 
@@ -49,9 +51,9 @@ void additionalCHPreprocess() {
 // one after each other.
 //______________________________________________________________________________________________________________________
 void compareDijkstraWithCHMemoryEconomical() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.FLA.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.USA.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-    Loader tripsLoader = Loader("../input/FLA100randomTrips");
+    Loader tripsLoader = Loader("../input/USA100randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -59,7 +61,7 @@ void compareDijkstraWithCHMemoryEconomical() {
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistanes);
     delete dijkstraGraph;
 
-    Loader chGraphLoader = Loader("../input/USA.FLA.CH_add_ch_graph");
+    Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
     Graph * chGraph = chGraphLoader.loadCHGraph();
     //Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/USA.USA.CH_new_shortcuts");
 
@@ -72,6 +74,34 @@ void compareDijkstraWithCHMemoryEconomical() {
     printf("CH were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
 
     delete chGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void compareDDSGwithMyCH() {
+    Loader tripsLoader = Loader("../input/USA1000randomTripsTR");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
+    Graph * chGraph = chGraphLoader.loadCHGraph();
+
+    vector<long long unsigned int> myDistances(trips.size());
+    double myTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, myDistances);
+
+    delete chGraph;
+
+    DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
+    vector<unsigned int> ranks(0);
+    Graph * ddsgGraph = ddsgGraphLoader.loadGraphWithRanks(ranks);
+
+    vector<long long unsigned int> ddsgDistances(trips.size());
+    double ddsgTime = CHBenchmarkWithRanks::runAndMeasureOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
+
+    CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
+    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);
+
+    delete ddsgGraph;
 
 }
 
@@ -170,16 +200,24 @@ void runOneCHQuery() {
     delete chGraph;
 }
 
-// Simple mainfunction, uncomment the function you want to use.
+//______________________________________________________________________________________________________________________
+void DIMACStoDDSG() {
+    Loader loader = Loader("../input/USA-road-t.USA.gr");
+    loader.transformToDDSG("../input/USA-road-t.USA.ddsg");
+}
+
+// Simple main function, uncomment the function you want to use.
 //______________________________________________________________________________________________________________________
 int main() {
     //constructCH();
     //additionalCHPreprocess();
     //compareDijkstraWithCH();
-    compareDijkstraWithCHMemoryEconomical();
+    //compareDijkstraWithCHMemoryEconomical();
     //runOneCHQuery();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
+    //DIMACStoDDSG();
+    compareDDSGwithMyCH();
 
     return 0;
 }
