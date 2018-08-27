@@ -6,6 +6,7 @@
 #include <queue>
 #include <climits>
 #include <cstdio>
+#include <unordered_set>
 #include "CHQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
 
@@ -22,6 +23,8 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> fromQueue(cmp);
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> toQueue(cmp);
+    unordered_set<unsigned int> forwardStalled;
+    unordered_set<unsigned int> backwardStalled;
 
     long long unsigned int * fromDistance = new long long unsigned int[n];
     long long unsigned int * toDistance = new long long unsigned int[n];
@@ -48,7 +51,10 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
         if (! fromQueue.empty()) {
             unsigned int current = fromQueue.top().ID;
             long long unsigned int currentDist = fromQueue.top().weight;
-            fromClosed[current] = true;
+            fromQueue.pop();
+            if (forwardStalled.count(current) == 1) {
+                continue;
+            }
 
             if( currentDist < shortestFound ) {
                 if (toClosed[current]) {
@@ -64,21 +70,29 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
                         if (newDist < fromDistance[following.at(i).first]) {
                             fromDistance[following.at(i).first] = newDist;
                             fromQueue.push(DijkstraNode(following.at(i).first, newDist));
+                            forwardStalled.erase(following.at(i).first);
+                        }
+                        long long unsigned int complen = existsBackwardEdge(following.at(i).first, current, graph);
+                        if ( complen != ULLONG_MAX && fromDistance[current] + complen < fromDistance[following.at(i).first] ) {
+                            forwardStall(current, fromDistance[current] + complen, forwardStalled, graph, fromDistance);
+                            break;
                         }
                 }
-
-                fromQueue.pop();
             } else {
                 while (! fromQueue.empty()) {
                     fromQueue.pop();
                 }
             }
+            fromClosed[current] = true;
         }
 
         if (! toQueue.empty()) {
             unsigned int current = toQueue.top().ID;
             long long unsigned int currentDist = toQueue.top().weight;
-            toClosed[current] = true;
+            toQueue.pop();
+            if (backwardStalled.count(current) == 1) {
+                continue;
+            }
 
             if( currentDist < shortestFound ) {
                 if (fromClosed[current]) {
@@ -95,15 +109,22 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
                             toDistance[previous.at(i).first] = newDist;
                             toQueue.push(DijkstraNode(previous.at(i).first, newDist));
                         }
+                        long long unsigned int complen = existsForwardEdge(previous.at(i).first, current, graph);
+                        if ( complen != ULLONG_MAX && toDistance[current] + complen < toDistance[previous.at(i).first] ) {
+                            backwardStall(current, toDistance[current] + complen, backwardStalled, graph, toDistance);
+                            break;
+                        }
                 }
 
-                toQueue.pop();
+
             } else {
                 while (! toQueue.empty()) {
                     toQueue.pop();
                 }
             }
+            toClosed[current] = true;
         }
+
 
     }
 
@@ -112,4 +133,90 @@ long long unsigned int CHQueryManager::findDistance(const unsigned int source, c
     delete [] fromClosed;
     delete [] toClosed;
     return shortestFound;
+}
+
+//______________________________________________________________________________________________________________________
+long long unsigned int CHQueryManager::existsBackwardEdge(const unsigned int x, const unsigned int y, const Graph & graph) {
+    const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(x);
+    for(unsigned int i = 0; i < neighbours.size(); i++) {
+        if(y == neighbours.at(i).first) {
+            return neighbours.at(i).second;
+        }
+    }
+    return ULLONG_MAX;
+}
+
+//______________________________________________________________________________________________________________________
+long long unsigned int CHQueryManager::existsForwardEdge(const unsigned int x, const unsigned int y, const Graph & graph) {
+    const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(x);
+    for(unsigned int i = 0; i < neighbours.size(); i++) {
+        if(y == neighbours.at(i).first) {
+            return neighbours.at(i).second;
+        }
+    }
+    return ULLONG_MAX;
+}
+
+//______________________________________________________________________________________________________________________
+void CHQueryManager::forwardStall(const unsigned int node, const long long unsigned int weight, unordered_set<unsigned int> & forwardStalled, const Graph & graph, const long long unsigned int * fromDistance) {
+    queue<pair<unsigned int, long long unsigned int> > bfs_q;
+    bfs_q.push(make_pair(node, weight));
+    forwardStalled.insert(node);
+
+    while(! bfs_q.empty()) {
+        unsigned int curnode = bfs_q.front().first;
+        long long unsigned int curweight = bfs_q.front().second;
+        bfs_q.pop();
+
+        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(curnode);
+        for(unsigned int i = 0; i < neighbours.size(); i++) {
+            unsigned int neighnode = neighbours.at(i).first;
+            if (forwardStalled.count(neighnode) == 1) {
+                continue;
+            }
+
+            long long unsigned int opositeEdge = existsBackwardEdge(neighnode, curnode, graph);
+            if (opositeEdge == ULLONG_MAX) {
+                continue;
+            }
+            unsigned int neighweight = opositeEdge + curweight;
+            if (neighweight < fromDistance[neighnode]) {
+                forwardStalled.insert(neighnode);
+                bfs_q.push(make_pair(neighnode, neighweight));
+            }
+        }
+
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void CHQueryManager::backwardStall(const unsigned int node, const long long unsigned int weight, unordered_set<unsigned int> & backwardStalled, const Graph & graph, const long long unsigned int * toDistance) {
+    queue<pair<unsigned int, long long unsigned int> > bfs_q;
+    bfs_q.push(make_pair(node, weight));
+    backwardStalled.insert(node);
+
+    while(! bfs_q.empty()) {
+        unsigned int curnode = bfs_q.front().first;
+        long long unsigned int curweight = bfs_q.front().second;
+        bfs_q.pop();
+
+        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(curnode);
+        for(unsigned int i = 0; i < neighbours.size(); i++) {
+            unsigned int neighnode = neighbours.at(i).first;
+            if (backwardStalled.count(neighnode) == 1) {
+                continue;
+            }
+
+            long long unsigned int opositeEdge = existsForwardEdge(neighnode, curnode, graph);
+            if (opositeEdge == ULLONG_MAX) {
+                continue;
+            }
+            unsigned int neighweight = opositeEdge + curweight;
+            if (neighweight < toDistance[neighnode]) {
+                backwardStalled.insert(neighnode);
+                bfs_q.push(make_pair(neighnode, neighweight));
+            }
+        }
+
+    }
 }
