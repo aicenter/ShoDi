@@ -35,14 +35,14 @@ void constructCH() {
 
 //______________________________________________________________________________________________________________________
 void additionalCHPreprocess() {
-    Loader chGraphLoader = Loader("../input/USA-road-t.USA.gr");
-    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.USA.CH_new_shortcuts");
-    Loader ranksLoader = Loader("../input/USA.USA.CH_new_ranks");
+    Loader chGraphLoader = Loader("../input/USA-road-t.BAY.gr");
+    ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.BAY.CH_measure4_shortcuts");
+    Loader ranksLoader = Loader("../input/USA.BAY.CH_measure4_ranks");
     vector<unsigned int> ranks;
     ranksLoader.loadRanks(ranks);
 
     chGraph->removeUnnecesarryEdges(ranks);
-    chGraph->flushGraph("../input/USA.USA.CH_add");
+    chGraph->flushGraph("../input/USA.BAY.CH_add");
 
     delete chGraph;
 
@@ -79,28 +79,64 @@ void compareDijkstraWithCHMemoryEconomical() {
 }
 
 //______________________________________________________________________________________________________________________
-void compareDDSGwithMyCH() {
+void compareDDSGwithMyCHFromClion() {
     Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    //Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    //Loader tripsLoader = Loader("input/USA1000randomTripsNewGen");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
+    /*Loader chGraphLoader = Loader("../input/USA.BAY.CH_add_ch_graph");
     Graph * chGraph = chGraphLoader.loadCHGraph();
 
     vector<long long unsigned int> myDistances(trips.size());
     double myTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, myDistances);
 
-    delete chGraph;
+    delete chGraph;*/
 
     DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
+    //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
+    //DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.USA.DDSG.ch");
     vector<unsigned int> ranks(0);
     Graph * ddsgGraph = ddsgGraphLoader.loadGraphWithRanks(ranks);
 
     vector<long long unsigned int> ddsgDistances(trips.size());
     double ddsgTime = CHBenchmarkWithRanks::runAndMeasureOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
 
-    CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
-    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);
+    /*CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
+    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);*/
+
+    delete ddsgGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void compareDDSGwithMyCH() {
+    Loader tripsLoader = Loader("input/BAY1000randomTrips");
+    //Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    //Loader tripsLoader = Loader("input/USA1000randomTripsNewGen");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    /*Loader chGraphLoader = Loader("../input/USA.BAY.CH_add_ch_graph");
+    Graph * chGraph = chGraphLoader.loadCHGraph();
+
+    vector<long long unsigned int> myDistances(trips.size());
+    double myTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, myDistances);
+
+    delete chGraph;*/
+
+    DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.BAY.DDSG.ch");
+    //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
+    //DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.USA.DDSG.ch");
+    vector<unsigned int> ranks(0);
+    Graph * ddsgGraph = ddsgGraphLoader.loadGraphWithRanks(ranks);
+
+    vector<long long unsigned int> ddsgDistances(trips.size());
+    double ddsgTime = CHBenchmarkWithRanks::runAndMeasureOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
+
+    /*CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
+    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);*/
 
     delete ddsgGraph;
 
@@ -246,8 +282,8 @@ void runOneDDSGQuery() {
 
 //______________________________________________________________________________________________________________________
 void DIMACStoDDSG() {
-    Loader loader = Loader("../input/USA-road-t.USA.gr");
-    loader.transformToDDSG("../input/USA-road-t.USA.ddsg");
+    Loader loader = Loader("../input/USA-road-t.BAY.gr");
+    loader.transformToDDSG("../input/USA-road-t.BAY.ddsg");
 }
 
 // Simple main function, uncomment the function you want to use.
@@ -262,7 +298,8 @@ int main() {
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
     //DIMACStoDDSG();
-    compareDDSGwithMyCH();
+    compareDDSGwithMyCHFromClion();
+    //compareDDSGwithMyCH();
     //compareQueryAlgorithms();
 
     return 0;

@@ -79,10 +79,10 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, Graph &
             printf("Edge %u: from %u to %u (weight: %u), flags: %u\n", i, from, to, weight, flags);
         }*/
 
-        if(flags & 1 == 1) {
+        if((flags & 1) == 1) {
             graph.addEdge(from, to, weight);
         }
-        if(flags & 2 == 2) {
+        if((flags & 2) == 2) {
             graph.addEdge(to, from, weight);
         }
 
@@ -101,10 +101,10 @@ void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges,
         input.read((char*)&flags, sizeof(flags));
         input.read((char*)&middleNode, sizeof(middleNode));
 
-        if(flags & 1 == 1) {
+        if((flags & 1) == 1) {
             graph.addEdge(from, to, weight);
         }
-        if(flags & 2 == 2) {
+        if((flags & 2) == 2) {
             graph.addEdge(to, from, weight);
         }
 

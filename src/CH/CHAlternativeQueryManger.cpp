@@ -153,12 +153,14 @@ void CHAlternativeQueryManager::prepareStructuresForNextQuery() {
         forwardSettled[forwardChanged[i]] = false;
         //forwardReached[forwardChanged[i]] = false;
     }
+    forwardChanged.clear();
 
     for (unsigned int i = 0; i < backwardChanged.size(); i++) {
         backwardDist[backwardChanged[i]] = ULLONG_MAX;
         backwardSettled[backwardChanged[i]] = false;
         //backwardReached[backwardChanged[i]] = false;
     }
+    backwardChanged.clear();
 
     forwardQ.clean();
     backwardQ.clean();
