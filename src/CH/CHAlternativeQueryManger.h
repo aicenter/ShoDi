@@ -7,6 +7,7 @@
 #define TRANSIT_NODE_ROUTING_CHALTERNATIVEQUERYMANGER_H
 
 #include <vector>
+#include <queue>
 #include "../GraphBuilder/Graph.h"
 #include "CHQueryManager.h"
 #include "Structures/QueryPriorityQueue.h"
@@ -29,11 +30,11 @@ protected:
     //vector<bool> backwardReached;
     vector<bool> forwardSettled;
     vector<bool> backwardSettled;
-    QueryPriorityQueue forwardQ;
-    QueryPriorityQueue backwardQ;
+    //priority_queue<DijkstraNode> forwardQ;
+    //priority_queue<DijkstraNode> backwardQ;
     void prepareStructuresForNextQuery();
-    void relaxForwardEdges(unsigned int curNode, long long unsigned int curLen);
-    void relaxBackwardEdges(unsigned int curNode, long long unsigned int curLen);
+    //void relaxForwardEdges(unsigned int curNode, long long unsigned int curLen, priority_queue<DijkstraNode, vector<DijkstraNode>, bool> & pq);
+    //void relaxBackwardEdges(unsigned int curNode, long long unsigned int curLen, priority_queue<DijkstraNode, vector<DijkstraNode>, bool> & pq);
 };
 
 

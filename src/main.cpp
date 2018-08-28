@@ -86,13 +86,13 @@ void compareDDSGwithMyCHFromClion() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    /*Loader chGraphLoader = Loader("../input/USA.BAY.CH_add_ch_graph");
+    Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
     Graph * chGraph = chGraphLoader.loadCHGraph();
 
     vector<long long unsigned int> myDistances(trips.size());
     double myTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, myDistances);
 
-    delete chGraph;*/
+    delete chGraph;
 
     DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
     //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
@@ -103,8 +103,8 @@ void compareDDSGwithMyCHFromClion() {
     vector<long long unsigned int> ddsgDistances(trips.size());
     double ddsgTime = CHBenchmarkWithRanks::runAndMeasureOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
 
-    /*CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
-    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);*/
+    CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
+    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);
 
     delete ddsgGraph;
 

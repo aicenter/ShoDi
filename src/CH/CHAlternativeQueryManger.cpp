@@ -4,6 +4,7 @@
 //
 
 #include <climits>
+#include <queue>
 #include "CHAlternativeQueryManger.h"
 
 //______________________________________________________________________________________________________________________
@@ -20,8 +21,12 @@ CHAlternativeQueryManager::CHAlternativeQueryManager(vector<unsigned int> & x, c
 //______________________________________________________________________________________________________________________
 long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned int source, const unsigned int target) {
 
-    forwardQ.push(source, 0);
-    backwardQ.push(target, 0);
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
+
+    forwardQ.push(DijkstraNode(source, 0));
+    backwardQ.push(DijkstraNode(target, 0));
 
     bool forwardFinished = false;
     bool backwardFinished = false;
@@ -54,6 +59,10 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
             long long unsigned int curLen = forwardQ.top().weight;
             forwardQ.pop();
 
+            if (forwardSettled[curNode]) {
+                continue;
+            }
+
             forwardSettled[curNode] = true;
             if (backwardSettled[curNode]) {
                 long long unsigned int newUpperboundCandidate = curLen + backwardDist[curNode];
@@ -62,7 +71,21 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
                 }
             }
 
-            relaxForwardEdges(curNode, curLen);
+            const vector<pair<unsigned int, unsigned long long int>> & neighbours = graph.outgoingEdges(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                //forwardReached[(*iter).first] = true;
+                if (ranks[(*iter).first] > ranks[curNode]) {
+                    long long unsigned int newlen = curLen + (*iter).second;
+
+                    if (newlen < forwardDist[(*iter).first]) {
+                        forwardQ.push(DijkstraNode((*iter).first, newlen));
+                        if (forwardDist[(*iter).first] == ULLONG_MAX) {
+                            forwardChanged.push_back((*iter).first);
+                        }
+                        forwardDist[(*iter).first] = newlen;
+                    }
+                }
+            }
 
             if(! forwardQ.empty() && forwardQ.top().weight > upperbound) {
                 forwardFinished = true;
@@ -76,6 +99,10 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
             long long unsigned int curLen = backwardQ.top().weight;
             backwardQ.pop();
 
+            if (backwardSettled[curNode]) {
+                continue;
+            }
+
             backwardSettled[curNode] = true;
             if (forwardSettled[curNode]) {
                 long long unsigned int newUpperboundCandidate = curLen + forwardDist[curNode];
@@ -84,7 +111,21 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
                 }
             }
 
-            relaxBackwardEdges(curNode, curLen);
+            const vector<pair<unsigned int, unsigned long long int>> & neighbours = graph.incomingEdges(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                //forwardReached[(*iter).first] = true;
+                if(ranks[(*iter).first] > ranks[curNode]) {
+                    long long unsigned int newlen = curLen + (*iter).second;
+
+                    if (newlen < backwardDist[(*iter).first]) {
+                        backwardQ.push(DijkstraNode((*iter).first, newlen));
+                        if (backwardDist[(*iter).first] == ULLONG_MAX) {
+                            backwardChanged.push_back((*iter).first);
+                        }
+                        backwardDist[(*iter).first] = newlen;
+                    }
+                }
+            }
 
             if(! backwardQ.empty() && backwardQ.top().weight > upperbound) {
                 backwardFinished = true;
@@ -103,7 +144,7 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
 }
 
 //______________________________________________________________________________________________________________________
-void CHAlternativeQueryManager::relaxForwardEdges(unsigned int curNode, long long unsigned int curLen) {
+/*void CHAlternativeQueryManager::relaxForwardEdges(unsigned int curNode, long long unsigned int curLen, priority_queue<DijkstraNode> & pq) {
     const vector<pair<unsigned int, unsigned long long int>> & neighbours = graph.outgoingEdges(curNode);
     for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
         //forwardReached[(*iter).first] = true;
@@ -111,12 +152,7 @@ void CHAlternativeQueryManager::relaxForwardEdges(unsigned int curNode, long lon
             long long unsigned int newlen = curLen + (*iter).second;
 
             if (newlen < forwardDist[(*iter).first]) {
-                if (forwardDist[(*iter).first] == ULLONG_MAX) {
-                    forwardQ.push((*iter).first, newlen);
-                    forwardChanged.push_back((*iter).first);
-                } else {
-                    forwardQ.decreaseKey((*iter).first, newlen);
-                }
+                forwardQ.push(DijkstraNode((*iter).first, newlen));
                 forwardDist[(*iter).first] = newlen;
             }
         }
@@ -124,7 +160,7 @@ void CHAlternativeQueryManager::relaxForwardEdges(unsigned int curNode, long lon
 }
 
 //______________________________________________________________________________________________________________________
-void CHAlternativeQueryManager::relaxBackwardEdges(unsigned int curNode, long long unsigned int curLen) {
+void CHAlternativeQueryManager::relaxBackwardEdges(unsigned int curNode, long long unsigned int curLen, priority_queue<DijkstraNode> & pq) {
     const vector<pair<unsigned int, unsigned long long int>> & neighbours = graph.incomingEdges(curNode);
     for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
         //forwardReached[(*iter).first] = true;
@@ -132,17 +168,12 @@ void CHAlternativeQueryManager::relaxBackwardEdges(unsigned int curNode, long lo
             long long unsigned int newlen = curLen + (*iter).second;
 
             if (newlen < backwardDist[(*iter).first]) {
-                if (backwardDist[(*iter).first] == ULLONG_MAX) {
-                    backwardQ.push((*iter).first, newlen);
-                    backwardChanged.push_back((*iter).first);
-                } else {
-                    backwardQ.decreaseKey((*iter).first, newlen);
-                }
+                backwardQ.push(DijkstraNode((*iter).first, newlen));
                 backwardDist[(*iter).first] = newlen;
             }
         }
     }
-}
+}*/
 
 
 
@@ -162,6 +193,6 @@ void CHAlternativeQueryManager::prepareStructuresForNextQuery() {
     }
     backwardChanged.clear();
 
-    forwardQ.clean();
-    backwardQ.clean();
+   // forwardQ.clean();
+   // backwardQ.clean();
 }
