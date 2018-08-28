@@ -17,7 +17,7 @@ CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {
 void CHpriorityQueue::insert(const unsigned int x, const int y) {
     content.push_back(CHNode(x, y));
     mapping[x] = content.size() - 1;
-    bubbleDown(content.size() - 1);
+    bubbleUp(content.size() - 1);
 }
 
 //______________________________________________________________________________________________________________________
@@ -91,7 +91,7 @@ void CHpriorityQueue::bubbleDown(const unsigned int i) {
 void CHpriorityQueue::bubbleUp(const unsigned int i) {
     unsigned int cur = i;
     while (cur != 0) {
-        unsigned int father = (i - 1) / 2;
+        unsigned int father = (cur - 1) / 2;
         if (content[cur].weight >= content[father].weight) {
             return;
         }

@@ -16,6 +16,7 @@
 #include "CH/CHPreprocessor.h"
 #include "CH/CHQueryManager.h"
 #include "CH/CHPathQueryManager.h"
+#include "CH/CHAlternativeQueryManger.h"
 
 
 // This function will construct Contraction Hierarchies from a given graph. This means preprocessing the graph and
@@ -79,7 +80,7 @@ void compareDijkstraWithCHMemoryEconomical() {
 
 //______________________________________________________________________________________________________________________
 void compareDDSGwithMyCH() {
-    Loader tripsLoader = Loader("../input/USA1000randomTripsTR");
+    Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -102,6 +103,33 @@ void compareDDSGwithMyCH() {
     printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);
 
     delete ddsgGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void compareQueryAlgorithms() {
+    Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    Loader oldGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
+    Graph * oldGraph = oldGraphLoader.loadCHGraph();
+
+    vector<long long unsigned int> oldDistances(trips.size());
+    double oldTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *oldGraph, oldDistances);
+
+    //delete oldGraph;
+    //vector< pair < unsigned int, unsigned int > > oneTrip(1);
+    //oneTrip[0].first = trips[0].first;
+    //oneTrip[0].second = trips[0].second;
+
+    vector<long long unsigned int> newDistances(trips.size());
+    double newTime = CHBenchmarkWithRanks::runNewQueryAlgorithmMeasureOutputAndRetval(trips, *oldGraph, newDistances);
+
+    CorectnessValidator::validateVerbose(oldDistances, newDistances);
+    printf("New query algorithm was %lf times faster than the old one!\n", oldTime/newTime);
+
+    delete oldGraph;
 
 }
 
@@ -138,10 +166,10 @@ void compareDijkstraWithCH() {
 // Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip() {
-    Loader dijkstraGraphLoader = Loader("../input/Rome-road.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.USA.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
-    Loader tripsLoader = Loader("../input/rome_1000randomTrips");
+    Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -181,23 +209,39 @@ void getCHPathForTrip() {
 // Runs one CH query, but doesn't print the path, only the distance.
 //______________________________________________________________________________________________________________________
 void runOneCHQuery() {
-    Loader chGraphLoader = Loader("../input/artifGraph1.CH_graph");
-    Graph * chGraph = chGraphLoader.loadGraph();
-    Loader ranksLoader = Loader("../input/artifGraph1.CH_ranks");
-    vector<unsigned int> ranks;
-    ranksLoader.loadRanks(ranks);
+    Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
+    Graph * chGraph = chGraphLoader.loadCHGraph();
 
-    Loader tripsLoader = Loader("../input/artif1_1000randomTrips");
+    Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 0;
+    unsigned int chosenTrip = 1;
 
     CHQueryManager qm;
     long long unsigned int distance = qm.findDistance(trips.at(chosenTrip).first, trips.at(chosenTrip).second, *chGraph);
     printf("Returned distance: %llu\n", distance);
 
     delete chGraph;
+}
+
+//______________________________________________________________________________________________________________________
+void runOneDDSGQuery() {
+    DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
+    vector<unsigned int> ranks(0);
+    Graph * ddsgGraph = ddsgGraphLoader.loadGraphWithRanks(ranks);
+
+    Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    unsigned int chosenTrip = 895;
+
+    CHAlternativeQueryManager qm(ranks, *ddsgGraph);
+    long long unsigned int distance = qm.findDistance(trips.at(chosenTrip).first, trips.at(chosenTrip).second);
+    printf("Returned distance: %llu\n", distance);
+
+    delete ddsgGraph;
 }
 
 //______________________________________________________________________________________________________________________
@@ -214,10 +258,12 @@ int main() {
     //compareDijkstraWithCH();
     //compareDijkstraWithCHMemoryEconomical();
     //runOneCHQuery();
+    //runOneDDSGQuery();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
     //DIMACStoDDSG();
     compareDDSGwithMyCH();
+    //compareQueryAlgorithms();
 
     return 0;
 }

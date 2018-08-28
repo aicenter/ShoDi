@@ -6,6 +6,7 @@
 #include <string>
 #include "CHBenchmark.h"
 #include "../CH/CHQueryManager.h"
+#include "../CH/CHMyCHVersionNewQueryManager.h"
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
@@ -47,6 +48,24 @@ double CHBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned 
 
     for(unsigned int i = 0; i < trips.size(); i++) {
         distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second, graph);
+    }
+
+    chTimer.finish();
+    chTimer.printMeasuredTime();
+    return chTimer.getMeasuredTimeInSeconds();
+}
+
+//______________________________________________________________________________________________________________________
+double CHBenchmark::runNewQueryAlgorithmMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances) {
+    CHMyChVersionNewQueryManager queryManager(graph);
+
+    Timer chTimer("Contraction hierarchies trips benchmark");
+    chTimer.begin();
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        //printf("~~~ Start of query: %u ~~~\n", i);
+        distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second);
+        //printf("~~~ End of query: %u ~~~\n", i);
     }
 
     chTimer.finish();

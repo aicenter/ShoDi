@@ -10,6 +10,7 @@
 #include <cstdio>
 #include "CHQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
+#include "Structures/QueryPriorityQueue.h"
 
 //______________________________________________________________________________________________________________________
 CHQueryManagerWithRanks::CHQueryManagerWithRanks(vector<unsigned int> & x) : ranks(x) {
@@ -21,9 +22,11 @@ CHQueryManagerWithRanks::CHQueryManagerWithRanks(vector<unsigned int> & x) : ran
 long long unsigned int CHQueryManagerWithRanks::findDistance(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();
 
-    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> fromQueue(cmp);
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> toQueue(cmp);
+    //auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
+    //priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> fromQueue(cmp);
+    //priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> toQueue(cmp);
+    QueryPriorityQueue fromQueue;
+    QueryPriorityQueue toQueue;
 
     long long unsigned int * fromDistance = new long long unsigned int[n];
     long long unsigned int * toDistance = new long long unsigned int[n];
@@ -40,8 +43,8 @@ long long unsigned int CHQueryManagerWithRanks::findDistance(const unsigned int 
     fromDistance[source] = 0;
     toDistance[target] = 0;
 
-    fromQueue.push(DijkstraNode(source, 0));
-    toQueue.push(DijkstraNode(target, 0));
+    fromQueue.push(source, 0);
+    toQueue.push(target, 0);
 
     long long unsigned int shortestFound = ULLONG_MAX;
     while (! fromQueue.empty() || ! toQueue.empty()) {
@@ -65,8 +68,12 @@ long long unsigned int CHQueryManagerWithRanks::findDistance(const unsigned int 
                         long long unsigned int newDist = currentDist + following.at(i).second;
 
                         if (newDist < fromDistance[following.at(i).first]) {
+                            if (fromDistance[following.at(i).first == ULLONG_MAX]) {
+                                fromQueue.push(following.at(i).first, newDist);
+                            } else {
+                                fromQueue.decreaseKey(following.at(i).first, newDist);
+                            }
                             fromDistance[following.at(i).first] = newDist;
-                            fromQueue.push(DijkstraNode(following.at(i).first, newDist));
                         }
                     }
                 }
@@ -97,8 +104,12 @@ long long unsigned int CHQueryManagerWithRanks::findDistance(const unsigned int 
                         long long unsigned int newDist = currentDist + previous.at(i).second;
 
                         if (newDist < toDistance[previous.at(i).first]) {
+                            if (toDistance[previous.at(i).first] == ULLONG_MAX) {
+                                toQueue.push(previous.at(i).first, newDist);
+                            } else {
+                                toQueue.decreaseKey(previous.at(i).first, newDist);
+                            }
                             toDistance[previous.at(i).first] = newDist;
-                            toQueue.push(DijkstraNode(previous.at(i).first, newDist));
                         }
                     }
                 }
