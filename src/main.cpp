@@ -80,9 +80,9 @@ void compareDijkstraWithCHMemoryEconomical() {
 
 //______________________________________________________________________________________________________________________
 void compareDDSGwithMyCHFromClion() {
+    //Loader tripsLoader = Loader("../input/BAY1000randomTrips");
     Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
-    //Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
-    //Loader tripsLoader = Loader("input/USA1000randomTripsNewGen");
+    //Loader tripsLoader = Loader("input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -94,9 +94,9 @@ void compareDDSGwithMyCHFromClion() {
 
     delete chGraph;
 
+    //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.BAY.DDSG.ch");
     DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
-    //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
-    //DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.USA.DDSG.ch");
+    //DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.BAY.DDSG.ch");
     vector<unsigned int> ranks(0);
     FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks(ranks);
 
@@ -104,7 +104,7 @@ void compareDDSGwithMyCHFromClion() {
     double ddsgTime = CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
 
     CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
-    printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);
+    printf("Their implementatetion was %lf times faster than mine!\n", myTime/ddsgTime);
 
     delete ddsgGraph;
 

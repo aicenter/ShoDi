@@ -12,7 +12,7 @@
 class CHBenchmarkWithRanks : public CHBenchmark {
 public:
     static double runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances);
-    static double runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const FlagsGraph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances);
+    static double runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances);
 };
 
 

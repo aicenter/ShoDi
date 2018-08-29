@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include "Edge.h"
+#include "../CH/Structures/NodeData.h"
 
 using namespace std;
 
@@ -17,12 +18,18 @@ using namespace std;
 class FlagsGraph{
 private:
     vector< vector < Edge > > neighbours;
+    vector< NodeData > nodesData;
 public:
     FlagsGraph(unsigned int n);
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
     const vector< Edge > & nextNodes(const unsigned int x)const;
     const unsigned int degree(unsigned int node)const;
+    NodeData & data(unsigned int node);
+    void resetForwardInfo(const unsigned int node);
+    void resetBackwardInfo(const unsigned int node);
+    void resetForwardStall(const unsigned int node);
+    void resetBackwardStall(const unsigned int node);
 };
 
 

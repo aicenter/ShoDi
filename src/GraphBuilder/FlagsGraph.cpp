@@ -3,11 +3,13 @@
 // Created on: 28.8.18
 //
 
+#include <climits>
 #include "FlagsGraph.h"
 
 //______________________________________________________________________________________________________________________
 FlagsGraph::FlagsGraph(unsigned int n) {
     neighbours.resize(n);
+    nodesData.resize(n);
 }
 
 
@@ -40,4 +42,34 @@ const unsigned int FlagsGraph::degree(unsigned int node)const {
     }
     return degree;
 
+}
+
+//______________________________________________________________________________________________________________________
+NodeData & FlagsGraph::data(unsigned int node) {
+    return nodesData[node];
+}
+
+//______________________________________________________________________________________________________________________
+void FlagsGraph::resetForwardInfo(const unsigned int node) {
+    nodesData[node].forwardDist = ULLONG_MAX;
+    nodesData[node].forwardSettled = false;
+    nodesData[node].forwardReached = false;
+
+}
+
+//______________________________________________________________________________________________________________________
+void FlagsGraph::resetBackwardInfo(const unsigned int node) {
+    nodesData[node].backwardDist = ULLONG_MAX;
+    nodesData[node].backwardSettled = false;
+    nodesData[node].backwardReached = false;
+}
+
+//______________________________________________________________________________________________________________________
+void FlagsGraph::resetForwardStall(const unsigned int node) {
+    nodesData[node].forwardStalled = false;
+}
+
+//______________________________________________________________________________________________________________________
+void FlagsGraph::resetBackwardStall(const unsigned int node) {
+    nodesData[node].backwardStalled = false;
 }

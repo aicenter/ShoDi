@@ -7,16 +7,8 @@
 #include "CHFlagsGraphQueryManager.h"
 
 //______________________________________________________________________________________________________________________
-CHFlagsGraphQueryManager::CHFlagsGraphQueryManager(vector<unsigned int> & x, const FlagsGraph & g) : ranks(x), graph(g) {
-    unsigned int n = graph.nodes();
-    forwardDist.resize(n, ULLONG_MAX);
-    backwardDist.resize(n, ULLONG_MAX);
-    forwardReached.resize(n, false);
-    backwardReached.resize(n, false);
-    forwardSettled.resize(n, false);
-    backwardSettled.resize(n, false);
-    forwardStalled.resize(n, false);
-    backwardStalled.resize(n, false);
+CHFlagsGraphQueryManager::CHFlagsGraphQueryManager(vector<unsigned int> & x, FlagsGraph & g) : ranks(x), graph(g) {
+
 }
 
 //______________________________________________________________________________________________________________________
@@ -32,19 +24,17 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
     bool forwardFinished = false;
     bool backwardFinished = false;
 
-    forwardDist[source] = 0;
-    backwardDist[target] = 0;
+    graph.data(source).forwardDist = 0;
+    graph.data(target).backwardDist = 0;
     forwardChanged.push_back(source);
     backwardChanged.push_back(target);
-    forwardReached[source] = true;
-    backwardReached[target] = true;
+    graph.data(source).forwardReached = true;
+    graph.data(target).backwardReached = true;
 
     bool forward = false;
     upperbound = ULLONG_MAX;
 
     while (! (forwardQ.empty() && backwardQ.empty())) {
-        //printf("Currently in queues: forward: %lu, backward: %lu (top: %llu)\n", forwardQ.size(), backwardQ.size(), backwardQ.top().weight);
-        //printf("Currently in queues: forward: %lu, backward: %lu\n", forwardQ.size(), backwardQ.size());
         if (forwardFinished || forwardQ.empty()) {
             forward = false;
         } else if (backwardFinished || backwardQ.empty()) {
@@ -62,13 +52,13 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
             long long unsigned int curLen = forwardQ.top().weight;
             forwardQ.pop();
 
-            if (forwardSettled[curNode] || forwardStalled[curNode]) {
+            if (graph.data(curNode).forwardSettled || graph.data(curNode).forwardStalled) {
                 continue;
             }
 
-            forwardSettled[curNode] = true;
-            if (backwardSettled[curNode]) {
-                long long unsigned int newUpperboundCandidate = curLen + backwardDist[curNode];
+            graph.data(curNode).forwardSettled = true;
+            if ( graph.data(curNode).backwardSettled ) {
+                long long unsigned int newUpperboundCandidate = curLen +  graph.data(curNode).backwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
                 }
@@ -76,10 +66,10 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
 
             const vector<Edge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                if ((*iter).backward && forwardReached[(*iter).targetNode]) {
-                    long long unsigned int newdistance = forwardDist[(*iter).targetNode] + (*iter).weight;
+                if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
+                    long long unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
                     if (newdistance < curLen) {
-                        forwardDist[curNode] = newdistance;
+                        graph.data(curNode).forwardDist = newdistance;
                         forwardStall(curNode, newdistance);
                     }
                 }
@@ -92,14 +82,14 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
                 if (ranks[(*iter).targetNode] > ranks[curNode]) {
                     long long unsigned int newlen = curLen + (*iter).weight;
 
-                    if (newlen < forwardDist[(*iter).targetNode]) {
+                    if (newlen < graph.data((*iter).targetNode).forwardDist) {
                         forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
-                        if (forwardDist[(*iter).targetNode] == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).forwardDist == ULLONG_MAX) {
                             forwardChanged.push_back((*iter).targetNode);
                         }
-                        forwardDist[(*iter).targetNode] = newlen;
-                        forwardReached[(*iter).targetNode] = true;
-                        forwardStalled[(*iter).targetNode] = false;
+                        graph.data((*iter).targetNode).forwardDist = newlen;
+                        graph.data((*iter).targetNode).forwardReached = true;
+                        graph.data((*iter).targetNode).forwardStalled = false;
                     }
                 }
             }
@@ -116,13 +106,13 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
             long long unsigned int curLen = backwardQ.top().weight;
             backwardQ.pop();
 
-            if (backwardSettled[curNode] || backwardStalled[curNode]) {
+            if (graph.data(curNode).backwardSettled || graph.data(curNode).backwardStalled) {
                 continue;
             }
 
-            backwardSettled[curNode] = true;
-            if (forwardSettled[curNode]) {
-                long long unsigned int newUpperboundCandidate = curLen + forwardDist[curNode];
+            graph.data(curNode).backwardSettled = true;
+            if (graph.data(curNode).forwardSettled) {
+                long long unsigned int newUpperboundCandidate = curLen + graph.data(curNode).forwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
                 }
@@ -130,8 +120,8 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
 
             const vector<Edge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                if ((*iter).forward && backwardReached[(*iter).targetNode]) {
-                    long long unsigned int newdistance = backwardDist[(*iter).targetNode] + (*iter).weight;
+                if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
+                    long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         backwardStall(curNode, newdistance);
                     }
@@ -145,14 +135,14 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
                 if(ranks[(*iter).targetNode] > ranks[curNode]) {
                     long long unsigned int newlen = curLen + (*iter).weight;
 
-                    if (newlen < backwardDist[(*iter).targetNode]) {
+                    if (newlen < graph.data((*iter).targetNode).backwardDist) {
                         backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
-                        if (backwardDist[(*iter).targetNode] == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).backwardDist == ULLONG_MAX) {
                             backwardChanged.push_back((*iter).targetNode);
                         }
-                        backwardDist[(*iter).targetNode] = newlen;
-                        backwardReached[(*iter).targetNode] = true;
-                        backwardStalled[(*iter).targetNode] = false;
+                        graph.data((*iter).targetNode).backwardDist = newlen;
+                        graph.data((*iter).targetNode).backwardReached = true;
+                        graph.data((*iter).targetNode).backwardStalled = false;
                     }
                 }
             }
@@ -182,7 +172,7 @@ void CHFlagsGraphQueryManager::forwardStall(unsigned int stallnode, long long un
         unsigned int curNode = stallQueue.front().ID;
         long long unsigned int curDist = stallQueue.front().weight;
         stallQueue.pop();
-        forwardStalled[curNode] = true;
+        graph.data(curNode).forwardStalled = true;
         forwardStallChanged.push_back(curNode);
 
         const vector<Edge> & neighbours = graph.nextNodes(curNode);
@@ -191,16 +181,16 @@ void CHFlagsGraphQueryManager::forwardStall(unsigned int stallnode, long long un
                 continue;
             }
 
-            if (forwardReached[(*iter).targetNode]) {
+            if (graph.data((*iter).targetNode).forwardReached) {
                 long long unsigned int newdistance = curDist + (*iter).weight;
 
-                if (newdistance < forwardDist[(*iter).targetNode]) {
-                    if (! forwardStalled[(*iter).targetNode]) {
+                if (newdistance < graph.data((*iter).targetNode).forwardDist) {
+                    if (! graph.data((*iter).targetNode).forwardStalled) {
                         stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
-                        if (forwardDist[(*iter).targetNode] == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).forwardDist == ULLONG_MAX) {
                             forwardChanged.push_back((*iter).targetNode);
                         }
-                        forwardDist[(*iter).targetNode] = newdistance;
+                        graph.data((*iter).targetNode).forwardDist = newdistance;
                     }
                 }
             }
@@ -218,7 +208,7 @@ void CHFlagsGraphQueryManager::backwardStall(unsigned int stallnode, long long u
         unsigned int curNode = stallQueue.front().ID;
         long long unsigned int curDist = stallQueue.front().weight;
         stallQueue.pop();
-        backwardStalled[curNode] = true;
+        graph.data(curNode).backwardStalled = true;
         backwardStallChanged.push_back(curNode);
 
         const vector<Edge> & neighbours = graph.nextNodes(curNode);
@@ -227,16 +217,16 @@ void CHFlagsGraphQueryManager::backwardStall(unsigned int stallnode, long long u
                 continue;
             }
 
-            if (backwardReached[(*iter).targetNode]) {
+            if (graph.data((*iter).targetNode).backwardReached) {
                 long long unsigned int newdistance = curDist + (*iter).weight;
 
-                if (newdistance < backwardDist[(*iter).targetNode]) {
-                    if (! backwardStalled[(*iter).targetNode]) {
+                if (newdistance < graph.data((*iter).targetNode).backwardDist) {
+                    if (! graph.data((*iter).targetNode).backwardStalled) {
                         stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
-                        if (backwardDist[(*iter).targetNode] == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).backwardDist == ULLONG_MAX) {
                             backwardChanged.push_back((*iter).targetNode);
                         }
-                        backwardDist[(*iter).targetNode] = newdistance;
+                        graph.data((*iter).targetNode).backwardDist = newdistance;
                     }
                 }
             }
@@ -247,29 +237,22 @@ void CHFlagsGraphQueryManager::backwardStall(unsigned int stallnode, long long u
 //______________________________________________________________________________________________________________________
 void CHFlagsGraphQueryManager::prepareStructuresForNextQuery() {
     for (unsigned int i = 0; i < forwardChanged.size(); i++) {
-        forwardDist[forwardChanged[i]] = ULLONG_MAX;
-        forwardSettled[forwardChanged[i]] = false;
-        forwardReached[forwardChanged[i]] = false;
+        graph.resetForwardInfo(forwardChanged[i]);
     }
     forwardChanged.clear();
 
     for (unsigned int i = 0; i < backwardChanged.size(); i++) {
-        backwardDist[backwardChanged[i]] = ULLONG_MAX;
-        backwardSettled[backwardChanged[i]] = false;
-        backwardReached[backwardChanged[i]] = false;
+       graph.resetBackwardInfo(backwardChanged[i]);
     }
     backwardChanged.clear();
 
     for (unsigned int i = 0; i < forwardStallChanged.size(); i++) {
-        forwardStalled[forwardStallChanged[i]] = false;
+        graph.resetForwardStall(forwardStallChanged[i]);
     }
     forwardStallChanged.clear();
 
     for (unsigned int i = 0; i < backwardStallChanged.size(); i++) {
-        backwardStalled[backwardStallChanged[i]] = false;
+        graph.resetBackwardStall(backwardStallChanged[i]);
     }
     backwardStallChanged.clear();
-
-    // forwardQ.clean();
-    // backwardQ.clean();
 }
