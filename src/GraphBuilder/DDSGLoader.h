@@ -8,6 +8,7 @@
 
 #include <string>
 #include "Graph.h"
+#include "FlagsGraph.h"
 
 using namespace std;
 
@@ -20,9 +21,12 @@ private:
     void loadRanks(ifstream & input, unsigned int nodes, vector <unsigned int> & ranks);
     void loadOriginalEdges(ifstream & input, unsigned int edges, Graph & graph);
     void loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, Graph & graph);
+    void loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph, vector <unsigned int> & ranks);
+    void loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph, vector <unsigned int> & ranks);
 public:
     DDSGLoader(string inputFile);
     Graph * loadGraphWithRanks(vector <unsigned int> & ranks);
+    FlagsGraph * loadFlagsGraphWithRanks(vector <unsigned int> & ranks);
 };
 
 

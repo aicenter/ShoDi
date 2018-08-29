@@ -57,6 +57,49 @@ Graph * DDSGLoader::loadGraphWithRanks(vector <unsigned int> & ranks) {
 }
 
 //______________________________________________________________________________________________________________________
+FlagsGraph * DDSGLoader::loadFlagsGraphWithRanks(vector <unsigned int> & ranks) {
+    ifstream input;
+    input.open(inputFile, ios::binary);
+
+    if ( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        exit(1);
+    }
+
+    Timer loadTimer("DDSG Graph loading timer");
+    loadTimer.begin();
+
+    if ( verifyHeader(input) == false ) {
+        printf("Something was wrong with the header.\nFile should start with 'CH\\r\\n' followed by the");
+        printf(" version '1', but it didn't.\n");
+        exit(1);
+    }
+
+    printf("Header was verified and suggests the file is a correct DDSG CH file.\n");
+
+    unsigned int nodes, edges, shortcutEdges;
+    loadCnts(input, nodes, edges, shortcutEdges);
+    loadRanks(input, nodes, ranks);
+
+    FlagsGraph * graph = new FlagsGraph(nodes);
+    loadOriginalEdges(input, edges, *graph, ranks);
+    loadShortcutEdges(input, shortcutEdges, *graph, ranks);
+
+    if ( verifyFooter(input) == false ) {
+        printf("The file didn't end the expected way!\nThis file should have ended with an unsigned int");
+        printf(" with value '0x12345678', but it didn't.\nThe file could be corrupted, so using it");
+        printf(" might provide unexpected and incorrect results.\n");
+    }
+
+    loadTimer.finish();
+    loadTimer.printMeasuredTime();
+
+    printf("Graph seems to be loaded correctly!\n");
+
+    return graph;
+}
+
+//______________________________________________________________________________________________________________________
 void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, vector <unsigned int> & ranks) {
     ranks.resize(nodes);
     for(unsigned int i = 0; i < nodes; i++) {
@@ -110,6 +153,64 @@ void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges,
 
     }
 }
+
+//______________________________________________________________________________________________________________________
+void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph, vector <unsigned int> & ranks) {
+    for(unsigned int i = 0; i < edges; i++) {
+        unsigned int from, to, weight, flags;
+        input.read((char*)&from, sizeof(from));
+        input.read((char*)&to, sizeof(to));
+        input.read((char*)&weight, sizeof(weight));
+        input.read((char*)&flags, sizeof(flags));
+
+        /*if(i < 20) {
+            printf("Edge %u: from %u to %u (weight: %u), flags: %u\n", i, from, to, weight, flags);
+        }*/
+
+        bool forward = false;
+        bool backward = false;
+        if((flags & 1) == 1) {
+            forward = true;
+        }
+        if((flags & 2) == 2) {
+            backward = true;
+        }
+        if ( ranks[from] < ranks[to] ) {
+            graph.addEdge(from, to, weight, forward, backward);
+        } else {
+            graph.addEdge(to, from, weight, forward, backward);
+        }
+
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph, vector <unsigned int> & ranks) {
+    for(unsigned int i = 0; i < shortcutEdges; i++) {
+        unsigned int from, to, weight, flags, middleNode;
+        input.read((char*)&from, sizeof(from));
+        input.read((char*)&to, sizeof(to));
+        input.read((char*)&weight, sizeof(weight));
+        input.read((char*)&flags, sizeof(flags));
+        input.read((char*)&middleNode, sizeof(middleNode));
+
+        bool forward = false;
+        bool backward = false;
+        if((flags & 1) == 1) {
+            forward = true;
+        }
+        if((flags & 2) == 2) {
+            backward = true;
+        }
+        if ( ranks[from] < ranks[to] ) {
+            graph.addEdge(from, to, weight, forward, backward);
+        } else {
+            graph.addEdge(to, from, weight, forward, backward);
+        }
+
+    }
+}
+
 
 //______________________________________________________________________________________________________________________
 bool DDSGLoader::verifyHeader(ifstream & input) {

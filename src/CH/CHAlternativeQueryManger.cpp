@@ -12,8 +12,8 @@ CHAlternativeQueryManager::CHAlternativeQueryManager(vector<unsigned int> & x, c
     unsigned int n = graph.nodes();
     forwardDist.resize(n, ULLONG_MAX);
     backwardDist.resize(n, ULLONG_MAX);
-    //forwardReached.resize(n, false);
-    //backwardReached.resize(n, false);
+    forwardReached.resize(n, false);
+    backwardReached.resize(n, false);
     forwardSettled.resize(n, false);
     backwardSettled.resize(n, false);
 }
@@ -35,6 +35,8 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
     backwardDist[target] = 0;
     forwardChanged.push_back(source);
     backwardChanged.push_back(target);
+    forwardReached[source] = true;
+    backwardReached[target] = true;
 
     bool forward = false;
     upperbound = ULLONG_MAX;
@@ -73,6 +75,10 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
 
             const vector<pair<unsigned int, unsigned long long int>> & neighbours = graph.outgoingEdges(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                if (forwardReached[(*iter).first] && existsBackwardEdge(curNode, (*iter).first) != ULLONG_MAX) {
+
+                }
+
                 //forwardReached[(*iter).first] = true;
                 if (ranks[(*iter).first] > ranks[curNode]) {
                     long long unsigned int newlen = curLen + (*iter).second;
@@ -83,6 +89,7 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
                             forwardChanged.push_back((*iter).first);
                         }
                         forwardDist[(*iter).first] = newlen;
+                        forwardReached[(*iter).first] = true;
                     }
                 }
             }
@@ -114,6 +121,7 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
             const vector<pair<unsigned int, unsigned long long int>> & neighbours = graph.incomingEdges(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 //forwardReached[(*iter).first] = true;
+
                 if(ranks[(*iter).first] > ranks[curNode]) {
                     long long unsigned int newlen = curLen + (*iter).second;
 
@@ -123,6 +131,7 @@ long long unsigned int CHAlternativeQueryManager::findDistance(const unsigned in
                             backwardChanged.push_back((*iter).first);
                         }
                         backwardDist[(*iter).first] = newlen;
+                        backwardReached[(*iter).first] = true;
                     }
                 }
             }
@@ -175,21 +184,41 @@ void CHAlternativeQueryManager::relaxBackwardEdges(unsigned int curNode, long lo
     }
 }*/
 
+//______________________________________________________________________________________________________________________
+long long unsigned int CHAlternativeQueryManager::existsBackwardEdge(const unsigned int x, const unsigned int y) {
+    const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(x);
+    for(unsigned int i = 0; i < neighbours.size(); i++) {
+        if(y == neighbours.at(i).first) {
+            return neighbours.at(i).second;
+        }
+    }
+    return ULLONG_MAX;
+}
 
+//______________________________________________________________________________________________________________________
+long long unsigned int CHAlternativeQueryManager::existsForwardEdge(const unsigned int x, const unsigned int y) {
+    const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(x);
+    for(unsigned int i = 0; i < neighbours.size(); i++) {
+        if(y == neighbours.at(i).first) {
+            return neighbours.at(i).second;
+        }
+    }
+    return ULLONG_MAX;
+}
 
 //______________________________________________________________________________________________________________________
 void CHAlternativeQueryManager::prepareStructuresForNextQuery() {
     for (unsigned int i = 0; i < forwardChanged.size(); i++) {
         forwardDist[forwardChanged[i]] = ULLONG_MAX;
         forwardSettled[forwardChanged[i]] = false;
-        //forwardReached[forwardChanged[i]] = false;
+        forwardReached[forwardChanged[i]] = false;
     }
     forwardChanged.clear();
 
     for (unsigned int i = 0; i < backwardChanged.size(); i++) {
         backwardDist[backwardChanged[i]] = ULLONG_MAX;
         backwardSettled[backwardChanged[i]] = false;
-        //backwardReached[backwardChanged[i]] = false;
+        backwardReached[backwardChanged[i]] = false;
     }
     backwardChanged.clear();
 

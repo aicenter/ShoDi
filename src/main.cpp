@@ -98,10 +98,10 @@ void compareDDSGwithMyCHFromClion() {
     //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
     //DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.USA.DDSG.ch");
     vector<unsigned int> ranks(0);
-    Graph * ddsgGraph = ddsgGraphLoader.loadGraphWithRanks(ranks);
+    FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks(ranks);
 
     vector<long long unsigned int> ddsgDistances(trips.size());
-    double ddsgTime = CHBenchmarkWithRanks::runAndMeasureOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
+    double ddsgTime = CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
 
     CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
     printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);
@@ -281,6 +281,15 @@ void runOneDDSGQuery() {
 }
 
 //______________________________________________________________________________________________________________________
+void justLoadDDSG() {
+    DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
+    vector<unsigned int> ranks(0);
+    FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks(ranks);
+    delete ddsgGraph;
+}
+
+
+//______________________________________________________________________________________________________________________
 void DIMACStoDDSG() {
     Loader loader = Loader("../input/USA-road-t.BAY.gr");
     loader.transformToDDSG("../input/USA-road-t.BAY.ddsg");
@@ -301,6 +310,7 @@ int main() {
     compareDDSGwithMyCHFromClion();
     //compareDDSGwithMyCH();
     //compareQueryAlgorithms();
+    //justLoadDDSG();
 
     return 0;
 }

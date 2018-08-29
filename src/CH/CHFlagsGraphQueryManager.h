@@ -1,37 +1,42 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 27.8.18
+// Created on: 28.8.18
 //
 
-#ifndef TRANSIT_NODE_ROUTING_CHALTERNATIVEQUERYMANGER_H
-#define TRANSIT_NODE_ROUTING_CHALTERNATIVEQUERYMANGER_H
+#ifndef TRANSIT_NODE_ROUTING_CHFLAGSGRAPHQUERYMANAGER_H
+#define TRANSIT_NODE_ROUTING_CHFLAGSGRAPHQUERYMANAGER_H
+
 
 #include <vector>
 #include <queue>
-#include "../GraphBuilder/Graph.h"
+#include "../GraphBuilder/FlagsGraph.h"
 #include "CHQueryManager.h"
 #include "Structures/QueryPriorityQueue.h"
 
 using namespace std;
 
-class CHAlternativeQueryManager : public CHQueryManager {
+class CHFlagsGraphQueryManager : public CHQueryManager {
 public:
-    CHAlternativeQueryManager(vector<unsigned int> & x, const Graph & g);
+    CHFlagsGraphQueryManager(vector<unsigned int> & x, const FlagsGraph & g);
     long long unsigned int findDistance(const unsigned int source, const unsigned int target);
 protected:
-    long long unsigned int existsBackwardEdge(const unsigned int x, const unsigned int y);
-    long long unsigned int existsForwardEdge(const unsigned int x, const unsigned int y);
+    void forwardStall(unsigned int stallnode, long long unsigned int stalldistance);
+    void backwardStall(unsigned int stallnode, long long unsigned int stalldistance);
     vector<unsigned int> & ranks;
-    const Graph & graph;
+    const FlagsGraph & graph;
     long long unsigned int upperbound;
     vector<long long unsigned int> forwardDist;
     vector<long long unsigned int> backwardDist;
     vector<unsigned int> forwardChanged;
     vector<unsigned int> backwardChanged;
+    vector<unsigned int> forwardStallChanged;
+    vector<unsigned int> backwardStallChanged;
     vector<bool> forwardReached;
     vector<bool> backwardReached;
     vector<bool> forwardSettled;
     vector<bool> backwardSettled;
+    vector<bool> forwardStalled;
+    vector<bool> backwardStalled;
     //priority_queue<DijkstraNode> forwardQ;
     //priority_queue<DijkstraNode> backwardQ;
     void prepareStructuresForNextQuery();
@@ -39,5 +44,4 @@ protected:
     //void relaxBackwardEdges(unsigned int curNode, long long unsigned int curLen, priority_queue<DijkstraNode, vector<DijkstraNode>, bool> & pq);
 };
 
-
-#endif //TRANSIT_NODE_ROUTING_CHALTERNATIVEQUERYMANGER_H
+#endif //TRANSIT_NODE_ROUTING_CHFLAGSGRAPHQUERYMANAGER_H
