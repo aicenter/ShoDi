@@ -17,12 +17,11 @@ using namespace std;
 
 class CHFlagsGraphQueryManager : public CHQueryManager {
 public:
-    CHFlagsGraphQueryManager(vector<unsigned int> & x, FlagsGraph & g);
+    CHFlagsGraphQueryManager(FlagsGraph & g);
     long long unsigned int findDistance(const unsigned int source, const unsigned int target);
 protected:
     void forwardStall(unsigned int stallnode, long long unsigned int stalldistance);
     void backwardStall(unsigned int stallnode, long long unsigned int stalldistance);
-    vector<unsigned int> & ranks;
     FlagsGraph & graph;
     long long unsigned int upperbound;
     vector<unsigned int> forwardChanged;

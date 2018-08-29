@@ -26,8 +26,8 @@ double CHBenchmarkWithRanks::runAndMeasureOutputAndRetval(const vector < pair < 
 }
 
 //______________________________________________________________________________________________________________________
-double CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < unsigned int > & ranks, vector < long long unsigned int > & distances) {
-    CHFlagsGraphQueryManager queryManager(ranks, graph);
+double CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < long long unsigned int > & distances) {
+    CHFlagsGraphQueryManager queryManager(graph);
 
     Timer chTimer("Contraction hierarchies trips benchmark");
     chTimer.begin();

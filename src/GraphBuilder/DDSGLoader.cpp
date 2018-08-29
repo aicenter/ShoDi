@@ -57,7 +57,7 @@ Graph * DDSGLoader::loadGraphWithRanks(vector <unsigned int> & ranks) {
 }
 
 //______________________________________________________________________________________________________________________
-FlagsGraph * DDSGLoader::loadFlagsGraphWithRanks(vector <unsigned int> & ranks) {
+FlagsGraph * DDSGLoader::loadFlagsGraphWithRanks() {
     ifstream input;
     input.open(inputFile, ios::binary);
 
@@ -79,11 +79,11 @@ FlagsGraph * DDSGLoader::loadFlagsGraphWithRanks(vector <unsigned int> & ranks) 
 
     unsigned int nodes, edges, shortcutEdges;
     loadCnts(input, nodes, edges, shortcutEdges);
-    loadRanks(input, nodes, ranks);
-
     FlagsGraph * graph = new FlagsGraph(nodes);
-    loadOriginalEdges(input, edges, *graph, ranks);
-    loadShortcutEdges(input, shortcutEdges, *graph, ranks);
+
+    loadRanks(input, nodes, *graph);
+    loadOriginalEdges(input, edges, *graph);
+    loadShortcutEdges(input, shortcutEdges, *graph);
 
     if ( verifyFooter(input) == false ) {
         printf("The file didn't end the expected way!\nThis file should have ended with an unsigned int");
@@ -106,6 +106,15 @@ void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, vector <unsigne
         unsigned int rank;
         input.read((char*)&rank, sizeof(rank));
         ranks[i] = rank;
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraph & graph) {
+    for(unsigned int i = 0; i < nodes; i++) {
+        unsigned int rank;
+        input.read((char*)&rank, sizeof(rank));
+        graph.data(i).rank = rank;
     }
 }
 
@@ -155,7 +164,7 @@ void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges,
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph, vector <unsigned int> & ranks) {
+void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
         input.read((char*)&from, sizeof(from));
@@ -175,7 +184,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGr
         if((flags & 2) == 2) {
             backward = true;
         }
-        if ( ranks[from] < ranks[to] ) {
+        if ( graph.data(from).rank < graph.data(to).rank ) {
             graph.addEdge(from, to, weight, forward, backward);
         } else {
             graph.addEdge(to, from, weight, forward, backward);
@@ -185,7 +194,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGr
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph, vector <unsigned int> & ranks) {
+void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph) {
     for(unsigned int i = 0; i < shortcutEdges; i++) {
         unsigned int from, to, weight, flags, middleNode;
         input.read((char*)&from, sizeof(from));
@@ -202,7 +211,7 @@ void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges,
         if((flags & 2) == 2) {
             backward = true;
         }
-        if ( ranks[from] < ranks[to] ) {
+        if ( graph.data(from).rank < graph.data(to).rank ) {
             graph.addEdge(from, to, weight, forward, backward);
         } else {
             graph.addEdge(to, from, weight, forward, backward);

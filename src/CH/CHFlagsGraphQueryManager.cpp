@@ -7,7 +7,7 @@
 #include "CHFlagsGraphQueryManager.h"
 
 //______________________________________________________________________________________________________________________
-CHFlagsGraphQueryManager::CHFlagsGraphQueryManager(vector<unsigned int> & x, FlagsGraph & g) : ranks(x), graph(g) {
+CHFlagsGraphQueryManager::CHFlagsGraphQueryManager(FlagsGraph & g) : graph(g) {
 
 }
 
@@ -79,7 +79,7 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
                 }
                 //forwardReached[(*iter).first] = true;
 
-                if (ranks[(*iter).targetNode] > ranks[curNode]) {
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
                     long long unsigned int newlen = curLen + (*iter).weight;
 
                     if (newlen < graph.data((*iter).targetNode).forwardDist) {
@@ -132,7 +132,7 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
                 }
                 //forwardReached[(*iter).first] = true;
 
-                if(ranks[(*iter).targetNode] > ranks[curNode]) {
+                if(graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
                     long long unsigned int newlen = curLen + (*iter).weight;
 
                     if (newlen < graph.data((*iter).targetNode).backwardDist) {

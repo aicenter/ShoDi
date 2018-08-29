@@ -86,25 +86,24 @@ void compareDDSGwithMyCHFromClion() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
+    /*Loader chGraphLoader = Loader("../input/USA.USA.CH_add_ch_graph");
     Graph * chGraph = chGraphLoader.loadCHGraph();
 
     vector<long long unsigned int> myDistances(trips.size());
     double myTime = CHBenchmark::runAndMeasureOutputAndRetval(trips, *chGraph, myDistances);
 
-    delete chGraph;
+    delete chGraph;*/
 
     //DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.BAY.DDSG.ch");
     DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
     //DDSGLoader ddsgGraphLoader = DDSGLoader("input/USA.BAY.DDSG.ch");
-    vector<unsigned int> ranks(0);
-    FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks(ranks);
+    FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks();
 
     vector<long long unsigned int> ddsgDistances(trips.size());
-    double ddsgTime = CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(trips, *ddsgGraph, ranks, ddsgDistances);
+    double ddsgTime = CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(trips, *ddsgGraph, ddsgDistances);
 
-    CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
-    printf("Their implementatetion was %lf times faster than mine!\n", myTime/ddsgTime);
+    /*CorectnessValidator::validateVerbose(myDistances, ddsgDistances);
+    printf("Their implementatetion was %lf times faster than mine!\n", myTime/ddsgTime);*/
 
     delete ddsgGraph;
 
@@ -283,8 +282,7 @@ void runOneDDSGQuery() {
 //______________________________________________________________________________________________________________________
 void justLoadDDSG() {
     DDSGLoader ddsgGraphLoader = DDSGLoader("../input/USA.USA.DDSG.ch");
-    vector<unsigned int> ranks(0);
-    FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks(ranks);
+    FlagsGraph * ddsgGraph = ddsgGraphLoader.loadFlagsGraphWithRanks();
     delete ddsgGraph;
 }
 
