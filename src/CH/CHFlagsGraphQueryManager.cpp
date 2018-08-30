@@ -64,7 +64,7 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
                 }
             }
 
-            const vector<Edge> & neighbours = graph.nextNodes(curNode);
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
                     long long unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
@@ -118,7 +118,7 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
                 }
             }
 
-            const vector<Edge> & neighbours = graph.nextNodes(curNode);
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
@@ -175,7 +175,7 @@ void CHFlagsGraphQueryManager::forwardStall(unsigned int stallnode, long long un
         graph.data(curNode).forwardStalled = true;
         forwardStallChanged.push_back(curNode);
 
-        const vector<Edge> & neighbours = graph.nextNodes(curNode);
+        const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
         for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
             if (! (*iter).forward) {
                 continue;
@@ -211,7 +211,7 @@ void CHFlagsGraphQueryManager::backwardStall(unsigned int stallnode, long long u
         graph.data(curNode).backwardStalled = true;
         backwardStallChanged.push_back(curNode);
 
-        const vector<Edge> & neighbours = graph.nextNodes(curNode);
+        const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
         for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
             if (! (*iter).backward) {
                 continue;

@@ -10,8 +10,10 @@
 #include <unordered_set>
 #include <string>
 #include "../GraphBuilder/UpdateableGraph.h"
+#include "../GraphBuilder/ShortcutEdge.h"
 #include "Structures/CHNode.h"
 #include "Structures/CHpriorityQueue.h"
+
 
 using namespace std;
 
@@ -21,11 +23,13 @@ class CHPreprocessor {
 public:
     static void preprocessAndSave(string filePath, UpdateableGraph & graph);
     static void preprocessAndSaveWithUnpackingData(string filePath, UpdateableGraph & graph);
+    static void preprocessForDDSG(UpdateableGraph & graph);
 private:
     static void flushCHgraph(string & filePath, UpdateableGraph & graph);
     static void flushShortcuts(string & filePath, UpdateableGraph & graph);
     static void flushCHRanks(string & filePath);
     static void flushUnpackingData(string & filePath);
+    static void reinsertShortcuts(UpdateableGraph & graph);
     static void initializePriorityQueue(CHpriorityQueue & priorityQueue, UpdateableGraph & graph);
     static void contractNodes(CHpriorityQueue & priorityQueue, UpdateableGraph & graph);
     static void contractNodesWithUnpackingData(CHpriorityQueue & priorityQueue, UpdateableGraph & graph);
@@ -61,8 +65,7 @@ private:
     static vector<unsigned int> preprocessingDegrees;
     static vector<unsigned int> nodeRanks;
     static vector<long long unsigned int> dijkstraDistance;
-    static vector<pair<pair<unsigned int, unsigned int>, unsigned int>> unpacking;
-    static vector<pair<pair<unsigned int, unsigned int>, long long unsigned int>> allShortcuts;
+    static vector<ShortcutEdge> allShortcuts;
 
     static unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, pair_hash> distances;
     static unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, pair_hash> distancesWithoutX;

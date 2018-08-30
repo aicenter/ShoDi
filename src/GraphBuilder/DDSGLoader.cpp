@@ -128,7 +128,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, Graph &
         input.read((char*)&flags, sizeof(flags));
 
         /*if(i < 20) {
-            printf("Edge %u: from %u to %u (weight: %u), flags: %u\n", i, from, to, weight, flags);
+            printf("QueryEdge %u: from %u to %u (weight: %u), flags: %u\n", i, from, to, weight, flags);
         }*/
 
         if((flags & 1) == 1) {
@@ -171,10 +171,6 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGr
         input.read((char*)&to, sizeof(to));
         input.read((char*)&weight, sizeof(weight));
         input.read((char*)&flags, sizeof(flags));
-
-        /*if(i < 20) {
-            printf("Edge %u: from %u to %u (weight: %u), flags: %u\n", i, from, to, weight, flags);
-        }*/
 
         bool forward = false;
         bool backward = false;

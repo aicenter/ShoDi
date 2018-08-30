@@ -34,6 +34,23 @@ void constructCH() {
 }
 
 //______________________________________________________________________________________________________________________
+void constructDDSGCH() {
+    Timer timer("Whole CH construction timer");
+    timer.begin();
+
+    Loader graphLoader = Loader("../input/USA-road-t.BAY.gr");
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    CHPreprocessor::preprocessForDDSG(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    graph->flushInDdsgFormat("../input/USA.BAY.MY.DDSG");
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
+//______________________________________________________________________________________________________________________
 void additionalCHPreprocess() {
     Loader chGraphLoader = Loader("../input/USA-road-t.BAY.gr");
     ShrinkingGraph * chGraph = chGraphLoader.loadCHWithShortcutsIntoShrinkingGraph("../input/USA.BAY.CH_measure4_shortcuts");
@@ -138,6 +155,34 @@ void compareDDSGwithMyCH() {
     printf("Their implementation was %lf times faster than mine!\n", myTime/ddsgTime);*/
 
     delete ddsgGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void compareMineWithReference() {
+    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    //Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader myLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
+    FlagsGraph * myCH = myLoader.loadFlagsGraphWithRanks();
+
+    vector<long long unsigned int> myDistances(trips.size());
+    double myTime = CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(trips, *myCH, myDistances);
+
+    delete myCH;
+
+    DDSGLoader theirLoader = DDSGLoader("../input/USA.BAY.DDSG.ch");
+    FlagsGraph * theirCH = theirLoader.loadFlagsGraphWithRanks();
+
+    vector<long long unsigned int> theirDistances(trips.size());
+    double theirTime = CHBenchmarkWithRanks::runAndMeasureFlagsGraphOutputAndRetval(trips, *theirCH, theirDistances);
+
+    CorectnessValidator::validateVerbose(myDistances, theirDistances);
+    printf("Their implementation was %lf times faster than mine!\n", myTime/theirTime);
+
+    delete theirCH;
 
 }
 
@@ -305,10 +350,13 @@ int main() {
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
     //DIMACStoDDSG();
-    compareDDSGwithMyCHFromClion();
+    //compareDDSGwithMyCHFromClion();
     //compareDDSGwithMyCH();
     //compareQueryAlgorithms();
     //justLoadDDSG();
+
+    //constructDDSGCH();
+    compareMineWithReference();
 
     return 0;
 }

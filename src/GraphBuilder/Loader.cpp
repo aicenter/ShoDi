@@ -174,6 +174,31 @@ UpdateableGraph * Loader::loadUpdateableGraph() {
 }
 
 //______________________________________________________________________________________________________________________
+void Loader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Putting all original edges back into updateable graph!\n");
+
+    Timer graphLoadTimer("Putting back original edges");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges;
+    parseGraphProblemLine(input, nodes, edges);
+
+    parseEdges(input, graph, edges);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+
+}
+
+//______________________________________________________________________________________________________________________
 void Loader::transformToDDSG(string DIMACSfile) {
     ifstream input;
     ofstream output;

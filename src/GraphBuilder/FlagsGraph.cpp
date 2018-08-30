@@ -15,7 +15,7 @@ FlagsGraph::FlagsGraph(unsigned int n) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw) {
-    neighbours.at(from).push_back(Edge(to, weight, fw, bw));
+    neighbours.at(from).push_back(QueryEdge(to, weight, fw, bw));
 }
 
 //______________________________________________________________________________________________________________________
@@ -24,7 +24,7 @@ const unsigned int FlagsGraph::nodes() const {
 }
 
 //______________________________________________________________________________________________________________________
-const vector< Edge > & FlagsGraph::nextNodes(const unsigned int x)const {
+const vector< QueryEdge > & FlagsGraph::nextNodes(const unsigned int x)const {
     return neighbours.at(x);
 }
 

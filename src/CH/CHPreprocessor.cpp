@@ -21,8 +21,7 @@ vector<bool> CHPreprocessor::contracted(0);
 vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
 vector<unsigned int> CHPreprocessor::nodeRanks(0);
 vector<long long unsigned int> CHPreprocessor::dijkstraDistance(0);
-vector<pair<pair<unsigned int, unsigned int>, unsigned int>> CHPreprocessor::unpacking(0);
-vector<pair<pair<unsigned int, unsigned int>, long long unsigned int>> CHPreprocessor::allShortcuts(0);
+vector<ShortcutEdge> CHPreprocessor::allShortcuts;
 unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distances;
 unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distancesWithoutX;
 vector<unsigned int> CHPreprocessor::sources(0);
@@ -101,6 +100,39 @@ void CHPreprocessor::preprocessAndSaveWithUnpackingData(string filePath, Updatea
 }
 
 //______________________________________________________________________________________________________________________
+void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
+    printf("Started preprocessing!\n");
+    Timer preprocessTimer("Contraction Hierarchies preprocessing timer");
+    preprocessTimer.begin();
+
+    CHpriorityQueue priorityQueue(graph.nodes());
+
+    CHPreprocessor::contracted.resize(graph.nodes(), false);
+    CHPreprocessor::preprocessingDegrees.resize(graph.nodes());
+    CHPreprocessor::nodeRanks.resize(graph.nodes());
+    CHPreprocessor::dijkstraDistance.resize(graph.nodes(), ULLONG_MAX);
+    EdgeDifferenceManager::init(graph.nodes());
+
+    initializePriorityQueue(priorityQueue, graph);
+    priorityQueue.debugPrint();
+    printf("Initialized priority queue!\n");
+    contractNodesWithUnpackingData(priorityQueue, graph);
+    reinsertShortcuts(graph);
+
+    preprocessTimer.finish();
+    preprocessTimer.printMeasuredTime();
+
+    /*printf("Now writing preprocessed data into files.\n");
+    Timer writeTimer("Contraction Hierarchies file writing timer");
+    writeTimer.begin();
+
+    graph.flushInDdsgFormat(filePath);
+
+    writeTimer.finish();
+    writeTimer.printMeasuredTime();*/
+}
+
+//______________________________________________________________________________________________________________________
 void CHPreprocessor::flushCHgraph(string & filePath, UpdateableGraph & graph) {
     flushShortcuts(filePath, graph);
     flushCHRanks(filePath);
@@ -119,7 +151,7 @@ void CHPreprocessor::flushShortcuts(string & filePath, UpdateableGraph & graph) 
 
     output << shortcuts << endl;
     for(long long unsigned int i = 0; i < shortcuts; i++) {
-        output << allShortcuts[i].first.first << " " <<  allShortcuts[i].first.second << " " << allShortcuts[i].second << endl;
+      //  output << allShortcuts[i].first.first << " " <<  allShortcuts[i].first.second << " " << allShortcuts[i].second << endl;
     }
 
     output.close();
@@ -156,10 +188,10 @@ void CHPreprocessor::flushUnpackingData(string & filePath) {
         printf("Couldn't open file '%s'!", (filePath + "_ranks").c_str());
     }
 
-    output << unpacking.size() << endl;
-    for ( unsigned int i = 0; i < unpacking.size(); i++ ) {
-        output << unpacking[i].first.first << " " << unpacking[i].first.second << " " << unpacking[i].second << endl;
-    }
+    //output << unpacking.size() << endl;
+    //for ( unsigned int i = 0; i < unpacking.size(); i++ ) {
+    //    output << unpacking[i].first.first << " " << unpacking[i].first.second << " " << unpacking[i].second << endl;
+    //}
 
     output.close();
 
@@ -214,7 +246,7 @@ void CHPreprocessor::contractNodes(CHpriorityQueue & priorityQueue, UpdateableGr
             removeContractedNodeEdges(graph, current.id);
             clearStructures();
             updateNeighboursPriorities(current.id, graph, priorityQueue);
-            nodeRanks[current.id] = CHrank++;
+            graph.setRank(current.id, CHrank++);
 
             if(graph.nodes() - CHrank < 2000) {
                 //if(CHrank % 10 == 0) {
@@ -238,8 +270,10 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
     unsigned int CHrank = 1;
 
     while( ! priorityQueue.empty() ) {
+        //printf("Contracting node: %u\n", CHrank);
         CHNode current = priorityQueue.front();
         priorityQueue.pop();
+        //printf("Current: %u (with weight %i)\n", current.id, current.weight);
 
         getPossibleShortcuts(current.id, graph, true);
         unsigned int shortcuts = calculateShortcutsAmount();
@@ -249,13 +283,20 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
             clearStructures();
             priorityQueue.insert(current.id, newweight);
         } else {
+            //printf("In the else branch\n");
             contracted[current.id] = true;
             adjustNeighbourgDegrees(current.id, graph);
+            //printf("Adjusted edges\n");
             actuallyAddShortcutsWithUnpackingData(graph, current.id);
+           // printf("Added shortcuts\n");
             removeContractedNodeEdges(graph, current.id);
+            //printf("Removed edges\n");
             clearStructures();
+            //printf("Cleader structures\n");
             updateNeighboursPriorities(current.id, graph, priorityQueue);
-            nodeRanks[current.id] = CHrank++;
+            //printf("Updated priorities\n");
+            graph.setRank(current.id, CHrank++);
+            //printf("Rank set\n");
 
             if(graph.nodes() - CHrank < 2000) {
                 //if(CHrank % 10 == 0) {
@@ -269,11 +310,18 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
     }
 }
 
+//______________________________________________________________________________________________________________________
+void CHPreprocessor::reinsertShortcuts(UpdateableGraph & graph) {
+    for(unsigned int i = 0; i < allShortcuts.size(); i++) {
+        graph.addShortcutEdge(allShortcuts[i].sourceNode, allShortcuts[i].targetNode, allShortcuts[i].weight, allShortcuts[i].middleNode);
+    }
+}
+
 // Helper function that adjust neighbourg degrees when a node is contracted.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, UpdateableGraph & graph) {
     unordered_map < unsigned int, long long unsigned int > previousNodes = graph.incomingEdges(x);
-    unordered_map < unsigned int, long long unsigned int > nextNodes = graph.outgoingEdges(x);
+    unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
     for(auto iter = previousNodes.begin(); iter != previousNodes.end(); ++iter) {
         if (! contracted[(*iter).first]) {
@@ -292,7 +340,7 @@ void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, UpdateableGra
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, UpdateableGraph & graph, CHpriorityQueue & priorityQueue) {
     unordered_map < unsigned int, long long unsigned int > previousNodes = graph.incomingEdges(x);
-    unordered_map < unsigned int, long long unsigned int > nextNodes = graph.outgoingEdges(x);
+    unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
     unordered_set < unsigned int > alreadyUpdated;
     for(auto iter = previousNodes.begin(); iter != previousNodes.end(); ++iter) {
@@ -360,7 +408,7 @@ void CHPreprocessor::actuallyAddShortcuts(UpdateableGraph & graph) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;
                     if ( graph.addEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2))) ) {
-                        allShortcuts.push_back(make_pair(make_pair(*iter1, *iter2), distances.at(make_pair(*iter1, *iter2))));
+                        allShortcuts.push_back(ShortcutEdge((*iter1), (*iter2), distances.at(make_pair(*iter1, *iter2)), 0));
                     }
                 }
             }
@@ -380,9 +428,8 @@ void CHPreprocessor::actuallyAddShortcutsWithUnpackingData(UpdateableGraph & gra
                 if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;
-                    if( graph.addEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2))) ) {
-                        unpacking.push_back(make_pair(make_pair(*iter1, *iter2), x));
-                        allShortcuts.push_back(make_pair(make_pair(*iter1, *iter2), distances.at(make_pair(*iter1, *iter2))));
+                    if (graph.addShortcutEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2)), x)) {
+                        allShortcuts.push_back(ShortcutEdge((*iter1), (*iter2), distances.at(make_pair(*iter1, *iter2)), x));
                     }
                 }
             }
@@ -419,17 +466,17 @@ void CHPreprocessor::clearStructures() {
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph & graph ) {
     unordered_map <unsigned int, long long unsigned int> i_sources = graph.incomingEdges(i);
-    unordered_map <unsigned int, long long unsigned int> i_targets = graph.outgoingEdges(i);
+    unordered_map <unsigned int, PreprocessingEdgeData> i_targets = graph.outgoingEdges(i);
     for(auto iter1 = i_sources.begin(); iter1 != i_sources.end(); ++iter1) {
         for(auto iter2 = i_targets.begin(); iter2 != i_targets.end(); ++iter2) {
             if((*iter1).first != (*iter2).first && ! contracted[(*iter1).first] && ! contracted[(*iter2).first]) {
                 if (distances.count(make_pair((*iter1).first, (*iter2).first))  == 1) {
-                    if((*iter1).second + (*iter2).second < distances.at(make_pair((*iter1).first, (*iter2).first))) {
-                        distances[(make_pair((*iter1).first, (*iter2).first))] = (*iter1).second + (*iter2).second;
+                    if((*iter1).second + (*iter2).second.weight < distances.at(make_pair((*iter1).first, (*iter2).first))) {
+                        distances[(make_pair((*iter1).first, (*iter2).first))] = (*iter1).second + (*iter2).second.weight;
                     }
                 } else {
                     distances.insert(make_pair(make_pair((*iter1).first, (*iter2).first),
-                                               (*iter1).second + (*iter2).second));
+                                               (*iter1).second + (*iter2).second.weight));
                 }
             }
         }
@@ -553,18 +600,18 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const long 
             }
         }
 
-        const unordered_map < unsigned int, long long unsigned int > & neighbours = graph.outgoingEdges(current.ID);
+        const unordered_map < unsigned int, PreprocessingEdgeData > & neighbours = graph.outgoingEdges(current.ID);
         for ( auto n_iter = neighbours.begin(); n_iter != neighbours.end(); ++n_iter ) {
             if (buckets.count((*n_iter).first) == 1 ) {
                 for(auto iter = buckets[(*n_iter).first].begin(); iter != buckets[(*n_iter).first].end(); ++iter) {
-                    long long unsigned int newDistUsingBucket = current.weight + (*n_iter).second + (*iter).second;
+                    long long unsigned int newDistUsingBucket = current.weight + (*n_iter).second.weight + (*iter).second;
                     if (newDistUsingBucket < dijkstraDistance[(*iter).first]) {
                         dijkstraDistance[(*iter).first] = newDistUsingBucket;
                         nodesWithChangedDistances.push_back((*iter).first);
                     }
                 }
             }
-            long long unsigned int newDistance = current.weight + (*n_iter).second;
+            long long unsigned int newDistance = current.weight + (*n_iter).second.weight;
             if ( ! CHPreprocessor::contracted[(*n_iter).first] && newDistance < dijkstraDistance[(*n_iter).first]) {
                 dijkstraDistance[(*n_iter).first] = newDistance;
                 nodesWithChangedDistances.push_back((*n_iter).first);

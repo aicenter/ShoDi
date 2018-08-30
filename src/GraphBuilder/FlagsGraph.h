@@ -8,7 +8,7 @@
 
 #include <utility>
 #include <vector>
-#include "Edge.h"
+#include "QueryEdge.h"
 #include "../CH/Structures/NodeData.h"
 
 using namespace std;
@@ -17,13 +17,13 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class FlagsGraph{
 private:
-    vector< vector < Edge > > neighbours;
+    vector< vector < QueryEdge > > neighbours;
     vector< NodeData > nodesData;
 public:
     FlagsGraph(unsigned int n);
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
-    const vector< Edge > & nextNodes(const unsigned int x)const;
+    const vector< QueryEdge > & nextNodes(const unsigned int x)const;
     const unsigned int degree(unsigned int node)const;
     NodeData & data(unsigned int node);
     void resetForwardInfo(const unsigned int node);

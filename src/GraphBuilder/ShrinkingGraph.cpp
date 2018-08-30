@@ -34,7 +34,7 @@ void ShrinkingGraph::flushGraph(string filePath) {
     output << "p sp " << followingNodes.size() << " " << records << endl;
     for (unsigned int i = 0; i < followingNodes.size(); i++) {
         for (auto iter = followingNodes.at(i).begin(); iter != followingNodes.at(i).end(); ++iter) {
-            output << "b " << i+1 << " " << (*iter).first + 1 << " " << (*iter).second << endl;
+            output << "b " << i+1 << " " << (*iter).first + 1 << " " << (*iter).second.weight << endl;
         }
     }
     for (unsigned int i = 0; i < previousNodes.size(); i++) {

@@ -51,6 +51,7 @@ public:
     void loadRanks(vector < unsigned int > & x);
     void loadUnpackingData(map < pair < unsigned int, unsigned int >, unsigned int > & x);
     void transformToDDSG(string DIMACSfile);
+    void putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph);
 
 };
 

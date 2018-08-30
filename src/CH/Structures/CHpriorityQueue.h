@@ -27,6 +27,7 @@ public:
     void pop();
     bool empty();
     void buildProperHeap();
+    void debugPrint();
 private:
     void bubbleDown(const unsigned int i);
     void bubbleUp(const unsigned int i);
