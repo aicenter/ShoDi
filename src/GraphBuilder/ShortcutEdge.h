@@ -6,7 +6,9 @@
 #ifndef TRANSIT_NODE_ROUTING_SHORTCUTEDGE_H
 #define TRANSIT_NODE_ROUTING_SHORTCUTEDGE_H
 
-
+// This structure is used during the preprocessing phase to keep track of all the created shortcuts.
+// Each instance represents one shortcut with all it's info necessary for additional preprocessing.
+//______________________________________________________________________________________________________________________
 class ShortcutEdge {
 public:
     ShortcutEdge(unsigned int a, unsigned int b, long long unsigned int c, unsigned int d);

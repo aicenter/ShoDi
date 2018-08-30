@@ -23,27 +23,14 @@ const unsigned int FlagsGraph::nodes() const {
     return neighbours.size();
 }
 
+// Returns all neighbours of a given node 'x'. Keep in mind that this returns neighbour both in the forward and
+// backward direction, so we always have to check if the neighbour is in the correct direction when expanding a node.
 //______________________________________________________________________________________________________________________
 const vector< QueryEdge > & FlagsGraph::nextNodes(const unsigned int x)const {
     return neighbours.at(x);
 }
 
-
-//______________________________________________________________________________________________________________________
-const unsigned int FlagsGraph::degree(unsigned int node)const {
-    unsigned int degree = 0;
-    for(auto iter = neighbours.at(node).begin(); iter != neighbours.at(node).end(); ++iter) {
-        if ((*iter).backward) {
-            degree++;
-        }
-        if ((*iter).forward) {
-            degree++;
-        }
-    }
-    return degree;
-
-}
-
+// Returns the data for a certain node.
 //______________________________________________________________________________________________________________________
 NodeData & FlagsGraph::data(unsigned int node) {
     return nodesData[node];

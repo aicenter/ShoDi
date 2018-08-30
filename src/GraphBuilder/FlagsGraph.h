@@ -14,6 +14,12 @@
 using namespace std;
 
 // Class representing a graph for specifically for the CH query algorithm.
+// We use the representation suggested in the "Contraction Hierarchies: Faster and Simpler Hierarchical
+// Routing in Road Networks" article by Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
+// Basically, for example Dijkstra requires undirected edges to be saved at both nodes. This representation
+// only saves every edge at the incident node with the lower rank. This makes sense, because we only expand edges
+// going from lower ranked nodes to higher ranked nodes in the query algorithm anyway. We store additional flags
+// "forward" and "backward" with each edge to determine in which direction the edge should be expanded.
 //______________________________________________________________________________________________________________________
 class FlagsGraph{
 private:
@@ -24,7 +30,6 @@ public:
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
     const vector< QueryEdge > & nextNodes(const unsigned int x)const;
-    const unsigned int degree(unsigned int node)const;
     NodeData & data(unsigned int node);
     void resetForwardInfo(const unsigned int node);
     void resetBackwardInfo(const unsigned int node);

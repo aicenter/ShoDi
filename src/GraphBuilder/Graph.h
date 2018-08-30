@@ -13,6 +13,8 @@
 using namespace std;
 
 // Class representing a graph.
+// This simple graph representation is used for the Dijkstra Algorithm. For the Contraction Hierarchies,
+// other representation seem to work better.
 //______________________________________________________________________________________________________________________
 class Graph{
 private:
@@ -27,7 +29,6 @@ public:
     const unsigned int nodes() const;
     const vector<pair<unsigned int, long long unsigned int>> & incomingEdges(const unsigned int x)const;
     const vector<pair<unsigned int, long long unsigned int>> & outgoingEdges(const unsigned int x)const;
-    const unsigned int degree(unsigned int node)const;
 };
 
 #endif //TRANSIT_NODE_ROUTING_GRAPH_H

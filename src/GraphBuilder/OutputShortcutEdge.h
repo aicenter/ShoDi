@@ -9,6 +9,9 @@
 
 #include "OutputEdge.h"
 
+// Simple structure used for outputing shortcut edges into the binary .ch format.
+// Each instance is one shortcut edge with all it's necessary information ('middleNode' is added)
+//______________________________________________________________________________________________________________________
 class OutputShortcutEdge : public OutputEdge {
 public:
     OutputShortcutEdge(unsigned int a, unsigned int b, unsigned int c, unsigned int d, unsigned int e);

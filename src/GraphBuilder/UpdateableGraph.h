@@ -14,6 +14,10 @@
 
 using namespace std;
 
+// This class is used to represent the graph during the preprocessing phase. This representation supports pretty simple
+// and reasonably quick edge adding and removing. It also keeps track of which edges are shortcut edges and which
+// are original edges. The information in this structure can be directly used to generate a .ch file.
+//______________________________________________________________________________________________________________________
 class UpdateableGraph{
 protected:
     void prepareEdgesForFlushing(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts);

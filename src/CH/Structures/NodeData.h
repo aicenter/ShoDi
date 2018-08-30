@@ -6,7 +6,9 @@
 #ifndef TRANSIT_NODE_ROUTING_NODEDATA_H
 #define TRANSIT_NODE_ROUTING_NODEDATA_H
 
-
+// A simple structure encapsulating all the important information about a node for the Contraction Hierarchies
+// query algorithm.
+//______________________________________________________________________________________________________________________
 class NodeData {
 public:
     NodeData();

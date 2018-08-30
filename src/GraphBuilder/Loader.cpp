@@ -12,6 +12,9 @@ Loader::Loader(string inputFile) {
     this->inputFile = inputFile;
 }
 
+// Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
+// into an 'SimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct a 'Graph'
+// from that.
 //______________________________________________________________________________________________________________________
 Graph * Loader::loadGraph() {
     ifstream input;
@@ -27,7 +30,6 @@ Graph * Loader::loadGraph() {
 
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
-    //printf("Nodes: %u, edges: %u.\n", nodes, edges);
 
     SimpleGraph * graph = new SimpleGraph(nodes);
     parseEdges(input, *graph, edges);
@@ -45,72 +47,8 @@ Graph * Loader::loadGraph() {
 
 }
 
-//______________________________________________________________________________________________________________________
-Graph * Loader::loadCHGraph() {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    printf("Started loading CH graph!\n");
-
-    Timer graphLoadTimer("CH Graph loading");
-    graphLoadTimer.begin();
-
-    unsigned int nodes, edges;
-    parseGraphProblemLine(input, nodes, edges);
-
-    Graph * graph = new Graph(nodes);
-    parseCHEdges(input, *graph, edges);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
-
-    input.close();
-
-    return graph;
-
-}
-
-//______________________________________________________________________________________________________________________
-Graph * Loader::loadCHGraphWithShortcuts(string shortcutsFile) {
-    ifstream input, shortcutsInput;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-    shortcutsInput.open(shortcutsFile);
-    if( ! shortcutsInput.is_open() ) {
-        printf("Couldn't open file '%s'!", shortcutsFile.c_str());
-    }
-
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("Graph loading");
-    graphLoadTimer.begin();
-
-    unsigned int nodes, edges;
-    parseGraphProblemLine(input, nodes, edges);
-    //printf("Nodes: %u, edges: %u.\n", nodes, edges);
-
-    SimpleGraph * graph = new SimpleGraph(nodes);
-    parseEdges(input, *graph, edges);
-    parseShortcuts(shortcutsInput, *graph);
-
-    Graph * retvalGraph = new Graph(*graph);
-
-    delete graph;
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
-
-    input.close();
-    shortcutsInput.close();
-
-    return retvalGraph;
-}
-
+// This function is used to load the graph data into an 'UpdateableGraph' instance, which can be used for the
+// preprocessing to create a Contraction Hierarchy from the input graph.
 //______________________________________________________________________________________________________________________
 UpdateableGraph * Loader::loadUpdateableGraph() {
     ifstream input;
@@ -126,7 +64,6 @@ UpdateableGraph * Loader::loadUpdateableGraph() {
 
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
-    //printf("Nodes: %u, edges: %u.\n", nodes, edges);
 
     UpdateableGraph * graph = new UpdateableGraph(nodes);
     parseEdges(input, *graph, edges);
@@ -139,6 +76,7 @@ UpdateableGraph * Loader::loadUpdateableGraph() {
     return graph;
 }
 
+// This function is used to reinsert all the original edges into the graph after the preprocessing has been finished.
 //______________________________________________________________________________________________________________________
 void Loader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     ifstream input;
@@ -164,6 +102,9 @@ void Loader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
 
 }
 
+// This is used to transorm a file from the DIMACS challenge format to the format used for input graphs in the reference
+// implementation. Output of this function isn't used anywhere in this implementation, but can be useful for debug
+// purposes.
 //______________________________________________________________________________________________________________________
 void Loader::transformToDDSG(string DIMACSfile) {
     ifstream input;
@@ -189,6 +130,11 @@ void Loader::transformToDDSG(string DIMACSfile) {
     output.close();
 }
 
+// This function just loads trips in a simple format.
+// The trips file should be a text file starting with an unsigned int with the number of trips "n" and then
+// "n" rows should follow each row containing two integers "source" and "target" separated by a space.
+// This function doesn't validate that the sources and targets are valid (that means that they are lower number than
+// the amount of edges in the used graph), it just loads the pairs. Do any validations yourself, if necessary.
 //______________________________________________________________________________________________________________________
 void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     ifstream input;
@@ -198,32 +144,6 @@ void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     }
 
     parseTrips(input, x);
-
-    input.close();
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::loadRanks(vector < unsigned int > & x) {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    parseRanks(input, x);
-
-    input.close();
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::loadUnpackingData(map < pair < unsigned int, unsigned int >, unsigned int > & x) {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    parseUnpackingData(input, x);
 
     input.close();
 }
@@ -273,7 +193,6 @@ void Loader::transformEdges(ifstream & input, ofstream & output, unsigned int ed
             long long unsigned int weight;
             getEdge(buffer, from, to, weight);
             output << from << " " << to << " " << weight << " 1" << endl;
-            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
             loadededgescnt++;
         }
     }
@@ -290,7 +209,6 @@ void Loader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edge
             long long unsigned int weight;
             getEdge(buffer, from, to, weight);
             graph.addEdge(from, to, weight);
-            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
             loadededgescnt++;
         }
     }
@@ -307,32 +225,6 @@ void Loader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int 
             long long unsigned int weight;
             getEdge(buffer, from, to, weight);
             graph.addEdge(from, to, weight);
-            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
-            loadededgescnt++;
-        }
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseCHEdges(ifstream & input, Graph & graph, unsigned int edges) {
-    unsigned int loadededgescnt = 0;
-    while (loadededgescnt < edges) {
-        string buffer;
-        getline(input, buffer);
-        if (buffer[0] == 'b') {
-            unsigned int from, to;
-            long long unsigned int weight;
-            getEdge(buffer, from, to, weight);
-            graph.addFollowingNode(from, to, weight);
-            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
-            loadededgescnt++;
-        }
-        if (buffer[0] == 'c') {
-            unsigned int from, to;
-            long long unsigned int weight;
-            getEdge(buffer, from, to, weight);
-            graph.addPreviousNode(from, to, weight);
-            //printf("Got edge: %u -> %u, weight: %u.\n", from, to, weight);
             loadededgescnt++;
         }
     }
@@ -377,143 +269,4 @@ void Loader::parseTrips(ifstream & input, vector < pair < unsigned int, unsigned
     for (unsigned int i = 0; i < tripscnt; i++) {
         input >> x.at(i).first >> x.at(i).second;
     }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseShortcuts(ifstream & input, SimpleGraph & graph) {
-    long long unsigned int shortcuts;
-    input >> shortcuts;
-    for(long long unsigned int i = 0; i < shortcuts; i++) {
-        unsigned int from, to;
-        long long unsigned int weight;
-        input >> from >> to >> weight;
-        graph.addEdge(from, to, weight);
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseShortcuts(ifstream & input, UpdateableGraph & graph) {
-    long long unsigned int shortcuts;
-    input >> shortcuts;
-    for(long long unsigned int i = 0; i < shortcuts; i++) {
-        unsigned int from, to;
-        long long unsigned int weight;
-        input >> from >> to >> weight;
-        graph.addEdge(from, to, weight);
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseRanks(ifstream & input, vector < unsigned int > & x) {
-    unsigned int nodes;
-    input >> nodes;
-    x.resize(nodes);
-    for (unsigned int i = 0; i < nodes; i++) {
-        input >> x[i];
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseUnpackingData(ifstream & input, map < pair < unsigned int, unsigned int >, unsigned int > & x) {
-    unsigned int shortcutsCnt;
-    input >> shortcutsCnt;
-    for (unsigned int i = 0; i < shortcutsCnt; i++) {
-        unsigned int s, t, m;
-        input >> s >> t >> m;
-        x.insert(make_pair(make_pair(s, t), m));
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseCoordinatesProblemLine(ifstream & input, unsigned int & nodes) {
-    while (true) {
-        string buffer;
-        getline(input, buffer);
-        if (buffer[0] == 'p') {
-            processCoordinatesProblemLine(buffer, nodes);
-            return;
-        }
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::parseNodesCoordinates(ifstream & input, vector < pair < int, int > > & x, unsigned int nodes) {
-    unsigned int loadednodescnt = 0;
-    while (loadednodescnt < nodes) {
-        string buffer;
-        getline(input, buffer);
-        if (buffer[0] == 'v') {
-            unsigned int node;
-            int coord1, coord2;
-            getNodeCoordinates(buffer, node, coord1, coord2);
-            x.at(node).first = coord1;
-            x.at(node).second = coord2;
-            loadednodescnt++;
-        }
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::processCoordinatesProblemLine(string & buffer, unsigned int & nodes) {
-    unsigned int position = 12;
-    unsigned int tmpnodes = 0;
-    while (position < buffer.size()) {
-        tmpnodes *= 10;
-        tmpnodes += (buffer[position] - 48);
-        position++;
-    }
-
-    nodes = tmpnodes;
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::getNodeCoordinates(string & buffer, unsigned int & node, int & coord1, int & coord2) {
-    unsigned int position = 2;
-    unsigned int tmpnode = 0;
-    while (buffer[position] != ' ') {
-        tmpnode *= 10;
-        tmpnode += (buffer[position] - 48);
-        position++;
-    }
-
-    position++;
-    int tmpcoord1 = 0;
-    bool coord1lessthanzero;
-    if (buffer[position] == '-') {
-        coord1lessthanzero = true;
-        position++;
-    } else {
-        coord1lessthanzero = false;
-    }
-    while(buffer[position] != ' ') {
-        tmpcoord1 *= 10;
-        tmpcoord1 += (buffer[position] - 48);
-        position++;
-    }
-
-    position++;
-    int tmpcoord2 = 0;
-    bool coord2lessthanzero;
-    if (buffer[position] == '-') {
-        coord2lessthanzero = true;
-        position++;
-    } else {
-        coord2lessthanzero = false;
-    }
-    while(position < buffer.size()) {
-        tmpcoord2 *= 10;
-        tmpcoord2 += (buffer[position] - 48);
-        position++;
-    }
-
-    if(coord1lessthanzero) {
-        tmpcoord1 = -tmpcoord1;
-    }
-    if(coord2lessthanzero) {
-        tmpcoord2 = -tmpcoord2;
-    }
-
-    node = tmpnode - 1;
-    coord1 = tmpcoord1;
-    coord2 = tmpcoord2;
 }

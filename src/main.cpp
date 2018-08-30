@@ -80,7 +80,7 @@ void getDijkstraPathForTrip() {
 // be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
-    Loader chGraphLoader = Loader("../input/Rome-road.gr");
+    /*Loader chGraphLoader = Loader("../input/Rome-road.gr");
     Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/Rome_debug3_shortcuts");
     Loader ranksLoader = Loader("../input/Rome_debug3_ranks");
     vector<unsigned int> ranks;
@@ -99,7 +99,7 @@ void getCHPathForTrip() {
     long long unsigned int distance = qm.findPath(trips.at(chosenTrip).first, trips.at(chosenTrip).second, *chGraph);
     printf("Returned distance: %llu\n", distance);
 
-    delete chGraph;
+    delete chGraph;*/
 }
 
 //______________________________________________________________________________________________________________________
@@ -111,8 +111,8 @@ void DIMACStoDDSG() {
 // Simple main function, uncomment the function you want to use.
 //______________________________________________________________________________________________________________________
 int main() {
-    //constructDDSGCH();
-    compareMineWithReference();
+    constructDDSGCH();
+    //compareMineWithReference();
 
     //getDijkstraPathForTrip();
     //getCHPathForTrip();

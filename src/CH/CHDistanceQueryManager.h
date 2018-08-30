@@ -10,10 +10,12 @@
 #include <vector>
 #include <queue>
 #include "../GraphBuilder/FlagsGraph.h"
-#include "Structures/QueryPriorityQueue.h"
 
 using namespace std;
 
+// This class is responsible for the Contraction Hierarchies 'distance' queries - when we only require the 'distance'
+// between two points and don't care about the actual path.
+//______________________________________________________________________________________________________________________
 class CHDistanceQueryManager {
 public:
     CHDistanceQueryManager(FlagsGraph & g);

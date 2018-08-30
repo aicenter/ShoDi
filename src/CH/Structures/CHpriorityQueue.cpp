@@ -7,6 +7,10 @@
 #include <cstdio>
 #include "CHpriorityQueue.h"
 
+// All methods are pretty standard binary heap methods, so google 'binary heap' and you will probably find articles
+// about how it works and why it works this way. Also mapping is added here - we store heap positions for all the
+// nodes, so during change value we immediately know where to find the element we want to change.
+
 //______________________________________________________________________________________________________________________
 CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {
     content.reserve(16);

@@ -79,6 +79,8 @@ void UpdateableGraph::setRank(unsigned int node, unsigned int rank) {
     ranks[node] = rank;
 }
 
+// Outputs the graph in the format used for the Contraction Hierarchies. This format is briefly described in the
+// 'DDSGLoader.h' file.
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushInDdsgFormat(string filePath) {
     vector < OutputEdge > edges;
