@@ -74,40 +74,6 @@ Graph * Loader::loadCHGraph() {
 }
 
 //______________________________________________________________________________________________________________________
-ShrinkingGraph * Loader::loadCHWithShortcutsIntoShrinkingGraph(string shortcutsFile) {
-    ifstream input, shortcutsInput;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-    shortcutsInput.open(shortcutsFile);
-    if( ! shortcutsInput.is_open() ) {
-        printf("Couldn't open file '%s'!", shortcutsFile.c_str());
-    }
-
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("Graph loading");
-    graphLoadTimer.begin();
-
-    unsigned int nodes, edges;
-    parseGraphProblemLine(input, nodes, edges);
-    //printf("Nodes: %u, edges: %u.\n", nodes, edges);
-
-    ShrinkingGraph * graph = new ShrinkingGraph(nodes);
-    parseEdges(input, *graph, edges);
-    parseShortcuts(shortcutsInput, *graph);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
-
-    input.close();
-    shortcutsInput.close();
-
-    return graph;
-}
-
-//______________________________________________________________________________________________________________________
 Graph * Loader::loadCHGraphWithShortcuts(string shortcutsFile) {
     ifstream input, shortcutsInput;
     input.open(this->inputFile);
@@ -232,22 +198,6 @@ void Loader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     }
 
     parseTrips(input, x);
-
-    input.close();
-}
-
-//______________________________________________________________________________________________________________________
-void Loader::loadCoordinates(vector < pair < int, int > > & x) {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    unsigned int nodes;
-    parseCoordinatesProblemLine(input, nodes);
-    x.resize(nodes);
-    parseNodesCoordinates(input, x, nodes);
 
     input.close();
 }

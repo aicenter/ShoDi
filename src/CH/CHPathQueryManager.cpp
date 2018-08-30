@@ -9,7 +9,7 @@
 #include "../Dijkstra/DijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-CHPathQueryManager::CHPathQueryManager(vector<unsigned int> & x, map < pair < unsigned int, unsigned int >, unsigned int > & y) : CHQueryManager(), ranks(x), unpackingData(y) {
+CHPathQueryManager::CHPathQueryManager(vector<unsigned int> & x, map < pair < unsigned int, unsigned int >, unsigned int > & y) : ranks(x), unpackingData(y) {
 
 }
 

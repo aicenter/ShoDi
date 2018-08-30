@@ -111,11 +111,3 @@ void CHpriorityQueue::swap(const unsigned int x, const unsigned int y) {
     mapping[content[x].id] = x;
     mapping[content[y].id] = y;
 }
-
-//______________________________________________________________________________________________________________________
-void CHpriorityQueue::debugPrint() {
-    for(unsigned int i = 0; i < 20; i++) {
-        printf("%i (%u), ", content[i].weight, content[i].id);
-    }
-    printf("\n");
-}

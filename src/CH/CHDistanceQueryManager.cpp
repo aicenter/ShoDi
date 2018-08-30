@@ -4,15 +4,15 @@
 //
 
 #include <climits>
-#include "CHFlagsGraphQueryManager.h"
+#include "CHDistanceQueryManager.h"
 
 //______________________________________________________________________________________________________________________
-CHFlagsGraphQueryManager::CHFlagsGraphQueryManager(FlagsGraph & g) : graph(g) {
+CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
 
 }
 
 //______________________________________________________________________________________________________________________
-long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int source, const unsigned int target) {
+long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
@@ -164,7 +164,7 @@ long long unsigned int CHFlagsGraphQueryManager::findDistance(const unsigned int
 }
 
 //______________________________________________________________________________________________________________________
-void CHFlagsGraphQueryManager::forwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+void CHDistanceQueryManager::forwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
     queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
@@ -200,7 +200,7 @@ void CHFlagsGraphQueryManager::forwardStall(unsigned int stallnode, long long un
 }
 
 //______________________________________________________________________________________________________________________
-void CHFlagsGraphQueryManager::backwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+void CHDistanceQueryManager::backwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
     queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
@@ -235,7 +235,7 @@ void CHFlagsGraphQueryManager::backwardStall(unsigned int stallnode, long long u
 }
 
 //______________________________________________________________________________________________________________________
-void CHFlagsGraphQueryManager::prepareStructuresForNextQuery() {
+void CHDistanceQueryManager::prepareStructuresForNextQuery() {
     for (unsigned int i = 0; i < forwardChanged.size(); i++) {
         graph.resetForwardInfo(forwardChanged[i]);
     }

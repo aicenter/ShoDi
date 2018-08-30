@@ -1,27 +1,18 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 6.8.18
+// Created on: 23.8.18
 //
 
-#ifndef TRANSIT_NODE_ROUTING_CHBENCHMARK_H
-#define TRANSIT_NODE_ROUTING_CHBENCHMARK_H
+#ifndef TRANSIT_NODE_ROUTING_CHBENCHMARKWITHRANKS_H
+#define TRANSIT_NODE_ROUTING_CHBENCHMARKWITHRANKS_H
 
-#include <vector>
+#include "../GraphBuilder/FlagsGraph.h"
 #include "../GraphBuilder/Graph.h"
 
-using namespace std;
-
-// A class that allows us to run Contraction Hierarchies over a vector of trips. The time of the queries is recorded
-// and returned.
-//______________________________________________________________________________________________________________________
 class CHBenchmark {
 public:
-    static void runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph);
-    static void runAndMeasureWithOutput(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances);
-    static double runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances);
-    static double runNewQueryAlgorithmMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances);
-private:
+    static double runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < long long unsigned int > & distances);
 };
 
 
-#endif //TRANSIT_NODE_ROUTING_CHBENCHMARK_H
+#endif //TRANSIT_NODE_ROUTING_CHBENCHMARKWITHRANKS_H

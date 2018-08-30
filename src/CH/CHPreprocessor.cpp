@@ -114,7 +114,6 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
     EdgeDifferenceManager::init(graph.nodes());
 
     initializePriorityQueue(priorityQueue, graph);
-    priorityQueue.debugPrint();
     printf("Initialized priority queue!\n");
     contractNodesWithUnpackingData(priorityQueue, graph);
     reinsertShortcuts(graph);
@@ -270,10 +269,8 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
     unsigned int CHrank = 1;
 
     while( ! priorityQueue.empty() ) {
-        //printf("Contracting node: %u\n", CHrank);
         CHNode current = priorityQueue.front();
         priorityQueue.pop();
-        //printf("Current: %u (with weight %i)\n", current.id, current.weight);
 
         getPossibleShortcuts(current.id, graph, true);
         unsigned int shortcuts = calculateShortcutsAmount();
@@ -283,25 +280,18 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
             clearStructures();
             priorityQueue.insert(current.id, newweight);
         } else {
-            //printf("In the else branch\n");
             contracted[current.id] = true;
             adjustNeighbourgDegrees(current.id, graph);
-            //printf("Adjusted edges\n");
             actuallyAddShortcutsWithUnpackingData(graph, current.id);
-           // printf("Added shortcuts\n");
             removeContractedNodeEdges(graph, current.id);
-            //printf("Removed edges\n");
             clearStructures();
-            //printf("Cleader structures\n");
             updateNeighboursPriorities(current.id, graph, priorityQueue);
-            //printf("Updated priorities\n");
             graph.setRank(current.id, CHrank++);
-            //printf("Rank set\n");
 
             if(graph.nodes() - CHrank < 2000) {
-                //if(CHrank % 10 == 0) {
-                printf("Contracted %u nodes!\n", CHrank);
-                //}
+                if(CHrank % 10 == 0) {
+                    printf("Contracted %u nodes!\n", CHrank);
+                }
             } else if(CHrank % 1000 == 0) {
                 printf("Contracted %u nodes!\n", CHrank);
             }

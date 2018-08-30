@@ -10,7 +10,6 @@
 #include <map>
 #include "Graph.h"
 #include "UpdateableGraph.h"
-#include "ShrinkingGraph.h"
 
 using namespace std;
 
@@ -43,11 +42,9 @@ public:
     Loader(string inputFile);
     Graph * loadGraph();
     UpdateableGraph * loadUpdateableGraph();
-    ShrinkingGraph * loadCHWithShortcutsIntoShrinkingGraph(string shortcutsFile);
     Graph * loadCHGraph();
     Graph * loadCHGraphWithShortcuts(string shortcutsFile);
     void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
-    void loadCoordinates(vector < pair <int, int > > & x);
     void loadRanks(vector < unsigned int > & x);
     void loadUnpackingData(map < pair < unsigned int, unsigned int >, unsigned int > & x);
     void transformToDDSG(string DIMACSfile);

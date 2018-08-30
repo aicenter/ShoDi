@@ -10,14 +10,13 @@
 #include <vector>
 #include <queue>
 #include "../GraphBuilder/FlagsGraph.h"
-#include "CHQueryManager.h"
 #include "Structures/QueryPriorityQueue.h"
 
 using namespace std;
 
-class CHFlagsGraphQueryManager : public CHQueryManager {
+class CHDistanceQueryManager {
 public:
-    CHFlagsGraphQueryManager(FlagsGraph & g);
+    CHDistanceQueryManager(FlagsGraph & g);
     long long unsigned int findDistance(const unsigned int source, const unsigned int target);
 protected:
     void forwardStall(unsigned int stallnode, long long unsigned int stalldistance);
