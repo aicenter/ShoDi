@@ -9,6 +9,7 @@
 #include <string>
 #include "Graph.h"
 #include "FlagsGraph.h"
+#include "FlagsGraphWithUnpackingData.h"
 
 using namespace std;
 
@@ -25,9 +26,11 @@ private:
     void loadRanks(ifstream & input, unsigned int nodes, FlagsGraph & graph);
     void loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph);
     void loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph);
+    void loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, FlagsGraphWithUnpackingData & graph);
 public:
     DDSGLoader(string inputFile);
-    FlagsGraph * loadFlagsGraphWithRanks();
+    FlagsGraph * loadFlagsGraph();
+    FlagsGraphWithUnpackingData * loadFlagsGraphWithUnpackingData();
 };
 
 // ~~~ DESCRIPTION OF THE CH FORMAT ~~~

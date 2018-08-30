@@ -39,7 +39,7 @@ void compareMineWithReference() {
     tripsLoader.loadTrips(trips);
 
     DDSGLoader myLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    FlagsGraph * myCH = myLoader.loadFlagsGraphWithRanks();
+    FlagsGraph * myCH = myLoader.loadFlagsGraph();
 
     vector<long long unsigned int> myDistances(trips.size());
     double myTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *myCH, myDistances);
@@ -47,7 +47,7 @@ void compareMineWithReference() {
     delete myCH;
 
     DDSGLoader theirLoader = DDSGLoader("../input/USA.BAY.DDSG.ch");
-    FlagsGraph * theirCH = theirLoader.loadFlagsGraphWithRanks();
+    FlagsGraph * theirCH = theirLoader.loadFlagsGraph();
 
     vector<long long unsigned int> theirDistances(trips.size());
     double theirTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *theirCH, theirDistances);
@@ -62,15 +62,15 @@ void compareMineWithReference() {
 // Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.USA.gr");
+    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.BAY.gr");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
-    Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
+    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 0;
-    unsigned long long int distance = BasicDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
+    unsigned int chosenTrip = 1;
+    BasicDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
 
     delete dijkstraGraph;
 
@@ -80,26 +80,21 @@ void getDijkstraPathForTrip() {
 // be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
-    /*Loader chGraphLoader = Loader("../input/Rome-road.gr");
-    Graph * chGraph = chGraphLoader.loadCHGraphWithShortcuts("../input/Rome_debug3_shortcuts");
-    Loader ranksLoader = Loader("../input/Rome_debug3_ranks");
-    vector<unsigned int> ranks;
-    ranksLoader.loadRanks(ranks);
-    Loader unpackingDataLoader = Loader("../input/Rome_debug3_unpacking");
-    map < pair < unsigned int, unsigned int >, unsigned int > unpackingData;
-    unpackingDataLoader.loadUnpackingData(unpackingData);
+    DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
+    FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
 
-    Loader tripsLoader = Loader("../input/rome_1000randomTrips");
+    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 0;
+    unsigned int chosenTrip = 1;
 
-    CHPathQueryManager qm(ranks, unpackingData);
-    long long unsigned int distance = qm.findPath(trips.at(chosenTrip).first, trips.at(chosenTrip).second, *chGraph);
+    CHPathQueryManager queryManager(*chGraph);
+    //chGraph->debugPrint();
+    long long unsigned int distance = queryManager.findDistance(trips[chosenTrip].first, trips[chosenTrip].second);
     printf("Returned distance: %llu\n", distance);
 
-    delete chGraph;*/
+    delete chGraph;
 }
 
 //______________________________________________________________________________________________________________________
@@ -111,11 +106,11 @@ void DIMACStoDDSG() {
 // Simple main function, uncomment the function you want to use.
 //______________________________________________________________________________________________________________________
 int main() {
-    constructDDSGCH();
+    //constructDDSGCH();
     //compareMineWithReference();
 
-    //getDijkstraPathForTrip();
-    //getCHPathForTrip();
+    getDijkstraPathForTrip();
+    getCHPathForTrip();
     //DIMACStoDDSG();
 
     return 0;

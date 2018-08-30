@@ -22,7 +22,7 @@ using namespace std;
 // "forward" and "backward" with each edge to determine in which direction the edge should be expanded.
 //______________________________________________________________________________________________________________________
 class FlagsGraph{
-private:
+protected:
     vector< vector < QueryEdge > > neighbours;
     vector< NodeData > nodesData;
 public:

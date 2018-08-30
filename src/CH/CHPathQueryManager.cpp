@@ -3,166 +3,330 @@
 // Created on: 7.8.18
 //
 
-#include <queue>
 #include <climits>
 #include "CHPathQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-CHPathQueryManager::CHPathQueryManager(vector<unsigned int> & x, map < pair < unsigned int, unsigned int >, unsigned int > & y) : ranks(x), unpackingData(y) {
+CHPathQueryManager::CHPathQueryManager(FlagsGraphWithUnpackingData & g) : graph(g) {
 
 }
 
-// The query algorithm is already described briefly in the 'CHQueryManager.cpp' file. Here it works exactly the same,
-// only we have to store some additional information such as previous nodes, which can be later used to reconstruct the
-// path. After we find the shortest path, we call the outputPath() function which does the actual path reconstruction.
+// We use the query algorithm that was described in the "Contraction Hierarchies: Faster and Simpler Hierarchical
+// Routing in Road Networks" article by Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
+// Basically, the query is a modified bidirectional Dijkstra query, where from the source node we only expand following
+// nodes with higher contraction rank than the current node and from the target we only expand previous nodes with
+// higher contraction rank than the current node. Both scopes will eventually meet in the node with the highest
+// contraction rank from all nodes in the path. This implementation additionaly uses the 'stall-on-demand' technique
+// described in the same article which noticeably improved the query times.
 //______________________________________________________________________________________________________________________
-long long unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, const Graph & graph) {
-    unsigned int n = graph.nodes();
+long long unsigned int CHPathQueryManager::findDistance(const unsigned int source, const unsigned int target) {
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> fromQueue(cmp);
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> toQueue(cmp);
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
 
-    long long unsigned int * fromDistance = new long long unsigned int[n];
-    long long unsigned int * toDistance = new long long unsigned int[n];
-    bool * fromClosed = new bool[n];
-    bool * toClosed = new bool[n];
-    unsigned int * fromPrev = new unsigned int[n];
-    unsigned int * toPrev = new unsigned int[n];
+    forwardQ.push(DijkstraNode(source, 0));
+    backwardQ.push(DijkstraNode(target, 0));
 
-    for(unsigned int i = 0; i < n; i++) {
-        fromDistance[i] = ULLONG_MAX;
-        toDistance[i] = ULLONG_MAX;
-        fromClosed[i] = false;
-        toClosed[i] = false;
-        fromPrev[i] = UINT_MAX;
-        toPrev[i] = UINT_MAX;
-    }
+    bool forwardFinished = false;
+    bool backwardFinished = false;
 
-    fromDistance[source] = 0;
-    toDistance[target] = 0;
+    graph.data(source).forwardDist = 0;
+    graph.data(target).backwardDist = 0;
+    forwardChanged.push_back(source);
+    backwardChanged.push_back(target);
+    graph.data(source).forwardReached = true;
+    graph.data(target).backwardReached = true;
 
-    fromQueue.push(DijkstraNode(source, 0));
-    toQueue.push(DijkstraNode(target, 0));
+    bool forward = false;
+    upperbound = ULLONG_MAX;
+    meetingNode = UINT_MAX;
 
-    long long unsigned int shortestFound = ULLONG_MAX;
-    unsigned int meetingNode = UINT_MAX;
-    while (! fromQueue.empty() || ! toQueue.empty()) {
+    while (! (forwardQ.empty() && backwardQ.empty())) {
+        // Determine the search direction for the current iteration (forward of backward)
+        // The directions take turns unless one of the directions is already finished (that means either the first
+        // element in the priority queue already has weight bigger than the upperbound or the queue in that direction
+        // doesn't contain any more elements).
+        if (forwardFinished || forwardQ.empty()) {
+            forward = false;
+        } else if (backwardFinished || backwardQ.empty()) {
+            forward = true;
+        } else {
+            forward = ! forward;
+        }
 
-        if (! fromQueue.empty()) {
-            unsigned int current = fromQueue.top().ID;
-            long long unsigned int currentDist = fromQueue.top().weight;
-            fromClosed[current] = true;
-            printf("FROM: Expanding %u (rank %u)\n", current, ranks[current]);
+        if (forward) {
+            if (forwardQ.empty()) {
+                break;
+            }
 
-            if( currentDist < shortestFound ) {
-                if (toClosed[current]) {
-                    if (currentDist + toDistance[current] < shortestFound) {
-                        shortestFound = currentDist + toDistance[current];
-                        meetingNode = current;
+            unsigned int curNode = forwardQ.top().ID;
+            long long unsigned int curLen = forwardQ.top().weight;
+            forwardQ.pop();
+
+            if (graph.data(curNode).forwardSettled || graph.data(curNode).forwardStalled) {
+                continue;
+            }
+
+
+            graph.data(curNode).forwardSettled = true;
+            // Check if the node was already settled in the opposite direction - if yes, we get a new candidate
+            // for the shortest path.
+            if ( graph.data(curNode).backwardSettled ) {
+                long long unsigned int newUpperboundCandidate = curLen +  graph.data(curNode).backwardDist;
+                if (newUpperboundCandidate < upperbound) {
+                    upperbound = newUpperboundCandidate;
+                    meetingNode = curNode;
+                }
+            }
+
+            // Classic edges relaxation
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Here we stall a node if it's reached on a suboptimal path. This can happen in the Contraction
+                // Hierarchies query algorithm, because we can reach a node from the wrong direction (for example
+                // we reach a node on a suboptimal path in the forward direction, because the actual optimal path
+                // will be later found in the backward direction)
+                if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
+                    long long unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
+                    if (newdistance < curLen) {
+                        graph.data(curNode).forwardDist = newdistance;
+                        forwardStall(curNode, newdistance);
                     }
                 }
 
-                const vector < pair < unsigned int, long long unsigned int > > & following = graph.outgoingEdges(current);
-                for (unsigned int i = 0; i < following.size(); i++) {
-                    if (ranks[following.at(i).first] > ranks[current]) {
-                        long long unsigned int newDist = currentDist + following.at(i).second;
+                if (! (*iter).forward) {
+                    continue;
+                }
 
-                        if (newDist < fromDistance[following.at(i).first]) {
-                            fromDistance[following.at(i).first] = newDist;
-                            fromQueue.push(DijkstraNode(following.at(i).first, newDist));
-                            fromPrev[following.at(i).first] = current;
+                // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
+                // if it was stalled previously, because it might be now reached on the optimal path.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+
+                    if (newlen < graph.data((*iter).targetNode).forwardDist) {
+                        forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
+                        if (graph.data((*iter).targetNode).forwardDist == ULLONG_MAX) {
+                            forwardChanged.push_back((*iter).targetNode);
                         }
+                        graph.data((*iter).targetNode).forwardDist = newlen;
+                        graph.data((*iter).targetNode).forwardReached = true;
+                        graph.data((*iter).targetNode).forwardStalled = false;
+                        graph.setForwardPrev((*iter).targetNode, curNode);
+                    }
+                }
+            }
+
+            if(! forwardQ.empty() && forwardQ.top().weight > upperbound) {
+                forwardFinished = true;
+            }
+            // The backward direction is symetrical to the forward direction.
+        } else {
+            if (backwardQ.empty()) {
+                break;
+            }
+
+            unsigned int curNode = backwardQ.top().ID;
+            long long unsigned int curLen = backwardQ.top().weight;
+            backwardQ.pop();
+
+            if (graph.data(curNode).backwardSettled || graph.data(curNode).backwardStalled) {
+                continue;
+            }
+
+            graph.data(curNode).backwardSettled = true;
+            if (graph.data(curNode).forwardSettled) {
+                long long unsigned int newUpperboundCandidate = curLen + graph.data(curNode).forwardDist;
+                if (newUpperboundCandidate < upperbound) {
+                    upperbound = newUpperboundCandidate;
+                    meetingNode = curNode;
+                }
+            }
+
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
+                    long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
+                    if (newdistance < curLen) {
+                        backwardStall(curNode, newdistance);
                     }
                 }
 
-                fromQueue.pop();
-            } else {
-                while (! fromQueue.empty()) {
-                    fromQueue.pop();
+                if (! (*iter).backward) {
+                    continue;
                 }
+
+                if(graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+
+                    if (newlen < graph.data((*iter).targetNode).backwardDist) {
+                        backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
+                        if (graph.data((*iter).targetNode).backwardDist == ULLONG_MAX) {
+                            backwardChanged.push_back((*iter).targetNode);
+                        }
+                        graph.data((*iter).targetNode).backwardDist = newlen;
+                        graph.data((*iter).targetNode).backwardReached = true;
+                        graph.data((*iter).targetNode).backwardStalled = false;
+                        graph.setBackwardPrev((*iter).targetNode, curNode);
+                    }
+                }
+            }
+
+            if(! backwardQ.empty() && backwardQ.top().weight > upperbound) {
+                backwardFinished = true;
             }
         }
 
-        if (! toQueue.empty()) {
-            unsigned int current = toQueue.top().ID;
-            long long unsigned int currentDist = toQueue.top().weight;
-            toClosed[current] = true;
-            printf("TO:   Expanding %u (rank %u)\n", current, ranks[current]);
-
-            if( currentDist < shortestFound ) {
-                if (fromClosed[current]) {
-                    if (currentDist + fromDistance[current] < shortestFound) {
-                        shortestFound = currentDist + fromDistance[current];
-                        meetingNode = current;
-                    }
-                }
-
-                const vector < pair < unsigned int, long long unsigned int > > & previous = graph.incomingEdges(current);
-                for (unsigned int i = 0; i < previous.size(); i++) {
-                    if (ranks[previous.at(i).first] > ranks[current]) {
-                        long long unsigned int newDist = currentDist + previous.at(i).second;
-
-                        if (newDist < toDistance[previous.at(i).first]) {
-                            toDistance[previous.at(i).first] = newDist;
-                            toQueue.push(DijkstraNode(previous.at(i).first, newDist));
-                            toPrev[previous.at(i).first] = current;
-                        }
-                    }
-                }
-
-                toQueue.pop();
-            } else {
-                while (! toQueue.empty()) {
-                    toQueue.pop();
-                }
-            }
+        if (backwardFinished && forwardFinished) {
+            break;
         }
 
     }
 
-    outputPath(meetingNode, fromPrev, toPrev);
+    outputPath(meetingNode);
 
-    delete [] fromPrev;
-    delete [] toPrev;
-    delete [] fromDistance;
-    delete [] toDistance;
-    delete [] fromClosed;
-    delete [] toClosed;
-    return shortestFound;
+    prepareStructuresForNextQuery();
+
+    return upperbound;
+}
+
+// Code for stalling a node in the forward distance. We try to stall additional nodes using BFS as long as we don't
+// reach already stalled nodes or nodes that can't be stalled.
+//______________________________________________________________________________________________________________________
+void CHPathQueryManager::forwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+    queue<DijkstraNode> stallQueue;
+    stallQueue.push(DijkstraNode(stallnode, stalldistance));
+
+    while (! stallQueue.empty()) {
+        unsigned int curNode = stallQueue.front().ID;
+        long long unsigned int curDist = stallQueue.front().weight;
+        stallQueue.pop();
+        graph.data(curNode).forwardStalled = true;
+        forwardStallChanged.push_back(curNode);
+
+        const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+        for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+            if (! (*iter).forward) {
+                continue;
+            }
+
+            if (graph.data((*iter).targetNode).forwardReached) {
+                long long unsigned int newdistance = curDist + (*iter).weight;
+
+                if (newdistance < graph.data((*iter).targetNode).forwardDist) {
+                    if (! graph.data((*iter).targetNode).forwardStalled) {
+                        stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
+                        if (graph.data((*iter).targetNode).forwardDist == ULLONG_MAX) {
+                            forwardChanged.push_back((*iter).targetNode);
+                        }
+                        graph.data((*iter).targetNode).forwardDist = newdistance;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+// Code for stalling a node in the backward distance. We try to stall additional nodes using BFS as long as we don't
+// reach already stalled nodes or nodes that can't be stalled.
+//______________________________________________________________________________________________________________________
+void CHPathQueryManager::backwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+    queue<DijkstraNode> stallQueue;
+    stallQueue.push(DijkstraNode(stallnode, stalldistance));
+
+    while (! stallQueue.empty()) {
+        unsigned int curNode = stallQueue.front().ID;
+        long long unsigned int curDist = stallQueue.front().weight;
+        stallQueue.pop();
+        graph.data(curNode).backwardStalled = true;
+        backwardStallChanged.push_back(curNode);
+
+        const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+        for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+            if (! (*iter).backward) {
+                continue;
+            }
+
+            if (graph.data((*iter).targetNode).backwardReached) {
+                long long unsigned int newdistance = curDist + (*iter).weight;
+
+                if (newdistance < graph.data((*iter).targetNode).backwardDist) {
+                    if (! graph.data((*iter).targetNode).backwardStalled) {
+                        stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
+                        if (graph.data((*iter).targetNode).backwardDist == ULLONG_MAX) {
+                            backwardChanged.push_back((*iter).targetNode);
+                        }
+                        graph.data((*iter).targetNode).backwardDist = newdistance;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Reset information for the nodes that were changed in the current query.
+//______________________________________________________________________________________________________________________
+void CHPathQueryManager::prepareStructuresForNextQuery() {
+    for (unsigned int i = 0; i < forwardChanged.size(); i++) {
+        graph.resetForwardInfo(forwardChanged[i]);
+        graph.resetForwardPrev(forwardChanged[i]);
+    }
+    forwardChanged.clear();
+
+    for (unsigned int i = 0; i < backwardChanged.size(); i++) {
+        graph.resetBackwardInfo(backwardChanged[i]);
+        graph.resetBackwardPrev(backwardChanged[i]);
+    }
+    backwardChanged.clear();
+
+    for (unsigned int i = 0; i < forwardStallChanged.size(); i++) {
+        graph.resetForwardStall(forwardStallChanged[i]);
+    }
+    forwardStallChanged.clear();
+
+    for (unsigned int i = 0; i < backwardStallChanged.size(); i++) {
+        graph.resetBackwardStall(backwardStallChanged[i]);
+    }
+    backwardStallChanged.clear();
 }
 
 // This function fills the nodes on the path in the Contraction Hierarchies graph from the fromPrev and toPrev arrays
 // by calling the fillFromPath() and fillToPath() functions and then calls the unpackPrevious() and unpackFollowing()
 // functions which print the actual path by unpacking the shortcuts and printing only edges in the original graph.
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::outputPath(const unsigned int meetingNode, const unsigned int * fromPrev, const unsigned int * toPrev) {
+void CHPathQueryManager::outputPath(const unsigned int meetingNode) {
+    if (meetingNode == UINT_MAX) {
+        printf("No path was found! Nothing to unpack!\n");
+        return;
+    }
+
     printf("~~~ Outputting shortest path (unpacked from CH) ~~~\n");
     vector<pair<unsigned int, unsigned int> > fromPath;
     vector<pair<unsigned int, unsigned int> > toPath;
-    fillFromPath(meetingNode, fromPrev, fromPath);
-    fillToPath(meetingNode, toPrev, toPath);
+    fillFromPath(meetingNode, fromPath);
+    fillToPath(meetingNode, toPath);
     unpackPrevious(fromPath);
     unpackFollowing(toPath);
     printf("~~~ End of path output ~~~\n");
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillFromPath(const unsigned int meetingNode, const unsigned int * fromPrev, vector<pair<unsigned int, unsigned int> > & fromPath) {
+void CHPathQueryManager::fillFromPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & fromPath) {
     unsigned int current = meetingNode;
-    while(fromPrev[current] != UINT_MAX) {
-        fromPath.push_back(make_pair(fromPrev[current], current));
-        current = fromPrev[current];
+    while(graph.getForwardPrev(current) != UINT_MAX) {
+        fromPath.push_back(make_pair(graph.getForwardPrev(current), current));
+        current = graph.getForwardPrev(current);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillToPath(const unsigned int meetingNode, const unsigned int * toPrev, vector<pair<unsigned int, unsigned int> > & toPath) {
+void CHPathQueryManager::fillToPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & toPath) {
     unsigned int current = meetingNode;
-    while(toPrev[current] != UINT_MAX) {
-        toPath.push_back(make_pair(current, toPrev[current]));
-        current = toPrev[current];
+    while(graph.getBackwardPrev(current) != UINT_MAX) {
+        toPath.push_back(make_pair(current, graph.getBackwardPrev(current)));
+        current = graph.getBackwardPrev(current);
     }
 }
 
@@ -182,12 +346,18 @@ void CHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsigned int>
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::unpackEdge(unsigned int s, unsigned int t) {
-    if (unpackingData.count(make_pair(s, t)) == 0) {
+    unsigned int m;
+    if (graph.data(s).rank < graph.data(t).rank) {
+        m = graph.getMiddleNode(s, t);
+    } else {
+        m = graph.getMiddleNode(t, s);
+    }
+
+    if (m == UINT_MAX) {
         printf("%u -> %u\n", s, t);
         return;
     }
 
-    unsigned int m = unpackingData.at(make_pair(s, t));
     unpackEdge(s, m);
     unpackEdge(m, t);
 }
