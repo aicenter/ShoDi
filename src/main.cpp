@@ -12,7 +12,10 @@
 #include "Timer/Timer.h"
 #include "CH/CHPreprocessor.h"
 #include "CH/CHPathQueryManager.h"
+#include "CH/CHDistanceQueryManager.h"
 
+// This function constructs a 'Contraction Hierarchy' from a given graph a saves it into a binary file in a format
+// described briefly in the 'DDSGLoader.h' file.
 //______________________________________________________________________________________________________________________
 void constructDDSGCH() {
     Timer timer("Whole CH construction timer");
@@ -30,7 +33,9 @@ void constructDDSGCH() {
     delete graph;
 }
 
-
+// Loads two 'Contraction Hierarchies' and runs a set of queries on both of them. Running times are compared and also
+// output is validated (it only checks if the output of both 'CHs' is the same. If both 'CHs' aren't working correctly,
+// this function won't detect that).
 //______________________________________________________________________________________________________________________
 void compareMineWithReference() {
     Loader tripsLoader = Loader("../input/BAY1000randomTrips");
@@ -59,6 +64,52 @@ void compareMineWithReference() {
 
 }
 
+// This function runs a set of queries first using a given 'Contraction Hierarchy' and then also with 'Dijkstra'.
+// The output is validated, since 'Dijkstra' should give correct results, if there are any mismatches, it probably
+// means that the 'Contraction Hierarchy' implementation isn't working correctly. Also the time of both algorithms
+// is measured and the speedup of 'Contraction Hierarchies' in comparison with 'Dijkstra' is also computed and printed.
+//______________________________________________________________________________________________________________________
+void compareCHWithDijkstra() {
+    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<long long unsigned int> chDistances(trips.size());
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    Loader dijkstraLoader = Loader("../input/USA-road-t.BAY.gr");
+    Graph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<long long unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    CorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
+
+}
+
+// Runs a set of queries in a given 'Contraction Hierarchy'. Sum of the query times is computed and returned.
+// Average time per query can be simply counted by dividing the result by the amount of queries.
+//______________________________________________________________________________________________________________________
+void runCHBenchmark() {
+    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader loader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
+    FlagsGraph * ch = loader.loadFlagsGraph();
+
+    vector<long long unsigned int> distances(trips.size());
+    CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, distances);
+}
+
 // Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip() {
@@ -78,6 +129,8 @@ void getDijkstraPathForTrip() {
 
 // Will print the node sequence on a certain path computed by Contraction Hierarchies - this means that the paths will
 // be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
+// WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'CHPathQueryManager'
+// is fixed.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
     DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
@@ -97,6 +150,8 @@ void getCHPathForTrip() {
     delete chGraph;
 }
 
+// Transforms a graph from the DIMACS challenge format into the .ddsg format used by the Karlsruhe researchers
+// in their implementation. The output format isn't used anywhere in this project.
 //______________________________________________________________________________________________________________________
 void DIMACStoDDSG() {
     Loader loader = Loader("../input/USA-road-t.BAY.gr");
@@ -107,10 +162,12 @@ void DIMACStoDDSG() {
 //______________________________________________________________________________________________________________________
 int main() {
     //constructDDSGCH();
-    //compareMineWithReference();
+    //runCHBenchmark();
 
-    getDijkstraPathForTrip();
-    getCHPathForTrip();
+    compareCHWithDijkstra();
+    //compareMineWithReference();
+    //getDijkstraPathForTrip();
+    //getCHPathForTrip();
     //DIMACStoDDSG();
 
     return 0;
