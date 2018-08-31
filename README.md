@@ -13,7 +13,11 @@ Kompilace
 - V libovolném IDE něco jako 'build project from sources'
 - Odeberte z projektu soubory `RandomGraphGenerator.cpp`, `RandomTripsGenerator.cpp` a `AlternativeRandomTripsGenerator.cpp`. Jedná se o samostatné programy, které se dají samostatně zkompilovat a generují náhodné grafy nebo náhodné dvojice source - target v určité rozsahu. Dají se použít pro debugování. Pokud je necháte v projektu, nejspíše dostanete chybovou hlášku něco ve smyslu "multiple main definitions".
 
-Projekt nepouzívá žádné externí knihovny (pouze stl), takže by měl bez větších potíží fungovat. V budoucnu možná přidám makefile aby bylo možné projekt zkompilovat i z příkazové řádky.
+Alternativně se dá program zkompilovat s využitím přiloženého `Makefile`. Ten funguje s masterem při commitu s SHA:'c20503730a7c1c3aee89c9a92ca436c52e85417b', byl ovšem vygenerován ručně, takže není zaručeno, že bude fungovat i v budoucnu. S pomocí Makefilu se dá program zkompilovat i z příkazové řádky:
+- Ve složce s Makefilem stačí použít příkaz `make compile`
+- Pro smazání všech vygenerovaných souborů a opětovnou čistou kompilaci programu stačí použít příkaz `make compile` následovaný opět příkazem `make compile`
+
+Projekt nepouzívá žádné externí knihovny (pouze stl), takže by měl bez větších potíží fungovat. 
 
 Použití
 -------
