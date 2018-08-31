@@ -55,7 +55,9 @@ Pokud bych chtěl připravit 'Contraction Hierarchy', aby odpovídala na přích
 Popis vstupních formátů
 -----------------------
 
-### Formát grafu z implementační soutěže DIMACS (ukázkové grafy v tomto formátu mohou být staženy zde: http://www.dis.uniroma1.it/challenge9/download.shtml)
+### Formát grafu z implementační soutěže DIMACS 
+(Ukázkové grafy v tomto formátu mohou být staženy zde: http://www.dis.uniroma1.it/challenge9/download.shtml)
+
 - Soubor začíná řádkou `p sp n e` kde místo 'n' je číslo určující počet vrcholů a místo 'e' je číslo určující počet hran.
 - Následuje 'e' řádek ve tvaru `a u v w` reprezentujících jednotlivé hrany, s tím že 'u' je číslo source uzlu, 'v' je číslo target uzlu a 'w' je váha hrany (délka, čas potřebný pro její projetí...). Čísla 'u' a 'v' musí být z rozsahu 1 až n. V rámci formátu pro soutěž DIMACS se vrcholy indexovaly od jedničky. Program indexuje vrcholy od nuly, takže se každý načtený vrchol automaticky sníží o 1. Hrany se načítají orientovaně, takže pokud chci mít hranu 'u <-> v' obousměrnou, musím jí zadat jako hranu z 'u' do 'v' a znovu jako hranu z 'v' do 'u'.
 - Kdekoliv v soubrou se dále mouhou vyskytovat řádky začínající znakem `c`. Tyto řádky reprezentují komentáře a program je pouze zahazuje.
@@ -68,3 +70,17 @@ Popis vstupních formátů
 
 ### Formát 'Contraction Hierarchies'
 - Pro ukládání 'Contraction Hierarchy' se používá binární formát, který je stručně popsaný na konci souboru `DDSGLoader.h`.
+
+
+Kde co hledat
+-------------
+
+### Předzpracování
+- V podstatě za veškerý preprocessing grafu na 'Contraction Hierarchy' je zodpovědná třída `CHPreprocessor` s malou pomocí třídy `EdgeDifferenceManager`. Při předzpracování se používá `UpdateableGraph` pro reprezentaci grafu, což je třída, která umožňuje snadné přidávání a odebírání hran. Fungování jednotlivých metod je stručně popsáno v kódu vždy nad každou metodou.
+
+### Dotazy
+- Vyhodnocování 'Contraction Hierarchy' dotazů řeší třída `CHDistanceQueryManager`. Ten dostane reprezentaci 'Contraction Hierarchy' jakožto instanci třídy `FlagsGraph` a následně se na něj dají volat dotazy pomocí funkce `findDistance`. V rámci `FlagsGraph` je každá hrana uložena pouze jednou a sice u vrcholu s menším rankem v rámci 'Contraction Hierarchies' společně s flagy v kterém směru tato hrana existuje. Navíc tato reprezentace grafu obsahuje různé pomocné informace o jednotlivých vrcholech potřebné pro vyhodnocování dotazů.
+- Třídy `CHDistanceQueryManager` řeší pouze dotazy na vzdálenost, tedy dotaz typu 'vrať nejkratší vzdálenost z bodu a do bodu b'. V budoucnu by třída `CHPathQueryManager` mohla vracet i posloupnost vrcholů na nalezené nejkratší cestě. Momentálně `CHPathQueryManager` nefunguje správně (nevrací správné cesty).
+
+### Načítání
+- Načítání grafů a sad dotazů řeší třída `Loader` a načítání 'Contraction Hierarchies' řeší `DDSGLoader`. Momentálně `Loader` podporuje pouze načítání grafu ve formátu z implementační soutěže DIMACS (popsáno výše). Pokud by byla potřeba generovat 'Contraction Hierarchy' i pro grafy v jiném formátu, jedna možnost je napsat v rámci `Loader` novou funkci, která by dokázala načíst graf v jiném formátu ...
