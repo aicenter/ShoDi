@@ -45,12 +45,12 @@ unsigned int FlagsGraphWithUnpackingData::getBackwardPrev(unsigned int x) {
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int FlagsGraphWithUnpackingData::resetForwardPrev(unsigned int x) {
+void FlagsGraphWithUnpackingData::resetForwardPrev(unsigned int x) {
     forwardPrev[x] = UINT_MAX;
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int FlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
+void FlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
     backwardPrev[x] = UINT_MAX;
 }
 

@@ -22,8 +22,8 @@ public:
     void setBackwardPrev(unsigned int x, unsigned int y);
     unsigned int getForwardPrev(unsigned int x);
     unsigned int getBackwardPrev(unsigned int x);
-    unsigned int resetForwardPrev(unsigned int x);
-    unsigned int resetBackwardPrev(unsigned int x);
+    void resetForwardPrev(unsigned int x);
+    void resetBackwardPrev(unsigned int x);
     void debugPrint();
 };
 
