@@ -333,24 +333,24 @@ void CHPathQueryManager::fillToPath(const unsigned int meetingNode, vector<pair<
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::unpackPrevious(vector<pair<unsigned int, unsigned int> > & fromPath) {
     for(int i = fromPath.size()-1; i >= 0; i--) {
-        unpackEdge(fromPath[i].first, fromPath[i].second);
+        unpackForwardEdge(fromPath[i].first, fromPath[i].second);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsigned int> > & toPath) {
     for(unsigned int i = 0; i < toPath.size(); i++) {
-        unpackEdge(toPath[i].first, toPath[i].second);
+        unpackBackwardEdge(toPath[i].first, toPath[i].second);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::unpackEdge(unsigned int s, unsigned int t) {
+void CHPathQueryManager::unpackForwardEdge(unsigned int s, unsigned int t) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
-        m = graph.getMiddleNode(s, t);
+        m = graph.getForwardMiddleNode(s, t);
     } else {
-        m = graph.getMiddleNode(t, s);
+        m = graph.getForwardMiddleNode(t, s);
     }
 
     if (m == UINT_MAX) {
@@ -358,6 +358,25 @@ void CHPathQueryManager::unpackEdge(unsigned int s, unsigned int t) {
         return;
     }
 
-    unpackEdge(s, m);
-    unpackEdge(m, t);
+    unpackForwardEdge(s, m);
+    unpackForwardEdge(m, t);
 }
+
+//______________________________________________________________________________________________________________________
+void CHPathQueryManager::unpackBackwardEdge(unsigned int s, unsigned int t) {
+    unsigned int m;
+    if (graph.data(s).rank < graph.data(t).rank) {
+        m = graph.getBackwardMiddleNode(s, t);
+    } else {
+        m = graph.getBackwardMiddleNode(t, s);
+    }
+
+    if (m == UINT_MAX) {
+        printf("%u -> %u\n", s, t);
+        return;
+    }
+
+    unpackBackwardEdge(s, m);
+    unpackBackwardEdge(m, t);
+}
+

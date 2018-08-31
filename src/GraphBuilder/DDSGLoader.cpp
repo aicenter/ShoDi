@@ -176,16 +176,16 @@ void DDSGLoader::loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned i
         bool backward = false;
         if((flags & 1) == 1) {
             forward = true;
+            graph.addForwardUnpackingData(from, to, middleNode);
         }
         if((flags & 2) == 2) {
             backward = true;
+            graph.addBackwardUnpackingData(from, to, middleNode);
         }
         if ( graph.data(from).rank < graph.data(to).rank ) {
             graph.addEdge(from, to, weight, forward, backward);
-            graph.addUnpackingData(from, to, middleNode);
         } else {
             graph.addEdge(to, from, weight, forward, backward);
-            graph.addUnpackingData(to, from, middleNode);
         }
 
     }

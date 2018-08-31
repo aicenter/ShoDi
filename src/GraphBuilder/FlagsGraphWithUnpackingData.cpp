@@ -12,14 +12,28 @@ FlagsGraphWithUnpackingData::FlagsGraphWithUnpackingData(unsigned int n) : Flags
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraphWithUnpackingData::addUnpackingData(unsigned int s, unsigned int t, unsigned int m) {
-    unpackingData.insert(make_pair(make_pair(s,t), m));
+void FlagsGraphWithUnpackingData::addForwardUnpackingData(unsigned int s, unsigned int t, unsigned int m) {
+    forwardUnpackingData.insert(make_pair(make_pair(s,t), m));
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int FlagsGraphWithUnpackingData::getMiddleNode(unsigned int s, unsigned int t) {
-    if (unpackingData.count(make_pair(s, t)) == 1) {
-        return unpackingData[make_pair(s, t)];
+void FlagsGraphWithUnpackingData::addBackwardUnpackingData(unsigned int s, unsigned int t, unsigned int m) {
+    backwardUnpackingData.insert(make_pair(make_pair(s,t), m));
+}
+
+
+//______________________________________________________________________________________________________________________
+unsigned int FlagsGraphWithUnpackingData::getForwardMiddleNode(unsigned int s, unsigned int t) {
+    if (forwardUnpackingData.count(make_pair(s, t)) == 1) {
+        return forwardUnpackingData[make_pair(s, t)];
+    }
+    return UINT_MAX;
+}
+
+//______________________________________________________________________________________________________________________
+unsigned int FlagsGraphWithUnpackingData::getBackwardMiddleNode(unsigned int s, unsigned int t) {
+    if (backwardUnpackingData.count(make_pair(s, t)) == 1) {
+        return backwardUnpackingData[make_pair(s, t)];
     }
     return UINT_MAX;
 }
@@ -52,9 +66,4 @@ void FlagsGraphWithUnpackingData::resetForwardPrev(unsigned int x) {
 //______________________________________________________________________________________________________________________
 void FlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
     backwardPrev[x] = UINT_MAX;
-}
-
-//______________________________________________________________________________________________________________________
-void FlagsGraphWithUnpackingData::debugPrint() {
-    printf("This graph has %lu middle node records!\n", unpackingData.size());
 }
