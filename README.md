@@ -16,6 +16,9 @@ Kompilace
 Alternativně se dá program zkompilovat s využitím přiloženého `Makefile`. Ten funguje s masterem při commitu s SHA:'c20503730a7c1c3aee89c9a92ca436c52e85417b', byl ovšem vygenerován ručně, takže není zaručeno, že bude fungovat i v budoucnu. S pomocí Makefilu se dá program zkompilovat i z příkazové řádky:
 - Ve složce s Makefilem stačí použít příkaz `make compile`
 - Pro smazání všech vygenerovaných souborů a opětovnou čistou kompilaci programu stačí použít příkaz `make compile` následovaný opět příkazem `make compile`
+- Tím se vygeneruje spustitelný soubor `chTest` v aktuálním souboru.
+- Makefile implicitně používá `g++` ke kompilaci. Pro použití jiného kompilátoru (nebo jiných přepínačů) stačí v Makefilu přepsat 'CC' a 'CFLAGS' na požadované hodnoty.
+ 
 
 Projekt nepouzívá žádné externí knihovny (pouze stl), takže by měl bez větších potíží fungovat. 
 
