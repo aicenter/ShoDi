@@ -23,7 +23,7 @@ Momentálně se při každém spuštění programu provede 'odkomentovaná' funk
 Řeší metoda 'constructDDSGCH()'. Ta dostane graf zadaný ve formátu implementační soutěže DIMACS (popsán níže) a vygeneruje z něj soubor obsahující vygenerovanou 'Contraction Hierarchy' s příponou ".ch". U velkých grafů může předzpracování trvat poměrně dlouho a být celkem náročné na paměť.
 
 Co kde nastavit ve funkci DDSGCH():
-- Na řádce kde je 'Loader graphLoader = Loader("xyz");' tak na místo 'xyz' doplňte cestu k vašemu vstupnímu souboru (včetně přípony). Soubor musí být korektní soubor v daném formátu, program neprovádí kontroly validity vstupního souboru.
-- Na řádce kde je 'graph->flushInDdsgFormat("xyz");' tak na místo 'xyz' doplnit cestu k souboru, kam se uloží daná 'Contraction Hierarchy'. K názvu souboru je automaticky přidána přípona ".ch".
+- Na řádce kde je `Loader graphLoader = Loader("xyz");` tak na místo 'xyz' doplňte cestu k vašemu vstupnímu souboru (včetně přípony). Soubor musí být korektní soubor v daném formátu, program neprovádí kontroly validity vstupního souboru.
+- Na řádce kde je `graph->flushInDdsgFormat("xyz");` tak na místo 'xyz' doplnit cestu k souboru, kam se uloží daná 'Contraction Hierarchy'. K názvu souboru je automaticky přidána přípona ".ch".
 
 ### Benchmarking
