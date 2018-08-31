@@ -46,8 +46,3 @@ const vector<pair<unsigned int, long long unsigned int>> & Graph::incomingEdges(
 const vector<pair<unsigned int, long long unsigned int>> & Graph::outgoingEdges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }
-
-//______________________________________________________________________________________________________________________
-const unsigned int Graph::degree(unsigned int node)const {
-    return followingNodes.at(node).size() + previousNodes.at(node).size();
-}

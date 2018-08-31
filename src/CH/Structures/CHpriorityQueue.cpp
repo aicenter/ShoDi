@@ -7,6 +7,10 @@
 #include <cstdio>
 #include "CHpriorityQueue.h"
 
+// All methods are pretty standard binary heap methods, so google 'binary heap' and you will probably find articles
+// about how it works and why it works this way. Also mapping is added here - we store heap positions for all the
+// nodes, so during change value we immediately know where to find the element we want to change.
+
 //______________________________________________________________________________________________________________________
 CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {
     content.reserve(16);
@@ -17,7 +21,7 @@ CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {
 void CHpriorityQueue::insert(const unsigned int x, const int y) {
     content.push_back(CHNode(x, y));
     mapping[x] = content.size() - 1;
-    bubbleDown(content.size() - 1);
+    bubbleUp(content.size() - 1);
 }
 
 //______________________________________________________________________________________________________________________
@@ -91,7 +95,7 @@ void CHpriorityQueue::bubbleDown(const unsigned int i) {
 void CHpriorityQueue::bubbleUp(const unsigned int i) {
     unsigned int cur = i;
     while (cur != 0) {
-        unsigned int father = (i - 1) / 2;
+        unsigned int father = (cur - 1) / 2;
         if (content[cur].weight >= content[father].weight) {
             return;
         }

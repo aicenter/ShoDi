@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define NODES_CNT 1070376 //23947347
+#define NODES_CNT 23947347 //23947347
 #define TRIPS_AMOUNT 1000
 
 // Auxiliary program for generating random trips with source and target nodes in a certain range.

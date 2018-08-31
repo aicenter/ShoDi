@@ -1,14 +1,14 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 7.8.18
+// Created on: 28.8.18
 //
 
 #include <climits>
-#include "CHPathQueryManager.h"
+#include "CHDistanceQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-CHPathQueryManager::CHPathQueryManager(FlagsGraphWithUnpackingData & g) : graph(g) {
+CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
 
 }
 
@@ -20,7 +20,7 @@ CHPathQueryManager::CHPathQueryManager(FlagsGraphWithUnpackingData & g) : graph(
 // contraction rank from all nodes in the path. This implementation additionaly uses the 'stall-on-demand' technique
 // described in the same article which noticeably improved the query times.
 //______________________________________________________________________________________________________________________
-long long unsigned int CHPathQueryManager::findDistance(const unsigned int source, const unsigned int target) {
+long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
@@ -41,7 +41,6 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
 
     bool forward = false;
     upperbound = ULLONG_MAX;
-    meetingNode = UINT_MAX;
 
     while (! (forwardQ.empty() && backwardQ.empty())) {
         // Determine the search direction for the current iteration (forward of backward)
@@ -77,7 +76,6 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
                 long long unsigned int newUpperboundCandidate = curLen +  graph.data(curNode).backwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
-                    meetingNode = curNode;
                 }
             }
 
@@ -113,7 +111,6 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
                         graph.data((*iter).targetNode).forwardDist = newlen;
                         graph.data((*iter).targetNode).forwardReached = true;
                         graph.data((*iter).targetNode).forwardStalled = false;
-                        graph.setForwardPrev((*iter).targetNode, curNode);
                     }
                 }
             }
@@ -121,7 +118,7 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
             if(! forwardQ.empty() && forwardQ.top().weight > upperbound) {
                 forwardFinished = true;
             }
-            // The backward direction is symetrical to the forward direction.
+        // The backward direction is symetrical to the forward direction.
         } else {
             if (backwardQ.empty()) {
                 break;
@@ -140,7 +137,6 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
                 long long unsigned int newUpperboundCandidate = curLen + graph.data(curNode).forwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
-                    meetingNode = curNode;
                 }
             }
 
@@ -168,7 +164,6 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
                         graph.data((*iter).targetNode).backwardDist = newlen;
                         graph.data((*iter).targetNode).backwardReached = true;
                         graph.data((*iter).targetNode).backwardStalled = false;
-                        graph.setBackwardPrev((*iter).targetNode, curNode);
                     }
                 }
             }
@@ -184,8 +179,6 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
 
     }
 
-    outputPath(meetingNode);
-
     prepareStructuresForNextQuery();
 
     return upperbound;
@@ -194,7 +187,7 @@ long long unsigned int CHPathQueryManager::findDistance(const unsigned int sourc
 // Code for stalling a node in the forward distance. We try to stall additional nodes using BFS as long as we don't
 // reach already stalled nodes or nodes that can't be stalled.
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::forwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+void CHDistanceQueryManager::forwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
     queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
@@ -232,7 +225,7 @@ void CHPathQueryManager::forwardStall(unsigned int stallnode, long long unsigned
 // Code for stalling a node in the backward distance. We try to stall additional nodes using BFS as long as we don't
 // reach already stalled nodes or nodes that can't be stalled.
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::backwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+void CHDistanceQueryManager::backwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
     queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
@@ -268,16 +261,14 @@ void CHPathQueryManager::backwardStall(unsigned int stallnode, long long unsigne
 
 // Reset information for the nodes that were changed in the current query.
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::prepareStructuresForNextQuery() {
+void CHDistanceQueryManager::prepareStructuresForNextQuery() {
     for (unsigned int i = 0; i < forwardChanged.size(); i++) {
         graph.resetForwardInfo(forwardChanged[i]);
-        graph.resetForwardPrev(forwardChanged[i]);
     }
     forwardChanged.clear();
 
     for (unsigned int i = 0; i < backwardChanged.size(); i++) {
-        graph.resetBackwardInfo(backwardChanged[i]);
-        graph.resetBackwardPrev(backwardChanged[i]);
+       graph.resetBackwardInfo(backwardChanged[i]);
     }
     backwardChanged.clear();
 
@@ -290,74 +281,4 @@ void CHPathQueryManager::prepareStructuresForNextQuery() {
         graph.resetBackwardStall(backwardStallChanged[i]);
     }
     backwardStallChanged.clear();
-}
-
-// This function fills the nodes on the path in the Contraction Hierarchies graph from the fromPrev and toPrev arrays
-// by calling the fillFromPath() and fillToPath() functions and then calls the unpackPrevious() and unpackFollowing()
-// functions which print the actual path by unpacking the shortcuts and printing only edges in the original graph.
-//______________________________________________________________________________________________________________________
-void CHPathQueryManager::outputPath(const unsigned int meetingNode) {
-    if (meetingNode == UINT_MAX) {
-        printf("No path was found! Nothing to unpack!\n");
-        return;
-    }
-
-    printf("~~~ Outputting shortest path (unpacked from CH) ~~~\n");
-    vector<pair<unsigned int, unsigned int> > fromPath;
-    vector<pair<unsigned int, unsigned int> > toPath;
-    fillFromPath(meetingNode, fromPath);
-    fillToPath(meetingNode, toPath);
-    unpackPrevious(fromPath);
-    unpackFollowing(toPath);
-    printf("~~~ End of path output ~~~\n");
-}
-
-//______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillFromPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & fromPath) {
-    unsigned int current = meetingNode;
-    while(graph.getForwardPrev(current) != UINT_MAX) {
-        fromPath.push_back(make_pair(graph.getForwardPrev(current), current));
-        current = graph.getForwardPrev(current);
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillToPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & toPath) {
-    unsigned int current = meetingNode;
-    while(graph.getBackwardPrev(current) != UINT_MAX) {
-        toPath.push_back(make_pair(current, graph.getBackwardPrev(current)));
-        current = graph.getBackwardPrev(current);
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void CHPathQueryManager::unpackPrevious(vector<pair<unsigned int, unsigned int> > & fromPath) {
-    for(int i = fromPath.size()-1; i >= 0; i--) {
-        unpackEdge(fromPath[i].first, fromPath[i].second);
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void CHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsigned int> > & toPath) {
-    for(unsigned int i = 0; i < toPath.size(); i++) {
-        unpackEdge(toPath[i].first, toPath[i].second);
-    }
-}
-
-//______________________________________________________________________________________________________________________
-void CHPathQueryManager::unpackEdge(unsigned int s, unsigned int t) {
-    unsigned int m;
-    if (graph.data(s).rank < graph.data(t).rank) {
-        m = graph.getMiddleNode(s, t);
-    } else {
-        m = graph.getMiddleNode(t, s);
-    }
-
-    if (m == UINT_MAX) {
-        printf("%u -> %u\n", s, t);
-        return;
-    }
-
-    unpackEdge(s, m);
-    unpackEdge(m, t);
 }
