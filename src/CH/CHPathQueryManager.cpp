@@ -54,6 +54,7 @@ long long unsigned int CHPathQueryManager::findPath(const unsigned int source, c
             unsigned int current = fromQueue.top().ID;
             long long unsigned int currentDist = fromQueue.top().weight;
             fromClosed[current] = true;
+            printf("FROM: Expanding %u (rank %u)\n", current, ranks[current]);
 
             if( currentDist < shortestFound ) {
                 if (toClosed[current]) {
@@ -88,6 +89,7 @@ long long unsigned int CHPathQueryManager::findPath(const unsigned int source, c
             unsigned int current = toQueue.top().ID;
             long long unsigned int currentDist = toQueue.top().weight;
             toClosed[current] = true;
+            printf("TO:   Expanding %u (rank %u)\n", current, ranks[current]);
 
             if( currentDist < shortestFound ) {
                 if (fromClosed[current]) {
