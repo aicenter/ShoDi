@@ -51,3 +51,20 @@ Pokud bych chtěl připravit 'Contraction Hierarchy', aby odpovídala na přích
 - Pomocí `DDSGLoader loader = DDSGLoader("xyz");` kde na místo 'xyz' doplním cestu k souboru s 'Contraction Hierarchy' a následným zavoláním `FlagsGraph * ch = loader.loadFlagsGraph();` program načte 'Contraction Hierarchy' ze souboru a vytvoří z ní graf.
 - Pomocí `CHDistanceQueryManager queryManager(*ch);` vytvořím 'queryManager', který si inicializuje všechny pomocné struktury.
 - Každé následující volání `queryManager.findDistance(x, y);` kde 'x' a 'y' jsou dva vrcholy vrátí vzdálenost mezi těmito vrcholy. Je jedno, jak se tyto dva vrcholy získají, zda se načtou odněkud ze souboru, nebo třeba přijdou jako dotaz po síti. Je ovšem třeba, aby obě čísla byla validní, tedy z rozsahu 0 až n-1 kde 'n' je počet vrcholů v použitém grafu. Při hledání vzdálenosti už se toto nijak nekontroluje.
+
+Popis vstupních formátů
+-----------------------
+
+### Formát grafu z implementační soutěže DIMACS (ukázkové grafy v tomto formátu mohou být staženy zde: http://www.dis.uniroma1.it/challenge9/download.shtml)
+- Soubor začíná řádkou `p sp n e` kde místo 'n' je číslo určující počet vrcholů a místo 'e' je číslo určující počet hran.
+- Následuje 'e' řádek ve tvaru `a u v w` reprezentujících jednotlivé hrany, s tím že 'u' je číslo source uzlu, 'v' je číslo target uzlu a 'w' je váha hrany (délka, čas potřebný pro její projetí...). Čísla 'u' a 'v' musí být z rozsahu 1 až n. V rámci formátu pro soutěž DIMACS se vrcholy indexovaly od jedničky. Program indexuje vrcholy od nuly, takže se každý načtený vrchol automaticky sníží o 1. Hrany se načítají orientovaně, takže pokud chci mít hranu 'u <-> v' obousměrnou, musím jí zadat jako hranu z 'u' do 'v' a znovu jako hranu z 'v' do 'u'.
+- Kdekoliv v soubrou se dále mouhou vyskytovat řádky začínající znakem `c`. Tyto řádky reprezentují komentáře a program je pouze zahazuje.
+
+
+### Formát souboru s dotazy
+- Na první řádce bude číslo `x` reprezentující počet párů source target (tedy dotazů)
+- Následuje 'x' řádek z nichž každá obsahuje dvě čísla oddělená mezerou `a b` kde 'a' je source a 'b' je target. Oba vrcholy musí být z rozsahu 0 až n-1 kde 'n' je počet vrcholů v pouužitém grafu. Zde se vrcholy indexují od nuly.
+- Pro vygenerování libovolně velké sady dotazů se dá využít soubor 'RandomTripsGenerator.cpp'
+
+### Formát 'Contraction Hierarchies'
+- Pro ukládání 'Contraction Hierarchy' se používá binární formát, který je stručně popsaný na konci souboru "DDSGLoader.h"
