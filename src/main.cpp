@@ -3,16 +3,19 @@
 // Created on: 25.7.18
 //
 
-#include "GraphBuilder/DDSGLoader.h"
-#include "GraphBuilder/Loader.h"
-#include "Dijkstra/BasicDijkstra.h"
-#include "Benchmarking/CHBenchmark.h"
-#include "Benchmarking/CorectnessValidator.h"
-#include "Benchmarking/DijkstraBenchmark.h"
+#include "GraphBuilding/Loaders/DDSGLoader.h"
+#include "GraphBuilding/Loaders/DIMACSLoader.h"
+#include "GraphBuilding/Loaders/TripsLoader.h"
+#include "GraphBuilding/Loaders/XenGraphLoader.h"
+#include "IntegerDijkstra/BasicIntegerDijkstra.h"
+#include "Integer/IntegerCHBenchmark.h"
+#include "Integer/IntegerCorectnessValidator.h"
+#include "Integer/IntegerDijkstraBenchmark.h"
+#include "FloatingPoint/FPointDijkstraBenchmark.h"
 #include "Timer/Timer.h"
-#include "CH/CHPreprocessor.h"
-#include "CH/CHPathQueryManager.h"
-#include "CH/CHDistanceQueryManager.h"
+#include "Integer/IntegerCHPreprocessor.h"
+#include "Integer/IntegerCHPathQueryManager.h"
+#include "Integer/IntegerCHDistanceQueryManager.h"
 
 // This function constructs a 'Contraction Hierarchy' from a given graph a saves it into a binary file in a format
 // described briefly in the 'DDSGLoader.h' file.
@@ -21,9 +24,9 @@ void constructDDSGCH() {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    Loader graphLoader = Loader("../input/USA-road-t.USA.gr");
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessForDDSG(*graph);
+    DIMACSLoader graphLoader = DIMACSLoader("../input/USA-road-t.USA.gr");
+    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat("../input/USA.USA.MY.DDSG");
 
@@ -38,26 +41,26 @@ void constructDDSGCH() {
 // this function won't detect that).
 //______________________________________________________________________________________________________________________
 void compareMineWithReference() {
-    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
     //Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
     DDSGLoader myLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    FlagsGraph * myCH = myLoader.loadFlagsGraph();
+    IntegerFlagsGraph * myCH = myLoader.loadFlagsGraph();
 
     vector<long long unsigned int> myDistances(trips.size());
-    double myTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *myCH, myDistances);
+    double myTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *myCH, myDistances);
 
     delete myCH;
 
     DDSGLoader theirLoader = DDSGLoader("../input/USA.BAY.DDSG.ch");
-    FlagsGraph * theirCH = theirLoader.loadFlagsGraph();
+    IntegerFlagsGraph * theirCH = theirLoader.loadFlagsGraph();
 
     vector<long long unsigned int> theirDistances(trips.size());
-    double theirTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *theirCH, theirDistances);
+    double theirTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *theirCH, theirDistances);
 
-    CorectnessValidator::validateVerbose(myDistances, theirDistances);
+    IntegerCorectnessValidator::validateVerbose(myDistances, theirDistances);
     printf("Their implementation was %lf times faster than mine!\n", myTime/theirTime);
 
     delete theirCH;
@@ -70,25 +73,25 @@ void compareMineWithReference() {
 // is measured and the speedup of 'Contraction Hierarchies' in comparison with 'Dijkstra' is also computed and printed.
 //______________________________________________________________________________________________________________________
 void compareCHWithDijkstra() {
-    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    FlagsGraph * ch = chLoader.loadFlagsGraph();
+    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<long long unsigned int> chDistances(trips.size());
-    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
 
-    Loader dijkstraLoader = Loader("../input/USA-road-t.BAY.gr");
-    Graph * dijkstraGraph = dijkstraLoader.loadGraph();
+    DIMACSLoader dijkstraLoader = DIMACSLoader("../input/USA-road-t.BAY.gr");
+    IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<long long unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+    double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
 
-    CorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    IntegerCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
 
     delete dijkstraGraph;
@@ -99,29 +102,29 @@ void compareCHWithDijkstra() {
 // Average time per query can be simply counted by dividing the result by the amount of queries.
 //______________________________________________________________________________________________________________________
 void runCHBenchmark() {
-    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
     DDSGLoader loader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    FlagsGraph * ch = loader.loadFlagsGraph();
+    IntegerFlagsGraph * ch = loader.loadFlagsGraph();
 
     vector<long long unsigned int> distances(trips.size());
-    CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, distances);
+    IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, distances);
 }
 
 // Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip() {
-    Loader dijkstraGraphLoader = Loader("../input/USA-road-t.BAY.gr");
-    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    DIMACSLoader dijkstraGraphLoader = DIMACSLoader("../input/USA-road-t.BAY.gr");
+    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
-    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
     unsigned int chosenTrip = 1;
-    BasicDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
+    BasicIntegerDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
 
     delete dijkstraGraph;
 
@@ -129,20 +132,20 @@ void getDijkstraPathForTrip() {
 
 // Will print the node sequence on a certain path computed by Contraction Hierarchies - this means that the paths will
 // be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
-// WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'CHPathQueryManager'
+// WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'IntegerCHPathQueryManager'
 // is fixed.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip() {
     DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
+    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
 
-    Loader tripsLoader = Loader("../input/BAY1000randomTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
     unsigned int chosenTrip = 1;
 
-    CHPathQueryManager queryManager(*chGraph);
+    IntegerCHPathQueryManager queryManager(*chGraph);
     //chGraph->debugPrint();
     long long unsigned int distance = queryManager.findDistance(trips[chosenTrip].first, trips[chosenTrip].second);
     printf("Returned distance: %llu\n", distance);
@@ -154,8 +157,28 @@ void getCHPathForTrip() {
 // in their implementation. The output format isn't used anywhere in this project.
 //______________________________________________________________________________________________________________________
 void DIMACStoDDSG() {
-    Loader loader = Loader("../input/USA-road-t.BAY.gr");
+    DIMACSLoader loader = DIMACSLoader("../input/USA-road-t.BAY.gr");
     loader.transformToDDSG("../input/USA-road-t.BAY.ddsg");
+}
+
+void testDoubleDijkstra() {
+    XenGraphLoader graphLoader = XenGraphLoader("../input/graph.xeng");
+    FPointGraph * graph = graphLoader.loadGraph();
+
+    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    vector<double> dijkstraDistances(trips.size());
+    FPointDijkstraBenchmark::runAndMeasureWithOutput(trips, *graph, dijkstraDistances);
+
+    for(unsigned int i = 0; i < 20; i++) {
+        printf("Distance for trip %u: %f\n", i, dijkstraDistances[i]);
+    }
+
+    delete graph;
+
+
 }
 
 // Simple main function, uncomment the function you want to use.
@@ -164,11 +187,13 @@ int main() {
     //constructDDSGCH();
     //runCHBenchmark();
 
-    compareCHWithDijkstra();
+    //compareCHWithDijkstra();
     //compareMineWithReference();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
     //DIMACStoDDSG();
+
+    testDoubleDijkstra();
 
     return 0;
 }

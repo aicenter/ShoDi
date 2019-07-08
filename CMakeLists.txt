@@ -1,0 +1,80 @@
+cmake_minimum_required(VERSION 3.14)
+project(contraction_hierarchies)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(src/Benchmarking)
+include_directories(src/CH)
+include_directories(src/CH/Integer/Structures)
+include_directories(src/Dijkstra)
+include_directories(src/GraphBuilding)
+include_directories(src/Timer)
+
+add_executable(contraction_hierarchies
+        src/Benchmarking/Integer/IntegerCHBenchmark.cpp
+        src/Benchmarking/Integer/IntegerCHBenchmark.h
+        src/Benchmarking/Integer/IntegerCorectnessValidator.cpp
+        src/Benchmarking/Integer/IntegerCorectnessValidator.h
+        src/Benchmarking/Integer/IntegerDijkstraBenchmark.cpp
+        src/Benchmarking/Integer/IntegerDijkstraBenchmark.h
+        src/Benchmarking/FloatingPoint/FPointDijkstraBenchmark.cpp
+        src/Benchmarking/FloatingPoint/FPointDijkstraBenchmark.h
+        src/CH/Generic/Structures/CHNode.cpp
+        src/CH/Generic/Structures/CHNode.h
+        src/CH/Generic/Structures/CHpriorityQueue.cpp
+        src/CH/Generic/Structures/CHpriorityQueue.h
+        src/CH/Integer/Structures/IntegerHopsDijkstraNode.cpp
+        src/CH/Integer/Structures/IntegerHopsDijkstraNode.h
+        src/CH/Integer/Structures/IntegerNodeData.cpp
+        src/CH/Integer/Structures/IntegerNodeData.h
+        src/CH/Integer/IntegerCHDistanceQueryManager.cpp
+        src/CH/Integer/IntegerCHDistanceQueryManager.h
+        src/CH/Integer/IntegerCHPathQueryManager.cpp
+        src/CH/Integer/IntegerCHPathQueryManager.h
+        src/CH/Integer/IntegerCHPreprocessor.cpp
+        src/CH/Integer/IntegerCHPreprocessor.h
+        src/CH/Generic/EdgeDifferenceManager.cpp
+        src/CH/Generic/EdgeDifferenceManager.h
+        src/Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.cpp
+        src/Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h
+        src/Dijkstra/IntegerDijkstra/IntegerDijkstraNode.cpp
+        src/Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h
+        src/Dijkstra/FloatingPointDijkstra/BasicFPointDijkstra.cpp
+        src/Dijkstra/FloatingPointDijkstra/BasicFPointDijkstra.h
+        src/Dijkstra/FloatingPointDijkstra/FPointDijkstraNode.cpp
+        src/Dijkstra/FloatingPointDijkstra/FPointDijkstraNode.h
+        src/GraphBuilding/Loaders/DDSGLoader.cpp
+        src/GraphBuilding/Loaders/DDSGLoader.h
+        src/GraphBuilding/Loaders/DIMACSLoader.cpp
+        src/GraphBuilding/Loaders/DIMACSLoader.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerGraph.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerOutputEdge.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerOutputEdge.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerOutputShortcutEdge.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerOutputShortcutEdge.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerPreprocessingEdgeData.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerPreprocessingEdgeData.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdge.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdge.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.cpp
+        src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.h
+        src/GraphBuilding/Structures/FloatingPointStructures/FPointSimpleGraph.cpp
+        src/GraphBuilding/Structures/FloatingPointStructures/FPointSimpleGraph.h
+        src/GraphBuilding/Loaders/XenGraphLoader.cpp
+        src/GraphBuilding/Loaders/XenGraphLoader.h
+        src/GraphBuilding/Loaders/TripsLoader.cpp
+        src/GraphBuilding/Loaders/TripsLoader.h
+        src/Timer/Timer.cpp
+        src/Timer/Timer.h
+        src/main.cpp)
