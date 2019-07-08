@@ -57,7 +57,7 @@ FPointUpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
 
     printf("Started loading graph!\n");
 
-    Timer graphLoadTimer("IntegerGraph loading");
+    Timer graphLoadTimer("FPointUpdateableGraph loading");
     graphLoadTimer.begin();
 
     unsigned int nodes, edges;

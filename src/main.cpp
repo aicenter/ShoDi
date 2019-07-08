@@ -4,6 +4,7 @@
 //
 
 #include "GraphBuilding/Loaders/DDSGLoader.h"
+#include "GraphBuilding/Loaders/DDSGFLoader.h"
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
@@ -12,6 +13,8 @@
 #include "Integer/IntegerCorectnessValidator.h"
 #include "Integer/IntegerDijkstraBenchmark.h"
 #include "FloatingPoint/FPointDijkstraBenchmark.h"
+#include "FloatingPoint/FPointCHBenchmark.h"
+#include "FloatingPoint/FPointCorectnessValidator.h"
 #include "Timer/Timer.h"
 #include "Integer/IntegerCHPreprocessor.h"
 #include "Integer/IntegerCHPathQueryManager.h"
@@ -48,7 +51,7 @@ void constructDDSGCHF() {
     FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     FPointCHPreprocessor::preprocessForDDSGF(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat("../input/USA.USA.MY.DDSG");
+    graph->flushInDdsgfFormat("../input/experimentGraph2");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -118,6 +121,33 @@ void compareCHWithDijkstra() {
 
 }
 
+//______________________________________________________________________________________________________________________
+void compareCHFWithDijkstra() {
+    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraph2.chf");
+    FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<double> chDistances(trips.size());
+    double chTime = FPointCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/graph.xeng");
+    FPointGraph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<double> dijkstraDistances(trips.size());
+    double dijkstraTime = FPointDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    FPointCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
+
+}
+
 // Runs a set of queries in a given 'Contraction Hierarchy'. Sum of the query times is computed and returned.
 // Average time per query can be simply counted by dividing the result by the amount of queries.
 //______________________________________________________________________________________________________________________
@@ -181,6 +211,7 @@ void DIMACStoDDSG() {
     loader.transformToDDSG("../input/USA-road-t.BAY.ddsg");
 }
 
+//______________________________________________________________________________________________________________________
 void testDoubleDijkstra() {
     XenGraphLoader graphLoader = XenGraphLoader("../input/graph.xeng");
     FPointGraph * graph = graphLoader.loadGraph();
@@ -214,7 +245,8 @@ int main() {
     //DIMACStoDDSG();
 
     //testDoubleDijkstra();
-    constructDDSGCHF();
+    //constructDDSGCHF();
+    compareCHFWithDijkstra();
 
     return 0;
 }
