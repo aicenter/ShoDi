@@ -3,9 +3,9 @@
 // Created on: 8.7.19
 //
 
-#include "FPointDijkstraNode.h"
+#include "FPointHopsDijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-FPointDijkstraNode::FPointDijkstraNode(unsigned int x, double y) : ID(x), weight(y) {
+FPointHopsDijkstraNode::FPointHopsDijkstraNode(unsigned int x, double y, unsigned int z) : FPointDijkstraNode(x, y), hops(z) {
 
 }

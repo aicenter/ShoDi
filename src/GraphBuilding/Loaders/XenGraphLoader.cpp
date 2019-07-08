@@ -1,5 +1,6 @@
 //
-// Created by xenty on 8.7.19.
+// Author: Xenty (Michal Cvach)
+// Created on: 8.7.19
 //
 
 #include "../../Timer/Timer.h"
@@ -47,6 +48,59 @@ FPointGraph * XenGraphLoader::loadGraph() {
 }
 
 //______________________________________________________________________________________________________________________
+FPointUpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Started loading graph!\n");
+
+    Timer graphLoadTimer("IntegerGraph loading");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges;
+    parseFirstLine(input, nodes, edges);
+
+    FPointUpdateableGraph * graph = new FPointUpdateableGraph(nodes);
+    parseEdges(input, *graph, edges);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+
+    return graph;
+}
+
+// This function is used to reinsert all the original edges into the graph after the preprocessing has been finished.
+//______________________________________________________________________________________________________________________
+void XenGraphLoader::putAllEdgesIntoUpdateableGraph(FPointUpdateableGraph & graph) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Putting all original edges back into updateable graph!\n");
+
+    Timer graphLoadTimer("Putting back original edges");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges;
+    parseFirstLine(input, nodes, edges);
+
+    parseEdges(input, graph, edges);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+
+}
+
+//______________________________________________________________________________________________________________________
 void XenGraphLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges) {
     char c1, c2;
     input >> c1 >> c2;
@@ -61,6 +115,21 @@ void XenGraphLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsi
 
 //______________________________________________________________________________________________________________________
 void XenGraphLoader::parseEdges(ifstream & input, FPointSimpleGraph & graph, unsigned int edges) {
+    unsigned int from, to, oneWayFlag;
+    double weight;
+    for(unsigned int i = 0; i < edges; i++) {
+        input >> from >> to >> weight >> oneWayFlag;
+        if(oneWayFlag == 1) {
+            graph.addEdge(from, to, weight);
+        } else {
+            graph.addEdge(from, to, weight);
+            graph.addEdge(to, from, weight);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void XenGraphLoader::parseEdges(ifstream & input, FPointUpdateableGraph & graph, unsigned int edges) {
     unsigned int from, to, oneWayFlag;
     double weight;
     for(unsigned int i = 0; i < edges; i++) {

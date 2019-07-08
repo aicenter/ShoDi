@@ -1,5 +1,6 @@
 //
-// Created by xenty on 8.7.19.
+// Author: Xenty (Michal Cvach)
+// Created on: 8.7.19
 //
 
 #include "TripsLoader.h"

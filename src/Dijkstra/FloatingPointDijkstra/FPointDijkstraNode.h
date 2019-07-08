@@ -1,5 +1,6 @@
 //
-// Created by xenty on 8.7.19.
+// Author: Xenty (Michal Cvach)
+// Created on: 8.7.19
 //
 
 #ifndef CONTRACTION_HIERARCHIES_FPOINTDIJKSTRANODE_H
@@ -13,8 +14,9 @@
 class FPointDijkstraNode {
 public:
     FPointDijkstraNode(unsigned int x, double y);
-    unsigned int ID;
     double weight;
+    unsigned int ID;
+
 
 };
 

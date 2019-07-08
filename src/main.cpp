@@ -16,6 +16,7 @@
 #include "Integer/IntegerCHPreprocessor.h"
 #include "Integer/IntegerCHPathQueryManager.h"
 #include "Integer/IntegerCHDistanceQueryManager.h"
+#include "CH/FloatingPoint/FPointCHPreprocessor.h"
 
 // This function constructs a 'Contraction Hierarchy' from a given graph a saves it into a binary file in a format
 // described briefly in the 'DDSGLoader.h' file.
@@ -29,6 +30,25 @@ void constructDDSGCH() {
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat("../input/USA.USA.MY.DDSG");
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
+// This function constructs a 'Floating Point Contraction Hierarchy' from a given graph a saves it into a binary file
+// in a format described briefly in the 'DDSGLoader.h' file. (Might not be DDSGLoader.h anymore FIXME)
+//______________________________________________________________________________________________________________________
+void constructDDSGCHF() {
+    Timer timer("Whole CH construction timer");
+    timer.begin();
+
+    XenGraphLoader graphLoader = XenGraphLoader("../input/graph.xeng");
+    FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    FPointCHPreprocessor::preprocessForDDSGF(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    graph->flushInDdsgfFormat("../input/USA.USA.MY.DDSG");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -193,7 +213,8 @@ int main() {
     //getCHPathForTrip();
     //DIMACStoDDSG();
 
-    testDoubleDijkstra();
+    //testDoubleDijkstra();
+    constructDDSGCHF();
 
     return 0;
 }

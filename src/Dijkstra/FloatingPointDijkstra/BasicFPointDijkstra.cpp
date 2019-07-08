@@ -1,5 +1,6 @@
 //
-// Created by xenty on 8.7.19.
+// Author: Xenty (Michal Cvach)
+// Created on: 8.7.19
 //
 
 #include <climits>
@@ -57,7 +58,7 @@ double BasicFPointDijkstra::runWithPathOutput(const unsigned int source, const u
     vector < vector < unsigned int > > previous(n);
 
     for(unsigned int i = 0; i < n; i++) {
-        distance[i] = numeric_limits<double>::max();;
+        distance[i] = numeric_limits<double>::max();
     }
 
     distance[source] = 0;
