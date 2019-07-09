@@ -53,7 +53,11 @@ double FPointCHDistanceQueryManager::findDistance(const unsigned int source, con
         } else if (backwardFinished || backwardQ.empty()) {
             forward = true;
         } else {
-            forward = ! forward;
+            if (forwardQ.top().weight < backwardQ.top().weight) {
+                forward = true;
+            } else {
+                forward = false;
+            }
         }
 
         if (forward) {
