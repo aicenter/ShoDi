@@ -15,9 +15,11 @@ class TripsLoader {
 private:
     string inputFile;
     void parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x);
+    void parseLongLongTrips(ifstream & input, vector < pair < long long unsigned int, long long unsigned int > > & x);
 public:
     TripsLoader(string inputFile);
     void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
+    void loadLongLongTrips(vector < pair < long long unsigned int, long long unsigned int > > & x);
 };
 
 

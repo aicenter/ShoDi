@@ -228,8 +228,25 @@ void testDoubleDijkstra() {
     }
 
     delete graph;
+}
 
+//______________________________________________________________________________________________________________________
+void testCHDistanceQueriesWithMapping() {
+    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTripsOriginalIDs");
+    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    tripsLoader.loadLongLongTrips(trips);
 
+    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraphDebug.chf");
+    FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<double> chDistances(trips.size());
+    FPointCHBenchmark::runMeasureAndOutputDistanceQueriesWithMapping(trips, *ch, "../input/graph.xeni" , chDistances);
+
+    for(unsigned int i = 0; i < 15; i++) {
+        printf("Distance for trip %u: %f\n", i, chDistances[i]);
+    }
+
+    delete ch;
 }
 
 // Simple main function, uncomment the function you want to use.
@@ -245,8 +262,9 @@ int main() {
     //DIMACStoDDSG();
 
     //testDoubleDijkstra();
+    testCHDistanceQueriesWithMapping();
     //constructDDSGCHF();
-    compareCHFWithDijkstra();
+    //compareCHFWithDijkstra();
 
     return 0;
 }

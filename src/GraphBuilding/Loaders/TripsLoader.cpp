@@ -29,6 +29,19 @@ void TripsLoader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) 
 }
 
 //______________________________________________________________________________________________________________________
+void TripsLoader::loadLongLongTrips(vector < pair < long long unsigned int, long long unsigned int > > & x) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    parseLongLongTrips(input, x);
+
+    input.close();
+}
+
+//______________________________________________________________________________________________________________________
 void TripsLoader::parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x) {
     unsigned int tripscnt;
     input >> tripscnt;
@@ -37,3 +50,14 @@ void TripsLoader::parseTrips(ifstream & input, vector < pair < unsigned int, uns
         input >> x.at(i).first >> x.at(i).second;
     }
 }
+
+//______________________________________________________________________________________________________________________
+void TripsLoader::parseLongLongTrips(ifstream & input, vector < pair < long long unsigned int, long long unsigned int > > & x) {
+    unsigned int tripscnt;
+    input >> tripscnt;
+    x.resize(tripscnt);
+    for (unsigned int i = 0; i < tripscnt; i++) {
+        input >> x.at(i).first >> x.at(i).second;
+    }
+}
+

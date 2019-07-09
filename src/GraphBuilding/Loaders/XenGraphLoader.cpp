@@ -74,6 +74,27 @@ FPointUpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
     return graph;
 }
 
+//______________________________________________________________________________________________________________________
+void XenGraphLoader::loadNodesMapping(unordered_map <long long unsigned int, unsigned int> & mapping) {
+    ifstream input;
+    input.open(this->inputFile);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Started nodes mapping!\n");
+
+    Timer graphLoadTimer("Mapping loading");
+    graphLoadTimer.begin();
+
+    parseNodesMapping(input, mapping);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+}
+
 // This function is used to reinsert all the original edges into the graph after the preprocessing has been finished.
 //______________________________________________________________________________________________________________________
 void XenGraphLoader::putAllEdgesIntoUpdateableGraph(FPointUpdateableGraph & graph) {
@@ -145,4 +166,26 @@ void XenGraphLoader::parseEdges(ifstream & input, FPointUpdateableGraph & graph,
             }
         }
     }
+}
+
+//______________________________________________________________________________________________________________________
+void XenGraphLoader::parseNodesMapping(ifstream & input, unordered_map <long long unsigned int, unsigned int> & mapping) {
+    unsigned int nodes;
+    long long unsigned int cur;
+
+    char c1, c2;
+    input >> c1 >> c2;
+    if (c1 != 'X' || c2 != 'I') {
+        cout << "The input file is missing the XenGraph indices file header." << endl
+             << "Are you sure the input file is in the correct format?" << endl
+             << "The loading will proceed but the mapping might be corrupted." << endl;
+    }
+
+    input >> nodes;
+
+    for(unsigned int i = 0; i < nodes; i++) {
+        input >> cur;
+        mapping.insert(make_pair(cur, i));
+    }
+
 }

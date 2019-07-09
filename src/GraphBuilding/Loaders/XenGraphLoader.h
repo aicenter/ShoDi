@@ -18,11 +18,13 @@ private:
     void parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
     void parseEdges(ifstream & input, FPointSimpleGraph & graph, unsigned int edges);
     void parseEdges(ifstream & input, FPointUpdateableGraph & graph, unsigned int edges);
+    void parseNodesMapping(ifstream & input, unordered_map <long long unsigned int, unsigned int> & mapping);
 public:
     XenGraphLoader(string inputFile);
     FPointGraph * loadGraph();
     FPointUpdateableGraph * loadUpdateableGraph();
     void putAllEdgesIntoUpdateableGraph(FPointUpdateableGraph & graph);
+    void loadNodesMapping(unordered_map <long long unsigned int, unsigned int> & mapping);
 };
 
 
