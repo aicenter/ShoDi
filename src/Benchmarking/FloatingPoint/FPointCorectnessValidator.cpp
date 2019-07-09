@@ -5,6 +5,9 @@
 
 #include "FPointCorectnessValidator.h"
 #include <cstdio>
+#include <cmath>
+
+#define EPS 0.000000001
 
 //______________________________________________________________________________________________________________________
 bool FPointCorectnessValidator::validate(vector < double > & a, vector < double > & b) {
@@ -20,9 +23,9 @@ bool FPointCorectnessValidator::validate(vector < double > & a, vector < double 
 bool FPointCorectnessValidator::validateVerbose(vector < double > & a, vector < double > & b) {
     unsigned int mmcnt = 0;
     for (unsigned int i = 0; i < a.size(); i++) {
-        if (a.at(i) != b.at(i)) {
+        if (abs(a.at(i) - b.at(i)) > EPS) {
             printf("Found mismatch at trip %u (indexing trips from 0).\n", i);
-            printf("Vector 'a' contains: %llu, while vector 'b' contains: %llu.\n", a.at(i), b.at(i));
+            printf("Vector 'a' contains: %.15f, while vector 'b' contains: %.15f.\n", a.at(i), b.at(i));
             mmcnt++;//return false;
         }
     }

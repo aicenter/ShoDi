@@ -86,7 +86,6 @@ void FPointUpdateableGraph::flushInDdsgfFormat(string filePath) {
     vector < FPointOutputShortcutEdge > shortcuts;
     printf("Reordering edges for file writing\n");
     prepareEdgesForFlushing(edges, shortcuts);
-    printf("Laggy machacha boyyy"); // FIXME
 
     ofstream output;
     output.open ( filePath + ".chf", ios::binary );
@@ -165,14 +164,12 @@ void FPointUpdateableGraph::flushTerminator(ostream & output) {
 //______________________________________________________________________________________________________________________
 void FPointUpdateableGraph::prepareEdgesForFlushing(vector < FPointOutputEdge > & edges, vector < FPointOutputShortcutEdge > & shortcuts) {
     for(unsigned int i = 0; i < followingNodes.size(); i++) {
-        printf("Processing node %u\n", i);
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
-            bool toBeErased = false;
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
                 if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight) {
                     flags += 2;
-                    toBeErased = true;
+                    followingNodes[(*iter).first].erase(i);
                 }
                 if ((*iter).second.isShortcut) {
                     flags += 4;
@@ -184,7 +181,7 @@ void FPointUpdateableGraph::prepareEdgesForFlushing(vector < FPointOutputEdge > 
                 unsigned int flags = 2;
                 if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight) {
                     flags += 1;
-                    toBeErased = true;
+                    followingNodes[(*iter).first].erase(i);
                 }
                 if ((*iter).second.isShortcut) {
                     flags += 4;
@@ -193,9 +190,6 @@ void FPointUpdateableGraph::prepareEdgesForFlushing(vector < FPointOutputEdge > 
                     edges.push_back(FPointOutputEdge((*iter).first, i, (*iter).second.weight, flags));
                 }
             }
-            //if (toBeErased) {
-            //    followingNodes[(*iter).first].erase(i);
-            //}
         }
     }
 }

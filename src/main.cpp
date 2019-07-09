@@ -51,7 +51,7 @@ void constructDDSGCHF() {
     FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     FPointCHPreprocessor::preprocessForDDSGF(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat("../input/experimentGraph2");
+    graph->flushInDdsgfFormat("../input/experimentGraphDebug");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -127,7 +127,7 @@ void compareCHFWithDijkstra() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraph2.chf");
+    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraphDebug.chf");
     FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<double> chDistances(trips.size());

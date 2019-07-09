@@ -119,11 +119,13 @@ void XenGraphLoader::parseEdges(ifstream & input, FPointSimpleGraph & graph, uns
     double weight;
     for(unsigned int i = 0; i < edges; i++) {
         input >> from >> to >> weight >> oneWayFlag;
-        if(oneWayFlag == 1) {
-            graph.addEdge(from, to, weight);
-        } else {
-            graph.addEdge(from, to, weight);
-            graph.addEdge(to, from, weight);
+        if (from != to) {
+            if (oneWayFlag == 1) {
+                graph.addEdge(from, to, weight);
+            } else {
+                graph.addEdge(from, to, weight);
+                graph.addEdge(to, from, weight);
+            }
         }
     }
 }
@@ -134,11 +136,13 @@ void XenGraphLoader::parseEdges(ifstream & input, FPointUpdateableGraph & graph,
     double weight;
     for(unsigned int i = 0; i < edges; i++) {
         input >> from >> to >> weight >> oneWayFlag;
-        if(oneWayFlag == 1) {
-            graph.addEdge(from, to, weight);
-        } else {
-            graph.addEdge(from, to, weight);
-            graph.addEdge(to, from, weight);
+        if (from != to) {
+            if (oneWayFlag == 1) {
+                graph.addEdge(from, to, weight);
+            } else {
+                graph.addEdge(from, to, weight);
+                graph.addEdge(to, from, weight);
+            }
         }
     }
 }
