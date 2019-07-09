@@ -11,6 +11,10 @@ include_directories(src/GraphBuilding)
 include_directories(src/Timer)
 
 add_executable(contraction_hierarchies
+        src/API/DistanceQueryManagerAPI.cpp
+        src/API/DistanceQueryManagerAPI.h
+        src/API/DistanceQueryManagerWithMappingAPI.cpp
+        src/API/DistanceQueryManagerWithMappingAPI.h
         src/Benchmarking/Integer/IntegerCHBenchmark.cpp
         src/Benchmarking/Integer/IntegerCHBenchmark.h
         src/Benchmarking/Integer/IntegerCorectnessValidator.cpp
