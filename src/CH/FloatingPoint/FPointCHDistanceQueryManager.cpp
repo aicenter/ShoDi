@@ -78,7 +78,7 @@ double FPointCHDistanceQueryManager::findDistance(const unsigned int source, con
             // Check if the node was already settled in the opposite direction - if yes, we get a new candidate
             // for the shortest path.
             if ( graph.data(curNode).backwardSettled ) {
-                double newUpperboundCandidate = curLen +  graph.data(curNode).backwardDist;
+                double newUpperboundCandidate = curLen + graph.data(curNode).backwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
                 }
@@ -95,7 +95,7 @@ double FPointCHDistanceQueryManager::findDistance(const unsigned int source, con
                     double newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         graph.data(curNode).forwardDist = newdistance;
-                        forwardStall(curNode, newdistance);
+                        //forwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
                     }
                 }
 
@@ -123,7 +123,7 @@ double FPointCHDistanceQueryManager::findDistance(const unsigned int source, con
             if(! forwardQ.empty() && forwardQ.top().weight > upperbound) {
                 forwardFinished = true;
             }
-            // The backward direction is symetrical to the forward direction.
+            // The backward direction is symmetrical to the forward direction.
         } else {
             if (backwardQ.empty()) {
                 break;
@@ -150,7 +150,8 @@ double FPointCHDistanceQueryManager::findDistance(const unsigned int source, con
                 if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     double newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
                     if (newdistance < curLen) {
-                        backwardStall(curNode, newdistance);
+                        graph.data(curNode).backwardDist = newdistance;
+                        //backwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
                     }
                 }
 

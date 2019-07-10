@@ -89,6 +89,7 @@ void FPointCHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &prior
 
         getPossibleShortcuts(current.id, graph, true);
         unsigned int shortcuts = calculateShortcutsAmount();
+        printf("Processing node %u, can add %u shortcuts.\n", current.id, shortcuts);
         int newweight = EdgeDifferenceManager::difference(UINT_MAX, current.id, shortcuts, preprocessingDegrees[current.id]);
 
         if(newweight > priorityQueue.front().weight) {
@@ -217,6 +218,7 @@ void FPointCHPreprocessor::actuallyAddShortcutsWithUnpackingData(FPointUpdateabl
                     preprocessingDegrees[*iter2]++;
                     if (graph.addShortcutEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2)), x)) {
                         allShortcuts.push_back(FPointShortcutEdge((*iter1), (*iter2), distances.at(make_pair(*iter1, *iter2)), x));
+                        printf("Actually added shortcut: %u -> %u (distance: %.15f).\n", (*iter1), (*iter2), distances.at(make_pair(*iter1, *iter2)));
                     }
                 }
             }

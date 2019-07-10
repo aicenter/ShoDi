@@ -28,11 +28,11 @@ void constructDDSGCH() {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    DIMACSLoader graphLoader = DIMACSLoader("../input/USA-road-t.USA.gr");
+    DIMACSLoader graphLoader = DIMACSLoader("../input/graph.gr");
     IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat("../input/USA.USA.MY.DDSG");
+    graph->flushInDdsgFormat("../input/graph");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -51,7 +51,7 @@ void constructDDSGCHF() {
     FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     FPointCHPreprocessor::preprocessForDDSGF(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat("../input/experimentGraphDebug");
+    graph->flushInDdsgfFormat("../input/experimentGraphDebug2");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -96,11 +96,11 @@ void compareMineWithReference() {
 // is measured and the speedup of 'Contraction Hierarchies' in comparison with 'Dijkstra' is also computed and printed.
 //______________________________________________________________________________________________________________________
 void compareCHWithDijkstra() {
-    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
+    DDSGLoader chLoader = DDSGLoader("../input/graphReference.ch");
     IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<long long unsigned int> chDistances(trips.size());
@@ -108,7 +108,7 @@ void compareCHWithDijkstra() {
 
     delete ch;
 
-    DIMACSLoader dijkstraLoader = DIMACSLoader("../input/USA-road-t.BAY.gr");
+    DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
     IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<long long unsigned int> dijkstraDistances(trips.size());
@@ -140,6 +140,43 @@ void compareCHFWithDijkstra() {
 
     vector<double> dijkstraDistances(trips.size());
     double dijkstraTime = FPointDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    FPointCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void debugOnSmallGraph() {
+    TripsLoader tripsLoader = TripsLoader("../input/smallTrips");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    XenGraphLoader graphLoader = XenGraphLoader("../input/small.xeng");
+    FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    FPointCHPreprocessor::preprocessForDDSGF(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    graph->flushInDdsgfFormat("../input/small");
+
+    DDSGFLoader chLoader = DDSGFLoader("../input/small.chf");
+    FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<double> chDistances(trips.size());
+    double chTime = FPointCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/small.xeng");
+    FPointGraph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<double> dijkstraDistances(trips.size());
+    double dijkstraTime = FPointDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    for(unsigned int i = 0; i < 15; i++) {
+        printf("Trip %u - distance using CH: %f, distance using Dijkstra: %f.\n", i, chDistances[i], dijkstraDistances[i]);
+    }
 
     FPointCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
@@ -207,8 +244,8 @@ void getCHPathForTrip() {
 // in their implementation. The output format isn't used anywhere in this project.
 //______________________________________________________________________________________________________________________
 void DIMACStoDDSG() {
-    DIMACSLoader loader = DIMACSLoader("../input/USA-road-t.BAY.gr");
-    loader.transformToDDSG("../input/USA-road-t.BAY.ddsg");
+    DIMACSLoader loader = DIMACSLoader("../input/graph.gr");
+    loader.transformToDDSG("../input/graph.ddsg");
 }
 
 //______________________________________________________________________________________________________________________
@@ -262,9 +299,10 @@ int main() {
     //DIMACStoDDSG();
 
     //testDoubleDijkstra();
-    testCHDistanceQueriesWithMapping();
+    //testCHDistanceQueriesWithMapping();
     //constructDDSGCHF();
-    //compareCHFWithDijkstra();
+    compareCHFWithDijkstra();
+    //debugOnSmallGraph();
 
     return 0;
 }

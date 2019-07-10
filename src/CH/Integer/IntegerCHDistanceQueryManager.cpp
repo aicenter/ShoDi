@@ -90,7 +90,7 @@ long long unsigned int IntegerCHDistanceQueryManager::findDistance(const unsigne
                     long long unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         graph.data(curNode).forwardDist = newdistance;
-                        forwardStall(curNode, newdistance);
+                        //forwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
                     }
                 }
 
@@ -145,7 +145,8 @@ long long unsigned int IntegerCHDistanceQueryManager::findDistance(const unsigne
                 if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
                     if (newdistance < curLen) {
-                        backwardStall(curNode, newdistance);
+                        graph.data(curNode).backwardDist = newdistance;
+                        //backwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
                     }
                 }
 

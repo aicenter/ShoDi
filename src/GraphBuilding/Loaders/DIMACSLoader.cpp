@@ -190,7 +190,9 @@ void DIMACSLoader::parseEdges(ifstream & input, IntegerSimpleGraph & graph, unsi
             unsigned int from, to;
             long long unsigned int weight;
             getEdge(buffer, from, to, weight);
-            graph.addEdge(from, to, weight);
+            if(from != to) {
+                graph.addEdge(from, to, weight);
+            }
             loadededgescnt++;
         }
     }
@@ -206,7 +208,9 @@ void DIMACSLoader::parseEdges(ifstream & input, IntegerUpdateableGraph & graph, 
             unsigned int from, to;
             long long unsigned int weight;
             getEdge(buffer, from, to, weight);
-            graph.addEdge(from, to, weight);
+            if(from != to) {
+                graph.addEdge(from, to, weight);
+            }
             loadededgescnt++;
         }
     }
