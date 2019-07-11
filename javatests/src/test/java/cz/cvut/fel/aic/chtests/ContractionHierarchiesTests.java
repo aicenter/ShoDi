@@ -22,11 +22,14 @@ class ContractionHierarchiesTests {
     @Test
     @DisplayName("1000 random queries")
     void randomQueries1000Test() {
-        System.load("/home/xenty/sum/2019/ContractionHierarchies/contraction-hierarchies/javatests/libcontractionHierarchies.so");
+        // This can be used if you can guarantee that the path to the library is always included in the
+        // java.library.path. For example by setting -Djava.library.path to the directory with the library.
+        // If you can not guarantee this, you can use an absolute path using System.load below.
+        System.loadLibrary("contractionHierarchies");
 
-        // This can be instead, but the user must guarantee the the path to the library is always included in the
-        // java.library.path.
-        //System.loadLibrary("contractionHierarchies");
+        // Here you can put an absolute path to the library if you can't assure that you will have the library
+        // included in the java.library.path.
+        // System.load("/home/xenty/sum/2019/ContractionHierarchies/contraction-hierarchies/javatests/libcontractionHierarchies.so");
 
         DistanceQueryManagerAPI dqm = new DistanceQueryManagerAPI();
         dqm.initializeCH("./testCHGraph.chf");
