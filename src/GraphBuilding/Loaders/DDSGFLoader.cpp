@@ -23,7 +23,7 @@ FPointFlagsGraph * DDSGFLoader::loadFlagsGraph() {
         exit(1);
     }
 
-    Timer loadTimer("DDSGF FPointGraph loading timer");
+    Timer loadTimer("DDSGF Contraction Hierarchy query graph loading timer");
     loadTimer.begin();
 
     if ( verifyHeader(input) == false ) {
@@ -51,7 +51,7 @@ FPointFlagsGraph * DDSGFLoader::loadFlagsGraph() {
     loadTimer.finish();
     loadTimer.printMeasuredTime();
 
-    printf("FPointGraph seems to be loaded correctly!\n");
+    printf("Contraction Hierarchy seems to be loaded correctly!\n");
 
     return graph;
 }

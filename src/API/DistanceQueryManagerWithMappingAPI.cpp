@@ -8,7 +8,7 @@
 
 //______________________________________________________________________________________________________________________
 void DistanceQueryManagerWithMappingAPI::initializeCH(string chFile, string mappingFile) {
-    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraphDebug.chf");
+    DDSGFLoader chLoader = DDSGFLoader(chFile;
     graph = chLoader.loadFlagsGraph();
     qm = new FPointCHDistanceQueryManagerWithMapping(*graph, mappingFile);
 }

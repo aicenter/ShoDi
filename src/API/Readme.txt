@@ -9,7 +9,7 @@ How to proceed
 3) In the "generateSharedLib.sh" script, on line 3, replace the paths
    at the end of the command with paths to the JDK in your system.
 2) Run the "generateSharedLib.sh" which creates the actual library,
-   in Linux the output will be the "contractionHierarchies.so" file.
+   in Linux the output will be the "libcontractionHierarchies.so" file.
 
 Requirements
 ============
@@ -22,3 +22,8 @@ In Linux, SWIG and g++ is required to run the scripts. Also JDK
 has to be installed on the system. For info on how to download
 and install SWIG, you can consult http://www.swig.org/ .
 
+Sidenote
+========
+In "generateSWIGcode.sh", the package option must match exactly
+the package in which the classes will be put, otherwise it will
+not be possible to call them from Java.

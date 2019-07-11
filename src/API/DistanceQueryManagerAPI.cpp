@@ -11,7 +11,7 @@
 // can then be used to answer queries.
 //______________________________________________________________________________________________________________________
 void DistanceQueryManagerAPI::initializeCH(string chFile) {
-    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraphDebug.chf");
+    DDSGFLoader chLoader = DDSGFLoader(chFile);
     graph = chLoader.loadFlagsGraph();
     qm = new FPointCHDistanceQueryManager(*graph);
 }

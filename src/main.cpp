@@ -3,6 +3,8 @@
 // Created on: 25.7.18
 //
 
+#include <fstream>
+#include <iomanip>
 #include "GraphBuilding/Loaders/DDSGLoader.h"
 #include "GraphBuilding/Loaders/DDSGFLoader.h"
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
@@ -20,6 +22,8 @@
 #include "CH/Integer/IntegerCHPathQueryManager.h"
 #include "CH/Integer/IntegerCHDistanceQueryManager.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
+
+using namespace std;
 
 // This function constructs a 'Contraction Hierarchy' from a given graph a saves it into a binary file in a format
 // described briefly in the 'DDSGLoader.h' file.
@@ -143,6 +147,16 @@ void compareCHFWithDijkstra() {
 
     FPointCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    /*ofstream trueDistancesFile;
+    trueDistancesFile.open("../input/testTrueDistances.txt");
+    if( ! trueDistancesFile.is_open() ) {
+        printf("Couldn't open file!");
+    }
+
+    for(unsigned int i = 0; i < dijkstraDistances.size(); i++) {
+        trueDistancesFile << setprecision(12) << dijkstraDistances[i] << endl;
+    }*/
 
     delete dijkstraGraph;
 
