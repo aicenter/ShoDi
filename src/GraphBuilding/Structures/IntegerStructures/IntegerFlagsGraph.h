@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 #include "IntegerQueryEdge.h"
-#include "Integer/Structures/IntegerNodeData.h"
+#include "../../../CH/Integer/Structures/IntegerNodeData.h"
 
 using namespace std;
 

@@ -4,8 +4,8 @@
 //
 
 #include <string>
-#include "IntegerDijkstra/BasicIntegerDijkstra.h"
-#include "Timer.h"
+#include "../../Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
+#include "../../Timer/Timer.h"
 #include "IntegerDijkstraBenchmark.h"
 
 //______________________________________________________________________________________________________________________

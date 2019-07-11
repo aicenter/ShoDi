@@ -5,7 +5,7 @@
 
 #include "../../Dijkstra/FloatingPointDijkstra/BasicFPointDijkstra.h"
 #include "FPointDijkstraBenchmark.h"
-#include "Timer.h"
+#include "../../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
 void FPointDijkstraBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const FPointGraph & graph) {

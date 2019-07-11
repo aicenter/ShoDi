@@ -7,7 +7,7 @@
 #define TRANSIT_NODE_ROUTING_DIJKSTRABENCHMARK_H
 
 #include <vector>
-#include "Structures/IntegerStructures/IntegerGraph.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerGraph.h"
 
 using namespace std;
 

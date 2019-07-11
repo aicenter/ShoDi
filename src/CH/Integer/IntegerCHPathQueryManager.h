@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <queue>
-#include "Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.h"
 
 using namespace std;
 

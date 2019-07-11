@@ -6,7 +6,7 @@
 #ifndef TRANSIT_NODE_ROUTING_HOPSDIJKSTRANODE_H
 #define TRANSIT_NODE_ROUTING_HOPSDIJKSTRANODE_H
 
-#include "IntegerDijkstra/IntegerDijkstraNode.h"
+#include "../../../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
 
 // This structure is used during preprocessing for the Contraction Hierarchies. In addition to the classic 'nodeID' and
 // 'weight' we want to store 'hops' in the current path to the node. This is used to reduce search space during

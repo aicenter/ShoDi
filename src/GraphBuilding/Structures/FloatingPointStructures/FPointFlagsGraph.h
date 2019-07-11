@@ -7,8 +7,8 @@
 #define CONTRACTION_HIERARCHIES_FPOINTFLAGSGRAPH_H
 
 #include <vector>
-#include "Structures/FloatingPointStructures/FPointQueryEdge.h"
-#include "FloatingPoint/Structures/FPointNodeData.h"
+#include "FPointQueryEdge.h"
+#include "../../../CH/FloatingPoint/Structures/FPointNodeData.h"
 
 using namespace std;
 

@@ -5,7 +5,7 @@
 
 #include <fstream>
 #include "DIMACSLoader.h"
-#include "Timer.h"
+#include "../../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
 DIMACSLoader::DIMACSLoader(string inputFile) {

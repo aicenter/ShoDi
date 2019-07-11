@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <queue>
-#include "Structures/IntegerStructures/IntegerFlagsGraph.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
 
 using namespace std;
 

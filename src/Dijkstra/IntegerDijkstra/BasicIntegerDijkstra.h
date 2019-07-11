@@ -7,7 +7,7 @@
 #define TRANSIT_NODE_ROUTING_BASICDIJKSTRA_H
 
 
-#include "Structures/IntegerStructures/IntegerGraph.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerGraph.h"
 
 // A simple implementation of a basic Dijkstra's algorithm, which we compare the CH with.
 //______________________________________________________________________________________________________________________

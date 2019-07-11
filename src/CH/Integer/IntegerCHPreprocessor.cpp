@@ -6,11 +6,11 @@
 #include <queue>
 #include <climits>
 #include <fstream>
-#include "Timer.h"
-#include "IntegerDijkstra/IntegerDijkstraNode.h"
-#include "Integer/Structures/IntegerHopsDijkstraNode.h"
+#include "../../Timer/Timer.h"
+#include "../../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
+#include "Structures/IntegerHopsDijkstraNode.h"
 #include "IntegerCHPreprocessor.h"
-#include "Generic/EdgeDifferenceManager.h"
+#include "../Generic/EdgeDifferenceManager.h"
 
 using namespace std;
 

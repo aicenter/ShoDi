@@ -6,8 +6,8 @@
 #ifndef TRANSIT_NODE_ROUTING_CHBENCHMARKWITHRANKS_H
 #define TRANSIT_NODE_ROUTING_CHBENCHMARKWITHRANKS_H
 
-#include "Structures/IntegerStructures/IntegerFlagsGraph.h"
-#include "Structures/IntegerStructures/IntegerGraph.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerGraph.h"
 
 // This class is responsible for running a CH Benchmark and outputing the time. The only method
 // 'runAndMeasureFlagsGraphOutputAndRetval()' just takes a vector of trips as an argument and computes shortest

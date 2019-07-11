@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_FPOINTDIJKSTRABENCHMARK_H
 
 #include <vector>
-#include "Structures/FloatingPointStructures/FPointGraph.h"
+#include "../../GraphBuilding/Structures/FloatingPointStructures/FPointGraph.h"
 
 using namespace std;
 

@@ -5,7 +5,7 @@
 
 #include <fstream>
 #include "DDSGLoader.h"
-#include "Timer.h"
+#include "../../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
 DDSGLoader::DDSGLoader(string inputFile) : inputFile(inputFile) {

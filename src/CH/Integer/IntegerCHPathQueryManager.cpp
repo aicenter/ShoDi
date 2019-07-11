@@ -5,7 +5,7 @@
 
 #include <climits>
 #include "IntegerCHPathQueryManager.h"
-#include "IntegerDijkstra/IntegerDijkstraNode.h"
+#include "../../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
 IntegerCHPathQueryManager::IntegerCHPathQueryManager(IntegerFlagsGraphWithUnpackingData & g) : graph(g) {

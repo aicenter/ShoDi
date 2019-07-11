@@ -8,8 +8,8 @@
 
 #include <string>
 #include <map>
-#include "Structures/IntegerStructures/IntegerGraph.h"
-#include "Structures/IntegerStructures/IntegerUpdateableGraph.h"
+#include "../Structures/IntegerStructures/IntegerGraph.h"
+#include "../Structures/IntegerStructures/IntegerUpdateableGraph.h"
 
 using namespace std;
 

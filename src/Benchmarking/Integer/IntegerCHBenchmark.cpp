@@ -4,8 +4,8 @@
 //
 
 #include "IntegerCHBenchmark.h"
-#include "Integer/IntegerCHDistanceQueryManager.h"
-#include "Timer.h"
+#include "../../CH/Integer/IntegerCHDistanceQueryManager.h"
+#include "../../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
 double IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, IntegerFlagsGraph & graph, vector < long long unsigned int > & distances) {

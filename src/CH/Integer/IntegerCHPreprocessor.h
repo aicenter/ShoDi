@@ -9,10 +9,10 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
-#include "Structures/IntegerStructures/IntegerUpdateableGraph.h"
-#include "Structures/IntegerStructures/IntegerShortcutEdge.h"
-#include "Generic/Structures/CHNode.h"
-#include "Generic/Structures/CHpriorityQueue.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.h"
+#include "../Generic/Structures/CHNode.h"
+#include "../Generic/Structures/CHpriorityQueue.h"
 
 
 using namespace std;

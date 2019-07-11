@@ -5,7 +5,7 @@
 
 #include <climits>
 #include "IntegerCHDistanceQueryManager.h"
-#include "IntegerDijkstra/IntegerDijkstraNode.h"
+#include "../../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
 IntegerCHDistanceQueryManager::IntegerCHDistanceQueryManager(IntegerFlagsGraph & g) : graph(g) {
@@ -118,7 +118,7 @@ long long unsigned int IntegerCHDistanceQueryManager::findDistance(const unsigne
             if(! forwardQ.empty() && forwardQ.top().weight > upperbound) {
                 forwardFinished = true;
             }
-        // The backward direction is symetrical to the forward direction.
+        // The backward direction is symmetrical to the forward direction.
         } else {
             if (backwardQ.empty()) {
                 break;
