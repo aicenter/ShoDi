@@ -14,7 +14,7 @@ void DistanceQueryManagerWithMappingAPI::initializeCH(string chFile, string mapp
 }
 
 //______________________________________________________________________________________________________________________
-double DistanceQueryManagerWithMappingAPI::distanceQuery(unsigned int source, unsigned int target) {
+double DistanceQueryManagerWithMappingAPI::distanceQuery(long long unsigned int source, long long unsigned int target) {
     return qm -> findDistance(source, target);
 }
 

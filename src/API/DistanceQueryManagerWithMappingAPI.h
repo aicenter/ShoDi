@@ -16,7 +16,7 @@ using namespace std;
 class DistanceQueryManagerWithMappingAPI {
 public:
     void initializeCH(string chFile, string mappingFile);
-    double distanceQuery(unsigned int source, unsigned int target);
+    double distanceQuery(long long unsigned int source, long long unsigned int target);
     void clearStructures();
 private:
     FPointCHDistanceQueryManagerWithMapping * qm;

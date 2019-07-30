@@ -13,7 +13,7 @@ add_library(contractionHierarchies SHARED
         src/API/DistanceQueryManagerAPI.h
         src/API/DistanceQueryManagerWithMappingAPI.cpp
         src/API/DistanceQueryManagerWithMappingAPI.h
-        src/API/DistanceQueryManagerAPI_wrap.cxx
+        src/API/CHinterface_wrap.cxx
         src/Benchmarking/Integer/IntegerCHBenchmark.cpp
         src/Benchmarking/Integer/IntegerCHBenchmark.h
         src/Benchmarking/Integer/IntegerCorectnessValidator.cpp
