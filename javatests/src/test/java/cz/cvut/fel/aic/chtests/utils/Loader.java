@@ -2,6 +2,7 @@ package cz.cvut.fel.aic.chtests.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
@@ -29,6 +30,21 @@ public class Loader {
         for (int i = 0; i < queriesCnt; i++) {
             int from = scanner.nextInt();
             int to = scanner.nextInt();
+            retval.add(Pair.createPair(from, to));
+        }
+
+        scanner.close();
+
+        return retval;
+    }
+
+    public ArrayList<Pair<BigInteger, BigInteger>> loadQueriesBigInteger(String filePath) throws FileNotFoundException {
+        ArrayList<Pair<BigInteger, BigInteger>> retval = new ArrayList<Pair<BigInteger, BigInteger>>();
+        Scanner scanner = new Scanner(new File(filePath));
+        int queriesCnt = scanner.nextInt();
+        for (int i = 0; i < queriesCnt; i++) {
+            BigInteger from = scanner.nextBigInteger();
+            BigInteger to = scanner.nextBigInteger();
             retval.add(Pair.createPair(from, to));
         }
 

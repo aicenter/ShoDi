@@ -8,16 +8,16 @@
 
 package cz.cvut.fel.aic.contractionhierarchies;
 
-public class DistanceQueryManagerAPI {
+public class DistanceQueryManagerWithMappingAPI {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected DistanceQueryManagerAPI(long cPtr, boolean cMemoryOwn) {
+  protected DistanceQueryManagerWithMappingAPI(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(DistanceQueryManagerAPI obj) {
+  protected static long getCPtr(DistanceQueryManagerWithMappingAPI obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,26 +29,26 @@ public class DistanceQueryManagerAPI {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        packageJNI.delete_DistanceQueryManagerAPI(swigCPtr);
+        packageJNI.delete_DistanceQueryManagerWithMappingAPI(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void initializeCH(String chFile) {
-    packageJNI.DistanceQueryManagerAPI_initializeCH(swigCPtr, this, chFile);
+  public void initializeCH(String chFile, String mappingFile) {
+    packageJNI.DistanceQueryManagerWithMappingAPI_initializeCH(swigCPtr, this, chFile, mappingFile);
   }
 
-  public double distanceQuery(long source, long target) {
-    return packageJNI.DistanceQueryManagerAPI_distanceQuery(swigCPtr, this, source, target);
+  public double distanceQuery(java.math.BigInteger source, java.math.BigInteger target) {
+    return packageJNI.DistanceQueryManagerWithMappingAPI_distanceQuery(swigCPtr, this, source, target);
   }
 
   public void clearStructures() {
-    packageJNI.DistanceQueryManagerAPI_clearStructures(swigCPtr, this);
+    packageJNI.DistanceQueryManagerWithMappingAPI_clearStructures(swigCPtr, this);
   }
 
-  public DistanceQueryManagerAPI() {
-    this(packageJNI.new_DistanceQueryManagerAPI(), true);
+  public DistanceQueryManagerWithMappingAPI() {
+    this(packageJNI.new_DistanceQueryManagerWithMappingAPI(), true);
   }
 
 }

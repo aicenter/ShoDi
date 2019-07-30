@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import cz.cvut.fel.aic.chtests.utils.Loader;
 import cz.cvut.fel.aic.chtests.utils.Pair;
 import cz.cvut.fel.aic.contractionhierarchies.DistanceQueryManagerAPI;
+import cz.cvut.fel.aic.contractionhierarchies.DistanceQueryManagerWithMappingAPI;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 class ContractionHierarchiesTests {
@@ -49,6 +51,39 @@ class ContractionHierarchiesTests {
         }
 
         dqm.clearStructures();
+
+    }
+
+    @Test
+    @DisplayName("15 queries using original IDs - mapping required")
+    void mappingTripsTest() {
+        // This can be used if you can guarantee that the path to the library is always included in the
+        // java.library.path. For example by setting -Djava.library.path to the directory with the library.
+        // If you can not guarantee this, you can use an absolute path using System.load below.
+        System.loadLibrary("contractionHierarchies");
+
+        // Here you can put an absolute path to the library if you can't assure that you will have the library
+        // included in the java.library.path.
+        // System.load("/home/xenty/sum/2019/ContractionHierarchies/contraction-hierarchies/javatests/libcontractionHierarchies.so");
+
+        DistanceQueryManagerWithMappingAPI dqmm = new DistanceQueryManagerWithMappingAPI();
+        dqmm.initializeCH("./testCHGraph.chf", "./testGraphMapping.xeni");
+        Loader l = new Loader();
+        ArrayList<Pair<BigInteger, BigInteger>> testQueries = new ArrayList<Pair<BigInteger, BigInteger>>();
+        ArrayList<Double> testDistances = new ArrayList<Double>();
+        try {
+            testQueries = l.loadQueriesBigInteger("./testQueriesOriginalIDs.txt");
+            testDistances = l.loadTrueDistances("./testTrueDistancesMapping.txt", testQueries.size());
+        } catch (FileNotFoundException e) {
+            System.out.println("Error reading input files for the test.");
+            e.printStackTrace();
+        }
+
+        for(int i = 0; i < testQueries.size(); i++) {
+            assertEquals(testDistances.get(i), dqmm.distanceQuery(testQueries.get(i).getElement0(), testQueries.get(i).getElement1()), eps);
+        }
+
+        dqmm.clearStructures();
 
     }
 }
