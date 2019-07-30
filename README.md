@@ -9,21 +9,32 @@ nejkratší cesta (tedy kromě vzdálenosti i posloupnost vrcholů na nejkratš�
 
 Kompilace
 ---------
+
+### Nejjednodušší varianta
+
 - Stáhněte si aktuální `master`
-- V libovolném IDE něco jako 'build project from sources'
-- Odeberte z projektu soubory `RandomGraphGenerator.cpp`, `RandomTripsGenerator.cpp` a `AlternativeRandomTripsGenerator.cpp`. Jedná se o samostatné programy, které se dají samostatně zkompilovat a generují náhodné grafy nebo náhodné dvojice source - target v určité rozsahu. Dají se použít pro debugování. Pokud je necháte v projektu, nejspíše dostanete chybovou hlášku něco ve smyslu "multiple main definitions".
+- Využijte přiložený `CMakeLists.txt`. Ten by měl zajistit zkompilování knihovny `contractionHierarchies` pro Váš systém, kterou je následně možné volat z Javy pro vyhodnocování dotazů.
+- Při volání `contractionHierarchies` z Javy je pak potřeba zajistit, že cesta k dané knihovně (soubor `libcontractionHierarchies.so` v Linuxu, `contractionHierarchies.dll` ve Windows...) je obsažena v `java.library.path` při spouštění Java aplikace, která bude `contractionHierarchies` volat (dá se například použít přepínač `-Djava.library.path` při spouštění Java aplikace).
 
-Alternativně se dá program zkompilovat s využitím přiloženého `Makefile`. Ten funguje s masterem při commitu s SHA:'c20503730a7c1c3aee89c9a92ca436c52e85417b', byl ovšem vygenerován ručně, takže není zaručeno, že bude fungovat i v budoucnu. S pomocí Makefilu se dá program zkompilovat i z příkazové řádky:
-- Ve složce s Makefilem stačí použít příkaz `make compile`
-- Pro smazání všech vygenerovaných souborů a opětovnou čistou kompilaci programu stačí použít příkaz `make compile` následovaný opět příkazem `make compile`
-- Tím se vygeneruje spustitelný soubor `chTest` v aktuálním souboru.
-- Makefile implicitně používá `g++` ke kompilaci. Pro použití jiného kompilátoru (nebo jiných přepínačů) stačí v Makefilu přepsat 'CC' a 'CFLAGS' na požadované hodnoty.
- 
+### Alternativní způsob
 
-Projekt nepouzívá žádné externí knihovny (pouze stl), takže by měl bez větších potíží fungovat. 
+- V případě, že z nějakého důvodu není možné použít CMake, například protože není na daném systému k dispozici, je možné aplikaci zkompilovat ručně.
+- V takovém případě je nejjednodušší v libovolném IDE zvolit něco jako 'build project from sources'
+- Následně je z projektu nutné odebrat soubory `RandomGraphGenerator.cpp`, `RandomTripsGenerator.cpp` a `AlternativeRandomTripsGenerator.cpp`. Jedná se o samostatné programy, které se dají samostatně zkompilovat a generují náhodné grafy nebo náhodné dvojice source - target v určité rozsahu. Dají se použít pro debugování. Pokud je necháte v projektu, nejspíše dostanete chybovou hlášku něco ve smyslu "multiple main definitions".
+- Pokud chcete vygenerovat pouze shared library pro následné volání z Javy, nezahrnujte `main.cpp` do kompilace. Naopak, je potřeba zkompilovat veškeré ostatní soubory s příponou `.cpp` a `.cxx` ve všech podadresářích `src`. Pokud chcete vygenerovat spustitelný program který dokáže zkonstruovat Contraction Hierarchy pro daný graf, pak je naopak potřeba `main.cpp` do kompilace zahrnout. Momentálně neexistuje jednoduchý způsob jak využít program pro generování Contraction Hierarchies, je vždy nutno v mainu explicitně napsat cestu k souboru a poté program znovu zkompilovat. V budoucnu určitě bude potřeba přidat nějaké alespoň textové rozhraní, avšak generování hierarchie není potřeba tak často aby toto byla priorita.
+
+### Poznámka
+
+Z C++ knihoven využívá program pouze `stl`, což by neměl být problém. Pro kompilaci je ovšem nutné mít na systému nainstalovaný `JDK`. V `CMakeLists.txt` je volání `find_package(JNI)`, pro které je potřeba `JDK` v daném systému.
+
 
 Použití
 -------
+
+### Poznámka
+Všechny následující sekce jsou poměrně zastaralé, proto by měli sloužit spíš jako jakýsi high-level náhled na to, jak tato implementace funguje. Například některé názvy tříd a cesty k některým souborům se mohli změnit. Navíc momentálně již implementace umožňuje načítání grafů ve více formátech než je zde popsáno, a umožňuje pracovat jak s grafy s celočíselnými vahami hran, tak s desetinnými. Toto zde není vůbec zohledněno, v budoucnu bude toto README upraveno aby lépe reflektovalo stávající implementaci.
+
+### Základ
 Momentálně se při každém spuštění programu provede 'odkomentovaná' funkce v 'main.cpp'. Do budoucna by bylo vhodné implementovat nějaké user interface, alespoň na úrovni command line, ale to jsem nestíhal. Momentálně je tedy potřeba při každé změně použití program znovu překompilovat.
 
 ### Generování Contraction Hierarchy
