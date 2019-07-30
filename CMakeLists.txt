@@ -8,11 +8,12 @@ find_package(JNI REQUIRED)
 include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-add_library(contraction_hierarchies SHARED
+add_library(contractionHierarchies SHARED
         src/API/DistanceQueryManagerAPI.cpp
         src/API/DistanceQueryManagerAPI.h
         src/API/DistanceQueryManagerWithMappingAPI.cpp
         src/API/DistanceQueryManagerWithMappingAPI.h
+        src/API/DistanceQueryManagerAPI_wrap.cxx
         src/Benchmarking/Integer/IntegerCHBenchmark.cpp
         src/Benchmarking/Integer/IntegerCHBenchmark.h
         src/Benchmarking/Integer/IntegerCorectnessValidator.cpp
