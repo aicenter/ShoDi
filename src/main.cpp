@@ -22,6 +22,7 @@
 #include "CH/Integer/IntegerCHPathQueryManager.h"
 #include "CH/Integer/IntegerCHDistanceQueryManager.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
+#include "API/DistanceQueryManagerWithMappingAPI.h"
 
 using namespace std;
 
@@ -149,7 +150,7 @@ void compareCHFWithDijkstra() {
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
 
     /*ofstream trueDistancesFile;
-    trueDistancesFile.open("../input/testTrueDistances.txt");
+    trueDistancesFile.open("../input/testTrueDistances2.txt");
     if( ! trueDistancesFile.is_open() ) {
         printf("Couldn't open file!");
     }
@@ -297,7 +298,33 @@ void testCHDistanceQueriesWithMapping() {
         printf("Distance for trip %u: %f\n", i, chDistances[i]);
     }
 
+    ofstream trueDistancesFile;
+    trueDistancesFile.open("../input/testTrueDistances2.txt");
+    if( ! trueDistancesFile.is_open() ) {
+        printf("Couldn't open file!");
+    }
+
+    for(unsigned int i = 0; i < chDistances.size(); i++) {
+        trueDistancesFile << setprecision(12) << chDistances[i] << endl;
+    }
+
     delete ch;
+}
+
+//______________________________________________________________________________________________________________________
+void testDQMMAPI() {
+    DistanceQueryManagerWithMappingAPI dqmm;
+    dqmm.initializeCH("../input/experimentGraphDebug.chf", "../input/graph.xeni");
+
+    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTripsOriginalIDs");
+    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    tripsLoader.loadLongLongTrips(trips);
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        printf("Distance for trip %u: %f\n", i, dqmm.distanceQuery(trips[i].first, trips[i].second));
+    }
+
+    dqmm.clearStructures();
 }
 
 // Simple main function, uncomment the function you want to use.
@@ -315,8 +342,10 @@ int main() {
     //testDoubleDijkstra();
     //testCHDistanceQueriesWithMapping();
     //constructDDSGCHF();
-    compareCHFWithDijkstra();
+    //compareCHFWithDijkstra();
     //debugOnSmallGraph();
+
+    testDQMMAPI();
 
     return 0;
 }
