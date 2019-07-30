@@ -1,16 +1,14 @@
 cmake_minimum_required(VERSION 3.14)
 project(contraction_hierarchies)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
-include_directories(src/Benchmarking)
-include_directories(src/CH)
-include_directories(src/CH/Integer/Structures)
-include_directories(src/Dijkstra)
-include_directories(src/GraphBuilding)
-include_directories(src/Timer)
+find_package(JNI REQUIRED)
 
-add_executable(contraction_hierarchies
+include_directories(${JNI_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+add_library(contraction_hierarchies SHARED
         src/API/DistanceQueryManagerAPI.cpp
         src/API/DistanceQueryManagerAPI.h
         src/API/DistanceQueryManagerWithMappingAPI.cpp
@@ -112,5 +110,4 @@ add_executable(contraction_hierarchies
         src/GraphBuilding/Structures/FloatingPointStructures/FPointQueryEdge.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointQueryEdge.h
         src/Timer/Timer.cpp
-        src/Timer/Timer.h
-        src/main.cpp)
+        src/Timer/Timer.h)
