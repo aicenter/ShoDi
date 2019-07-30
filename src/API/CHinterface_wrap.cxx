@@ -243,7 +243,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 extern "C" {
 #endif
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_DistanceQueryManagerWithMappingAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerWithMappingAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
   std::string arg2 ;
   std::string arg3 ;
@@ -272,7 +272,7 @@ SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_D
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_DistanceQueryManagerWithMappingAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3) {
+SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerWithMappingAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3) {
   jdouble jresult = 0 ;
   DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
   unsigned long long arg2 ;
@@ -335,7 +335,7 @@ SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJN
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_DistanceQueryManagerWithMappingAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerWithMappingAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
   
   (void)jenv;
@@ -346,7 +346,7 @@ SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_D
 }
 
 
-SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_new_1DistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1DistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   DistanceQueryManagerWithMappingAPI *result = 0 ;
   
@@ -358,7 +358,7 @@ SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_delete_1DistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1DistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
   
   (void)jenv;
@@ -368,7 +368,7 @@ SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_d
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_DistanceQueryManagerAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
   std::string arg2 ;
   
@@ -388,7 +388,7 @@ SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_D
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_DistanceQueryManagerAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jdouble jresult = 0 ;
   DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
   unsigned int arg2 ;
@@ -407,7 +407,7 @@ SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJN
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_DistanceQueryManagerAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
   
   (void)jenv;
@@ -418,7 +418,7 @@ SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_D
 }
 
 
-SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_new_1DistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1DistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   DistanceQueryManagerAPI *result = 0 ;
   
@@ -430,7 +430,7 @@ SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_packageJNI_delete_1DistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1DistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
   
   (void)jenv;

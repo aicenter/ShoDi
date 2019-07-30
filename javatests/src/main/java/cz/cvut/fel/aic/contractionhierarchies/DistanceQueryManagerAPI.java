@@ -29,26 +29,26 @@ public class DistanceQueryManagerAPI {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        packageJNI.delete_DistanceQueryManagerAPI(swigCPtr);
+        contractionHierarchiesJNI.delete_DistanceQueryManagerAPI(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void initializeCH(String chFile) {
-    packageJNI.DistanceQueryManagerAPI_initializeCH(swigCPtr, this, chFile);
+    contractionHierarchiesJNI.DistanceQueryManagerAPI_initializeCH(swigCPtr, this, chFile);
   }
 
   public double distanceQuery(long source, long target) {
-    return packageJNI.DistanceQueryManagerAPI_distanceQuery(swigCPtr, this, source, target);
+    return contractionHierarchiesJNI.DistanceQueryManagerAPI_distanceQuery(swigCPtr, this, source, target);
   }
 
   public void clearStructures() {
-    packageJNI.DistanceQueryManagerAPI_clearStructures(swigCPtr, this);
+    contractionHierarchiesJNI.DistanceQueryManagerAPI_clearStructures(swigCPtr, this);
   }
 
   public DistanceQueryManagerAPI() {
-    this(packageJNI.new_DistanceQueryManagerAPI(), true);
+    this(contractionHierarchiesJNI.new_DistanceQueryManagerAPI(), true);
   }
 
 }

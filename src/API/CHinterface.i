@@ -1,3 +1,3 @@
-%module package
+%module contractionHierarchies
 %include DistanceQueryManagerWithMappingAPI.i
 %include DistanceQueryManagerAPI.i

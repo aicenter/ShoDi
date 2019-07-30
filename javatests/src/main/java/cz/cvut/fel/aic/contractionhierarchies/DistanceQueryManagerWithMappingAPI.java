@@ -29,26 +29,26 @@ public class DistanceQueryManagerWithMappingAPI {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        packageJNI.delete_DistanceQueryManagerWithMappingAPI(swigCPtr);
+        contractionHierarchiesJNI.delete_DistanceQueryManagerWithMappingAPI(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void initializeCH(String chFile, String mappingFile) {
-    packageJNI.DistanceQueryManagerWithMappingAPI_initializeCH(swigCPtr, this, chFile, mappingFile);
+    contractionHierarchiesJNI.DistanceQueryManagerWithMappingAPI_initializeCH(swigCPtr, this, chFile, mappingFile);
   }
 
   public double distanceQuery(java.math.BigInteger source, java.math.BigInteger target) {
-    return packageJNI.DistanceQueryManagerWithMappingAPI_distanceQuery(swigCPtr, this, source, target);
+    return contractionHierarchiesJNI.DistanceQueryManagerWithMappingAPI_distanceQuery(swigCPtr, this, source, target);
   }
 
   public void clearStructures() {
-    packageJNI.DistanceQueryManagerWithMappingAPI_clearStructures(swigCPtr, this);
+    contractionHierarchiesJNI.DistanceQueryManagerWithMappingAPI_clearStructures(swigCPtr, this);
   }
 
   public DistanceQueryManagerWithMappingAPI() {
-    this(packageJNI.new_DistanceQueryManagerWithMappingAPI(), true);
+    this(contractionHierarchiesJNI.new_DistanceQueryManagerWithMappingAPI(), true);
   }
 
 }

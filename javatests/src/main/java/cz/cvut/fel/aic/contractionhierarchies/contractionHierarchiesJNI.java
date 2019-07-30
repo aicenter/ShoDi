@@ -8,7 +8,7 @@
 
 package cz.cvut.fel.aic.contractionhierarchies;
 
-public class packageJNI {
+public class contractionHierarchiesJNI {
   public final static native void DistanceQueryManagerWithMappingAPI_initializeCH(long jarg1, DistanceQueryManagerWithMappingAPI jarg1_, String jarg2, String jarg3);
   public final static native double DistanceQueryManagerWithMappingAPI_distanceQuery(long jarg1, DistanceQueryManagerWithMappingAPI jarg1_, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
   public final static native void DistanceQueryManagerWithMappingAPI_clearStructures(long jarg1, DistanceQueryManagerWithMappingAPI jarg1_);
