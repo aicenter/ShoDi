@@ -8,16 +8,16 @@
 
 package cz.cvut.fel.aic.contractionhierarchies;
 
-public class DistanceQueryManagerAPI {
+public class IntegerDistanceQueryManagerAPI {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected DistanceQueryManagerAPI(long cPtr, boolean cMemoryOwn) {
+  protected IntegerDistanceQueryManagerAPI(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(DistanceQueryManagerAPI obj) {
+  protected static long getCPtr(IntegerDistanceQueryManagerAPI obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,26 +29,26 @@ public class DistanceQueryManagerAPI {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        contractionHierarchiesJNI.delete_DistanceQueryManagerAPI(swigCPtr);
+        contractionHierarchiesJNI.delete_IntegerDistanceQueryManagerAPI(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void initializeCH(String chFile) {
-    contractionHierarchiesJNI.DistanceQueryManagerAPI_initializeCH(swigCPtr, this, chFile);
+    contractionHierarchiesJNI.IntegerDistanceQueryManagerAPI_initializeCH(swigCPtr, this, chFile);
   }
 
-  public double distanceQuery(long source, long target) {
-    return contractionHierarchiesJNI.DistanceQueryManagerAPI_distanceQuery(swigCPtr, this, source, target);
+  public long distanceQuery(long source, long target) {
+    return contractionHierarchiesJNI.IntegerDistanceQueryManagerAPI_distanceQuery(swigCPtr, this, source, target);
   }
 
   public void clearStructures() {
-    contractionHierarchiesJNI.DistanceQueryManagerAPI_clearStructures(swigCPtr, this);
+    contractionHierarchiesJNI.IntegerDistanceQueryManagerAPI_clearStructures(swigCPtr, this);
   }
 
-  public DistanceQueryManagerAPI() {
-    this(contractionHierarchiesJNI.new_DistanceQueryManagerAPI(), true);
+  public IntegerDistanceQueryManagerAPI() {
+    this(contractionHierarchiesJNI.new_IntegerDistanceQueryManagerAPI(), true);
   }
 
 }

@@ -9,14 +9,24 @@
 package cz.cvut.fel.aic.contractionhierarchies;
 
 public class contractionHierarchiesJNI {
-  public final static native void DistanceQueryManagerWithMappingAPI_initializeCH(long jarg1, DistanceQueryManagerWithMappingAPI jarg1_, String jarg2, String jarg3);
-  public final static native double DistanceQueryManagerWithMappingAPI_distanceQuery(long jarg1, DistanceQueryManagerWithMappingAPI jarg1_, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
-  public final static native void DistanceQueryManagerWithMappingAPI_clearStructures(long jarg1, DistanceQueryManagerWithMappingAPI jarg1_);
-  public final static native long new_DistanceQueryManagerWithMappingAPI();
-  public final static native void delete_DistanceQueryManagerWithMappingAPI(long jarg1);
-  public final static native void DistanceQueryManagerAPI_initializeCH(long jarg1, DistanceQueryManagerAPI jarg1_, String jarg2);
-  public final static native double DistanceQueryManagerAPI_distanceQuery(long jarg1, DistanceQueryManagerAPI jarg1_, long jarg2, long jarg3);
-  public final static native void DistanceQueryManagerAPI_clearStructures(long jarg1, DistanceQueryManagerAPI jarg1_);
-  public final static native long new_DistanceQueryManagerAPI();
-  public final static native void delete_DistanceQueryManagerAPI(long jarg1);
+  public final static native void IntegerDistanceQueryManagerAPI_initializeCH(long jarg1, IntegerDistanceQueryManagerAPI jarg1_, String jarg2);
+  public final static native long IntegerDistanceQueryManagerAPI_distanceQuery(long jarg1, IntegerDistanceQueryManagerAPI jarg1_, long jarg2, long jarg3);
+  public final static native void IntegerDistanceQueryManagerAPI_clearStructures(long jarg1, IntegerDistanceQueryManagerAPI jarg1_);
+  public final static native long new_IntegerDistanceQueryManagerAPI();
+  public final static native void delete_IntegerDistanceQueryManagerAPI(long jarg1);
+  public final static native void IntegerDistanceQueryManagerWithMappingAPI_initializeCH(long jarg1, IntegerDistanceQueryManagerWithMappingAPI jarg1_, String jarg2, String jarg3);
+  public final static native long IntegerDistanceQueryManagerWithMappingAPI_distanceQuery(long jarg1, IntegerDistanceQueryManagerWithMappingAPI jarg1_, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
+  public final static native void IntegerDistanceQueryManagerWithMappingAPI_clearStructures(long jarg1, IntegerDistanceQueryManagerWithMappingAPI jarg1_);
+  public final static native long new_IntegerDistanceQueryManagerWithMappingAPI();
+  public final static native void delete_IntegerDistanceQueryManagerWithMappingAPI(long jarg1);
+  public final static native void FPointDistanceQueryManagerAPI_initializeCH(long jarg1, FPointDistanceQueryManagerAPI jarg1_, String jarg2);
+  public final static native double FPointDistanceQueryManagerAPI_distanceQuery(long jarg1, FPointDistanceQueryManagerAPI jarg1_, long jarg2, long jarg3);
+  public final static native void FPointDistanceQueryManagerAPI_clearStructures(long jarg1, FPointDistanceQueryManagerAPI jarg1_);
+  public final static native long new_FPointDistanceQueryManagerAPI();
+  public final static native void delete_FPointDistanceQueryManagerAPI(long jarg1);
+  public final static native void FPointDistanceQueryManagerWithMappingAPI_initializeCH(long jarg1, FPointDistanceQueryManagerWithMappingAPI jarg1_, String jarg2, String jarg3);
+  public final static native double FPointDistanceQueryManagerWithMappingAPI_distanceQuery(long jarg1, FPointDistanceQueryManagerWithMappingAPI jarg1_, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
+  public final static native void FPointDistanceQueryManagerWithMappingAPI_clearStructures(long jarg1, FPointDistanceQueryManagerWithMappingAPI jarg1_);
+  public final static native long new_FPointDistanceQueryManagerWithMappingAPI();
+  public final static native void delete_FPointDistanceQueryManagerWithMappingAPI(long jarg1);
 }

@@ -23,6 +23,21 @@ public class Loader {
         return retval;
     }
 
+    public ArrayList<Long> loadIntegerTrueDistances(String filePath, int queriesCnt) throws FileNotFoundException {
+
+        ArrayList<Long> retval = new ArrayList<Long>();
+        Scanner scanner = new Scanner(new File(filePath));
+        scanner.useLocale(Locale.US);
+        for (int i = 0; i < queriesCnt; i++) {
+            scanner.hasNextDouble();
+            retval.add(scanner.nextLong());
+        }
+
+        scanner.close();
+
+        return retval;
+    }
+
     public ArrayList<Pair<Integer, Integer>> loadQueries(String filePath) throws FileNotFoundException {
         ArrayList<Pair<Integer, Integer>> retval = new ArrayList<Pair<Integer, Integer>>();
         Scanner scanner = new Scanner(new File(filePath));

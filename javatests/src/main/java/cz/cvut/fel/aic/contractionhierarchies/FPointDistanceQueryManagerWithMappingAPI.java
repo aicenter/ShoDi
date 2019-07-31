@@ -8,16 +8,16 @@
 
 package cz.cvut.fel.aic.contractionhierarchies;
 
-public class DistanceQueryManagerWithMappingAPI {
+public class FPointDistanceQueryManagerWithMappingAPI {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected DistanceQueryManagerWithMappingAPI(long cPtr, boolean cMemoryOwn) {
+  protected FPointDistanceQueryManagerWithMappingAPI(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(DistanceQueryManagerWithMappingAPI obj) {
+  protected static long getCPtr(FPointDistanceQueryManagerWithMappingAPI obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,26 +29,26 @@ public class DistanceQueryManagerWithMappingAPI {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        contractionHierarchiesJNI.delete_DistanceQueryManagerWithMappingAPI(swigCPtr);
+        contractionHierarchiesJNI.delete_FPointDistanceQueryManagerWithMappingAPI(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void initializeCH(String chFile, String mappingFile) {
-    contractionHierarchiesJNI.DistanceQueryManagerWithMappingAPI_initializeCH(swigCPtr, this, chFile, mappingFile);
+    contractionHierarchiesJNI.FPointDistanceQueryManagerWithMappingAPI_initializeCH(swigCPtr, this, chFile, mappingFile);
   }
 
   public double distanceQuery(java.math.BigInteger source, java.math.BigInteger target) {
-    return contractionHierarchiesJNI.DistanceQueryManagerWithMappingAPI_distanceQuery(swigCPtr, this, source, target);
+    return contractionHierarchiesJNI.FPointDistanceQueryManagerWithMappingAPI_distanceQuery(swigCPtr, this, source, target);
   }
 
   public void clearStructures() {
-    contractionHierarchiesJNI.DistanceQueryManagerWithMappingAPI_clearStructures(swigCPtr, this);
+    contractionHierarchiesJNI.FPointDistanceQueryManagerWithMappingAPI_clearStructures(swigCPtr, this);
   }
 
-  public DistanceQueryManagerWithMappingAPI() {
-    this(contractionHierarchiesJNI.new_DistanceQueryManagerWithMappingAPI(), true);
+  public FPointDistanceQueryManagerWithMappingAPI() {
+    this(contractionHierarchiesJNI.new_FPointDistanceQueryManagerWithMappingAPI(), true);
   }
 
 }
