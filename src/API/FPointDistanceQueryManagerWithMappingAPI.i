@@ -2,8 +2,9 @@
 %include "std_string.i"
  %{
  /* Includes the header in the wrapper code */
- #include "DistanceQueryManagerWithMappingAPI.h"
+ #include "FPointDistanceQueryManagerWithMappingAPI.h"
+
  %}
  
  /* Parse the header file to generate wrappers */
- %include "DistanceQueryManagerWithMappingAPI.h"
+ %include "FPointDistanceQueryManagerWithMappingAPI.h"

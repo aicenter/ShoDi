@@ -9,7 +9,8 @@
 #include "GraphBuilding/Loaders/DDSGFLoader.h"
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
-#include "GraphBuilding/Loaders/XenGraphLoader.h"
+#include "Loaders/FloatingPointXenGraphLoader.h"
+#include "Loaders/IntegerXenGraphLoader.h"
 #include "Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
 #include "Benchmarking/Integer/IntegerCHBenchmark.h"
 #include "Benchmarking/Integer/IntegerCorectnessValidator.h"
@@ -22,7 +23,7 @@
 #include "CH/Integer/IntegerCHPathQueryManager.h"
 #include "CH/Integer/IntegerCHDistanceQueryManager.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
-#include "API/DistanceQueryManagerWithMappingAPI.h"
+#include "API/FPointDistanceQueryManagerWithMappingAPI.h"
 
 using namespace std;
 
@@ -33,11 +34,12 @@ void constructDDSGCH() {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    DIMACSLoader graphLoader = DIMACSLoader("../input/graph.gr");
+    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph.xeng");
+    //DIMACSLoader graphLoader = DIMACSLoader("../input/graph.gr");
     IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat("../input/graph");
+    graph->flushInDdsgFormat("../input/Prague_map_int");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -52,11 +54,11 @@ void constructDDSGCHF() {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader("../input/graph.xeng");
+    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader("../input/Prague_graph.xeng");
     FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     FPointCHPreprocessor::preprocessForDDSGF(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat("../input/experimentGraphDebug2");
+    graph->flushInDdsgfFormat("../input/Prague_map");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -101,11 +103,11 @@ void compareMineWithReference() {
 // is measured and the speedup of 'Contraction Hierarchies' in comparison with 'Dijkstra' is also computed and printed.
 //______________________________________________________________________________________________________________________
 void compareCHWithDijkstra() {
-    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    DDSGLoader chLoader = DDSGLoader("../input/graphReference.ch");
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int.ch");
     IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<long long unsigned int> chDistances(trips.size());
@@ -113,7 +115,8 @@ void compareCHWithDijkstra() {
 
     delete ch;
 
-    DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
+    //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
+    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph.xeng");
     IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<long long unsigned int> dijkstraDistances(trips.size());
@@ -121,6 +124,16 @@ void compareCHWithDijkstra() {
 
     IntegerCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    ofstream trueDistancesFile;
+    trueDistancesFile.open("../input/Prague_map_5000trueDistances.txt");
+    if( ! trueDistancesFile.is_open() ) {
+        printf("Couldn't open file!");
+    }
+
+    for(unsigned int i = 0; i < dijkstraDistances.size(); i++) {
+        trueDistancesFile << dijkstraDistances[i] << endl;
+    }
 
     delete dijkstraGraph;
 
@@ -140,7 +153,7 @@ void compareCHFWithDijkstra() {
 
     delete ch;
 
-    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/graph.xeng");
+    FloatingPointXenGraphLoader dijkstraLoader = FloatingPointXenGraphLoader("../input/graph.xeng");
     FPointGraph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<double> dijkstraDistances(trips.size());
@@ -169,7 +182,7 @@ void debugOnSmallGraph() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    XenGraphLoader graphLoader = XenGraphLoader("../input/small.xeng");
+    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader("../input/small.xeng");
     FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     FPointCHPreprocessor::preprocessForDDSGF(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
@@ -183,7 +196,7 @@ void debugOnSmallGraph() {
 
     delete ch;
 
-    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/small.xeng");
+    FloatingPointXenGraphLoader dijkstraLoader = FloatingPointXenGraphLoader("../input/small.xeng");
     FPointGraph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<double> dijkstraDistances(trips.size());
@@ -265,7 +278,7 @@ void DIMACStoDDSG() {
 
 //______________________________________________________________________________________________________________________
 void testDoubleDijkstra() {
-    XenGraphLoader graphLoader = XenGraphLoader("../input/graph.xeng");
+    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader("../input/graph.xeng");
     FPointGraph * graph = graphLoader.loadGraph();
 
     TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
@@ -313,7 +326,7 @@ void testCHDistanceQueriesWithMapping() {
 
 //______________________________________________________________________________________________________________________
 void testDQMMAPI() {
-    DistanceQueryManagerWithMappingAPI dqmm;
+    FPointDistanceQueryManagerWithMappingAPI dqmm;
     dqmm.initializeCH("../input/experimentGraphDebug.chf", "../input/graph.xeni");
 
     TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTripsOriginalIDs");
@@ -333,7 +346,7 @@ int main() {
     //constructDDSGCH();
     //runCHBenchmark();
 
-    //compareCHWithDijkstra();
+    compareCHWithDijkstra();
     //compareMineWithReference();
     //getDijkstraPathForTrip();
     //getCHPathForTrip();
@@ -345,7 +358,7 @@ int main() {
     //compareCHFWithDijkstra();
     //debugOnSmallGraph();
 
-    testDQMMAPI();
+    //testDQMMAPI();
 
     return 0;
 }

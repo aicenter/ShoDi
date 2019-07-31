@@ -3,12 +3,12 @@
 // Created on: 9.7.19
 //
 
-#include "../../GraphBuilding/Loaders/XenGraphLoader.h"
+#include "../../GraphBuilding/Loaders/FloatingPointXenGraphLoader.h"
 #include "FPointCHDistanceQueryManagerWithMapping.h"
 
 //______________________________________________________________________________________________________________________
 FPointCHDistanceQueryManagerWithMapping::FPointCHDistanceQueryManagerWithMapping(FPointFlagsGraph & g, string mappingFilepath) : qm(g) {
-    XenGraphLoader mappingLoader(mappingFilepath);
+    FloatingPointXenGraphLoader mappingLoader(mappingFilepath);
     mappingLoader.loadNodesMapping(mapping);
 }
 

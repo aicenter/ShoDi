@@ -1,25 +1,25 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 9.7.19
+// Created on: 31.07.19
 //
 
-#include "DistanceQueryManagerAPI.h"
-#include "../GraphBuilding/Loaders/DDSGFLoader.h"
+#include "IntegerDistanceQueryManagerAPI.h"
+#include "../GraphBuilding/Loaders/DDSGLoader.h"
 
 // Initializes the Contraction Hierarchy for queries. This means loading the graph from the given input file, creating
-// an instance of a 'FPointFlagsGraph', and then also creating an instance of the 'FPointCHDistanceQueryManager', which
+// an instance of a 'IntegerFlagsGraph', and then also creating an instance of the 'IntegerCHDistanceQueryManager', which
 // can then be used to answer queries.
 //______________________________________________________________________________________________________________________
-void DistanceQueryManagerAPI::initializeCH(string chFile) {
-    DDSGFLoader chLoader = DDSGFLoader(chFile);
+void IntegerDistanceQueryManagerAPI::initializeCH(string chFile) {
+    DDSGLoader chLoader = DDSGLoader(chFile);
     graph = chLoader.loadFlagsGraph();
-    qm = new FPointCHDistanceQueryManager(*graph);
+    qm = new IntegerCHDistanceQueryManager(*graph);
 }
 
 // Queries after initialization are pretty straightforward, we just let the initialized QueryManager instance answer
 // the queries.
 //______________________________________________________________________________________________________________________
-double DistanceQueryManagerAPI::distanceQuery(unsigned int source, unsigned int target) {
+unsigned int IntegerDistanceQueryManagerAPI::distanceQuery(unsigned int source, unsigned int target) {
     return qm -> findDistance(source, target);
 }
 
@@ -29,7 +29,7 @@ double DistanceQueryManagerAPI::distanceQuery(unsigned int source, unsigned int 
 // this function, memory leaks will be possible and since the structures can be pretty big, it could lead to some
 // serious problems.
 //______________________________________________________________________________________________________________________
-void DistanceQueryManagerAPI::clearStructures() {
+void IntegerDistanceQueryManagerAPI::clearStructures() {
     delete qm;
     delete graph;
 }

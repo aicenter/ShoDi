@@ -3,8 +3,8 @@
 // Created on: 9.7.19
 //
 
-#ifndef CONTRACTION_HIERARCHIES_DISTANCEQUERYMANAGERWITHMAPPINGAPI_H
-#define CONTRACTION_HIERARCHIES_DISTANCEQUERYMANAGERWITHMAPPINGAPI_H
+#ifndef CONTRACTION_HIERARCHIES_FPOINTDISTANCEQUERYMANAGERWITHMAPPINGAPI_H
+#define CONTRACTION_HIERARCHIES_FPOINTDISTANCEQUERYMANAGERWITHMAPPINGAPI_H
 
 
 #include "../CH/FloatingPoint/FPointCHDistanceQueryManagerWithMapping.h"
@@ -13,7 +13,7 @@
 using namespace std;
 
 //______________________________________________________________________________________________________________________
-class DistanceQueryManagerWithMappingAPI {
+class FPointDistanceQueryManagerWithMappingAPI {
 public:
     void initializeCH(string chFile, string mappingFile);
     double distanceQuery(long long unsigned int source, long long unsigned int target);
@@ -24,4 +24,4 @@ private:
 };
 
 
-#endif //CONTRACTION_HIERARCHIES_DISTANCEQUERYMANAGERWITHMAPPINGAPI_H
+#endif //CONTRACTION_HIERARCHIES_FPOINTDISTANCEQUERYMANAGERWITHMAPPINGAPI_H

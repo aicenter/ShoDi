@@ -1,3 +1,5 @@
 %module contractionHierarchies
-%include DistanceQueryManagerWithMappingAPI.i
-%include DistanceQueryManagerAPI.i
+%include IntegerDistanceQueryManagerAPI.i
+%include IntegerDistanceQueryManagerWithMappingAPI.i
+%include FPointDistanceQueryManagerAPI.i
+%include FPointDistanceQueryManagerWithMappingAPI.i

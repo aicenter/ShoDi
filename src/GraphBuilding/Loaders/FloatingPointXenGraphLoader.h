@@ -3,8 +3,8 @@
 // Created on: 8.7.19
 //
 
-#ifndef CONTRACTION_HIERARCHIES_XENGRAPHLOADER_H
-#define CONTRACTION_HIERARCHIES_XENGRAPHLOADER_H
+#ifndef CONTRACTION_HIERARCHIES_FLOATINGPOINTXENGRAPHLOADER_H
+#define CONTRACTION_HIERARCHIES_FLOATINGPOINTXENGRAPHLOADER_H
 
 #include <string>
 #include <map>
@@ -12,7 +12,7 @@
 #include "../Structures/FloatingPointStructures/FPointSimpleGraph.h"
 #include "../Structures/FloatingPointStructures/FPointUpdateableGraph.h"
 
-class XenGraphLoader {
+class FloatingPointXenGraphLoader {
 private:
     string inputFile;
     void parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
@@ -20,7 +20,7 @@ private:
     void parseEdges(ifstream & input, FPointUpdateableGraph & graph, unsigned int edges);
     void parseNodesMapping(ifstream & input, unordered_map <long long unsigned int, unsigned int> & mapping);
 public:
-    XenGraphLoader(string inputFile);
+    FloatingPointXenGraphLoader(string inputFile);
     FPointGraph * loadGraph();
     FPointUpdateableGraph * loadUpdateableGraph();
     void putAllEdgesIntoUpdateableGraph(FPointUpdateableGraph & graph);
@@ -28,4 +28,4 @@ public:
 };
 
 
-#endif //CONTRACTION_HIERARCHIES_XENGRAPHLOADER_H
+#endif //CONTRACTION_HIERARCHIES_FLOATINGPOINTXENGRAPHLOADER_H

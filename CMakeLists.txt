@@ -9,10 +9,14 @@ include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_library(contractionHierarchies SHARED
-        src/API/DistanceQueryManagerAPI.cpp
-        src/API/DistanceQueryManagerAPI.h
-        src/API/DistanceQueryManagerWithMappingAPI.cpp
-        src/API/DistanceQueryManagerWithMappingAPI.h
+        src/API/IntegerDistanceQueryManagerAPI.cpp
+        src/API/IntegerDistanceQueryManagerAPI.h
+        src/API/IntegerDistanceQueryManagerWithMappingAPI.cpp
+        src/API/IntegerDistanceQueryManagerWithMappingAPI.h
+        src/API/FPointDistanceQueryManagerAPI.cpp
+        src/API/FPointDistanceQueryManagerAPI.h
+        src/API/FPointDistanceQueryManagerWithMappingAPI.cpp
+        src/API/FPointDistanceQueryManagerWithMappingAPI.h
         src/API/CHinterface_wrap.cxx
         src/Benchmarking/Integer/IntegerCHBenchmark.cpp
         src/Benchmarking/Integer/IntegerCHBenchmark.h
@@ -38,6 +42,8 @@ add_library(contractionHierarchies SHARED
         src/CH/Integer/Structures/IntegerNodeData.h
         src/CH/Integer/IntegerCHDistanceQueryManager.cpp
         src/CH/Integer/IntegerCHDistanceQueryManager.h
+        src/CH/Integer/IntegerCHDistanceQueryManagerWithMapping.cpp
+        src/CH/Integer/IntegerCHDistanceQueryManagerWithMapping.h
         src/CH/Integer/IntegerCHPathQueryManager.cpp
         src/CH/Integer/IntegerCHPathQueryManager.h
         src/CH/Integer/IntegerCHPreprocessor.cpp
@@ -64,8 +70,10 @@ add_library(contractionHierarchies SHARED
         src/GraphBuilding/Loaders/DDSGLoader.h
         src/GraphBuilding/Loaders/DIMACSLoader.cpp
         src/GraphBuilding/Loaders/DIMACSLoader.h
-        src/GraphBuilding/Loaders/XenGraphLoader.cpp
-        src/GraphBuilding/Loaders/XenGraphLoader.h
+        src/GraphBuilding/Loaders/IntegerXenGraphLoader.cpp
+        src/GraphBuilding/Loaders/IntegerXenGraphLoader.h
+        src/GraphBuilding/Loaders/FloatingPointXenGraphLoader.cpp
+        src/GraphBuilding/Loaders/FloatingPointXenGraphLoader.h
         src/GraphBuilding/Loaders/TripsLoader.cpp
         src/GraphBuilding/Loaders/TripsLoader.h
         src/GraphBuilding/Loaders/DDSGFLoader.cpp

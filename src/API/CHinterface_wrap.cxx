@@ -232,26 +232,110 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 
 
  /* Includes the header in the wrapper code */
- #include "DistanceQueryManagerWithMappingAPI.h"
+ #include "IntegerDistanceQueryManagerAPI.h"
+
  
 
  /* Includes the header in the wrapper code */
- #include "DistanceQueryManagerAPI.h"
+ #include "IntegerDistanceQueryManagerWithMappingAPI.h"
+
+ 
+
+ /* Includes the header in the wrapper code */
+ #include "FPointDistanceQueryManagerAPI.h"
+
+ 
+
+ /* Includes the header in the wrapper code */
+ #include "FPointDistanceQueryManagerWithMappingAPI.h"
+
  
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerWithMappingAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
-  DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_IntegerDistanceQueryManagerAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  IntegerDistanceQueryManagerAPI *arg1 = (IntegerDistanceQueryManagerAPI *) 0 ;
+  std::string arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(IntegerDistanceQueryManagerAPI **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return ;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  (&arg2)->assign(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  (arg1)->initializeCH(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_IntegerDistanceQueryManagerAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  IntegerDistanceQueryManagerAPI *arg1 = (IntegerDistanceQueryManagerAPI *) 0 ;
+  unsigned int arg2 ;
+  unsigned int arg3 ;
+  unsigned int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(IntegerDistanceQueryManagerAPI **)&jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (unsigned int)jarg3; 
+  result = (unsigned int)(arg1)->distanceQuery(arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_IntegerDistanceQueryManagerAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  IntegerDistanceQueryManagerAPI *arg1 = (IntegerDistanceQueryManagerAPI *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(IntegerDistanceQueryManagerAPI **)&jarg1; 
+  (arg1)->clearStructures();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1IntegerDistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  IntegerDistanceQueryManagerAPI *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (IntegerDistanceQueryManagerAPI *)new IntegerDistanceQueryManagerAPI();
+  *(IntegerDistanceQueryManagerAPI **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1IntegerDistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  IntegerDistanceQueryManagerAPI *arg1 = (IntegerDistanceQueryManagerAPI *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(IntegerDistanceQueryManagerAPI **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_IntegerDistanceQueryManagerWithMappingAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+  IntegerDistanceQueryManagerWithMappingAPI *arg1 = (IntegerDistanceQueryManagerWithMappingAPI *) 0 ;
   std::string arg2 ;
   std::string arg3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(DistanceQueryManagerWithMappingAPI **)&jarg1; 
+  arg1 = *(IntegerDistanceQueryManagerWithMappingAPI **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
     return ;
@@ -272,9 +356,206 @@ SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionH
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerWithMappingAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3) {
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_IntegerDistanceQueryManagerWithMappingAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3) {
+  jlong jresult = 0 ;
+  IntegerDistanceQueryManagerWithMappingAPI *arg1 = (IntegerDistanceQueryManagerWithMappingAPI *) 0 ;
+  unsigned long long arg2 ;
+  unsigned long long arg3 ;
+  unsigned int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(IntegerDistanceQueryManagerWithMappingAPI **)&jarg1; 
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = jenv->GetObjectClass(jarg2);
+    mid = jenv->GetMethodID(clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)jenv->CallObjectMethod(jarg2, mid);
+    bae = jenv->GetByteArrayElements(ba, 0);
+    sz = jenv->GetArrayLength(ba);
+    arg2 = 0;
+    for(i=0; i<sz; i++) {
+      arg2 = (arg2 << 8) | (unsigned long long)(unsigned char)bae[i];
+    }
+    jenv->ReleaseByteArrayElements(ba, bae, 0);
+  }
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = jenv->GetObjectClass(jarg3);
+    mid = jenv->GetMethodID(clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)jenv->CallObjectMethod(jarg3, mid);
+    bae = jenv->GetByteArrayElements(ba, 0);
+    sz = jenv->GetArrayLength(ba);
+    arg3 = 0;
+    for(i=0; i<sz; i++) {
+      arg3 = (arg3 << 8) | (unsigned long long)(unsigned char)bae[i];
+    }
+    jenv->ReleaseByteArrayElements(ba, bae, 0);
+  }
+  result = (unsigned int)(arg1)->distanceQuery(arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_IntegerDistanceQueryManagerWithMappingAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  IntegerDistanceQueryManagerWithMappingAPI *arg1 = (IntegerDistanceQueryManagerWithMappingAPI *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(IntegerDistanceQueryManagerWithMappingAPI **)&jarg1; 
+  (arg1)->clearStructures();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1IntegerDistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  IntegerDistanceQueryManagerWithMappingAPI *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (IntegerDistanceQueryManagerWithMappingAPI *)new IntegerDistanceQueryManagerWithMappingAPI();
+  *(IntegerDistanceQueryManagerWithMappingAPI **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1IntegerDistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  IntegerDistanceQueryManagerWithMappingAPI *arg1 = (IntegerDistanceQueryManagerWithMappingAPI *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(IntegerDistanceQueryManagerWithMappingAPI **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_FPointDistanceQueryManagerAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  FPointDistanceQueryManagerAPI *arg1 = (FPointDistanceQueryManagerAPI *) 0 ;
+  std::string arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FPointDistanceQueryManagerAPI **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return ;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  (&arg2)->assign(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  (arg1)->initializeCH(arg2);
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_FPointDistanceQueryManagerAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jdouble jresult = 0 ;
-  DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
+  FPointDistanceQueryManagerAPI *arg1 = (FPointDistanceQueryManagerAPI *) 0 ;
+  unsigned int arg2 ;
+  unsigned int arg3 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FPointDistanceQueryManagerAPI **)&jarg1; 
+  arg2 = (unsigned int)jarg2; 
+  arg3 = (unsigned int)jarg3; 
+  result = (double)(arg1)->distanceQuery(arg2,arg3);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_FPointDistanceQueryManagerAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  FPointDistanceQueryManagerAPI *arg1 = (FPointDistanceQueryManagerAPI *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FPointDistanceQueryManagerAPI **)&jarg1; 
+  (arg1)->clearStructures();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1FPointDistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  FPointDistanceQueryManagerAPI *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (FPointDistanceQueryManagerAPI *)new FPointDistanceQueryManagerAPI();
+  *(FPointDistanceQueryManagerAPI **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1FPointDistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  FPointDistanceQueryManagerAPI *arg1 = (FPointDistanceQueryManagerAPI *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(FPointDistanceQueryManagerAPI **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_FPointDistanceQueryManagerWithMappingAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+  FPointDistanceQueryManagerWithMappingAPI *arg1 = (FPointDistanceQueryManagerWithMappingAPI *) 0 ;
+  std::string arg2 ;
+  std::string arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FPointDistanceQueryManagerWithMappingAPI **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return ;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  (&arg2)->assign(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  if(!jarg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return ;
+  } 
+  const char *arg3_pstr = (const char *)jenv->GetStringUTFChars(jarg3, 0); 
+  if (!arg3_pstr) return ;
+  (&arg3)->assign(arg3_pstr);
+  jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
+  (arg1)->initializeCH(arg2,arg3);
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_FPointDistanceQueryManagerWithMappingAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3) {
+  jdouble jresult = 0 ;
+  FPointDistanceQueryManagerWithMappingAPI *arg1 = (FPointDistanceQueryManagerWithMappingAPI *) 0 ;
   unsigned long long arg2 ;
   unsigned long long arg3 ;
   double result;
@@ -282,7 +563,7 @@ SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contracti
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(DistanceQueryManagerWithMappingAPI **)&jarg1; 
+  arg1 = *(FPointDistanceQueryManagerWithMappingAPI **)&jarg1; 
   {
     jclass clazz;
     jmethodID mid;
@@ -335,107 +616,35 @@ SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contracti
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerWithMappingAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_FPointDistanceQueryManagerWithMappingAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  FPointDistanceQueryManagerWithMappingAPI *arg1 = (FPointDistanceQueryManagerWithMappingAPI *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(DistanceQueryManagerWithMappingAPI **)&jarg1; 
+  arg1 = *(FPointDistanceQueryManagerWithMappingAPI **)&jarg1; 
   (arg1)->clearStructures();
 }
 
 
-SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1DistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1FPointDistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
-  DistanceQueryManagerWithMappingAPI *result = 0 ;
+  FPointDistanceQueryManagerWithMappingAPI *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  result = (DistanceQueryManagerWithMappingAPI *)new DistanceQueryManagerWithMappingAPI();
-  *(DistanceQueryManagerWithMappingAPI **)&jresult = result; 
+  result = (FPointDistanceQueryManagerWithMappingAPI *)new FPointDistanceQueryManagerWithMappingAPI();
+  *(FPointDistanceQueryManagerWithMappingAPI **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1DistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  DistanceQueryManagerWithMappingAPI *arg1 = (DistanceQueryManagerWithMappingAPI *) 0 ;
+SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1FPointDistanceQueryManagerWithMappingAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  FPointDistanceQueryManagerWithMappingAPI *arg1 = (FPointDistanceQueryManagerWithMappingAPI *) 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = *(DistanceQueryManagerWithMappingAPI **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerAPI_1initializeCH(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
-  std::string arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(DistanceQueryManagerAPI **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
-    return ;
-  } 
-  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
-  if (!arg2_pstr) return ;
-  (&arg2)->assign(arg2_pstr);
-  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  (arg1)->initializeCH(arg2);
-}
-
-
-SWIGEXPORT jdouble JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerAPI_1distanceQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
-  jdouble jresult = 0 ;
-  DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
-  unsigned int arg2 ;
-  unsigned int arg3 ;
-  double result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(DistanceQueryManagerAPI **)&jarg1; 
-  arg2 = (unsigned int)jarg2; 
-  arg3 = (unsigned int)jarg3; 
-  result = (double)(arg1)->distanceQuery(arg2,arg3);
-  jresult = (jdouble)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_DistanceQueryManagerAPI_1clearStructures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(DistanceQueryManagerAPI **)&jarg1; 
-  (arg1)->clearStructures();
-}
-
-
-SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_new_1DistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  DistanceQueryManagerAPI *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (DistanceQueryManagerAPI *)new DistanceQueryManagerAPI();
-  *(DistanceQueryManagerAPI **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_cz_cvut_fel_aic_contractionhierarchies_contractionHierarchiesJNI_delete_1DistanceQueryManagerAPI(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  DistanceQueryManagerAPI *arg1 = (DistanceQueryManagerAPI *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(DistanceQueryManagerAPI **)&jarg1; 
+  arg1 = *(FPointDistanceQueryManagerWithMappingAPI **)&jarg1; 
   delete arg1;
 }
 

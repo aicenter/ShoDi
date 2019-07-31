@@ -3,23 +3,23 @@
 // Created on: 9.7.19
 //
 
-#include "DistanceQueryManagerWithMappingAPI.h"
+#include "FPointDistanceQueryManagerWithMappingAPI.h"
 #include "../GraphBuilding/Loaders/DDSGFLoader.h"
 
 //______________________________________________________________________________________________________________________
-void DistanceQueryManagerWithMappingAPI::initializeCH(string chFile, string mappingFile) {
+void FPointDistanceQueryManagerWithMappingAPI::initializeCH(string chFile, string mappingFile) {
     DDSGFLoader chLoader = DDSGFLoader(chFile);
     graph = chLoader.loadFlagsGraph();
     qm = new FPointCHDistanceQueryManagerWithMapping(*graph, mappingFile);
 }
 
 //______________________________________________________________________________________________________________________
-double DistanceQueryManagerWithMappingAPI::distanceQuery(long long unsigned int source, long long unsigned int target) {
+double FPointDistanceQueryManagerWithMappingAPI::distanceQuery(long long unsigned int source, long long unsigned int target) {
     return qm -> findDistance(source, target);
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceQueryManagerWithMappingAPI::clearStructures() {
+void FPointDistanceQueryManagerWithMappingAPI::clearStructures() {
     delete qm;
     delete graph;
 }

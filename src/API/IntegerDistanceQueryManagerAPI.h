@@ -1,12 +1,13 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 9.7.19
+// Created on: 31.07.19
 //
 
-#ifndef CONTRACTION_HIERARCHIES_DISTANCEQUERYMANAGERAPI_H
-#define CONTRACTION_HIERARCHIES_DISTANCEQUERYMANAGERAPI_H
+#ifndef CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERAPI_H
+#define CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERAPI_H
 
-#include "../CH/FloatingPoint/FPointCHDistanceQueryManager.h"
+
+#include "../CH/Integer/IntegerCHDistanceQueryManager.h"
 #include <string>
 
 using namespace std;
@@ -17,15 +18,16 @@ using namespace std;
 // then realize the actual queries, and then clean the structures when they are no longer needed.
 // Please note, that if you do not call the 'clearStructures' function manually from Java, memory leaks will occur.
 //______________________________________________________________________________________________________________________
-class DistanceQueryManagerAPI {
+class IntegerDistanceQueryManagerAPI {
 public:
     void initializeCH(string chFile);
-    double distanceQuery(unsigned int source, unsigned int target);
+    unsigned int distanceQuery(unsigned int source, unsigned int target);
     void clearStructures();
 private:
-    FPointCHDistanceQueryManager * qm;
-    FPointFlagsGraph * graph;
+    IntegerCHDistanceQueryManager * qm;
+    IntegerFlagsGraph * graph;
 };
 
 
-#endif //CONTRACTION_HIERARCHIES_DISTANCEQUERYMANAGERAPI_H
+
+#endif //CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERAPI_H
