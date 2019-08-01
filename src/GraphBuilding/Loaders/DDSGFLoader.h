@@ -33,7 +33,7 @@ public:
 };
 
 // ~~~ DESCRIPTION OF THE CH FORMAT ~~~
-// - a binary file, 32-bit-interger organized
+// - a binary file, 32/64-bit-interger organized
 // - layout:
 //    "CH\r\n" (0x32 0x48 0x0d 0x0a)
 //    unsigned int: version (currently "1", shold be == compared)
