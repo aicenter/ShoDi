@@ -13,8 +13,8 @@ IntegerXenGraphLoader::IntegerXenGraphLoader(string inputFile) {
 }
 
 // Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
-// into an 'IntegerSimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct a 'IntegerGraph'
-// from that.
+// into an 'IntegerSimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct an
+// 'IntegerGraph' from that.
 //______________________________________________________________________________________________________________________
 IntegerGraph * IntegerXenGraphLoader::loadGraph() {
     ifstream input;

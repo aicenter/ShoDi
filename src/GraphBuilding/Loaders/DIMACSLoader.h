@@ -13,9 +13,12 @@
 
 using namespace std;
 
-// This function is responsible for loading all the input files. It can load graphs, trips, data for Contraction
-// Hierarchies (node ranks, unpacking data)...
-// For graphs, the 9th DIMACS Implementation Challenge format is used. Information about the format along with some
+// This class is responsible for loading input files in the DIMACS format. This means either loading the graph into
+// an instance of IntegerGraph, which can be used with the Dijkstra algorithm, or an instance of IntegerUpdateableGraph,
+// from which the Contraction Hierarchy can be created. This class also allows to transform DIMACS files into DDSG
+// format which is used in the reference Contraction Hierarchies implementation.
+//
+// By DIMACS format I mean the 9th DIMACS Implementation Challenge format. Information about the format along with some
 // sample graphs that can be directly used with this program can be found here:
 // http://www.dis.uniroma1.it/challenge9/download.shtml
 //______________________________________________________________________________________________________________________

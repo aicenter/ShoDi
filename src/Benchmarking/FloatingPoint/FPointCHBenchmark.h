@@ -12,9 +12,6 @@
 
 using namespace std;
 
-// This class is responsible for running a CH Benchmark and outputing the time. The only method
-// 'runAndMeasureFlagsGraphOutputAndRetval()' just takes a vector of trips as an argument and computes shortest
-// distance for all of them, while also computing the time it spent doing it.
 //______________________________________________________________________________________________________________________
 class FPointCHBenchmark {
 public:
