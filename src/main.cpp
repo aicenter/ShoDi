@@ -1,45 +1,66 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 25.7.18
+// Created on: 01.08.19
 //
+
+/*
+ * This simple main provides a way to create Contraction Hierarchies for given input files (graphs).
+ */
+
 
 #include <fstream>
 #include <iomanip>
-#include "GraphBuilding/Loaders/DDSGLoader.h"
-#include "GraphBuilding/Loaders/DDSGFLoader.h"
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
-#include "GraphBuilding/Loaders/TripsLoader.h"
-#include "Loaders/FloatingPointXenGraphLoader.h"
-#include "Loaders/IntegerXenGraphLoader.h"
-#include "Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
-#include "Benchmarking/Integer/IntegerCHBenchmark.h"
-#include "Benchmarking/Integer/IntegerCorectnessValidator.h"
-#include "Benchmarking/Integer/IntegerDijkstraBenchmark.h"
-#include "Benchmarking/FloatingPoint/FPointDijkstraBenchmark.h"
-#include "Benchmarking/FloatingPoint/FPointCHBenchmark.h"
+#include "GraphBuilding/Loaders/FloatingPointXenGraphLoader.h"
+#include "GraphBuilding/Loaders/IntegerXenGraphLoader.h"
 #include "Benchmarking/FloatingPoint/FPointCorectnessValidator.h"
 #include "Timer/Timer.h"
 #include "CH/Integer/IntegerCHPreprocessor.h"
-#include "CH/Integer/IntegerCHPathQueryManager.h"
-#include "CH/Integer/IntegerCHDistanceQueryManager.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
-#include "API/FPointDistanceQueryManagerWithMappingAPI.h"
 
 using namespace std;
 
-// This function constructs a 'Contraction Hierarchy' from a given graph a saves it into a binary file in a format
-// described briefly in the 'DDSGLoader.h' file.
+// Prints info about how to use the application to the user.
 //______________________________________________________________________________________________________________________
-void constructDDSGCH() {
+void printUsageInfo(char * appName) {
+    printf("This application allows the user to create a Contraction Hierarchy for a given map file.\n"
+           "The correct usage is as follows:\n"
+           "%s [command] [precision] [input format] [input file path] [output file path]\n"
+           "  - Command: currently only 'c' (create) is a valid command.\n"
+           "             This means that you want to create a new Contraction Hierarchy.\n"
+           "             Other commands might be added in the future.\n"
+           "  - Precision: allows you to set whether the hierarchy should work with integers or doubles\n"
+           "               internally. 'f' for doubles (floating point), 'i' for integers.\n"
+           "  - Input format: currently the application allows two input formats. DIMACS, which is a format\n"
+           "                  introduced in the 9th DIMACS Implementation Challenge, and also XenGraph,\n"
+           "                  which is a simple text format for graphs. 'D' for DIMACS, 'X' for XenGraph.\n"
+           "                  Note that the DIMACS format can only be used with integer precision.\n"
+           "  - Input file path: file path to the graph file (in the chosen format) for which you want\n"
+           "                     to generate a hierarchy. The path can be in a relative form from the\n"
+           "                     current working directory or an absolute path.\n"
+           "  - Output file path: determines where the .ch or .chf file containing the Contraction Hierarchy\n"
+           "                      will be saved. The .ch or .chf suffix is added automatically so you do not\n"
+           "                      to include it in the path. The .ch suffix is for integer hierarchies while\n"
+           "                      the .chf suffix is for the floating point hierarchies.\n"
+           "\n"
+           "A simple example: let's say I have a file 'Prague_map.xeng' which is in a XenGraph format\n"
+           "and want to create a integer Contraction Hierarchy for this graph and save it into\n"
+           "the current directory with the name 'Prague_map.ch'. I can do this with the following command:\n"
+           " '%s c i X Prague_map.xeng Prague_map'\n", appName, appName);
+}
+
+// Creates an integer Contraction Hierarchy (.ch) for an input file in a XenGraph format.
+//______________________________________________________________________________________________________________________
+void createIntegerXenGraphHierarchy(char * inputFilePath, char * outputFilePath) {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph.xeng");
+    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader(inputFilePath);
     //DIMACSLoader graphLoader = DIMACSLoader("../input/graph.gr");
     IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat("../input/Prague_map_int");
+    graph->flushInDdsgFormat(outputFilePath);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -47,18 +68,17 @@ void constructDDSGCH() {
     delete graph;
 }
 
-// This function constructs a 'Floating Point Contraction Hierarchy' from a given graph a saves it into a binary file
-// in a format described briefly in the 'DDSGLoader.h' file. (Might not be DDSGLoader.h anymore FIXME)
+// Creates an integer Contraction Hierarchy (.ch) for an input file in a DIMACS format.
 //______________________________________________________________________________________________________________________
-void constructDDSGCHF() {
+void createIntegerDIMACSHierarchy(char * inputFilePath, char * outputFilePath) {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader("../input/Prague_graph.xeng");
-    FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    FPointCHPreprocessor::preprocessForDDSGF(*graph);
+    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
+    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat("../input/Prague_map");
+    graph->flushInDdsgFormat(outputFilePath);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -66,299 +86,67 @@ void constructDDSGCHF() {
     delete graph;
 }
 
-// Loads two 'Contraction Hierarchies' and runs a set of queries on both of them. Running times are compared and also
-// output is validated (it only checks if the output of both 'CHs' is the same. If both 'CHs' aren't working correctly,
-// this function won't detect that).
+// Creates a floating point Contraction Hierarchy (.chf) for an input file in a XenGraph format.
 //______________________________________________________________________________________________________________________
-void compareMineWithReference() {
-    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
-    //Loader tripsLoader = Loader("../input/USA1000randomTripsNewGen");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
+void createFloatingPointXenGraphHierarchy(char * inputFilePath, char * outputFilePath) {
+    Timer timer("Whole CH construction timer");
+    timer.begin();
 
-    DDSGLoader myLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    IntegerFlagsGraph * myCH = myLoader.loadFlagsGraph();
-
-    vector<long long unsigned int> myDistances(trips.size());
-    double myTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *myCH, myDistances);
-
-    delete myCH;
-
-    DDSGLoader theirLoader = DDSGLoader("../input/USA.BAY.DDSG.ch");
-    IntegerFlagsGraph * theirCH = theirLoader.loadFlagsGraph();
-
-    vector<long long unsigned int> theirDistances(trips.size());
-    double theirTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *theirCH, theirDistances);
-
-    IntegerCorectnessValidator::validateVerbose(myDistances, theirDistances);
-    printf("Their implementation was %lf times faster than mine!\n", myTime/theirTime);
-
-    delete theirCH;
-
-}
-
-// This function runs a set of queries first using a given 'Contraction Hierarchy' and then also with 'Dijkstra'.
-// The output is validated, since 'Dijkstra' should give correct results, if there are any mismatches, it probably
-// means that the 'Contraction Hierarchy' implementation isn't working correctly. Also the time of both algorithms
-// is measured and the speedup of 'Contraction Hierarchies' in comparison with 'Dijkstra' is also computed and printed.
-//______________________________________________________________________________________________________________________
-void compareCHWithDijkstra() {
-    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int.ch");
-    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
-
-    vector<long long unsigned int> chDistances(trips.size());
-    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
-
-    delete ch;
-
-    //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
-    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
-
-    vector<long long unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
-
-    IntegerCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
-    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
-
-    ofstream trueDistancesFile;
-    trueDistancesFile.open("../input/Prague_map_5000trueDistances.txt");
-    if( ! trueDistancesFile.is_open() ) {
-        printf("Couldn't open file!");
-    }
-
-    for(unsigned int i = 0; i < dijkstraDistances.size(); i++) {
-        trueDistancesFile << dijkstraDistances[i] << endl;
-    }
-
-    delete dijkstraGraph;
-
-}
-
-//______________________________________________________________________________________________________________________
-void compareCHFWithDijkstra() {
-    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraphDebug.chf");
-    FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
-
-    vector<double> chDistances(trips.size());
-    double chTime = FPointCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
-
-    delete ch;
-
-    FloatingPointXenGraphLoader dijkstraLoader = FloatingPointXenGraphLoader("../input/graph.xeng");
-    FPointGraph * dijkstraGraph = dijkstraLoader.loadGraph();
-
-    vector<double> dijkstraDistances(trips.size());
-    double dijkstraTime = FPointDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
-
-    FPointCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
-    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
-
-    /*ofstream trueDistancesFile;
-    trueDistancesFile.open("../input/testTrueDistances2.txt");
-    if( ! trueDistancesFile.is_open() ) {
-        printf("Couldn't open file!");
-    }
-
-    for(unsigned int i = 0; i < dijkstraDistances.size(); i++) {
-        trueDistancesFile << setprecision(12) << dijkstraDistances[i] << endl;
-    }*/
-
-    delete dijkstraGraph;
-
-}
-
-//______________________________________________________________________________________________________________________
-void debugOnSmallGraph() {
-    TripsLoader tripsLoader = TripsLoader("../input/smallTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader("../input/small.xeng");
+    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader(inputFilePath);
     FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     FPointCHPreprocessor::preprocessForDDSGF(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat("../input/small");
+    graph->flushInDdsgfFormat(outputFilePath);
 
-    DDSGFLoader chLoader = DDSGFLoader("../input/small.chf");
-    FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
-
-    vector<double> chDistances(trips.size());
-    double chTime = FPointCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
-
-    delete ch;
-
-    FloatingPointXenGraphLoader dijkstraLoader = FloatingPointXenGraphLoader("../input/small.xeng");
-    FPointGraph * dijkstraGraph = dijkstraLoader.loadGraph();
-
-    vector<double> dijkstraDistances(trips.size());
-    double dijkstraTime = FPointDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
-
-    for(unsigned int i = 0; i < 15; i++) {
-        printf("Trip %u - distance using CH: %f, distance using Dijkstra: %f.\n", i, chDistances[i], dijkstraDistances[i]);
-    }
-
-    FPointCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
-    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
-
-    delete dijkstraGraph;
-
-}
-
-// Runs a set of queries in a given 'Contraction Hierarchy'. Sum of the query times is computed and returned.
-// Average time per query can be simply counted by dividing the result by the amount of queries.
-//______________________________________________________________________________________________________________________
-void runCHBenchmark() {
-    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    DDSGLoader loader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    IntegerFlagsGraph * ch = loader.loadFlagsGraph();
-
-    vector<long long unsigned int> distances(trips.size());
-    IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, distances);
-}
-
-// Will print the node sequence with edge lengths on a certain path computed by Dijkstra - can be used for debug.
-//______________________________________________________________________________________________________________________
-void getDijkstraPathForTrip() {
-    DIMACSLoader dijkstraGraphLoader = DIMACSLoader("../input/USA-road-t.BAY.gr");
-    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
-
-    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    unsigned int chosenTrip = 1;
-    BasicIntegerDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
-
-    delete dijkstraGraph;
-
-}
-
-// Will print the node sequence on a certain path computed by Contraction Hierarchies - this means that the paths will
-// be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
-// WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'IntegerCHPathQueryManager'
-// is fixed.
-//______________________________________________________________________________________________________________________
-void getCHPathForTrip() {
-    DDSGLoader chLoader = DDSGLoader("../input/USA.BAY.MY.DDSG.ch");
-    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
-
-    TripsLoader tripsLoader = TripsLoader("../input/BAY1000randomTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    unsigned int chosenTrip = 1;
-
-    IntegerCHPathQueryManager queryManager(*chGraph);
-    //chGraph->debugPrint();
-    long long unsigned int distance = queryManager.findDistance(trips[chosenTrip].first, trips[chosenTrip].second);
-    printf("Returned distance: %llu\n", distance);
-
-    delete chGraph;
-}
-
-// Transforms a graph from the DIMACS challenge format into the .ddsg format used by the Karlsruhe researchers
-// in their implementation. The output format isn't used anywhere in this project.
-//______________________________________________________________________________________________________________________
-void DIMACStoDDSG() {
-    DIMACSLoader loader = DIMACSLoader("../input/graph.gr");
-    loader.transformToDDSG("../input/graph.ddsg");
-}
-
-//______________________________________________________________________________________________________________________
-void testDoubleDijkstra() {
-    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader("../input/graph.xeng");
-    FPointGraph * graph = graphLoader.loadGraph();
-
-    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTrips");
-    vector< pair < unsigned int, unsigned int > > trips;
-    tripsLoader.loadTrips(trips);
-
-    vector<double> dijkstraDistances(trips.size());
-    FPointDijkstraBenchmark::runAndMeasureWithOutput(trips, *graph, dijkstraDistances);
-
-    for(unsigned int i = 0; i < 20; i++) {
-        printf("Distance for trip %u: %f\n", i, dijkstraDistances[i]);
-    }
+    timer.finish();
+    timer.printMeasuredTime();
 
     delete graph;
 }
 
+// Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
-void testCHDistanceQueriesWithMapping() {
-    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTripsOriginalIDs");
-    vector< pair < long long unsigned int, long long unsigned int > > trips;
-    tripsLoader.loadLongLongTrips(trips);
+int main(int argc, char * argv[]) {
 
-    DDSGFLoader chLoader = DDSGFLoader("../input/experimentGraphDebug.chf");
-    FPointFlagsGraph * ch = chLoader.loadFlagsGraph();
-
-    vector<double> chDistances(trips.size());
-    FPointCHBenchmark::runMeasureAndOutputDistanceQueriesWithMapping(trips, *ch, "../input/graph.xeni" , chDistances);
-
-    for(unsigned int i = 0; i < 15; i++) {
-        printf("Distance for trip %u: %f\n", i, chDistances[i]);
+    if (argc != 6) {
+        printUsageInfo(argv[0]);
+        return 0;
     }
 
-    ofstream trueDistancesFile;
-    trueDistancesFile.open("../input/testTrueDistances2.txt");
-    if( ! trueDistancesFile.is_open() ) {
-        printf("Couldn't open file!");
+    if (argv[1][0] != 'c') {
+        printf("Invalid command. Valid command is only 'c' for create currently.\n"
+               "Run the program simply as '%s' to get usage info.\n", argv[0]);
+        return 0;
     }
 
-    for(unsigned int i = 0; i < chDistances.size(); i++) {
-        trueDistancesFile << setprecision(12) << chDistances[i] << endl;
+    if (argv[2][0] != 'i' && argv[2][0] != 'f') {
+        printf("Invalid precision. Valid are only 'i' and 'f' currently.\n"
+               "Run the program simply as '%s' to get usage info.\n", argv[0]);
+        return 0;
     }
 
-    delete ch;
-}
-
-//______________________________________________________________________________________________________________________
-void testDQMMAPI() {
-    FPointDistanceQueryManagerWithMappingAPI dqmm;
-    dqmm.initializeCH("../input/experimentGraphDebug.chf", "../input/graph.xeni");
-
-    TripsLoader tripsLoader = TripsLoader("../input/doubleExperimentTripsOriginalIDs");
-    vector< pair < long long unsigned int, long long unsigned int > > trips;
-    tripsLoader.loadLongLongTrips(trips);
-
-    for(unsigned int i = 0; i < trips.size(); i++) {
-        printf("Distance for trip %u: %f\n", i, dqmm.distanceQuery(trips[i].first, trips[i].second));
+    if (argv[3][0] != 'X' && argv[3][0] != 'D') {
+        printf("Invalid input format. Valid are only 'X' (XenGraph) and 'D' (DIMACS) currently.\n"
+               "Run the program simply as '%s' to get usage info.\n", argv[0]);
+        return 0;
     }
 
-    dqmm.clearStructures();
-}
-
-// Simple main function, uncomment the function you want to use.
-//______________________________________________________________________________________________________________________
-int main() {
-    //constructDDSGCH();
-    //runCHBenchmark();
-
-    compareCHWithDijkstra();
-    //compareMineWithReference();
-    //getDijkstraPathForTrip();
-    //getCHPathForTrip();
-    //DIMACStoDDSG();
-
-    //testDoubleDijkstra();
-    //testCHDistanceQueriesWithMapping();
-    //constructDDSGCHF();
-    //compareCHFWithDijkstra();
-    //debugOnSmallGraph();
-
-    //testDQMMAPI();
+    if (argv[2][0] == 'i') { // INTEGER
+        if (argv[3][0] == 'X') { // int XenGraph
+            createIntegerXenGraphHierarchy(argv[4], argv[5]);
+        } else { // int DIMACS
+            createIntegerDIMACSHierarchy(argv[4], argv[5]);
+        }
+    } else { // FLOATING POINT
+        if (argv[3][0] == 'X') { // double XenGraph
+            createFloatingPointXenGraphHierarchy(argv[4], argv[5]);
+        } else { // double DIMACS - not implemented.
+            printf("Invalid combination 'f D'. Only integer hierarchies can be created for graphs.\n"
+                   "in the DIMACS input format. Try 'i D' instead if you have a DIMACS file.\n"
+                   "Run the program simply as '%s' to get usage info.\n", argv[0]);
+            return 0;
+        }
+    }
 
     return 0;
 }

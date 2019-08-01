@@ -45,7 +45,7 @@ void IntegerCHPreprocessor::preprocessForDDSG(IntegerUpdateableGraph & graph) {
     EdgeDifferenceManager::init(graph.nodes());
 
     initializePriorityQueue(priorityQueue, graph);
-    printf("Initialized priority queue!\n");
+
     contractNodesWithUnpackingData(priorityQueue, graph);
     reinsertShortcuts(graph);
 

@@ -40,7 +40,7 @@ void FPointCHPreprocessor::preprocessForDDSGF(FPointUpdateableGraph &graph) {
     EdgeDifferenceManager::init(graph.nodes());
 
     initializePriorityQueue(priorityQueue, graph);
-    printf("Initialized priority queue!\n");
+
     contractNodesWithUnpackingData(priorityQueue, graph);
     reinsertShortcuts(graph);
 
