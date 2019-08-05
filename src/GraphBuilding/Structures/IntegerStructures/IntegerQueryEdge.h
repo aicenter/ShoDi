@@ -12,6 +12,7 @@
 class IntegerQueryEdge {
 public:
     IntegerQueryEdge(const unsigned int a, const long long unsigned int b, const bool c, const bool d);
+    IntegerQueryEdge(const IntegerQueryEdge & x);
     long long unsigned int weight;
     unsigned int targetNode;
     bool forward;

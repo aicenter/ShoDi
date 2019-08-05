@@ -31,6 +31,7 @@ protected:
 public:
     IntegerFlagsGraph(unsigned int n);
     IntegerFlagsGraph(IntegerUpdateableGraph & g);
+    void getEdgesForFlushing(vector < pair < unsigned int, IntegerQueryEdge > > & allEdges);
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
     const vector< IntegerQueryEdge > & nextNodes(const unsigned int x)const;

@@ -4,6 +4,7 @@
 //
 
 #include <climits>
+#include <fstream>
 #include "TNRPreprocessor.h"
 #include "../CH/Integer/IntegerCHPreprocessor.h"
 #include "../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
@@ -15,7 +16,7 @@
 // Generally, more transit nodes mean more memory consumption as more distances must be present in the distance table,
 // but could potentially speed up the queries as more queries will hit those new transit nodes.
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, unsigned int transitNodesAmount) {
+void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string outputPath, unsigned int transitNodesAmount) {
     IntegerCHPreprocessor::preprocessForDDSG(graph);
 
     vector < unsigned int > transitNodes(transitNodesAmount);
@@ -36,26 +37,65 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, unsigned
 
     vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
     vector < vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
+    vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
+    vector < vector < unsigned int > > backwardSearchSpaces(graph.nodes());
     unordered_map < unsigned int, unsigned int > transitNodesMapping;
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         transitNodesMapping.insert(transitNodes[i], i);
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        findForwardAccessNodes(i, forwardAccessNodes[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
-        findBackwardAccessNodes(i, backwardAccessNodes[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
+        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
+        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
+    }
+
+    vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
+    prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);
+
+    ofstream output;
+    output.open ( outputPath + ".tnrg" );
+    if( ! output.is_open() ) {
+        printf("Couldn't open file '%s'!", (outputPath + ".ch").c_str());
+    }
+
+    vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
+    chGraph.getEdgesForFlushing(allEdges);
+    output << "TNRG " << graph.nodes() << " " << allEdges.size() << " " << transitNodesAmount << endl;
+
+    for(unsigned int i = 0; i < allEdges.size(); i++) {
+        output << allEdges[i].first << " " << allEdges[i].second.targetNode << " " << allEdges[i].second.weight << " "
+        << allEdges[i].second.forward << " " << allEdges[i].second.backward << endl;
+    }
+
+    for(unsigned int i = 0; i < transitNodesAmount; i++) {
+        output << transitNodes[i] << endl;
+    }
+
+    for(unsigned int i = 0; i < transitNodesAmount; i++) {
+        for(unsigned int j = 0; j < transitNodesAmount; j++) {
+            output << transitNodesDistanceTable[i][j] << endl;
+        }
+    }
+
+    // OUTPUT ACCESS NODES
+
+    for(unsigned int i = 0; i < graph.nodes(); i++) {
+        for(unsigned int j = 0; j < graph.nodes(); j++) {
+            output << isLocal[i][j] << endl;
+        }
     }
 
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> forwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
     vector<bool> reached(graph.nodes(), false);
 
     forwardQ.push(IntegerDijkstraNode(source, 0));
+    forwardSearchSpaces.push_back(source);
 
     distances[source] = 0;
     reached[source] = true;
@@ -87,6 +127,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
                         accessNodesSuperset.push_back(AccessNodeData((*iter).targetNode, distances[(*iter).targetNode]));
                     } else {
                         forwardQ.push(IntegerDijkstraNode((*iter).targetNode, distances[(*iter).targetNode]));
+                        forwardSearchSpaces.push_back((*iter).targetNode);
                     }
                 }
             }
@@ -116,13 +157,14 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
+void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
     vector<bool> reached(graph.nodes(), false);
 
     backwardQ.push(IntegerDijkstraNode(source, 0));
+    backwardSearchSpaces.push_back(source);
 
     distances[source] = 0;
     reached[source] = true;
@@ -154,6 +196,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
                         accessNodesSuperset.push_back(AccessNodeData((*iter).targetNode, distances[(*iter).targetNode]));
                     } else {
                         backwardQ.push(IntegerDijkstraNode((*iter).targetNode, distances[(*iter).targetNode]));
+                        backwardSearchSpaces.push_back((*iter).targetNode);
                     }
                 }
             }
@@ -180,4 +223,27 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 
     }
 
+}
+
+//______________________________________________________________________________________________________________________
+void TNRPreprocessor::prepareLocalityFilter(vector < vector < bool > > & isLocal, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces) {
+    for(unsigned int i = 0; i < isLocal.size(); i++) {
+        for(unsigned int j = 0; j < isLocal.size(); j++) {
+            if(i != j) {
+                isLocal[i][j] = notEmptySearchSpacesUnion(i, j, forwardSearchSpaces, backwardSearchSpaces);
+            }
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+bool TNRPreprocessor::notEmptySearchSpacesUnion(unsigned int i, unsigned int j, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces) {
+    for(unsigned int k = 0; k < forwardSearchSpaces[i].size(); k++) {
+        for(unsigned int m = 0; m < backwardSearchSpaces[j].size(); j++) {
+            if(forwardSearchSpaces[i][k] == backwardSearchSpaces[j][m]) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
