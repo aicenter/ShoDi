@@ -20,7 +20,6 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class IntegerUpdateableGraph{
 protected:
-    void prepareEdgesForFlushing(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts);
     void flushHeader(ostream & output);
     void flushCnts(ostream & output, const unsigned int nodes, const unsigned int edges, const unsigned int shortcuts);
     void flushRanks(ostream & output);
@@ -31,12 +30,15 @@ protected:
     vector< unordered_map < unsigned int, long long unsigned int > > previousNodes;
     vector< unsigned int > ranks;
 public:
+    void prepareEdgesForFlushing(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts);
     IntegerUpdateableGraph(unsigned int n);
     void flushInDdsgFormat(string filePath);
     bool addEdge(unsigned int from, unsigned int to, long long unsigned int weight);
     bool addShortcutEdge(unsigned int from, unsigned int to, long long unsigned int weight, unsigned int middlenode);
     void removeEdge(unsigned int from, unsigned int to);
     void setRank(unsigned int node, unsigned int rank);
+    void getNodesWithHighestRank(vector< unsigned int > & highestNodes, unsigned int requestedAmount);
+    const unsigned int getRank(unsigned int nodeID) const;
     const unsigned int nodes() const;
     const unordered_map<unsigned int, long long unsigned int> & incomingEdges(const unsigned int x)const;
     const unordered_map<unsigned int, IntegerPreprocessingEdgeData> & outgoingEdges(const unsigned int x)const;

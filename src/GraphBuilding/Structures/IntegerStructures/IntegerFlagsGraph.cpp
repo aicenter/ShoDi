@@ -12,6 +12,76 @@ IntegerFlagsGraph::IntegerFlagsGraph(unsigned int n) {
     nodesData.resize(n);
 }
 
+// Build a FlagsGraph based on an instance of UpdateableGraph. This is intented to be used with an UpdateableGraph that
+// was already processed using the CHPreprocessor. This initializes a FlagsGraph which can be used for further CH
+// queries without the need to flush the CH into a file during the process.
+//______________________________________________________________________________________________________________________
+IntegerFlagsGraph::IntegerFlagsGraph(IntegerUpdateableGraph & g) {
+    unsigned int nodesCnt = g.nodes();
+    neighbours.resize(nodesCnt);
+    nodesData.resize(nodesCnt);
+
+    for(unsigned int i = 0; i < nodesCnt; i++) {
+        data(i).rank = g.getRank(i);
+    }
+
+    vector < IntegerOutputEdge > edges;
+    vector < IntegerOutputShortcutEdge > shortcuts;
+    g.prepareEdgesForFlushing(edges, shortcuts);
+
+    processOriginalEdges(edges);
+    processShortcuts(shortcuts);
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerFlagsGraph::processOriginalEdges(vector < IntegerOutputEdge > & edges) {
+    for(unsigned int i = 0; i < edges.size(); i++) {
+        unsigned int from, to, weight, flags;
+        from = edges[i].sourceNode;
+        to = edges[i].targetNode;
+        weight = edges[i].weight;
+        flags = edges[i].flags;
+
+        bool forward = false;
+        bool backward = false;
+        if((flags & 1) == 1) {
+            forward = true;
+        }
+        if((flags & 2) == 2) {
+            backward = true;
+        }
+        if ( data(from).rank < data(to).rank ) {
+            addEdge(from, to, weight, forward, backward);
+        } else {
+            addEdge(to, from, weight, forward, backward);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerFlagsGraph::processShortcuts( vector < IntegerOutputShortcutEdge > & shortcuts) {
+    for(unsigned int i = 0; i < shortcuts.size(); i++) {
+        unsigned int from, to, weight, flags;
+        from = shortcuts[i].sourceNode;
+        to = shortcuts[i].targetNode;
+        weight = shortcuts[i].weight;
+        flags = shortcuts[i].flags;
+
+        bool forward = false;
+        bool backward = false;
+        if((flags & 1) == 1) {
+            forward = true;
+        }
+        if((flags & 2) == 2) {
+            backward = true;
+        }
+        if ( data(from).rank < data(to).rank ) {
+            addEdge(from, to, weight, forward, backward);
+        } else {
+            addEdge(to, from, weight, forward, backward);
+        }
+    }
+}
 
 //______________________________________________________________________________________________________________________
 void IntegerFlagsGraph::addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw) {

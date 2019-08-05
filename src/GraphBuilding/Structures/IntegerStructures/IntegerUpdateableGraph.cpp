@@ -55,6 +55,11 @@ void IntegerUpdateableGraph::removeEdge(unsigned int from, unsigned int to) {
 }
 
 //______________________________________________________________________________________________________________________
+const unsigned int IntegerUpdateableGraph::getRank(unsigned int nodeID) const {
+    return ranks[nodeID];
+}
+
+//______________________________________________________________________________________________________________________
 const unsigned int IntegerUpdateableGraph::nodes() const {
     return followingNodes.size();
 }
@@ -77,6 +82,21 @@ const unsigned int IntegerUpdateableGraph::degree(unsigned int node)const {
 //______________________________________________________________________________________________________________________
 void IntegerUpdateableGraph::setRank(unsigned int node, unsigned int rank) {
     ranks[node] = rank;
+}
+
+
+// Gets requested amount of highest rank nodes from the Contraction Hierarchy. Those are used in Transit Node Routing
+// as Transit Nodes.
+//______________________________________________________________________________________________________________________
+void IntegerUpdateableGraph::getNodesWithHighestRank(vector< unsigned int > & highestNodes, unsigned int requestedAmount) {
+    unsigned int curPosition = 0;
+    for(unsigned int i = 0; i < requestedAmount; i++) {
+        while(ranks[curPosition] <= nodes() - requestedAmount) {
+            curPosition++;
+        }
+        highestNodes[i] = curPosition;
+        curPosition++;
+    }
 }
 
 // Outputs the graph in the format used for the Contraction Hierarchies. This format is briefly described in the

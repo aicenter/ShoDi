@@ -10,6 +10,7 @@
 #include <vector>
 #include "IntegerQueryEdge.h"
 #include "../../../CH/Integer/Structures/IntegerNodeData.h"
+#include "IntegerUpdateableGraph.h"
 
 using namespace std;
 
@@ -25,8 +26,11 @@ class IntegerFlagsGraph{
 protected:
     vector< vector < IntegerQueryEdge > > neighbours;
     vector< IntegerNodeData > nodesData;
+    void processOriginalEdges(vector < IntegerOutputEdge > & edges);
+    void processShortcuts( vector < IntegerOutputShortcutEdge > & shortcuts);
 public:
     IntegerFlagsGraph(unsigned int n);
+    IntegerFlagsGraph(IntegerUpdateableGraph & g);
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
     const vector< IntegerQueryEdge > & nextNodes(const unsigned int x)const;
