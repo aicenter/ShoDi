@@ -11,6 +11,9 @@
 
 using namespace std;
 
+// Class used for loading the Transit Node Routing data-structure. Currently I use a very simple plain-text file to
+// represent the TNR structure. This leads to some really big files with slow processing times though, so I will
+// probably change it to some binary format instead later.
 //______________________________________________________________________________________________________________________
 class TNRGLoader {
 private:

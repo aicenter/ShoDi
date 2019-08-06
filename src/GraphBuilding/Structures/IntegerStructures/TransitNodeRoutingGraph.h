@@ -10,6 +10,10 @@
 #include "IntegerFlagsGraph.h"
 #include "../../../TNR/Structures/AccessNodeData.h"
 
+// A Transit Node Routing data-structure. This basically contains all data required for the TNR queries. For non-local
+// queries, this structure contains the distance table for transit nodes, access nodes for all nodes, and also the
+// locality filter data. For local queries, Contraction Hierarchies are used, so this structure is built on top of
+// IntegerFlagsGraph which alone can be used for the Contraction Hierarchies query algorithm.
 //______________________________________________________________________________________________________________________
 class TransitNodeRoutingGraph : public IntegerFlagsGraph {
 public:

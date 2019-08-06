@@ -112,7 +112,7 @@ void createFloatingPointXenGraphHierarchy(char * inputFilePath, char * outputFil
     delete graph;
 }
 
-
+// Creates a TNR structure based on the given XenGraph file.
 //______________________________________________________________________________________________________________________
 void createTNR() {
     Timer timer("Whole TNR construction timer");
@@ -122,7 +122,7 @@ void createTNR() {
     IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000", 1000);
+    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000v2", 1000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -130,6 +130,10 @@ void createTNR() {
     delete graph;
 }
 
+// Compares the running times of Dijkstra, Contraction Hierarchies and Transit Node Routing on a given set of trips
+// (queries). Speed-up of CH in comparison with Dijkstra and of TNR in comparison with Dijkstra and CH is calculated
+// and the results of CH and TNR are compared with the results of Dijkstra to validate that those method give correct
+// results.
 //______________________________________________________________________________________________________________________
 void compareMethods() {
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
@@ -173,8 +177,8 @@ void compareMethods() {
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
-    //createTNR();
-    compareMethods();
+    createTNR();
+    //compareMethods();
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);

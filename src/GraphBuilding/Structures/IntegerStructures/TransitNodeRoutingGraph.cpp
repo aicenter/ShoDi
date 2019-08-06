@@ -16,14 +16,17 @@ bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int tar
     return isLocal[source][target];
 }
 
+// Finds the distance between two nodes based on the TNR data-structure. This is used for the non-local queries.
+// In that case, all pairs of access nodes of source and target are checked and the shortest distance from those
+// pairs is returned.
 //______________________________________________________________________________________________________________________
 unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int source, unsigned int target) {
     unsigned int shortestDistance = UINT_MAX;
 
     for(unsigned int i = 0; i < forwardAccessNodes[source].size(); i++) {
         for(unsigned int j = 0; j < backwardAccessNodes[target].size(); j++) {
-            unsigned int id1 = transitNodeMapping[forwardAccessNodes[source][i].acessNodeID];
-            unsigned int id2 = transitNodeMapping[backwardAccessNodes[target][j].acessNodeID];
+            unsigned int id1 = transitNodeMapping[forwardAccessNodes[source][i].accessNodeID];
+            unsigned int id2 = transitNodeMapping[backwardAccessNodes[target][j].accessNodeID];
             unsigned int newDistance = forwardAccessNodes[source][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[target][j].distanceToNode;
             if(newDistance < shortestDistance) {
                 shortestDistance = newDistance;

@@ -15,6 +15,7 @@
 
 using namespace std;
 
+// This class can create a Transit Node Routing (TNR) data-structure based on a given IntegerUpdateableGraph.
 //______________________________________________________________________________________________________________________
 class TNRPreprocessor {
 public:

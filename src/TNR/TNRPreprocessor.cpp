@@ -90,11 +90,11 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         output << forwardAccessNodes[i].size();
         for(unsigned int j = 0; j < forwardAccessNodes[i].size(); j++) {
-            output << " " << forwardAccessNodes[i][j].acessNodeID << " " << forwardAccessNodes[i][j].distanceToNode;
+            output << " " << forwardAccessNodes[i][j].accessNodeID << " " << forwardAccessNodes[i][j].distanceToNode;
         }
         output << endl << backwardAccessNodes[i].size();
         for(unsigned int j = 0; j < backwardAccessNodes[i].size(); j++) {
-            output << " " << backwardAccessNodes[i][j].acessNodeID << " " << backwardAccessNodes[i][j].distanceToNode;
+            output << " " << backwardAccessNodes[i][j].accessNodeID << " " << backwardAccessNodes[i][j].distanceToNode;
         }
         output << endl;
     }
@@ -109,6 +109,9 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
 
 }
 
+// Auxiliary function that will find forward access nodes for a given node. The process consists of first finding all
+// the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
+// some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
 void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
@@ -166,8 +169,8 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         bool validAccessNode = true;
         for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
             if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].acessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].acessNodeID];
+                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
+                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
                 if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
                     validAccessNode = false;
                     break;
@@ -176,13 +179,16 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         }
 
         if (validAccessNode) {
-            accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].acessNodeID, accessNodesSuperset[i].distanceToNode));
+            accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
         }
 
     }
 
 }
 
+// Auxiliary function that will find backward access nodes for a given node. The process consists of first finding all
+// the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
+// some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
 void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
@@ -241,8 +247,8 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         bool validAccessNode = true;
         for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
             if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].acessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].acessNodeID];
+                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
+                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
                 if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
                     validAccessNode = false;
                     break;
@@ -251,13 +257,18 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         }
 
         if (validAccessNode) {
-            accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].acessNodeID, accessNodesSuperset[i].distanceToNode));
+            accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
         }
 
     }
 
 }
 
+// Auxiliary function that will prepare the locality filter based on the search spaces for each node found during the
+// access node computation process. Please note that currently the locality filter is a table of |n|*|n| bool values.
+// This doesn't scale well as this means a quadratic space complexity. I currently use this locality filter for testing
+// purposes and it is sufficient at least when using a map with around 30000 nodes. Some better method should probably
+// be used later though, the article suggests "Graph Voronoi Label Compression".
 //______________________________________________________________________________________________________________________
 void TNRPreprocessor::prepareLocalityFilter(vector < vector < bool > > & isLocal, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces) {
     for(unsigned int i = 0; i < isLocal.size(); i++) {
@@ -269,6 +280,9 @@ void TNRPreprocessor::prepareLocalityFilter(vector < vector < bool > > & isLocal
     }
 }
 
+// Auxiliary function which basically takes two search spaces and validates if they have an non-empty union.
+// This is required by the locality filter, non-empty union means that the query is local.
+// (TNR query algorithm can't be used on local queries, fallback to some other routing algorithm is required)
 //______________________________________________________________________________________________________________________
 bool TNRPreprocessor::notEmptySearchSpacesUnion(unsigned int i, unsigned int j, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces) {
     //cout << "Preparing locality filter value for query: '" << i << " -> " << j << "'." << endl;

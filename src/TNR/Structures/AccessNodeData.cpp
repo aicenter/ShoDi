@@ -6,6 +6,6 @@
 #include "AccessNodeData.h"
 
 //______________________________________________________________________________________________________________________
-AccessNodeData::AccessNodeData(unsigned int a, unsigned int b) : acessNodeID(a), distanceToNode(b) {
+AccessNodeData::AccessNodeData(unsigned int a, unsigned int b) : accessNodeID(a), distanceToNode(b) {
 
 }
