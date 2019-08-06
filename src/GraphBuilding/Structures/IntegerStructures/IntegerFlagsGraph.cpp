@@ -33,6 +33,7 @@ IntegerFlagsGraph::IntegerFlagsGraph(IntegerUpdateableGraph & g) {
     processShortcuts(shortcuts);
 }
 
+//______________________________________________________________________________________________________________________
 void IntegerFlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, IntegerQueryEdge > > & allEdges) {
     for(unsigned int i = 0; i < neighbours.size(); i++) {
         for(unsigned int j = 0; j < neighbours[i].size(); j++) {

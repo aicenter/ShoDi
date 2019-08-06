@@ -63,8 +63,12 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
     output << "TNRG " << graph.nodes() << " " << allEdges.size() << " " << transitNodesAmount << endl;
 
     for(unsigned int i = 0; i < allEdges.size(); i++) {
-        output << allEdges[i].first << " " << allEdges[i].second.targetNode << " " << allEdges[i].second.weight << " "
+        output << allEdges[i].first << " " << allEdges[i].second.targetNode << " " << (unsigned int) allEdges[i].second.weight << " "
         << allEdges[i].second.forward << " " << allEdges[i].second.backward << endl;
+    }
+
+    for(unsigned int i = 0; i < graph.nodes(); i++) {
+        output << graph.getRank(i) << endl;
     }
 
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
@@ -77,7 +81,17 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
         }
     }
 
-    // OUTPUT ACCESS NODES
+    for(unsigned int i = 0; i < graph.nodes(); i++) {
+        output << forwardAccessNodes[i].size();
+        for(unsigned int j = 0; j < forwardAccessNodes[i].size(); j++) {
+            output << " " << forwardAccessNodes[i][j].acessNodeID << " " << forwardAccessNodes[i][j].distanceToNode;
+        }
+        output << endl << backwardAccessNodes[i].size();
+        for(unsigned int j = 0; j < backwardAccessNodes[i].size(); j++) {
+            output << " " << backwardAccessNodes[i][j].acessNodeID << " " << backwardAccessNodes[i][j].distanceToNode;
+        }
+        output << endl;
+    }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         for(unsigned int j = 0; j < graph.nodes(); j++) {
