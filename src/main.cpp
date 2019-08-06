@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iomanip>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
+#include "GraphBuilding/Loaders/TNRGLoader.h"
 #include "GraphBuilding/Loaders/FloatingPointXenGraphLoader.h"
 #include "GraphBuilding/Loaders/IntegerXenGraphLoader.h"
 #include "Benchmarking/FloatingPoint/FPointCorectnessValidator.h"
@@ -18,6 +19,12 @@
 #include "CH/Integer/IntegerCHPreprocessor.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
 #include "TNR/TNRPreprocessor.h"
+#include "GraphBuilding/Loaders/TripsLoader.h"
+#include "GraphBuilding/Loaders/DDSGLoader.h"
+#include "Benchmarking/Integer/IntegerCHBenchmark.h"
+#include "Benchmarking/Integer/IntegerDijkstraBenchmark.h"
+#include "Benchmarking/Integer/IntegerCorectnessValidator.h"
+#include "Benchmarking/Integer/TNRBenchmark.h"
 
 using namespace std;
 
@@ -123,11 +130,51 @@ void createTNR() {
     delete graph;
 }
 
+//______________________________________________________________________________________________________________________
+void compareMethods() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<long long unsigned int> chDistances(trips.size());
+    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
+    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<long long unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    IntegerCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
+
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
+
+    vector<long long unsigned int> tnrDistances(trips.size());
+    double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
+
+    IntegerCorectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
+    printf("TNR was %lf times faster than Dijkstra!\n", dijkstraTime/tnrTime);
+    printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
+
+    delete tnrGraph;
+
+}
+
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
-    createTNR();
-
+    //createTNR();
+    compareMethods();
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);

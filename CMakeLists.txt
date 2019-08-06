@@ -109,10 +109,19 @@ add_library(contractionHierarchies SHARED
         src/TNR/TNRDistanceQueryManager.cpp
         src/TNR/TNRDistanceQueryManager.h
         src/Timer/Timer.cpp
-        src/Timer/Timer.h
-)
+        src/Timer/Timer.h)
 
 add_executable(contractionHierarchiesPreprocessor
+        src/Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.cpp
+        src/Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h
+        src/Benchmarking/Integer/TNRBenchmark.cpp
+        src/Benchmarking/Integer/TNRBenchmark.h
+        src/Benchmarking/Integer/IntegerCHBenchmark.h
+        src/Benchmarking/Integer/IntegerCHBenchmark.cpp
+        src/Benchmarking/Integer/IntegerDijkstraBenchmark.h
+        src/Benchmarking/Integer/IntegerDijkstraBenchmark.cpp
+        src/Benchmarking/Integer/IntegerCorectnessValidator.h
+        src/Benchmarking/Integer/IntegerCorectnessValidator.cpp
         src/CH/Generic/Structures/CHNode.cpp
         src/CH/Generic/Structures/CHNode.h
         src/CH/Generic/Structures/CHpriorityQueue.cpp
