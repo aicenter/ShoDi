@@ -114,13 +114,11 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> forwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> reached(graph.nodes(), false);
+    vector<bool> settled(graph.nodes(), false);
 
     forwardQ.push(IntegerDijkstraNode(source, 0));
-    forwardSearchSpaces.push_back(source);
 
     distances[source] = 0;
-    reached[source] = true;
 
     vector < AccessNodeData > accessNodesSuperset;
 
@@ -129,27 +127,34 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         long long unsigned int curLen = forwardQ.top().weight;
         forwardQ.pop();
 
-        // Classic edges relaxation
-        const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
-        for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-            // Skip edge if it is only in the other direction.
-            if (! (*iter).forward) {
-                continue;
-            }
+        if(settled[curNode]) {
+            continue;
+        }
 
-            // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
-            // if it was stalled previously, because it might be now reached on the optimal path.
-            if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                long long unsigned int newlen = curLen + (*iter).weight;
-                if (! reached[(*iter).targetNode] && newlen < distances[(*iter).targetNode]) {
-                    distances[(*iter).targetNode] = newlen;
-                    reached[(*iter).targetNode] = true;
+        settled[curNode] = true;
+        if(transitNodes.count(curNode) == 1 && curNode != source) {
+            accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+        } else {
+            forwardSearchSpaces.push_back(curNode);
 
-                    if (transitNodes.count((*iter).targetNode) == 1) {
-                        accessNodesSuperset.push_back(AccessNodeData((*iter).targetNode, distances[(*iter).targetNode]));
-                    } else {
-                        forwardQ.push(IntegerDijkstraNode((*iter).targetNode, distances[(*iter).targetNode]));
-                        forwardSearchSpaces.push_back((*iter).targetNode);
+            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (! (*iter).forward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
+                // if it was stalled previously, because it might be now reached on the optimal path.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                        forwardQ.push(IntegerDijkstraNode((*iter).targetNode, newlen));
                     }
                 }
             }
@@ -183,13 +188,11 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> reached(graph.nodes(), false);
+    vector<bool> settled(graph.nodes(), false);
 
     backwardQ.push(IntegerDijkstraNode(source, 0));
-    backwardSearchSpaces.push_back(source);
 
     distances[source] = 0;
-    reached[source] = true;
 
     vector < AccessNodeData > accessNodesSuperset;
 
@@ -198,33 +201,41 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         long long unsigned int curLen = backwardQ.top().weight;
         backwardQ.pop();
 
-        // Classic edges relaxation
-        const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
-        for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-            // Skip edge if it is only in the other direction.
-            if (! (*iter).backward) {
-                continue;
-            }
+        if(settled[curNode]) {
+            continue;
+        }
 
-            // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
-            // if it was stalled previously, because it might be now reached on the optimal path.
-            if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                long long unsigned int newlen = curLen + (*iter).weight;
-                if (! reached[(*iter).targetNode] && newlen < distances[(*iter).targetNode]) {
-                    distances[(*iter).targetNode] = newlen;
-                    reached[(*iter).targetNode] = true;
+        settled[curNode] = true;
+        if(transitNodes.count(curNode) == 1 && curNode != source) {
+            accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+        } else {
+            backwardSearchSpaces.push_back(curNode);
 
-                    if (transitNodes.count((*iter).targetNode) == 1) {
-                        accessNodesSuperset.push_back(AccessNodeData((*iter).targetNode, distances[(*iter).targetNode]));
-                    } else {
-                        backwardQ.push(IntegerDijkstraNode((*iter).targetNode, distances[(*iter).targetNode]));
-                        backwardSearchSpaces.push_back((*iter).targetNode);
+            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (! (*iter).backward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
+                // if it was stalled previously, because it might be now reached on the optimal path.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                        backwardQ.push(IntegerDijkstraNode((*iter).targetNode, newlen));
                     }
                 }
             }
         }
 
     }
+
 
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
         bool validAccessNode = true;

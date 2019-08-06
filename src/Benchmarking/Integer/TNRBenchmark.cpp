@@ -14,8 +14,11 @@ double TNRBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned
     tnrTimer.begin();
 
     for(unsigned int i = 0; i < trips.size(); i++) {
+        printf("TNR  -  doing trip: %u\n", i);
         distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second);
     }
+
+    queryManager.printQueriesAnalysis();
 
     tnrTimer.finish();
     tnrTimer.printMeasuredTime();

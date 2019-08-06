@@ -10,13 +10,17 @@
 #include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h"
 #include "../CH/Integer/IntegerCHDistanceQueryManager.h"
 
+//______________________________________________________________________________________________________________________
 class TNRDistanceQueryManager {
 public:
     TNRDistanceQueryManager(TransitNodeRoutingGraph & graph);
     unsigned int findDistance(const unsigned int source, const unsigned int target);
+    void printQueriesAnalysis();
 private:
     TransitNodeRoutingGraph & graph;
     IntegerCHDistanceQueryManager fallbackCHmanager;
+    unsigned int globalQueries;
+    unsigned int localQueries;
 };
 
 
