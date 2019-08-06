@@ -36,7 +36,7 @@ unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int source, unsig
 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraph::addMappingPair(unsigned int realID, unsigned int transitNodesID) {
-    transitNodeMapping.insert(realID, transitNodesID);
+    transitNodeMapping.insert(make_pair(realID, transitNodesID));
 }
 
 //______________________________________________________________________________________________________________________

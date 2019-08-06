@@ -5,8 +5,8 @@
 
 #include <climits>
 #include <fstream>
+#include <iostream>
 #include "TNRPreprocessor.h"
-#include "../CH/Integer/IntegerCHPreprocessor.h"
 #include "../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
 #include "../CH/Integer/IntegerCHDistanceQueryManager.h"
 #include "Structures/AccessNodeData.h"
@@ -17,15 +17,18 @@
 // but could potentially speed up the queries as more queries will hit those new transit nodes.
 //______________________________________________________________________________________________________________________
 void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string outputPath, unsigned int transitNodesAmount) {
-    IntegerCHPreprocessor::preprocessForDDSG(graph);
-
+    cout << "Getting transit nodes" << endl;
     vector < unsigned int > transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
+    cout << "Computing transit nodes distance table" << endl;
     IntegerFlagsGraph chGraph(graph);
     IntegerCHDistanceQueryManager qm(chGraph);
     vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
+        if(i % 100 == 0) {
+            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
+        }
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
             if (i == j) {
                 transitNodesDistanceTable[i][j] = 0;
@@ -35,13 +38,14 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
         }
     }
 
+    cout << "Computing access nodes" << endl;
     vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
     vector < vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
     vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
     vector < vector < unsigned int > > backwardSearchSpaces(graph.nodes());
     unordered_map < unsigned int, unsigned int > transitNodesMapping;
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        transitNodesMapping.insert(transitNodes[i], i);
+        transitNodesMapping.insert(make_pair(transitNodes[i], i));
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
@@ -49,9 +53,11 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
     }
 
+    cout << "Computing locality filter" << endl;
     vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
     prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);
 
+    cout << "Outputting TNR" << endl;
     ofstream output;
     output.open ( outputPath + ".tnrg" );
     if( ! output.is_open() ) {
@@ -98,6 +104,8 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
             output << isLocal[i][j] << endl;
         }
     }
+
+    output.close();
 
 }
 
@@ -252,8 +260,10 @@ void TNRPreprocessor::prepareLocalityFilter(vector < vector < bool > > & isLocal
 
 //______________________________________________________________________________________________________________________
 bool TNRPreprocessor::notEmptySearchSpacesUnion(unsigned int i, unsigned int j, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces) {
+    //cout << "Preparing locality filter value for query: '" << i << " -> " << j << "'." << endl;
+    //cout << "Forward search space size: " << forwardSearchSpaces[i].size() << ", backward size: " << backwardSearchSpaces[j].size() << endl;
     for(unsigned int k = 0; k < forwardSearchSpaces[i].size(); k++) {
-        for(unsigned int m = 0; m < backwardSearchSpaces[j].size(); j++) {
+        for(unsigned int m = 0; m < backwardSearchSpaces[j].size(); m++) {
             if(forwardSearchSpaces[i][k] == backwardSearchSpaces[j][m]) {
                 return true;
             }

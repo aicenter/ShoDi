@@ -10,6 +10,7 @@
 #include "../GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h"
 #include "Structures/AccessNodeData.h"
 #include "../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
+#include "../GraphBuilding/Loaders/IntegerXenGraphLoader.h"
 
 
 using namespace std;

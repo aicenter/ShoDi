@@ -58,6 +58,8 @@ add_library(contractionHierarchies SHARED
         src/GraphBuilding/Loaders/TripsLoader.h
         src/GraphBuilding/Loaders/DDSGFLoader.cpp
         src/GraphBuilding/Loaders/DDSGFLoader.h
+        src/GraphBuilding/Loaders/TNRGLoader.cpp
+        src/GraphBuilding/Loaders/TNRGLoader.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.cpp
@@ -78,6 +80,8 @@ add_library(contractionHierarchies SHARED
         src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.cpp
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointSimpleGraph.cpp
@@ -98,8 +102,15 @@ add_library(contractionHierarchies SHARED
         src/GraphBuilding/Structures/FloatingPointStructures/FPointFlagsGraphWithUnpackingData.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointQueryEdge.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointQueryEdge.h
+        src/TNR/TNRPreprocessor.cpp
+        src/TNR/TNRPreprocessor.h
+        src/TNR/Structures/AccessNodeData.cpp
+        src/TNR/Structures/AccessNodeData.h
+        src/TNR/TNRDistanceQueryManager.cpp
+        src/TNR/TNRDistanceQueryManager.h
         src/Timer/Timer.cpp
-        src/Timer/Timer.h)
+        src/Timer/Timer.h
+)
 
 add_executable(contractionHierarchiesPreprocessor
         src/CH/Generic/Structures/CHNode.cpp
@@ -146,6 +157,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/GraphBuilding/Loaders/TripsLoader.h
         src/GraphBuilding/Loaders/DDSGFLoader.cpp
         src/GraphBuilding/Loaders/DDSGFLoader.h
+        src/GraphBuilding/Loaders/TNRGLoader.cpp
+        src/GraphBuilding/Loaders/TNRGLoader.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.cpp
@@ -166,6 +179,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.cpp
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointSimpleGraph.cpp
@@ -186,6 +201,12 @@ add_executable(contractionHierarchiesPreprocessor
         src/GraphBuilding/Structures/FloatingPointStructures/FPointFlagsGraphWithUnpackingData.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointQueryEdge.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointQueryEdge.h
+        src/TNR/TNRPreprocessor.cpp
+        src/TNR/TNRPreprocessor.h
+        src/TNR/Structures/AccessNodeData.cpp
+        src/TNR/Structures/AccessNodeData.h
+        src/TNR/TNRDistanceQueryManager.cpp
+        src/TNR/TNRDistanceQueryManager.h
         src/Timer/Timer.cpp
         src/Timer/Timer.h
         src/main.cpp)

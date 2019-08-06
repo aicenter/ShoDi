@@ -94,7 +94,7 @@ void TNRGLoader::parseTransitNodesDistanceTable(ifstream & input, TransitNodeRou
     for(unsigned int i = 0; i < tnodesAmount; i++) {
         for(unsigned int j = 0; j < tnodesAmount; j++) {
             input >> value;
-            graph.setDistanceTableValue(i j, value);
+            graph.setDistanceTableValue(i, j, value);
         }
     }
 }

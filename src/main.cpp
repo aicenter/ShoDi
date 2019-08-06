@@ -17,6 +17,7 @@
 #include "Timer/Timer.h"
 #include "CH/Integer/IntegerCHPreprocessor.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
+#include "TNR/TNRPreprocessor.h"
 
 using namespace std;
 
@@ -104,11 +105,31 @@ void createFloatingPointXenGraphHierarchy(char * inputFilePath, char * outputFil
     delete graph;
 }
 
+
+//______________________________________________________________________________________________________________________
+void createTNR() {
+    Timer timer("Whole TNR construction timer");
+    timer.begin();
+
+    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000", 1000);
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
+    createTNR();
 
-    if (argc != 6) {
+
+    /*if (argc != 6) {
         printUsageInfo(argv[0]);
         return 0;
     }
@@ -146,7 +167,7 @@ int main(int argc, char * argv[]) {
                    "Run the program simply as '%s' to get usage info.\n", argv[0]);
             return 0;
         }
-    }
+    }*/
 
     return 0;
 }

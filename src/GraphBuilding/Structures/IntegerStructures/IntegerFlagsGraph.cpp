@@ -37,7 +37,7 @@ IntegerFlagsGraph::IntegerFlagsGraph(IntegerUpdateableGraph & g) {
 void IntegerFlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, IntegerQueryEdge > > & allEdges) {
     for(unsigned int i = 0; i < neighbours.size(); i++) {
         for(unsigned int j = 0; j < neighbours[i].size(); j++) {
-            allEdges.push_back(make_pair(i, IntegerQueryEdge(neighbours[i][j]));
+            allEdges.push_back(make_pair(i, IntegerQueryEdge(neighbours[i][j])));
         }
     }
 }
