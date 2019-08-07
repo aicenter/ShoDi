@@ -57,56 +57,83 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
     vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
     prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);
 
+    vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
+    chGraph.getEdgesForFlushing(allEdges);
+}
+
+// Outputs the created Transit Node Routing data-structure with all the information required for the query algorithm
+// into a binary file.
+//______________________________________________________________________________________________________________________
+void TNRPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & graph, vector < pair < unsigned int, IntegerQueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeData > > & forwardAccessNodes, vector < vector < AccessNodeData > > & backwardAccessNodes, vector < vector < bool > > & isLocal, unsigned int transitNodesAmount) {
     cout << "Outputting TNR" << endl;
     ofstream output;
-    output.open ( outputPath + ".tnrg" );
+    output.open ( outputPath + ".tnrg", ios::binary );
     if( ! output.is_open() ) {
         printf("Couldn't open file '%s'!", (outputPath + ".ch").c_str());
     }
 
-    vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
-    chGraph.getEdgesForFlushing(allEdges);
-    output << "TNRG " << graph.nodes() << " " << allEdges.size() << " " << transitNodesAmount << endl;
+    char c1, c2, c3, c4;
+    c1 = 'T';
+    c2 = 'N';
+    c3 = 'R';
+    c4 = 'G';
+    output.write(&c1, sizeof (c1));
+    output.write(&c2, sizeof (c2));
+    output.write(&c3, sizeof (c3));
+    output.write(&c4, sizeof (c4));
+    unsigned int nodes = graph.nodes();
+    unsigned int edges = allEdges.size();
+    output.write((char *) &nodes, sizeof(nodes));
+    output.write((char *) &edges, sizeof(edges));
+    output.write((char *) &transitNodesAmount, sizeof(transitNodesAmount));
 
     for(unsigned int i = 0; i < allEdges.size(); i++) {
-        output << allEdges[i].first << " " << allEdges[i].second.targetNode << " " << (unsigned int) allEdges[i].second.weight << " "
-        << allEdges[i].second.forward << " " << allEdges[i].second.backward << endl;
+        output.write((char *) &allEdges[i].first, sizeof(allEdges[i].first));
+        output.write((char *) &allEdges[i].second.targetNode, sizeof(allEdges[i].second.targetNode));
+        unsigned int weight = allEdges[i].second.weight;
+        output.write((char *) &weight, sizeof(weight));
+        output.write((char *) &allEdges[i].second.forward, sizeof(allEdges[i].second.forward));
+        output.write((char *) &allEdges[i].second.backward, sizeof(allEdges[i].second.backward));
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        output << graph.getRank(i) << endl;
+        unsigned int rank = graph.getRank(i);
+        output.write((char *) &rank, sizeof(rank));
     }
 
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        output << transitNodes[i] << endl;
+        output.write((char *) &transitNodes[i], sizeof(transitNodes[i]));
     }
 
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
-            output << transitNodesDistanceTable[i][j] << endl;
+            output.write((char *) &transitNodesDistanceTable[i][j], sizeof(transitNodesDistanceTable[i][j]));
         }
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        output << forwardAccessNodes[i].size();
+        unsigned int fwSize = forwardAccessNodes[i].size();
+        output.write((char *) &fwSize, sizeof(fwSize));
         for(unsigned int j = 0; j < forwardAccessNodes[i].size(); j++) {
-            output << " " << forwardAccessNodes[i][j].accessNodeID << " " << forwardAccessNodes[i][j].distanceToNode;
+            output.write((char *) &forwardAccessNodes[i][j].accessNodeID, sizeof(forwardAccessNodes[i][j].accessNodeID));
+            output.write((char *) &forwardAccessNodes[i][j].distanceToNode, sizeof(forwardAccessNodes[i][j].distanceToNode));
         }
-        output << endl << backwardAccessNodes[i].size();
+        unsigned int bwSize = backwardAccessNodes[i].size();
+        output.write((char *) &bwSize, sizeof(bwSize));
         for(unsigned int j = 0; j < backwardAccessNodes[i].size(); j++) {
-            output << " " << backwardAccessNodes[i][j].accessNodeID << " " << backwardAccessNodes[i][j].distanceToNode;
+            output.write((char *) &backwardAccessNodes[i][j].accessNodeID, sizeof(backwardAccessNodes[i][j].accessNodeID));
+            output.write((char *) &backwardAccessNodes[i][j].distanceToNode, sizeof(backwardAccessNodes[i][j].distanceToNode));
         }
-        output << endl;
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         for(unsigned int j = 0; j < graph.nodes(); j++) {
-            output << isLocal[i][j] << endl;
+            bool flag = isLocal[i][j];
+            output.write((char *) &flag, sizeof(flag));
         }
     }
 
     output.close();
-
 }
 
 // Auxiliary function that will find forward access nodes for a given node. The process consists of first finding all
@@ -172,7 +199,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
                 unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
                 unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
                 if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    validAccessNode = false;
+                    //validAccessNode = false;
                     break;
                 }
             }
@@ -250,7 +277,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
                 unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
                 unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
                 if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    validAccessNode = false;
+                    //validAccessNode = false;
                     break;
                 }
             }
