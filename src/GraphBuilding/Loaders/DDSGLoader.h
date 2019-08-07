@@ -24,7 +24,9 @@ private:
     bool verifyFooter(ifstream & input);
     void loadCnts(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & shortcutEdges);
     void loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraph & graph);
+    void loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraphWithUnpackingData & graph);
     void loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraph & graph);
+    void loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraphWithUnpackingData & graph);
     void loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraph & graph);
     void loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraphWithUnpackingData & graph);
 public:

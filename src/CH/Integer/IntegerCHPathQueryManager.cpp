@@ -82,7 +82,7 @@ long long unsigned int IntegerCHPathQueryManager::findDistance(const unsigned in
             }
 
             // Classic edges relaxation
-            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            const vector<IntegerQueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Here we stall a node if it's reached on a suboptimal path. This can happen in the Contraction
                 // Hierarchies query algorithm, because we can reach a node from the wrong direction (for example
@@ -144,7 +144,7 @@ long long unsigned int IntegerCHPathQueryManager::findDistance(const unsigned in
                 }
             }
 
-            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            const vector<IntegerQueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
@@ -205,7 +205,7 @@ void IntegerCHPathQueryManager::forwardStall(unsigned int stallnode, long long u
         graph.data(curNode).forwardStalled = true;
         forwardStallChanged.push_back(curNode);
 
-        const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+        const vector<IntegerQueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
         for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
             if (! (*iter).forward) {
                 continue;
@@ -243,7 +243,7 @@ void IntegerCHPathQueryManager::backwardStall(unsigned int stallnode, long long 
         graph.data(curNode).backwardStalled = true;
         backwardStallChanged.push_back(curNode);
 
-        const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+        const vector<IntegerQueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
         for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
             if (! (*iter).backward) {
                 continue;
@@ -348,13 +348,13 @@ void IntegerCHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsign
 void IntegerCHPathQueryManager::unpackForwardEdge(unsigned int s, unsigned int t) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
-        m = graph.getForwardMiddleNode(s, t);
+        m = graph.getMiddleNode(s, t);
     } else {
-        m = graph.getForwardMiddleNode(t, s);
+        m = graph.getMiddleNode(t, s);
     }
 
     if (m == UINT_MAX) {
-        printf("%u -> %u\n", s, t);
+        printf("%u -> %u (%u)\n", s, t, graph.getDistance(s, t));
         return;
     }
 
@@ -366,13 +366,13 @@ void IntegerCHPathQueryManager::unpackForwardEdge(unsigned int s, unsigned int t
 void IntegerCHPathQueryManager::unpackBackwardEdge(unsigned int s, unsigned int t) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
-        m = graph.getBackwardMiddleNode(s, t);
+        m = graph.getMiddleNode(s, t);
     } else {
-        m = graph.getBackwardMiddleNode(t, s);
+        m = graph.getMiddleNode(t, s);
     }
 
     if (m == UINT_MAX) {
-        printf("%u -> %u\n", s, t);
+        printf("%u -> %u (%u)\n", s, t, graph.getDistance(s, t));
         return;
     }
 

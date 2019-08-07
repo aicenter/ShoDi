@@ -8,25 +8,32 @@
 
 #include <map>
 #include "IntegerFlagsGraph.h"
+#include "IntegerQueryEdgeWithUnpackingData.h"
 
-class IntegerFlagsGraphWithUnpackingData : public IntegerFlagsGraph {
+class IntegerFlagsGraphWithUnpackingData {
 protected:
-    map<pair<unsigned int, unsigned int>, unsigned int> forwardUnpackingData;
-    map<pair<unsigned int, unsigned int>, unsigned int> backwardUnpackingData;
+    vector< vector < IntegerQueryEdgeWithUnpackingData > > neighbours;
+    vector< IntegerNodeData > nodesData;
     vector<unsigned int> forwardPrev;
     vector<unsigned int> backwardPrev;
 public:
     IntegerFlagsGraphWithUnpackingData(unsigned int n);
-    void addForwardUnpackingData(unsigned int s, unsigned int t, unsigned int m);
-    void addBackwardUnpackingData(unsigned int s, unsigned int t, unsigned int m);
-    unsigned int getForwardMiddleNode(unsigned int s, unsigned int t);
-    unsigned int getBackwardMiddleNode(unsigned int s, unsigned int t);
+    unsigned int getMiddleNode(unsigned int source, unsigned int target);
+    unsigned int getDistance(unsigned int node1, unsigned int node2);
     void setForwardPrev(unsigned int x, unsigned int y);
     void setBackwardPrev(unsigned int x, unsigned int y);
     unsigned int getForwardPrev(unsigned int x);
     unsigned int getBackwardPrev(unsigned int x);
     void resetForwardPrev(unsigned int x);
     void resetBackwardPrev(unsigned int x);
+    void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw, unsigned int mNode = UINT_MAX);
+    const unsigned int nodes() const;
+    const vector< IntegerQueryEdgeWithUnpackingData > & nextNodes(const unsigned int x)const;
+    IntegerNodeData & data(unsigned int node);
+    void resetForwardInfo(const unsigned int node);
+    void resetBackwardInfo(const unsigned int node);
+    void resetForwardStall(const unsigned int node);
+    void resetBackwardStall(const unsigned int node);
 };
 
 

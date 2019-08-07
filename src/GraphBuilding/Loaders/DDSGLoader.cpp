@@ -110,6 +110,15 @@ void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGra
 }
 
 //______________________________________________________________________________________________________________________
+void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraphWithUnpackingData & graph) {
+    for(unsigned int i = 0; i < nodes; i++) {
+        unsigned int rank;
+        input.read((char*)&rank, sizeof(rank));
+        graph.data(i).rank = rank;
+    }
+}
+
+//______________________________________________________________________________________________________________________
 void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraph & graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
@@ -134,6 +143,33 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, Integer
 
     }
 }
+
+//______________________________________________________________________________________________________________________
+void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraphWithUnpackingData & graph) {
+    for(unsigned int i = 0; i < edges; i++) {
+        unsigned int from, to, weight, flags;
+        input.read((char*)&from, sizeof(from));
+        input.read((char*)&to, sizeof(to));
+        input.read((char*)&weight, sizeof(weight));
+        input.read((char*)&flags, sizeof(flags));
+
+        bool forward = false;
+        bool backward = false;
+        if((flags & 1) == 1) {
+            forward = true;
+        }
+        if((flags & 2) == 2) {
+            backward = true;
+        }
+        if ( graph.data(from).rank < graph.data(to).rank ) {
+            graph.addEdge(from, to, weight, forward, backward);
+        } else {
+            graph.addEdge(to, from, weight, forward, backward);
+        }
+
+    }
+}
+
 
 //______________________________________________________________________________________________________________________
 void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraph & graph) {
@@ -176,16 +212,14 @@ void DDSGLoader::loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned i
         bool backward = false;
         if((flags & 1) == 1) {
             forward = true;
-            graph.addForwardUnpackingData(from, to, middleNode);
         }
         if((flags & 2) == 2) {
             backward = true;
-            graph.addBackwardUnpackingData(from, to, middleNode);
         }
         if ( graph.data(from).rank < graph.data(to).rank ) {
-            graph.addEdge(from, to, weight, forward, backward);
+            graph.addEdge(from, to, weight, forward, backward, middleNode);
         } else {
-            graph.addEdge(to, from, weight, forward, backward);
+            graph.addEdge(to, from, weight, forward, backward, middleNode);
         }
 
     }
