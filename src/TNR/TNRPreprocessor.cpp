@@ -59,6 +59,8 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
 
     vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
+
+    outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, isLocal, transitNodesAmount);
 }
 
 // Outputs the created Transit Node Routing data-structure with all the information required for the query algorithm

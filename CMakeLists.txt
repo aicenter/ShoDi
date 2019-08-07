@@ -74,6 +74,8 @@ add_library(contractionHierarchies SHARED
         src/GraphBuilding/Structures/IntegerStructures/IntegerPreprocessingEdgeData.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdge.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdge.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdgeWithUnpackingData.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdgeWithUnpackingData.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.cpp
@@ -182,6 +184,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/GraphBuilding/Structures/IntegerStructures/IntegerPreprocessingEdgeData.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdge.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdge.h
+        src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdgeWithUnpackingData.cpp
+        src/GraphBuilding/Structures/IntegerStructures/IntegerQueryEdgeWithUnpackingData.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerShortcutEdge.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.cpp

@@ -162,7 +162,7 @@ void compareMethods() {
 
     delete dijkstraGraph;
 
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000v3.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -177,7 +177,7 @@ void compareMethods() {
 }
 
 //______________________________________________________________________________________________________________________
-void getDijkstraPathForTrip() {
+void getDijkstraPathForTrip(unsigned int tripNum) {
     IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
     IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
@@ -185,7 +185,7 @@ void getDijkstraPathForTrip() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 1;
+    unsigned int chosenTrip = tripNum;
     BasicIntegerDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
 
     delete dijkstraGraph;
@@ -197,7 +197,7 @@ void getDijkstraPathForTrip() {
 // WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'IntegerCHPathQueryManager'
 // is fixed.
 //______________________________________________________________________________________________________________________
-void getCHPathForTrip() {
+void getCHPathForTrip(unsigned int tripNum) {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
 
@@ -205,7 +205,7 @@ void getCHPathForTrip() {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = 1;
+    unsigned int chosenTrip = tripNum;
 
     IntegerCHPathQueryManager queryManager(*chGraph);
     //chGraph->debugPrint();
@@ -218,11 +218,11 @@ void getCHPathForTrip() {
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
-    createTNR();
+    //createTNR();
     //compareMethods();
 
-    //getDijkstraPathForTrip();
-    //getCHPathForTrip();
+    getDijkstraPathForTrip(127);
+    getCHPathForTrip(127);
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);

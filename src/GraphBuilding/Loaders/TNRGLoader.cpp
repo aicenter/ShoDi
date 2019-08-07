@@ -50,9 +50,9 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNR() {
 void TNRGLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount) {
     char c1, c2, c3, c4;
     input.read (&c1, sizeof(c1));
-    input.read (&c1, sizeof(c2));
-    input.read (&c1, sizeof(c3));
-    input.read (&c1, sizeof(c4));
+    input.read (&c2, sizeof(c2));
+    input.read (&c3, sizeof(c3));
+    input.read (&c4, sizeof(c4));
     if (c1 != 'T' || c2 != 'N' || c3 != 'R' || c4 != 'G') {
         cout << "The input file is missing the expected header!" << endl
              << "Transit Node Routing Graph file should begin with the string 'TNRG'." << endl
