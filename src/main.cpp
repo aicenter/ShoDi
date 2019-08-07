@@ -25,6 +25,8 @@
 #include "Benchmarking/Integer/IntegerDijkstraBenchmark.h"
 #include "Benchmarking/Integer/IntegerCorectnessValidator.h"
 #include "Benchmarking/Integer/TNRBenchmark.h"
+#include "CH/Integer/IntegerCHPathQueryManager.h"
+#include "Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
 
 using namespace std;
 
@@ -122,7 +124,7 @@ void createTNR() {
     IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000v2", 1000);
+    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000", 1000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -160,7 +162,7 @@ void compareMethods() {
 
     delete dijkstraGraph;
 
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000v3.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -174,11 +176,53 @@ void compareMethods() {
 
 }
 
+//______________________________________________________________________________________________________________________
+void getDijkstraPathForTrip() {
+    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    unsigned int chosenTrip = 1;
+    BasicIntegerDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
+
+    delete dijkstraGraph;
+
+}
+
+// Will print the node sequence on a certain path computed by Contraction Hierarchies - this means that the paths will
+// be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
+// WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'IntegerCHPathQueryManager'
+// is fixed.
+//______________________________________________________________________________________________________________________
+void getCHPathForTrip() {
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
+
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    unsigned int chosenTrip = 1;
+
+    IntegerCHPathQueryManager queryManager(*chGraph);
+    //chGraph->debugPrint();
+    long long unsigned int distance = queryManager.findDistance(trips[chosenTrip].first, trips[chosenTrip].second);
+    printf("Returned distance: %llu\n", distance);
+
+    delete chGraph;
+}
+
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     createTNR();
     //compareMethods();
+
+    //getDijkstraPathForTrip();
+    //getCHPathForTrip();
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);
