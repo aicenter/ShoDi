@@ -52,6 +52,8 @@ void IntegerCHPreprocessor::preprocessForDDSG(IntegerUpdateableGraph & graph) {
     preprocessTimer.finish();
     preprocessTimer.printMeasuredTime();
 
+    printf("During the preprocessing process, %lu shortcuts were added into the graph.\n", allShortcuts.size());
+
     allShortcuts.clear();
     preprocessingDegrees.clear();
     contracted.clear();

@@ -5,6 +5,7 @@
 
 #include <climits>
 #include "IntegerFlagsGraphWithUnpackingData.h"
+#include "../constants_defines.h"
 
 //______________________________________________________________________________________________________________________
 IntegerFlagsGraphWithUnpackingData::IntegerFlagsGraphWithUnpackingData(unsigned int n) {
@@ -17,6 +18,9 @@ IntegerFlagsGraphWithUnpackingData::IntegerFlagsGraphWithUnpackingData(unsigned 
 //______________________________________________________________________________________________________________________
 void IntegerFlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw, unsigned int mNode) {
     neighbours.at(from).push_back(IntegerQueryEdgeWithUnpackingData(to, weight, fw, bw, mNode));
+    if(to == 4294967295) {
+        printf("Adding edge from %u to %u. (Weight %llu, fw: %s, bw: %s, middle node: %u)\n", from, to, weight, fw ? "true" : "false", bw ? "true" : "false", mNode);
+    }
 }
 
 //______________________________________________________________________________________________________________________
@@ -93,10 +97,17 @@ void IntegerFlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int IntegerFlagsGraphWithUnpackingData::getMiddleNode(unsigned int source, unsigned int target) {
+unsigned int IntegerFlagsGraphWithUnpackingData::getMiddleNode(unsigned int source, unsigned int target, bool direction) {
     for(unsigned int i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
-            return neighbours[source][i].middleNode;
+            //printf("Possible middle node: %u between %u and %u, direction: %s (neigbour forward: %s, backward: %s)\n", neighbours[source][i].middleNode, source, target, direction ? "forward" : "backward", neighbours[source][i].forward ? "true" : "false" , neighbours[source][i].backward ? "true" : "false");
+            if (direction == FORWARD && neighbours[source][i].forward) {
+                //printf("Returning: %u as middle node between %u and %u\n", neighbours[source][i].middleNode, source, target);
+                return neighbours[source][i].middleNode;
+            } else if (direction == BACKWARD && neighbours[source][i].backward) {
+                //printf("Returning: %u as middle node between %u and %u\n", neighbours[source][i].middleNode, source, target);
+                return neighbours[source][i].middleNode;
+            }
         }
     }
 
@@ -104,7 +115,7 @@ unsigned int IntegerFlagsGraphWithUnpackingData::getMiddleNode(unsigned int sour
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int IntegerFlagsGraphWithUnpackingData::getDistance(unsigned int node1, unsigned int node2) {
+unsigned int IntegerFlagsGraphWithUnpackingData::getDistance(unsigned int node1, unsigned int node2, bool direction) {
     unsigned int source = node1;
     unsigned int target = node2;
     if (nodesData[source].rank > nodesData[target].rank) {
@@ -114,7 +125,12 @@ unsigned int IntegerFlagsGraphWithUnpackingData::getDistance(unsigned int node1,
 
     for(unsigned int i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
-            return neighbours[source][i].weight;
+            if (direction == FORWARD && neighbours[source][i].forward) {
+                return neighbours[source][i].weight;
+            } else if (direction == BACKWARD && neighbours[source][i].backward) {
+                return neighbours[source][i].weight;
+            }
+
         }
     }
 

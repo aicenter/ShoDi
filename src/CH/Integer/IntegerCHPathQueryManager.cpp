@@ -6,6 +6,7 @@
 #include <climits>
 #include "IntegerCHPathQueryManager.h"
 #include "../../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
+#include "../../GraphBuilding/Structures/constants_defines.h"
 
 //______________________________________________________________________________________________________________________
 IntegerCHPathQueryManager::IntegerCHPathQueryManager(IntegerFlagsGraphWithUnpackingData & g) : graph(g) {
@@ -88,13 +89,13 @@ long long unsigned int IntegerCHPathQueryManager::findDistance(const unsigned in
                 // Hierarchies query algorithm, because we can reach a node from the wrong direction (for example
                 // we reach a node on a suboptimal path in the forward direction, because the actual optimal path
                 // will be later found in the backward direction)
-                if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
+                /*if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
                     long long unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
                     if (newdistance < curLen) {
-                        graph.data(curNode).forwardDist = newdistance;
-                        forwardStall(curNode, newdistance);
+                        //graph.data(curNode).forwardDist = newdistance;
+                        //forwardStall(curNode, newdistance);
                     }
-                }
+                }*/
 
                 if (! (*iter).forward) {
                     continue;
@@ -146,12 +147,13 @@ long long unsigned int IntegerCHPathQueryManager::findDistance(const unsigned in
 
             const vector<IntegerQueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
+                /*if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
                     if (newdistance < curLen) {
-                        backwardStall(curNode, newdistance);
+                        graph.data(curNode).backwardDist = newdistance;
+                        //backwardStall(curNode, newdistance);
                     }
-                }
+                }*/
 
                 if (! (*iter).backward) {
                     continue;
@@ -307,7 +309,9 @@ void IntegerCHPathQueryManager::outputPath(const unsigned int meetingNode) {
     vector<pair<unsigned int, unsigned int> > toPath;
     fillFromPath(meetingNode, fromPath);
     fillToPath(meetingNode, toPath);
+    //printf("From source to middle node.\n");
     unpackPrevious(fromPath);
+    //printf("From middle node to target.\n");
     unpackFollowing(toPath);
     printf("~~~ End of path output ~~~\n");
 }
@@ -348,17 +352,17 @@ void IntegerCHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsign
 void IntegerCHPathQueryManager::unpackForwardEdge(unsigned int s, unsigned int t) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
-        m = graph.getMiddleNode(s, t);
+        m = graph.getMiddleNode(s, t, FORWARD);
     } else {
-        m = graph.getMiddleNode(t, s);
+        m = graph.getMiddleNode(t, s, FORWARD);
     }
 
     if (m == UINT_MAX) {
-        printf("%u -> %u (%u)\n", s, t, graph.getDistance(s, t));
+        printf("%u -> %u (%u)\n", s, t, graph.getDistance(s, t, FORWARD));
         return;
     }
 
-    unpackForwardEdge(s, m);
+    unpackBackwardEdge(s, m);
     unpackForwardEdge(m, t);
 }
 
@@ -366,17 +370,17 @@ void IntegerCHPathQueryManager::unpackForwardEdge(unsigned int s, unsigned int t
 void IntegerCHPathQueryManager::unpackBackwardEdge(unsigned int s, unsigned int t) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
-        m = graph.getMiddleNode(s, t);
+        m = graph.getMiddleNode(s, t, BACKWARD);
     } else {
-        m = graph.getMiddleNode(t, s);
+        m = graph.getMiddleNode(t, s, BACKWARD);
     }
 
     if (m == UINT_MAX) {
-        printf("%u -> %u (%u)\n", s, t, graph.getDistance(s, t));
+        printf("%u -> %u (%u)\n", s, t, graph.getDistance(s, t, BACKWARD));
         return;
     }
 
     unpackBackwardEdge(s, m);
-    unpackBackwardEdge(m, t);
+    unpackForwardEdge(m, t);
 }
 

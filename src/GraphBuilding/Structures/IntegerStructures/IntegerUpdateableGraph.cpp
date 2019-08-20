@@ -188,7 +188,7 @@ void IntegerUpdateableGraph::prepareEdgesForFlushing(vector < IntegerOutputEdge 
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
-                if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight) {
+                if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight && followingNodes[(*iter).first].at(i).middleNode == (*iter).second.middleNode) {
                     flags += 2;
                     followingNodes[(*iter).first].erase(i);
                 }
@@ -200,7 +200,7 @@ void IntegerUpdateableGraph::prepareEdgesForFlushing(vector < IntegerOutputEdge 
                 }
             } else {
                 unsigned int flags = 2;
-                if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight) {
+                if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight && followingNodes[(*iter).first].at(i).middleNode == (*iter).second.middleNode) {
                     flags += 1;
                     followingNodes[(*iter).first].erase(i);
                 }

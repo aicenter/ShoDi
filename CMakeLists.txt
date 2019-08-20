@@ -111,7 +111,7 @@ add_library(contractionHierarchies SHARED
         src/TNR/TNRDistanceQueryManager.cpp
         src/TNR/TNRDistanceQueryManager.h
         src/Timer/Timer.cpp
-        src/Timer/Timer.h)
+        src/Timer/Timer.h src/GraphBuilding/Structures/constants_defines.h)
 
 add_executable(contractionHierarchiesPreprocessor
         src/Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.cpp

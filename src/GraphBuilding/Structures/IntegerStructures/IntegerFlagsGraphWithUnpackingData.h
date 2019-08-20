@@ -18,8 +18,8 @@ protected:
     vector<unsigned int> backwardPrev;
 public:
     IntegerFlagsGraphWithUnpackingData(unsigned int n);
-    unsigned int getMiddleNode(unsigned int source, unsigned int target);
-    unsigned int getDistance(unsigned int node1, unsigned int node2);
+    unsigned int getMiddleNode(unsigned int source, unsigned int target, bool direction);
+    unsigned int getDistance(unsigned int node1, unsigned int node2, bool direction);
     void setForwardPrev(unsigned int x, unsigned int y);
     void setBackwardPrev(unsigned int x, unsigned int y);
     unsigned int getForwardPrev(unsigned int x);

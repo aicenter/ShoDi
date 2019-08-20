@@ -82,6 +82,8 @@ IntegerFlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData
     printf("IntegerGraph should have %u unpacking pairs\n", shortcutEdges);
     IntegerFlagsGraphWithUnpackingData * graph = new IntegerFlagsGraphWithUnpackingData(nodes);
 
+    printf("Will be loading %u edges and %u shortcut edges.\n", edges, shortcutEdges);
+
     loadRanks(input, nodes, *graph);
     loadOriginalEdges(input, edges, *graph);
     loadShortcutEdgesWithUnpackingData(input, shortcutEdges, *graph);
