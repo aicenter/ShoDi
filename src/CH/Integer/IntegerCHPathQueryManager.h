@@ -26,17 +26,30 @@ using namespace std;
 class IntegerCHPathQueryManager {
 public:
     IntegerCHPathQueryManager(IntegerFlagsGraphWithUnpackingData & g);
-    long long unsigned int findDistance(const unsigned int source, const unsigned int target);
+    long long unsigned int findDistanceOutputPath(const unsigned int source, const unsigned int target);
+    long long unsigned int findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    long long unsigned int findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges);
 protected:
+    long long unsigned int processQuery(const unsigned int source, const unsigned int target);
     void forwardStall(unsigned int stallnode, long long unsigned int stalldistance);
     void backwardStall(unsigned int stallnode, long long unsigned int stalldistance);
     void outputPath(const unsigned int meetingNode);
+    void fillPathInfo(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    void fillPathInfoEdgesOnly(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int>> & edges);
     void fillFromPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & fromPath);
     void fillToPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & toPath);
     void unpackPrevious(vector<pair<unsigned int, unsigned int> > & fromPath);
     void unpackFollowing(vector<pair<unsigned int, unsigned int> > & fromPath);
+    void getPreviousPathPart(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    void getFollowingPathPart(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    void getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges);
+    void getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges);
     void unpackForwardEdge(unsigned int s, unsigned int t);
     void unpackBackwardEdge(unsigned int s, unsigned int t);
+    void getForwardEdge(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    void getBackwardEdge(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    void getForwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges);
+    void getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges);
     IntegerFlagsGraphWithUnpackingData & graph;
     long long unsigned int upperbound;
     unsigned int meetingNode;

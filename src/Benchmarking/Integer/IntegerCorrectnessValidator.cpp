@@ -1,16 +1,13 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 8.7.19
+// Created on: 6.8.18
 //
 
-#include "FPointCorectnessValidator.h"
 #include <cstdio>
-#include <cmath>
-
-#define EPS 0.000000001
+#include "IntegerCorrectnessValidator.h"
 
 //______________________________________________________________________________________________________________________
-bool FPointCorectnessValidator::validate(vector < double > & a, vector < double > & b) {
+bool IntegerCorrectnessValidator::validate(vector < long long unsigned int > & a, vector < long long unsigned int > & b) {
     for (unsigned int i = 0; i < a.size(); i++) {
         if (a.at(i) != b.at(i)) {
             return false;
@@ -20,12 +17,12 @@ bool FPointCorectnessValidator::validate(vector < double > & a, vector < double 
 }
 
 //______________________________________________________________________________________________________________________
-bool FPointCorectnessValidator::validateVerbose(vector < double > & a, vector < double > & b) {
+bool IntegerCorrectnessValidator::validateVerbose(vector < long long unsigned int > & a, vector < long long unsigned int > & b) {
     unsigned int mmcnt = 0;
     for (unsigned int i = 0; i < a.size(); i++) {
-        if (abs(a.at(i) - b.at(i)) > EPS) {
+        if ((unsigned int) a.at(i) != (unsigned int) b.at(i)) {
             printf("Found mismatch at trip %u (indexing trips from 0).\n", i);
-            printf("Vector 'a' contains: %.15f, while vector 'b' contains: %.15f.\n", a.at(i), b.at(i));
+            printf("Vector 'a' contains: %llu, while vector 'b' contains: %llu.\n", a.at(i), b.at(i));
             mmcnt++;//return false;
         }
     }

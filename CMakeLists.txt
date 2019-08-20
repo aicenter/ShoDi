@@ -122,8 +122,10 @@ add_executable(contractionHierarchiesPreprocessor
         src/Benchmarking/Integer/IntegerCHBenchmark.cpp
         src/Benchmarking/Integer/IntegerDijkstraBenchmark.h
         src/Benchmarking/Integer/IntegerDijkstraBenchmark.cpp
-        src/Benchmarking/Integer/IntegerCorectnessValidator.h
-        src/Benchmarking/Integer/IntegerCorectnessValidator.cpp
+        src/Benchmarking/Integer/IntegerCorrectnessValidator.h
+        src/Benchmarking/Integer/IntegerCorrectnessValidator.cpp
+        src/Benchmarking/Integer/PathCorrectnessValidator.h
+        src/Benchmarking/Integer/PathCorrectnessValidator.cpp
         src/CH/Generic/Structures/CHNode.cpp
         src/CH/Generic/Structures/CHNode.h
         src/CH/Generic/Structures/CHpriorityQueue.cpp
@@ -222,4 +224,4 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNR/TNRDistanceQueryManager.h
         src/Timer/Timer.cpp
         src/Timer/Timer.h
-        src/main.cpp)
+        src/main.cpp src/Benchmarking/Integer/PathCorrectnessValidator.cpp src/Benchmarking/Integer/PathCorrectnessValidator.h)

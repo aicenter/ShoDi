@@ -14,7 +14,7 @@
 #include "GraphBuilding/Loaders/TNRGLoader.h"
 #include "GraphBuilding/Loaders/FloatingPointXenGraphLoader.h"
 #include "GraphBuilding/Loaders/IntegerXenGraphLoader.h"
-#include "Benchmarking/FloatingPoint/FPointCorectnessValidator.h"
+#include "Benchmarking/FloatingPoint/FPointCorrectnessValidator.h"
 #include "Timer/Timer.h"
 #include "CH/Integer/IntegerCHPreprocessor.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
@@ -23,10 +23,12 @@
 #include "GraphBuilding/Loaders/DDSGLoader.h"
 #include "Benchmarking/Integer/IntegerCHBenchmark.h"
 #include "Benchmarking/Integer/IntegerDijkstraBenchmark.h"
-#include "Benchmarking/Integer/IntegerCorectnessValidator.h"
+#include "Benchmarking/Integer/IntegerCorrectnessValidator.h"
 #include "Benchmarking/Integer/TNRBenchmark.h"
+#include "Benchmarking/Integer/PathCorrectnessValidator.h"
 #include "CH/Integer/IntegerCHPathQueryManager.h"
 #include "Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
+
 
 using namespace std;
 
@@ -132,6 +134,24 @@ void createTNR() {
     delete graph;
 }
 
+// Creates a Contraction Hierarchy based on the given XenGraph file.
+//______________________________________________________________________________________________________________________
+void createCH() {
+    Timer timer("Whole CH construction timer");
+    timer.begin();
+
+    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Debug_graph.xeng");
+    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    graph->flushInDdsgFormat("../input/Debug_graph");
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
 // Compares the running times of Dijkstra, Contraction Hierarchies and Transit Node Routing on a given set of trips
 // (queries). Speed-up of CH in comparison with Dijkstra and of TNR in comparison with Dijkstra and CH is calculated
 // and the results of CH and TNR are compared with the results of Dijkstra to validate that those method give correct
@@ -157,7 +177,7 @@ void compareMethods() {
     vector<long long unsigned int> dijkstraDistances(trips.size());
     double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
 
-    IntegerCorectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    IntegerCorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
 
     delete dijkstraGraph;
@@ -168,7 +188,7 @@ void compareMethods() {
     vector<long long unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
-    IntegerCorectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
+    IntegerCorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
     printf("TNR was %lf times faster than Dijkstra!\n", dijkstraTime/tnrTime);
     printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
 
@@ -209,10 +229,38 @@ void getCHPathForTrip(unsigned int tripNum) {
 
     IntegerCHPathQueryManager queryManager(*chGraph);
     //chGraph->debugPrint();
-    long long unsigned int distance = queryManager.findDistance(trips[chosenTrip].first, trips[chosenTrip].second);
+    long long unsigned int distance = queryManager.findDistanceOutputPath(trips[chosenTrip].first,
+                                                                          trips[chosenTrip].second);
     printf("Returned distance: %llu\n", distance);
 
     delete chGraph;
+}
+
+// This function runs Contraction Hierarchies on a given set of path queries. Each returned path is validated in order
+// to check if the paths actually exists in the original graph. This ensures that the unpacking routine for the path
+// queries in Contraction Hierarchies works correctly and only valid paths are returned.
+//______________________________________________________________________________________________________________________
+void validateCHPaths() {
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
+
+    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    Timer timer("CH path correctness validation");
+    timer.begin();
+
+    PathCorrectnessValidator::validateOnGivenTrips(trips, *chGraph, *dijkstraGraph);
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete chGraph;
+    delete dijkstraGraph;
 }
 
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
@@ -221,8 +269,10 @@ int main(int argc, char * argv[]) {
     //createTNR();
     //compareMethods();
 
-    getDijkstraPathForTrip(127);
-    getCHPathForTrip(127);
+    //createCH();
+    validateCHPaths();
+    //getDijkstraPathForTrip(0);
+    //getCHPathForTrip(0);
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);

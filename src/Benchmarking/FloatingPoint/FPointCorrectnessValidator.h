@@ -3,8 +3,8 @@
 // Created on: 8.7.19
 //
 
-#ifndef CONTRACTION_HIERARCHIES_FPOINTCORECTNESSVALIDATOR_H
-#define CONTRACTION_HIERARCHIES_FPOINTCORECTNESSVALIDATOR_H
+#ifndef CONTRACTION_HIERARCHIES_FPOINTCORRECTNESSVALIDATOR_H
+#define CONTRACTION_HIERARCHIES_FPOINTCORRECTNESSVALIDATOR_H
 
 
 #include <vector>
@@ -17,7 +17,7 @@ using namespace std;
 // to compare results of two Contaction Hierarchies implementation (or any algorithms for that matter), but in that
 // case you should always be sure that at least one of the compared implementations gives correct results.
 //______________________________________________________________________________________________________________________
-class FPointCorectnessValidator {
+class FPointCorrectnessValidator {
 public:
     static bool validate(vector < double > & a, vector < double > & b);
     static bool validateVerbose(vector < double > & a, vector < double > & b);
@@ -25,4 +25,4 @@ private:
 };
 
 
-#endif //CONTRACTION_HIERARCHIES_FPOINTCORECTNESSVALIDATOR_H
+#endif //CONTRACTION_HIERARCHIES_FPOINTCORRECTNESSVALIDATOR_H

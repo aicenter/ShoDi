@@ -16,7 +16,7 @@ using namespace std;
 // to compare results of two Contaction Hierarchies implementation (or any algorithms for that matter), but in that
 // case you should always be sure that at least one of the compared implementations gives correct results.
 //______________________________________________________________________________________________________________________
-class IntegerCorectnessValidator {
+class IntegerCorrectnessValidator {
 public:
     static bool validate(vector < long long unsigned int > & a, vector < long long unsigned int > & b);
     static bool validateVerbose(vector < long long unsigned int > & a, vector < long long unsigned int > & b);
