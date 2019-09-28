@@ -166,6 +166,27 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         settled[curNode] = true;
         if(transitNodes.count(curNode) == 1 && curNode != source) {
             accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+
+            // Check distances of neighbours for possible improvements.
+            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (!(*iter).forward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // We change the distances here, but don't push into the queue if the distance improves.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                    }
+                }
+            }
         } else {
             forwardSearchSpaces.push_back(curNode);
 
@@ -215,6 +236,103 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
 }
 
+// Alternative approach, does not seem to be working correctly.
+/*
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph) {
+    auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    vector<bool> settled(graph.nodes(), false);
+
+    forwardQ.push(IntegerDijkstraNode(source, 0));
+
+    distances[source] = 0;
+
+    vector < AccessNodeData > accessNodesSuperset;
+
+    while (! forwardQ.empty() ) {
+        unsigned int curNode = forwardQ.top().ID;
+        long long unsigned int curLen = forwardQ.top().weight;
+        forwardQ.pop();
+
+        if(settled[curNode]) {
+            continue;
+        }
+
+        settled[curNode] = true;
+        if(transitNodes.count(curNode) == 1 && curNode != source) {
+            accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+
+            // Check distances of neighbours for possible improvements.
+            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (!(*iter).forward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // We change the distances here, but don't push into the queue if the distance improves.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                    }
+                }
+            }
+        } else {
+            forwardSearchSpaces.push_back(curNode);
+
+            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (! (*iter).forward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
+                // if it was stalled previously, because it might be now reached on the optimal path.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                        forwardQ.push(IntegerDijkstraNode((*iter).targetNode, newlen));
+                    }
+                }
+            }
+        }
+
+    }
+
+    for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
+        bool validAccessNode = true;
+        for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
+            if (j != i) {
+                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
+                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
+                if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
+                    //validAccessNode = false;
+                    break;
+                }
+            }
+        }
+
+        if (validAccessNode) {
+            accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
+        }
+
+    }
+
+}
+*/
+
 // Auxiliary function that will find backward access nodes for a given node. The process consists of first finding all
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
 // some of the candidates can then be removed by a simple stalling process.
@@ -243,6 +361,27 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         settled[curNode] = true;
         if(transitNodes.count(curNode) == 1 && curNode != source) {
             accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+
+            // Check distances of neighbours for possible improvements.
+            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (! (*iter).backward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // We change the distances here, but don't push into the queue if the distance improves.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    long long unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                    }
+                }
+            }
         } else {
             backwardSearchSpaces.push_back(curNode);
 

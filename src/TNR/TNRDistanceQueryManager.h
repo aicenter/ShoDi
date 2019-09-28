@@ -10,7 +10,8 @@
 #include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h"
 #include "../CH/Integer/IntegerCHDistanceQueryManager.h"
 
-// This class handles queries over the TNR data structure.
+// This class handles distance queries over the TNR data structure (that means queries where we don't want to find the
+// actual shortest path, but instead we are only interested in its distance).
 //______________________________________________________________________________________________________________________
 class TNRDistanceQueryManager {
 public:
