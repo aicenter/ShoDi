@@ -164,29 +164,8 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         }
 
         settled[curNode] = true;
-        if(transitNodes.count(curNode) == 1 && curNode != source) {
+        if(transitNodes.count(curNode) == 1) {
             accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
-
-            // Check distances of neighbours for possible improvements.
-            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
-            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                // Skip edge if it is only in the other direction.
-                if (!(*iter).forward) {
-                    continue;
-                }
-
-                if (settled[(*iter).targetNode]) {
-                    continue;
-                }
-
-                // We change the distances here, but don't push into the queue if the distance improves.
-                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
-                    if (newlen < distances[(*iter).targetNode]) {
-                        distances[(*iter).targetNode] = newlen;
-                    }
-                }
-            }
         } else {
             forwardSearchSpaces.push_back(curNode);
 
@@ -359,29 +338,8 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         }
 
         settled[curNode] = true;
-        if(transitNodes.count(curNode) == 1 && curNode != source) {
+        if(transitNodes.count(curNode) == 1) {
             accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
-
-            // Check distances of neighbours for possible improvements.
-            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
-            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                // Skip edge if it is only in the other direction.
-                if (! (*iter).backward) {
-                    continue;
-                }
-
-                if (settled[(*iter).targetNode]) {
-                    continue;
-                }
-
-                // We change the distances here, but don't push into the queue if the distance improves.
-                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
-                    if (newlen < distances[(*iter).targetNode]) {
-                        distances[(*iter).targetNode] = newlen;
-                    }
-                }
-            }
         } else {
             backwardSearchSpaces.push_back(curNode);
 
