@@ -22,7 +22,7 @@ unsigned int TNRDistanceQueryManager::findDistance(const unsigned int source, co
         return 0;
     } else {
         if (graph.isLocalQuery(source, target)) { // Is local query, fallback to some other distance manager, here CH
-            printf("Local query.\n");
+            //printf("Local query.\n");
             localQueries++;
             return fallbackCHmanager.findDistance(source, target);
         } else { // Not local query, TNR can be used.

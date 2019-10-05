@@ -29,13 +29,17 @@ unsigned int TNRPathQueryManager::findDistance(const unsigned int source, const 
         }
     }
 
+    printf("Source: %u (rank %u), target: %u (rank %u)\n", source, graph.data(source).rank, target, graph.data(target).rank);
+    printf("Rank of %u is %u, rank of %u is %u.\n", 1870, graph.data(1870).rank, 21257, graph.data(21257).rank);
     if (distance == UINT_MAX) {
         printf("Couldn't find path from source to target. Nothing to output.\n");
         return UINT_MAX;
     }
 
     vector< IntegerQueryEdge > nextNodes = graph.nextNodes(source);
+    printf("Current distance left: %u, we have %lu neighbours to try.\n", distance, nextNodes.size());
     for(unsigned int i = 0; i < nextNodes.size(); i++) {
+        printf("Trying %u (rank %u) as middle node. Distances: %llu and %u, that is: %llu\n", nextNodes[i].targetNode, graph.data(nextNodes[i].targetNode).rank, nextNodes[i].weight, quickFindDistance(nextNodes[i].targetNode, target), quickFindDistance(nextNodes[i].targetNode, target) + nextNodes[i].weight);
         if(distance - nextNodes[i].weight == quickFindDistance(nextNodes[i].targetNode, target)) {
             printf("%u -> %u (%llu) - remainings: %llu\n", source, nextNodes[i].targetNode, nextNodes[i].weight, distance - nextNodes[i].weight);
             findDistance(nextNodes[i].targetNode, target);
