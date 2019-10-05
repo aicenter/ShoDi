@@ -36,7 +36,7 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNR() {
     parseTransitNodesMapping(input, *graph, tnodesAmount);
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
     parseAccessNodes(input, *graph, nodes);
-    parseLocalityFilter(input, *graph, nodes);
+    parseSearchSpaces(input, *graph, nodes);
 
     graphLoadTimer.finish();
     graphLoadTimer.printMeasuredTime();
@@ -124,6 +124,24 @@ void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraph & gr
             input.read ((char *) &nodeID, sizeof(nodeID));
             input.read ((char *) &nodeDistance, sizeof(nodeDistance));
             graph.addBackwardAccessNode(i, nodeID, nodeDistance);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseSearchSpaces(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
+    for(unsigned int i = 0; i < nodes; i++) {
+        unsigned int fwSearchSpaceSize, bwSearchSpaceSize, searchSpaceNode;
+        input.read((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
+        for(unsigned int j = 0; j < fwSearchSpaceSize; j++) {
+            input.read((char *) &searchSpaceNode, sizeof(searchSpaceNode));
+            graph.addForwardSearchSpaceNode(i, searchSpaceNode);
+        }
+
+        input.read((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
+        for(unsigned int j = 0; j < bwSearchSpaceSize; j++) {
+            input.read((char *) &searchSpaceNode, sizeof(searchSpaceNode));
+            graph.addBackwardSearchSpaceNode(i, searchSpaceNode);
         }
     }
 }

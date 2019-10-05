@@ -53,20 +53,20 @@ void TNRPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, string o
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
     }
 
-    cout << "Computing locality filter" << endl;
+    /*cout << "Computing locality filter" << endl;
     vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
-    prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);
+    prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);*/
 
     vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
-    outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, isLocal, transitNodesAmount);
+    outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount);
 }
 
 // Outputs the created Transit Node Routing data-structure with all the information required for the query algorithm
 // into a binary file.
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & graph, vector < pair < unsigned int, IntegerQueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeData > > & forwardAccessNodes, vector < vector < AccessNodeData > > & backwardAccessNodes, vector < vector < bool > > & isLocal, unsigned int transitNodesAmount) {
+void TNRPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & graph, vector < pair < unsigned int, IntegerQueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeData > > & forwardAccessNodes, vector < vector < AccessNodeData > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount) {
     cout << "Outputting TNR" << endl;
     ofstream output;
     output.open ( outputPath + ".tnrg", ios::binary );
@@ -128,12 +128,37 @@ void TNRPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & gr
         }
     }
 
+    printf("Will now output search spaces.\n");
+
+    unsigned int fwSearchSpaceSum = 0;
+    unsigned int bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
+        unsigned int fwSearchSpaceSize = forwardSearchSpaces[i].size();
+        output.write((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
+        for(unsigned int j = 0; j < fwSearchSpaceSize; j++) {
+            output.write((char *) &forwardSearchSpaces[i][j], sizeof(forwardSearchSpaces[i][j]));
+        }
+        fwSearchSpaceSum += fwSearchSpaceSize;
+
+        unsigned int bwSearchSpaceSize = backwardSearchSpaces[i].size();
+        output.write((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
+        for(unsigned int j = 0; j < bwSearchSpaceSize; j++) {
+            output.write((char *) &backwardSearchSpaces[i][j], sizeof(backwardSearchSpaces[i][j]));
+        }
+        bwSearchSpaceSum += bwSearchSpaceSize;
+
+    }
+
+    printf("Average forward search space size: %lf\n", (double)fwSearchSpaceSum/nodes);
+    printf("Average backward search space size: %lf\n", (double)bwSearchSpaceSum/nodes);
+
+
+    /*for(unsigned int i = 0; i < graph.nodes(); i++) {
         for(unsigned int j = 0; j < graph.nodes(); j++) {
             bool flag = isLocal[i][j];
             output.write((char *) &flag, sizeof(flag));
         }
-    }
+    }*/
 
     output.close();
 }

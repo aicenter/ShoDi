@@ -23,6 +23,7 @@ private:
     void parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount);
     void parseTransitNodesDistanceTable(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount);
     void parseAccessNodes(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes);
+    void parseSearchSpaces(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes);
     void parseLocalityFilter(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes);
     string inputFile;
 public:

@@ -28,6 +28,10 @@
 #include "Benchmarking/Integer/PathCorrectnessValidator.h"
 #include "CH/Integer/IntegerCHPathQueryManager.h"
 #include "Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
+#include "TNR/TNRPathQueryManager.h"
+#include "DistanceMatrix/IntegerDistanceMatrixComputor.h"
+#include "GraphBuilding/Loaders/IntegerDistanceMatrixLoader.h"
+#include "Benchmarking/Integer/DistanceMatrixBenchmark.h"
 
 
 using namespace std;
@@ -126,7 +130,8 @@ void createTNR() {
     IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000", 1000);
+
+    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000_newFilter", 1000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -145,6 +150,25 @@ void createCH() {
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat("../input/Debug_graph");
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
+// Creates a Distance Matrix based on the given file containing a graph.
+//______________________________________________________________________________________________________________________
+void createDM() {
+    Timer timer("Whole Distance Matrix computation timer");
+    timer.begin();
+
+    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * graph = dijkstraGraphLoader.loadGraph();
+
+    IntegerDistanceMatrixComputor dmComputor;
+    dmComputor.computeDistanceMatrix(*graph);
+    dmComputor.outputDistanceMatrixToFile("../input/Prague_int_1000prec");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -182,7 +206,7 @@ void compareMethods() {
 
     delete dijkstraGraph;
 
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_sept.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -196,6 +220,104 @@ void compareMethods() {
 
 }
 
+// Compares the running times of Dijkstra, Contraction Hierarchies, Transit Node Routing and Distance Matrix on a given
+// set of trips (queries).
+//______________________________________________________________________________________________________________________
+void compareFourMethods() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<long long unsigned int> chDistances(trips.size());
+    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
+    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<long long unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    IntegerCorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
+
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
+
+    vector<long long unsigned int> tnrDistances(trips.size());
+    double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
+
+    IntegerCorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
+    printf("TNR was %lf times faster than Dijkstra!\n", dijkstraTime/tnrTime);
+    printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
+
+    delete tnrGraph;
+
+    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+
+    vector<long long unsigned int> dmDistances(trips.size());
+    double dmTime = DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(trips, *distanceMatrix, dmDistances);
+
+    IntegerCorrectnessValidator::validateVerbose(dmDistances, dijkstraDistances);
+    printf("Distance Matrix was %lf times faster than Dijkstra!\n", dijkstraTime/dmTime);
+    printf("Distance Matrix was %lf times faster than CH!\n", chTime/dmTime);
+    printf("Distance Matrix was %lf times faster than TNR!\n", tnrTime/dmTime);
+
+}
+
+// Compares the running times of Contraction Hierarchies and Transit Node Routing on a given set of trips (queries).
+//______________________________________________________________________________________________________________________
+void compareCHandTNR() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<long long unsigned int> chDistances(trips.size());
+    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
+
+    vector<long long unsigned int> tnrDistances(trips.size());
+    double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
+
+    IntegerCorrectnessValidator::validateVerbose(tnrDistances, chDistances);
+    printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
+
+    delete tnrGraph;
+
+}
+
+// Auxiliary function currently used for debug purposes. Prints the real distance from source to access node, between
+// twe two access nodes and from access node to target. Might help determine which of these parts is being computed
+// incorrectly in TNR.
+//______________________________________________________________________________________________________________________
+void checkDijkstraDistances(unsigned int sourceNode, unsigned int sourceAccess, unsigned int targetAccess, unsigned int targetNode) {
+    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    printf("~~~ Computing distances using Dijkstra ~~~\n");
+    printf("%u -> %u: %llu\n", sourceNode, sourceAccess, BasicIntegerDijkstra::run(sourceNode, sourceAccess, *dijkstraGraph));
+    printf("%u -> %u: %llu\n", sourceAccess, targetAccess, BasicIntegerDijkstra::run(sourceAccess, targetAccess, *dijkstraGraph));
+    printf("%u -> %u: %llu\n", targetAccess, targetNode, BasicIntegerDijkstra::run(targetAccess, targetNode, *dijkstraGraph));
+    printf("~~~ End of Dijkstra computation ~~~\n");
+    delete dijkstraGraph;
+
+}
+
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip(unsigned int tripNum) {
     IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
@@ -205,8 +327,8 @@ void getDijkstraPathForTrip(unsigned int tripNum) {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = tripNum;
-    BasicIntegerDijkstra::runWithPathOutput(trips[chosenTrip].first, trips[chosenTrip].second, *dijkstraGraph);
+    //BasicIntegerDijkstra::runWithPathOutput(trips[tripNum].first, trips[tripNum].second, *dijkstraGraph);
+    BasicIntegerDijkstra::runWithPathOutput(trips[tripNum].first /*20652*/, trips[tripNum].second, *dijkstraGraph);
 
     delete dijkstraGraph;
 
@@ -214,8 +336,6 @@ void getDijkstraPathForTrip(unsigned int tripNum) {
 
 // Will print the node sequence on a certain path computed by Contraction Hierarchies - this means that the paths will
 // be unpacked from the shortcuts. Can be used for debug, especially if CH returns different paths than Dijkstra.
-// WARNING: 'CH' currently doesn't compute correct paths, so using this isn't recommended until the 'IntegerCHPathQueryManager'
-// is fixed.
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip(unsigned int tripNum) {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
@@ -225,15 +345,36 @@ void getCHPathForTrip(unsigned int tripNum) {
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    unsigned int chosenTrip = tripNum;
-
     IntegerCHPathQueryManager queryManager(*chGraph);
     //chGraph->debugPrint();
-    long long unsigned int distance = queryManager.findDistanceOutputPath(trips[chosenTrip].first,
-                                                                          trips[chosenTrip].second);
+    long long unsigned int distance = queryManager.findDistanceOutputPath(trips[tripNum].first,
+                                                                          trips[tripNum].second);
     printf("Returned distance: %llu\n", distance);
 
+    printf("Rank of node %u: %u\n", trips[tripNum].first, chGraph->data(trips[tripNum].first).rank);
+    printf("Rank of node %u: %u\n", trips[tripNum].second, chGraph->data(trips[tripNum].second).rank);
+
     delete chGraph;
+}
+
+// Will print the whole path computed by Transit Node Routing (all edges on the path). Can be used for debug if TNR
+// returns different distances than for example Dijkstra.
+//______________________________________________________________________________________________________________________
+void getTNRPathForTrip(unsigned int tripNum) {
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
+
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    TNRPathQueryManager queryManager(*tnrGraph);
+
+    unsigned int distance = queryManager.findDistance(trips[tripNum].first, trips[tripNum].second);
+    printf("Returned distance: %u\n", distance);
+
+    delete tnrGraph;
+
 }
 
 // This function runs Contraction Hierarchies on a given set of path queries. Each returned path is validated in order
@@ -268,11 +409,17 @@ void validateCHPaths() {
 int main(int argc, char * argv[]) {
     //createTNR();
     //compareMethods();
+    compareFourMethods();
+    //compareCHandTNR();
+
+    //createDM();
 
     //createCH();
-    validateCHPaths();
-    //getDijkstraPathForTrip(0);
-    //getCHPathForTrip(0);
+    //validateCHPaths();
+    //getDijkstraPathForTrip(2114);
+    //getCHPathForTrip(2114);
+    //checkDijkstraDistances(23993, 18595, 22059, 23696);
+    //getTNRPathForTrip(2114);
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);

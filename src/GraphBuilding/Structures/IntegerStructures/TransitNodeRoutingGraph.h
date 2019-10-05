@@ -25,11 +25,15 @@ public:
     void setLocalityFilterValue(unsigned int i, unsigned int j, bool value);
     void addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
     void addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
+    void addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
+    void addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
 protected:
     vector < vector < AccessNodeData > > forwardAccessNodes;
     vector < vector < AccessNodeData > > backwardAccessNodes;
+    vector < vector < unsigned int > > forwardSearchSpaces;
+    vector < vector < unsigned int > > backwardSearchSpaces;
     vector < vector < unsigned int > > transitNodesDistanceTable;
-    vector < vector < bool > > isLocal;
+    //vector < vector < bool > > isLocal;
     unordered_map < unsigned int, unsigned int > transitNodeMapping;
 };
 

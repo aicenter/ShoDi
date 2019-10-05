@@ -7,13 +7,23 @@
 #include "TransitNodeRoutingGraph.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : IntegerFlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), isLocal(nodes, vector<bool>(nodes)) {
+TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : IntegerFlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes) {
 
 }
 
 //______________________________________________________________________________________________________________________
 bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int target) {
-    return isLocal[source][target];
+    for(unsigned int k = 0; k < forwardSearchSpaces[source].size(); k++) {
+        for(unsigned int m = 0; m < backwardSearchSpaces[target].size(); m++) {
+            if(forwardSearchSpaces[source][k] == backwardSearchSpaces[target][m]) {
+                return true;
+            }
+        }
+    }
+    return false;
+
+
+    //return isLocal[source][target];
 }
 
 // Finds the distance between two nodes based on the TNR data-structure. This is used for the non-local queries.
@@ -51,7 +61,7 @@ void TransitNodeRoutingGraph::setDistanceTableValue(unsigned int i, unsigned int
 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraph::setLocalityFilterValue(unsigned int i, unsigned int j, bool value) {
-    isLocal[i][j] = value;
+    //isLocal[i][j] = value;
 }
 
 //______________________________________________________________________________________________________________________
@@ -62,4 +72,14 @@ void TransitNodeRoutingGraph::addForwardAccessNode(unsigned int node, unsigned i
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraph::addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance) {
     backwardAccessNodes[node].push_back(AccessNodeData(accessNodeID, accessNodeDistance));
+}
+
+//______________________________________________________________________________________________________________________
+void TransitNodeRoutingGraph::addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
+    forwardSearchSpaces[sourceNode].push_back(searchSpaceNode);
+}
+
+//______________________________________________________________________________________________________________________
+void TransitNodeRoutingGraph::addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
+    backwardSearchSpaces[sourceNode].push_back(searchSpaceNode);
 }
