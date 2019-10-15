@@ -89,8 +89,11 @@ long long unsigned int BasicIntegerDijkstra::runWithPathOutput(const unsigned in
 
     }
 
+    printf("Did not find path from %u to %u.\n", source, target);
     delete [] distance;
     return ULLONG_MAX;
+
+
 
 }
 

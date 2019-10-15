@@ -40,7 +40,7 @@ unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int source, unsig
             unsigned int id2 = transitNodeMapping[backwardAccessNodes[target][j].accessNodeID];
             unsigned int newDistance = forwardAccessNodes[source][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[target][j].distanceToNode;
             //printf("Possible candidate is pair of transit nodes: %u -> %u, distance %u (%u, %u, %u)\n", forwardAccessNodes[source][i].accessNodeID, backwardAccessNodes[target][j].accessNodeID, newDistance, forwardAccessNodes[source][i].distanceToNode, transitNodesDistanceTable[id1][id2], backwardAccessNodes[target][j].distanceToNode);
-            if(newDistance < shortestDistance) {
+            if(newDistance < shortestDistance && transitNodesDistanceTable[id1][id2] != UINT_MAX) {
                 shortestDistance = newDistance;
             }
         }

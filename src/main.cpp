@@ -131,7 +131,7 @@ void createTNR() {
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_1000_newFilter", 1000);
+    TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_map_n2000_debug", 2000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -224,7 +224,8 @@ void compareMethods() {
 // set of trips (queries).
 //______________________________________________________________________________________________________________________
 void compareFourMethods() {
-    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -276,7 +277,8 @@ void compareFourMethods() {
 // Compares the running times of Contraction Hierarchies and Transit Node Routing on a given set of trips (queries).
 //______________________________________________________________________________________________________________________
 void compareCHandTNR() {
-    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -288,7 +290,7 @@ void compareCHandTNR() {
 
     delete ch;
 
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_n2000_debug.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -299,6 +301,82 @@ void compareCHandTNR() {
 
     delete tnrGraph;
 
+}
+
+// Compares the running times of Transit Node Routing with different various transit node set sizes on a given set of
+// trips (queries).
+//______________________________________________________________________________________________________________________
+void compareVariousTransitSetSizes() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    TNRGLoader tnr500Loader = TNRGLoader("../input/Prague_map_1000_newFilter_500nodes.tnrg");
+    TransitNodeRoutingGraph * tnr500Graph = tnr500Loader.loadTNR();
+
+    vector<long long unsigned int> tnr500Distances(trips.size());
+    double tnr500Time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr500Graph, tnr500Distances);
+
+    delete tnr500Graph;
+
+    TNRGLoader tnr1000Loader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TransitNodeRoutingGraph * tnr1000Graph = tnr1000Loader.loadTNR();
+
+    vector<long long unsigned int> tnr1000Distances(trips.size());
+    double tnr1000Time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr1000Graph, tnr1000Distances);
+
+    delete tnr1000Graph;
+
+    TNRGLoader tnr2000Loader = TNRGLoader("../input/Prague_map_1000_newFilter_2000nodes.tnrg");
+    TransitNodeRoutingGraph * tnr2000Graph = tnr2000Loader.loadTNR();
+
+    vector<long long unsigned int> tnr2000Distances(trips.size());
+    double tnr2000Time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr2000Graph, tnr2000Distances);
+
+    delete tnr2000Graph;
+
+    IntegerCorrectnessValidator::validateVerbose(tnr500Distances, tnr1000Distances);
+    IntegerCorrectnessValidator::validateVerbose(tnr500Distances, tnr2000Distances);
+
+    printf("TNR with  500 transit nodes time: %lf (%lf for one query)\n", tnr500Time, tnr500Time/trips.size());
+    printf("TNR with 1000 transit nodes time: %lf (%lf for one query)\n", tnr1000Time, tnr1000Time/trips.size());
+    printf("TNR with 2000 transit nodes time: %lf (%lf for one query)\n", tnr2000Time, tnr2000Time/trips.size());
+
+
+
+}
+
+//______________________________________________________________________________________________________________________
+void memoryUsageOfDijkstra() {
+    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    delete dijkstraGraph;
+}
+
+//______________________________________________________________________________________________________________________
+void memoryUsageOfCH() {
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    delete ch;
+}
+
+//______________________________________________________________________________________________________________________
+void memoryUsageOfTNR() {
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
+
+    delete tnrGraph;
+}
+
+//______________________________________________________________________________________________________________________
+void memoryUsageOfDM() {
+    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+
+    delete distanceMatrix;
 }
 
 // Auxiliary function currently used for debug purposes. Prints the real distance from source to access node, between
@@ -361,7 +439,8 @@ void getCHPathForTrip(unsigned int tripNum) {
 // returns different distances than for example Dijkstra.
 //______________________________________________________________________________________________________________________
 void getTNRPathForTrip(unsigned int tripNum) {
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000.tnrg");
+    //TNRGLoader tnrLoader = TNRGLoader("/home/xenty/sum/2019/ContractionHierarchies/contraction-hierarchies/input/Prague_map_1000_newFilter_500nodes.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_n2000_debug.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNR();
 
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
@@ -409,17 +488,23 @@ void validateCHPaths() {
 int main(int argc, char * argv[]) {
     //createTNR();
     //compareMethods();
-    compareFourMethods();
+    //compareFourMethods();
     //compareCHandTNR();
+    //compareVariousTransitSetSizes();
+
+    //memoryUsageOfDijkstra();
+    //memoryUsageOfCH();
+    //memoryUsageOfTNR();
+    memoryUsageOfDM();
 
     //createDM();
 
     //createCH();
     //validateCHPaths();
-    //getDijkstraPathForTrip(2114);
-    //getCHPathForTrip(2114);
+    //getDijkstraPathForTrip(172);
+    //getCHPathForTrip(172);
     //checkDijkstraDistances(23993, 18595, 22059, 23696);
-    //getTNRPathForTrip(2114);
+    //getTNRPathForTrip(172);
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);
