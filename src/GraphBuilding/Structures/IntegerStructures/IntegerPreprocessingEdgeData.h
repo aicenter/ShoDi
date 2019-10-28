@@ -12,6 +12,7 @@
 class IntegerPreprocessingEdgeData {
 public:
     IntegerPreprocessingEdgeData(const long long unsigned int b, const unsigned int c, const bool d);
+    IntegerPreprocessingEdgeData(const IntegerPreprocessingEdgeData & data);
     long long unsigned int weight;
     unsigned int middleNode;
     bool isShortcut;

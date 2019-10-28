@@ -9,18 +9,21 @@
 #include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h"
 #include "../CH/Integer/IntegerCHDistanceQueryManager.h"
 #include "../CH/Integer/IntegerCHPathQueryManager.h"
+#include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.h"
+#include "../GraphBuilding/Structures/IntegerStructures/SimpleEdge.h"
 
 // This class handles Path queries over the TNR data structure (that means queries where we are interested in the actual
 // shortest path and not just the shortest distance).
 //______________________________________________________________________________________________________________________
 class TNRPathQueryManager {
 public:
-    TNRPathQueryManager(TransitNodeRoutingGraph & graph);
+    TNRPathQueryManager(TransitNodeRoutingGraphForPathQueries & graph);
     unsigned int findDistance(const unsigned int source, const unsigned int target);
+    unsigned int findPath(const unsigned int source, const unsigned int target, vector<SimpleEdge> & path);
     unsigned int quickFindDistance(const unsigned int source, const unsigned int target);
 private:
-    TransitNodeRoutingGraph & graph;
-    IntegerCHDistanceQueryManager fallbackCHmanager;
+    TransitNodeRoutingGraphForPathQueries & graph;
+    IntegerCHPathQueryManager fallbackCHmanager;
 };
 
 

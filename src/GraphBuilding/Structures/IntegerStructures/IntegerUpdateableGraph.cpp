@@ -65,6 +65,11 @@ const unsigned int IntegerUpdateableGraph::nodes() const {
 }
 
 //______________________________________________________________________________________________________________________
+bool IntegerUpdateableGraph::isShortcut(const unsigned int from, const unsigned int to) {
+    return followingNodes[from].at(to).isShortcut;
+}
+
+//______________________________________________________________________________________________________________________
 const unordered_map<unsigned int, long long unsigned int> & IntegerUpdateableGraph::incomingEdges(const unsigned int x)const {
     return previousNodes.at(x);
 }
@@ -184,7 +189,7 @@ void IntegerUpdateableGraph::flushTerminator(ostream & output) {
 
 //______________________________________________________________________________________________________________________
 void IntegerUpdateableGraph::prepareEdgesForFlushing(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts) {
-    for(unsigned int i = 0; i < followingNodes.size(); i++) {
+   for(unsigned int i = 0; i < followingNodes.size(); i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
@@ -212,5 +217,46 @@ void IntegerUpdateableGraph::prepareEdgesForFlushing(vector < IntegerOutputEdge 
                 }
             }
         }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerUpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts) {
+    vector<pair<pair<unsigned int, unsigned int>, IntegerPreprocessingEdgeData>> removedEdges;
+
+    for(unsigned int i = 0; i < followingNodes.size(); i++) {
+        for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
+            if (ranks[i] < ranks[(*iter).first]) {
+                unsigned int flags = 1;
+                if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight && followingNodes[(*iter).first].at(i).middleNode == (*iter).second.middleNode) {
+                    flags += 2;
+                    removedEdges.push_back(make_pair(make_pair((*iter).first, i), IntegerPreprocessingEdgeData(followingNodes[(*iter).first].at(i))));
+                    followingNodes[(*iter).first].erase(i);
+                }
+                if ((*iter).second.isShortcut) {
+                    flags += 4;
+                    shortcuts.push_back(IntegerOutputShortcutEdge(i, (*iter).first, (*iter).second.weight, flags, (*iter).second.middleNode));
+                } else {
+                    edges.push_back(IntegerOutputEdge(i, (*iter).first, (*iter).second.weight, flags));
+                }
+            } else {
+                unsigned int flags = 2;
+                if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight && followingNodes[(*iter).first].at(i).middleNode == (*iter).second.middleNode) {
+                    flags += 1;
+                    removedEdges.push_back(make_pair(make_pair((*iter).first, i), IntegerPreprocessingEdgeData(followingNodes[(*iter).first].at(i))));
+                    followingNodes[(*iter).first].erase(i);
+                }
+                if ((*iter).second.isShortcut) {
+                    flags += 4;
+                    shortcuts.push_back(IntegerOutputShortcutEdge((*iter).first, i, (*iter).second.weight, flags, (*iter).second.middleNode));
+                } else {
+                    edges.push_back(IntegerOutputEdge((*iter).first, i, (*iter).second.weight, flags));
+                }
+            }
+        }
+    }
+
+    for(unsigned int i = 0; i < removedEdges.size(); i++) {
+        followingNodes[removedEdges[i].first.first].insert(make_pair(removedEdges[i].first.second, IntegerPreprocessingEdgeData(removedEdges[i].second)));
     }
 }

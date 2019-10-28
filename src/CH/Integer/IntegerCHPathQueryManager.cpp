@@ -201,6 +201,15 @@ long long unsigned int IntegerCHPathQueryManager::findDistanceOutputPath(const u
     return distance;
 }
 
+//______________________________________________________________________________________________________________________
+long long unsigned int IntegerCHPathQueryManager::findDistanceOnly(const unsigned int source, const unsigned int target) {
+    long long unsigned int distance = processQuery(source, target);
+
+    prepareStructuresForNextQuery();
+
+    return distance;
+}
+
 // Finds the path, returns the distance, and additionally fills the vector 'edges' with all pairs of 'source->target'
 // edges in the original graph (in order as they appear on the path). The vector 'edgeLengths' is filled with respective
 // lengths of the edges in the original graph.
@@ -226,6 +235,29 @@ long long unsigned int IntegerCHPathQueryManager::findPath(const unsigned int so
     prepareStructuresForNextQuery();
 
     return distance;
+}
+
+// Finds the path, returns the distance, and additionally fills the vector 'edges' with all pairs of 'source->target'
+// edges in the original graph (in order as they appear on the path).
+//______________________________________________________________________________________________________________________
+long long unsigned int IntegerCHPathQueryManager::findPath(const unsigned int source, const unsigned int target, vector<SimpleEdge> & path) {
+    long long unsigned int distance = processQuery(source, target);
+
+    fillPathInfoEdgesOnly(meetingNode, path);
+
+    prepareStructuresForNextQuery();
+
+    return distance;
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::printEdgesForwardShortcut(const unsigned int source, const unsigned int target) {
+    unpackForwardEdge(source, target);
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::printEdgesBackwardShortcut(const unsigned int source, const unsigned int target) {
+    unpackBackwardEdge(source, target);
 }
 
 // Code for stalling a node in the forward distance. We try to stall additional nodes using BFS as long as we don't
@@ -378,6 +410,20 @@ void IntegerCHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meeting
 }
 
 //______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, vector<SimpleEdge> & edges) {
+    if (meetingNode == UINT_MAX) {
+        return;
+    }
+
+    vector<pair<unsigned int, unsigned int> > fromPath;
+    vector<pair<unsigned int, unsigned int> > toPath;
+    fillFromPath(meetingNode, fromPath);
+    fillToPath(meetingNode, toPath);
+    getPreviousPathPartEdgesOnly(fromPath, edges);
+    getFollowingPathPartEdgesOnly(toPath, edges);
+}
+
+//______________________________________________________________________________________________________________________
 void IntegerCHPathQueryManager::fillFromPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & fromPath) {
     unsigned int current = meetingNode;
     while(graph.getForwardPrev(current) != UINT_MAX) {
@@ -434,6 +480,20 @@ void IntegerCHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigne
 void IntegerCHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & toPath, vector<pair<unsigned int, unsigned int>> & edges) {
     for(unsigned int i = 0; i < toPath.size(); i++) {
         getBackwardEdgeWithoutLength(toPath[i].first, toPath[i].second, edges);
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<SimpleEdge> & path) {
+    for(int i = fromPath.size()-1; i >= 0; i--) {
+        getForwardEdgeWithoutLength(fromPath[i].first, fromPath[i].second, path);
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & toPath, vector<SimpleEdge> & path) {
+    for(unsigned int i = 0; i < toPath.size(); i++) {
+        getBackwardEdgeWithoutLength(toPath[i].first, toPath[i].second, path);
     }
 }
 
@@ -545,4 +605,40 @@ void IntegerCHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, uns
 
     getBackwardEdgeWithoutLength(s, m, edges);
     getForwardEdgeWithoutLength(m, t, edges);
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<SimpleEdge> & path) {
+    unsigned int m;
+    if (graph.data(s).rank < graph.data(t).rank) {
+        m = graph.getMiddleNode(s, t, FORWARD);
+    } else {
+        m = graph.getMiddleNode(t, s, FORWARD);
+    }
+
+    if (m == UINT_MAX) {
+        path.push_back(SimpleEdge(s, t));
+        return;
+    }
+
+    getBackwardEdgeWithoutLength(s, m, path);
+    getForwardEdgeWithoutLength(m, t, path);
+}
+
+//______________________________________________________________________________________________________________________
+void IntegerCHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<SimpleEdge> & path) {
+    unsigned int m;
+    if (graph.data(s).rank < graph.data(t).rank) {
+        m = graph.getMiddleNode(s, t, BACKWARD);
+    } else {
+        m = graph.getMiddleNode(t, s, BACKWARD);
+    }
+
+    if (m == UINT_MAX) {
+        path.push_back(SimpleEdge(s, t));
+        return;
+    }
+
+    getBackwardEdgeWithoutLength(s, m, path);
+    getForwardEdgeWithoutLength(m, t, path);
 }

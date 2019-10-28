@@ -15,7 +15,7 @@ TNRGLoader::TNRGLoader(string inputFile) : inputFile(inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph * TNRGLoader::loadTNR() {
+TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
     ifstream input;
     input.open(this->inputFile, ios::binary);
     if( ! input.is_open() ) {
@@ -31,7 +31,39 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNR() {
     parseFirstLine(input, nodes, edges, tnodesAmount);
 
     TransitNodeRoutingGraph * graph = new TransitNodeRoutingGraph(nodes, tnodesAmount);
-    parseEdges(input, *graph, edges);
+    parseEdgesForDistanceQueries(input, *graph, edges);
+    parseRanks(input, *graph, nodes);
+    parseTransitNodesMapping(input, *graph, tnodesAmount);
+    parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
+    parseAccessNodes(input, *graph, nodes);
+    parseSearchSpaces(input, *graph, nodes);
+
+    graphLoadTimer.finish();
+    graphLoadTimer.printMeasuredTime();
+
+    input.close();
+
+    return graph;
+}
+
+//______________________________________________________________________________________________________________________
+TransitNodeRoutingGraphForPathQueries * TNRGLoader::loadTNRforPathQueries() {
+    ifstream input;
+    input.open(this->inputFile, ios::binary);
+    if( ! input.is_open() ) {
+        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+    }
+
+    printf("Started loading graph!\n");
+
+    Timer graphLoadTimer("TNR Graph loading");
+    graphLoadTimer.begin();
+
+    unsigned int nodes, edges, tnodesAmount;
+    parseFirstLine(input, nodes, edges, tnodesAmount);
+
+    TransitNodeRoutingGraphForPathQueries * graph = new TransitNodeRoutingGraphForPathQueries(nodes, tnodesAmount);
+    parseEdgesForPathQueries(input, *graph, edges);
     parseRanks(input, *graph, nodes);
     parseTransitNodesMapping(input, *graph, tnodesAmount);
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
@@ -66,9 +98,9 @@ void TNRGLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseEdges(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges) {
+void TNRGLoader::parseEdgesForDistanceQueries(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges) {
     unsigned int from, to, weight;
-    bool forward, backward;
+    bool forward, backward, fwShortcutFlag, bwShortcutFlag;
 
     for(unsigned int i = 0; i < edges; i++) {
         input.read ((char *) &from, sizeof(from));
@@ -76,7 +108,32 @@ void TNRGLoader::parseEdges(ifstream & input, TransitNodeRoutingGraph & graph, u
         input.read ((char *) &weight, sizeof(weight));
         input.read ((char *) &forward, sizeof(forward));
         input.read ((char *) &backward, sizeof(backward));
+        input.read ((char *) &fwShortcutFlag, sizeof(fwShortcutFlag));
+        input.read ((char *) &bwShortcutFlag, sizeof(bwShortcutFlag));
         graph.addEdge(from, to, weight, forward, backward);
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int edges) {
+    unsigned int from, to, weight;
+    bool forward, backward, fwShortcutFlag, bwShortcutFlag;
+
+    for(unsigned int i = 0; i < edges; i++) {
+        input.read ((char *) &from, sizeof(from));
+        input.read ((char *) &to, sizeof(to));
+        input.read ((char *) &weight, sizeof(weight));
+        input.read ((char *) &forward, sizeof(forward));
+        input.read ((char *) &backward, sizeof(backward));
+        input.read ((char *) &fwShortcutFlag, sizeof(fwShortcutFlag));
+        input.read ((char *) &bwShortcutFlag, sizeof(bwShortcutFlag));
+        graph.addEdge(from, to, weight, forward, backward);
+        if(forward && !fwShortcutFlag) {
+            graph.addUnpackingEdge(from, to, weight);
+        }
+        if (backward && !bwShortcutFlag) {
+            graph.addUnpackingEdge(to, from, weight);
+        }
     }
 }
 
@@ -130,6 +187,72 @@ void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraph & gr
 
 //______________________________________________________________________________________________________________________
 void TNRGLoader::parseSearchSpaces(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
+    for(unsigned int i = 0; i < nodes; i++) {
+        unsigned int fwSearchSpaceSize, bwSearchSpaceSize, searchSpaceNode;
+        input.read((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
+        for(unsigned int j = 0; j < fwSearchSpaceSize; j++) {
+            input.read((char *) &searchSpaceNode, sizeof(searchSpaceNode));
+            graph.addForwardSearchSpaceNode(i, searchSpaceNode);
+        }
+
+        input.read((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
+        for(unsigned int j = 0; j < bwSearchSpaceSize; j++) {
+            input.read((char *) &searchSpaceNode, sizeof(searchSpaceNode));
+            graph.addBackwardSearchSpaceNode(i, searchSpaceNode);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
+    unsigned int rank;
+    for(unsigned int i = 0; i < nodes; i++) {
+        input.read ((char*) &rank, sizeof(rank));
+        graph.data(i).rank = rank;
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int tnodesAmount) {
+    unsigned int originalID;
+    for(unsigned int i = 0; i < tnodesAmount; i++) {
+        input.read ((char*) &originalID, sizeof(originalID));
+        graph.addMappingPair(originalID, i);
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseTransitNodesDistanceTable(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int tnodesAmount) {
+    unsigned int value;
+    for(unsigned int i = 0; i < tnodesAmount; i++) {
+        for(unsigned int j = 0; j < tnodesAmount; j++) {
+            input.read ((char*) &value, sizeof(value));
+            graph.setDistanceTableValue(i, j, value);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
+    unsigned int forwardNodes, backwardNodes, nodeID, nodeDistance;
+    for(unsigned int i = 0; i < nodes; i++) {
+        input.read ((char *) &forwardNodes, sizeof(forwardNodes));
+        for(unsigned int j = 0; j < forwardNodes; j++) {
+            input.read ((char *) &nodeID, sizeof(nodeID));
+            input.read ((char *) &nodeDistance, sizeof(nodeDistance));
+            graph.addForwardAccessNode(i, nodeID, nodeDistance);
+        }
+        input.read ((char *) &backwardNodes, sizeof(backwardNodes));
+        for(unsigned int j = 0; j < backwardNodes; j++) {
+            input.read ((char *) &nodeID, sizeof(nodeID));
+            input.read ((char *) &nodeDistance, sizeof(nodeDistance));
+            graph.addBackwardAccessNode(i, nodeID, nodeDistance);
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRGLoader::parseSearchSpaces(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int fwSearchSpaceSize, bwSearchSpaceSize, searchSpaceNode;
         input.read((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));

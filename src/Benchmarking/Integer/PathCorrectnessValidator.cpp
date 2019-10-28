@@ -1,65 +1,111 @@
 //
 // Author: Xenty (Michal Cvach)
-// Created on: 20.08.19
+// Created on: 28.10.19
 //
 
 #include "PathCorrectnessValidator.h"
-#include "../../CH/Integer/IntegerCHPathQueryManager.h"
+#include "../../GraphBuilding/Structures/IntegerStructures/SimpleEdge.h"
+#include "../../Timer/Timer.h"
 
-// Gets a vector of trips (pairs of source target queries), for each query it finds a path using Contraction Hierarchies
-// and then validates if the path exists in the original graph. The amount of wrong paths is counted. This does not
-// check if the returned distances are correct, only validates if the paths exist (those paths can still be suboptimal).
-// With that in mind, this should be always used after we are sure that the returned distances are correct, for example
-// by validating those using the 'IntegerCorrectnessValidator' to compare the distances with the distances computed
-// by Dijkstra.
 //______________________________________________________________________________________________________________________
-void PathCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned int, unsigned int > > & trips, IntegerFlagsGraphWithUnpackingData & chGraph, IntegerGraph & originalGraph) {
-    IntegerCHPathQueryManager qm(chGraph);
-
-    unsigned int pathMismatches = 0;
-    unsigned int distanceSumMismatches = 0;
+void PathCorrectnessValidator::validateTNRPaths(IntegerGraph * originalGraph, TNRPathQueryManager & tnrQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
     for(unsigned int i = 0; i < trips.size(); i++) {
-        vector < pair < unsigned int, unsigned int > > path;
-        vector < unsigned int > distances;
-        long long unsigned int reportedDistance = qm.findPath(trips[i].first, trips[i].second, path, distances);
+        vector<SimpleEdge> path;
+        unsigned int distance = tnrQueryManager.findPath(trips[i].first, trips[i].second, path);
 
+        /*printf("Path for trip %u:\n", i);
         for(unsigned int j = 0; j < path.size(); j++) {
-            unsigned int curSource = path[j].first;
-            vector<pair<unsigned int, long long unsigned int>> neighbours = originalGraph.outgoingEdges(curSource);
+            printf("%u -> %u\n", path[j].from, path[j].to);
+        }*/
 
-            bool found = false;
-            for(unsigned int k = 0; k < neighbours.size(); k++) {
-                if (neighbours[k].first == path[j].second) {
-                    found = true;
-                    if (neighbours[k].second != distances[j]) {
-                        printf("Found mismatch in trip '%u': length of edge '%u -> %u' reported by CH was %u, actual length is %llu.\n", i, curSource, path[j].second, distances[j], neighbours[k].second);
-                        pathMismatches++;
-                    }
-                    break;
-                }
-            }
-
-            if(! found) {
-                printf("Found mismatch in trip '%u': CH reported edge '%u -> %u' which doesn't exist in the original graph.\n", i, curSource, path[j].second);
-                pathMismatches++;
-                break;
-            }
-
+        if(validatePath(originalGraph, distance, path) == false) {
+            printf("Path returned by TNR for trip %u is not valid!\n", i);
+            return;
         }
-
-        long long unsigned int sumDistance = 0;
-        for(unsigned int j = 0; j < distances.size(); j++) {
-            sumDistance += distances[j];
-        }
-
-        if (sumDistance != reportedDistance && reportedDistance != ULLONG_MAX) {
-            printf("Found mismatch in trip '%u': Reported distance was %llu while the sum of all the reported edges was %llu\n", i, reportedDistance, sumDistance);
-            distanceSumMismatches++;
-        }
-
     }
 
-    printf("Finished paths validation.\n"
-           "Found %u path mismatches (%f %%)\n"
-           "Found %u distance sum mismatches (%f %%)\n", pathMismatches, (double) pathMismatches / trips.size() * 100, distanceSumMismatches, (double) distanceSumMismatches / trips.size() * 100);
+    printf("Validated %lu trips. All paths computed by TNR were valid in the original graph.\n", trips.size());
+
+    Timer pathQueriesTimer = Timer("TNR path queries");
+    pathQueriesTimer.begin();
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        vector<SimpleEdge> path;
+        tnrQueryManager.findPath(trips[i].first, trips[i].second, path);
+    }
+
+    pathQueriesTimer.finish();
+    double time = pathQueriesTimer.getMeasuredTimeInSeconds();
+    printf("Performed %lu path queries using TNR in time %f (sec).\n", trips.size(), time);
+    printf("This means one query took %f (sec).\n", time / trips.size());
+}
+
+//______________________________________________________________________________________________________________________
+void PathCorrectnessValidator::validateCHPaths(IntegerGraph * originalGraph, IntegerCHPathQueryManager & chQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        vector<SimpleEdge> path;
+        unsigned int distance = chQueryManager.findPath(trips[i].first, trips[i].second, path);
+
+        /*printf("Path for trip %u:\n", i);
+        for(unsigned int j = 0; j < path.size(); j++) {
+            printf("%u -> %u\n", path[j].from, path[j].to);
+        }*/
+
+        if(validatePath(originalGraph, distance, path) == false) {
+            printf("Path returned by CH for trip %u is not valid!\n", i);
+            return;
+        }
+    }
+
+    printf("Validated %lu trips. All paths computed by CH were valid in the original graph.\n", trips.size());
+
+    Timer pathQueriesTimer = Timer("CH path queries");
+    pathQueriesTimer.begin();
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        vector<SimpleEdge> path;
+        chQueryManager.findPath(trips[i].first, trips[i].second, path);
+    }
+
+    pathQueriesTimer.finish();
+    double time = pathQueriesTimer.getMeasuredTimeInSeconds();
+    printf("Performed %lu path queries using CH in time %f (sec).\n", trips.size(), time);
+    printf("This means one query took %f (sec).\n", time / trips.size());
+}
+
+//______________________________________________________________________________________________________________________
+bool PathCorrectnessValidator::validatePath(IntegerGraph * originalGraph, const unsigned int distance, vector<SimpleEdge> & tnrPath) {
+    if (distance == UINT_MAX && tnrPath.empty()) {
+        return true;
+    }
+
+    unsigned int edgesDistance = 0;
+    for(unsigned int i = 0; i < tnrPath.size(); i++) {
+        unsigned int iDistance = checkIfEdgeExists(tnrPath[i].from, tnrPath[i].to, originalGraph);
+        if (iDistance == UINT_MAX) {
+            printf("Path returned by TNR contains edge '%u -> %u' which does not exist in the original graph.\n", tnrPath[i].from, tnrPath[i].to);
+            return false;
+        }
+        edgesDistance += iDistance;
+    }
+
+    if(edgesDistance != distance) {
+        printf("Sum of edge weights of the path returned by TNR does not match the distance returned by TNR.\n");
+        printf("Returned distance: %u, sum of weights: %u\n", distance, edgesDistance);
+        return false;
+    }
+
+    return true;
+}
+
+//______________________________________________________________________________________________________________________
+unsigned int PathCorrectnessValidator::checkIfEdgeExists(const unsigned int from, const unsigned int to, IntegerGraph * originalGraph) {
+    const vector<pair<unsigned int, long long unsigned int>> & edges = originalGraph->outgoingEdges(from);
+    for(unsigned int i = 0; i < edges.size(); i++) {
+        if(edges[i].first == to) {
+            return edges[i].second;
+        }
+    }
+
+    return UINT_MAX;
 }

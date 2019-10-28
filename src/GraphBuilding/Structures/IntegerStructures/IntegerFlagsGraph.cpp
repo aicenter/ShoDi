@@ -27,7 +27,7 @@ IntegerFlagsGraph::IntegerFlagsGraph(IntegerUpdateableGraph & g) {
 
     vector < IntegerOutputEdge > edges;
     vector < IntegerOutputShortcutEdge > shortcuts;
-    g.prepareEdgesForFlushing(edges, shortcuts);
+    g.prepareEdgesForFlushingWithReinsert(edges, shortcuts);
 
     processOriginalEdges(edges);
     processShortcuts(shortcuts);

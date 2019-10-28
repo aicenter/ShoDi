@@ -96,6 +96,22 @@ void TNRPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & gr
         output.write((char *) &weight, sizeof(weight));
         output.write((char *) &allEdges[i].second.forward, sizeof(allEdges[i].second.forward));
         output.write((char *) &allEdges[i].second.backward, sizeof(allEdges[i].second.backward));
+        bool t = true;
+        bool f = false;
+        //printf("Check forward shortcut.\n");
+        printf("Check forward shortcut. (%u -> %u, fwflag: %u)\n", allEdges[i].first, allEdges[i].second.targetNode, allEdges[i].second.forward);
+        if (allEdges[i].second.forward && graph.isShortcut(allEdges[i].first, allEdges[i].second.targetNode)) {
+            output.write((char *) &t, sizeof(t));
+        } else {
+            output.write((char *) &f, sizeof(f));
+        }
+
+        printf("Check backward shortcut. (%u -> %u, bwflag: %u)\n", allEdges[i].second.targetNode, allEdges[i].first, allEdges[i].second.backward);
+        if (allEdges[i].second.backward && graph.isShortcut(allEdges[i].second.targetNode, allEdges[i].first)) {
+            output.write((char *) &t, sizeof(t));
+        } else {
+            output.write((char *) &f, sizeof(f));
+        }
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {

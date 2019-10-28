@@ -31,12 +31,14 @@ protected:
     vector< unsigned int > ranks;
 public:
     void prepareEdgesForFlushing(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts);
+    void prepareEdgesForFlushingWithReinsert(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts);
     IntegerUpdateableGraph(unsigned int n);
     void flushInDdsgFormat(string filePath);
     bool addEdge(unsigned int from, unsigned int to, long long unsigned int weight);
     bool addShortcutEdge(unsigned int from, unsigned int to, long long unsigned int weight, unsigned int middlenode);
     void removeEdge(unsigned int from, unsigned int to);
     void setRank(unsigned int node, unsigned int rank);
+    bool isShortcut(const unsigned int from, const unsigned int to);
     void getNodesWithHighestRank(vector< unsigned int > & highestNodes, unsigned int requestedAmount);
     const unsigned int getRank(unsigned int nodeID) const;
     const unsigned int nodes() const;

@@ -84,8 +84,12 @@ add_library(contractionHierarchies SHARED
         src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/SimpleEdge.cpp
+        src/GraphBuilding/Structures/IntegerStructures/SimpleEdge.h
         src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.cpp
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointSimpleGraph.cpp
@@ -134,8 +138,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/Benchmarking/Integer/IntegerDijkstraBenchmark.cpp
         src/Benchmarking/Integer/IntegerCorrectnessValidator.h
         src/Benchmarking/Integer/IntegerCorrectnessValidator.cpp
-        src/Benchmarking/Integer/PathCorrectnessValidator.h
-        src/Benchmarking/Integer/PathCorrectnessValidator.cpp
+        src/Benchmarking/Integer/DistanceCorrectnessValidator.h
+        src/Benchmarking/Integer/DistanceCorrectnessValidator.cpp
         src/CH/Generic/Structures/CHNode.cpp
         src/CH/Generic/Structures/CHNode.h
         src/CH/Generic/Structures/CHpriorityQueue.cpp
@@ -210,8 +214,12 @@ add_executable(contractionHierarchiesPreprocessor
         src/GraphBuilding/Structures/IntegerStructures/IntegerSimpleGraph.h
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/SimpleEdge.cpp
+        src/GraphBuilding/Structures/IntegerStructures/SimpleEdge.h
         src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.cpp
         src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.cpp
+        src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.cpp
         src/GraphBuilding/Structures/FloatingPointStructures/FPointGraph.h
         src/GraphBuilding/Structures/FloatingPointStructures/FPointSimpleGraph.cpp
@@ -242,4 +250,4 @@ add_executable(contractionHierarchiesPreprocessor
         src/Timer/Timer.h
         src/TNR/TNRPathQueryManager.cpp
         src/TNR/TNRPathQueryManager.h
-        src/main.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.h)
+        src/main.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.h src/Benchmarking/Integer/PathCorrectnessValidator.cpp src/Benchmarking/Integer/PathCorrectnessValidator.h)
