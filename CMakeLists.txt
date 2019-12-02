@@ -258,4 +258,6 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNRAF/TNRAFPreprocessor.h
         src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
         src/TNRAF/Structures/AccessNodeDataArcFlags.h
+        src/TNRAF/Structures/RegionsStructure.cpp
+        src/TNRAF/Structures/RegionsStructure.h
         src/main.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.h src/Benchmarking/Integer/PathCorrectnessValidator.cpp src/Benchmarking/Integer/PathCorrectnessValidator.h)

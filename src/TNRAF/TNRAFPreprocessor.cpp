@@ -11,7 +11,6 @@
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
 #include "../Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
-#include "Structures/RegionsStructure.h"
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, IntegerGraph & originalGraph, string outputPath, unsigned int transitNodesAmount, unsigned int regionsCnt) {
@@ -23,7 +22,8 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
     IntegerFlagsGraph chGraph(graph);
     IntegerCHDistanceQueryManager qm(chGraph);
     vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
-    for(unsigned int i = 0; i < transitNodesAmount; i++) {
+    computeTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount, originalGraph);
+    /*for(unsigned int i = 0; i < transitNodesAmount; i++) {
         if(i % 100 == 0) {
             cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
         }
@@ -34,11 +34,11 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
                 transitNodesDistanceTable[i][j] = qm.findDistance(transitNodes[i], transitNodes[j]);
             }
         }
-    }
+    }*/
 
     cout << "Generating regions for the nodes" << endl;
     //vector<unsigned int> clusters(originalGraph.nodes());
-    RegionsStructure regions(regionsCnt);
+    RegionsStructure regions(graph.nodes(), regionsCnt);
     generateClustering(originalGraph, regions, regionsCnt);
 
     cout << "Computing access nodes" << endl;
@@ -52,9 +52,12 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, originalGraph, clusters, regionsCnt);
-        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, originalGraph, clusters, regionsCnt);
-        cout << "Computed forward and backward access nodes for node " << i << endl;
+        if(i % 100 == 0) {
+            cout << "Computed access nodes for '" << i << "' transit nodes." << endl;
+        }
+
+        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, originalGraph, regions);
+        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, originalGraph, regions);
     }
 
     /*cout << "Computing locality filter" << endl;
@@ -64,13 +67,29 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
     vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
-    outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount, clusters, regionsCnt);
+    outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount, regions, regionsCnt);
+}
+
+//______________________________________________________________________________________________________________________
+void
+TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, IntegerGraph & originalGraph) {
+    for(unsigned int i = 0; i < transitNodesCnt; i++) {
+        if(i % 100 == 0) {
+            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
+        }
+
+        vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
+        BasicIntegerDijkstra::computeOneToAllDistances(transitNodes[i], originalGraph, distancesFromNodeI);
+        for(unsigned int j = 0; j < transitNodesCnt; j++) {
+            distanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
+        }
+    }
 }
 
 // Outputs the created Transit Node Routing data-structure with all the information required for the query algorithm
 // into a binary file.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & graph, vector < pair < unsigned int, IntegerQueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes, vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount, vector<unsigned int> & regions, unsigned int regionsCnt) {
+void TNRAFPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & graph, vector < pair < unsigned int, IntegerQueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes, vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount, RegionsStructure & regions, unsigned int regionsCnt) {
     cout << "Outputting TNR" << endl;
     ofstream output;
     output.open ( outputPath + ".tgaf", ios::binary );
@@ -127,7 +146,8 @@ void TNRAFPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & 
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-       output.write((char *) &regions[i], sizeof(regions[i]));
+        unsigned int region = regions.getRegion(i);
+       output.write((char *) &region, sizeof(region));
     }
 
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
@@ -212,7 +232,7 @@ void TNRAFPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & 
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
 // some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph, IntegerGraph & originalGraph, vector<unsigned int> & clusters, unsigned int regionsCnt) {
+void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph, IntegerGraph & originalGraph, RegionsStructure & regions) {
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> forwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -278,17 +298,17 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
         }
 
         if (validAccessNode) {
-            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regionsCnt));
+            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
         }
 
     }
 
-    computeForwardArcFlags(source, accessNodes, originalGraph, clusters, regionsCnt);
+    computeForwardArcFlags(source, accessNodes, originalGraph, regions);
 
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, vector<unsigned int> & clusters, unsigned int regionsCnt) {
+void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, RegionsStructure & regions) {
     vector<unsigned int> distancesFromNode(originalGraph.nodes());
     BasicIntegerDijkstra::computeOneToAllDistances(node, originalGraph, distancesFromNode);
     for(unsigned int i = 0; i < accessNodes.size(); i++) {
@@ -296,20 +316,13 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
         unsigned int accessNode = accessNodes[i].accessNodeID;
         BasicIntegerDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
         unsigned int distanceToAccessNode = distancesFromAccessNode[node];
-        unsigned int j;
-        for(j = 0; j < min(node, accessNode); j++) { // FIXME: This could be sped up by having a structure containing clusters with their respective nodes. You could then for each cluster go over the nodes to find the first one for which the condition is true, without checking the other ones.
-            if (distancesFromNode[j] == distancesFromAccessNode[j] + distanceToAccessNode) {
-                accessNodes[i].regionFlags[clusters[j]] = true;
-            }
-        }
-        for(j = min(node, accessNode) + 1; j < max(node, accessNode); j++) {
-            if (distancesFromNode[j] == distancesFromAccessNode[j] + distanceToAccessNode) {
-                accessNodes[i].regionFlags[clusters[j]] = true;
-            }
-        }
-        for(j = max(node, accessNode) + 1; j < originalGraph.nodes(); j++) {
-            if (distancesFromNode[j] == distancesFromAccessNode[j] + distanceToAccessNode) {
-                accessNodes[i].regionFlags[clusters[j]] = true;
+        for(unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+            vector < unsigned int > & nodesInRegion = regions.nodesInRegion(j);
+            for(unsigned int k = 0; k < nodesInRegion.size(); k++) {
+                if(distancesFromNode[nodesInRegion[k]] == distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
+                    accessNodes[i].regionFlags[j] = true;
+                    break;
+                }
             }
         }
     }
@@ -319,7 +332,7 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
 // some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph, IntegerGraph & originalGraph, vector<unsigned int> & clusters, unsigned int regionsCnt) {
+void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph, IntegerGraph & originalGraph, RegionsStructure & regions) {
     auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -386,17 +399,17 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
         }
 
         if (validAccessNode) {
-            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regionsCnt));
+            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
         }
 
     }
 
-    computeBackwardArcFlags(source, accessNodes, originalGraph, clusters, regionsCnt);
+    computeBackwardArcFlags(source, accessNodes, originalGraph, regions);
 
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, vector<unsigned int> & clusters, unsigned int regionsCnt) {
+void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, RegionsStructure & regions) {
     vector<unsigned int> distancesFromNode(originalGraph.nodes());
     BasicIntegerDijkstra::computeOneToAllDistancesInReversedGraph(node, originalGraph, distancesFromNode);
     for(unsigned int i = 0; i < accessNodes.size(); i++) {
@@ -404,20 +417,13 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
         unsigned int accessNode = accessNodes[i].accessNodeID;
         BasicIntegerDijkstra::computeOneToAllDistancesInReversedGraph(accessNode, originalGraph, distancesFromAccessNode);
         unsigned int distanceToAccessNode = distancesFromAccessNode[node];
-        unsigned int j;
-        for(j = 0; j < min(node, accessNode); j++) { // FIXME: This could be sped up by having a structure containing clusters with their respective nodes. You could then for each cluster go over the nodes to find the first one for which the condition is true, without checking the other ones.
-            if (distancesFromNode[j] == distancesFromAccessNode[j] + distanceToAccessNode) {
-                accessNodes[i].regionFlags[clusters[j]] = true;
-            }
-        }
-        for(j = min(node, accessNode) + 1; j < max(node, accessNode); j++) {
-            if (distancesFromNode[j] == distancesFromAccessNode[j] + distanceToAccessNode) {
-                accessNodes[i].regionFlags[clusters[j]] = true;
-            }
-        }
-        for(j = max(node, accessNode) + 1; j < originalGraph.nodes(); j++) {
-            if (distancesFromNode[j] == distancesFromAccessNode[j] + distanceToAccessNode) {
-                accessNodes[i].regionFlags[clusters[j]] = true;
+        for(unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+            vector < unsigned int > & nodesInRegion = regions.nodesInRegion(j);
+            for(unsigned int k = 0; k < nodesInRegion.size(); k++) {
+                if(distancesFromNode[nodesInRegion[k]] == distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
+                    accessNodes[i].regionFlags[j] = true;
+                    break;
+                }
             }
         }
     }
@@ -425,9 +431,9 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
 
 // Completely random clustering just for testing purposes. FIXME
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::CnNgenerateClustering(IntegerGraph & originalGraph, vector<unsigned int> & clusters, unsigned int clustersCnt) {
+void TNRAFPreprocessor::generateClustering(IntegerGraph & originalGraph, RegionsStructure & regions, unsigned int clustersCnt) {
     for(unsigned int i = 0; i < originalGraph.nodes(); i++) {
-        clusters[i] = i % clustersCnt;
+        regions.addNode(i, i % clustersCnt);
     }
 }
 
