@@ -121,3 +121,65 @@ void BasicIntegerDijkstra::outputPath(const unsigned int x, const long long unsi
     printf("~~~ End of path ~~~\n");
 
 }
+
+//______________________________________________________________________________________________________________________
+void BasicIntegerDijkstra::computeOneToAllDistances(const unsigned int source, const IntegerGraph & graph, vector<unsigned int> & distances) {
+    unsigned int n = graph.nodes();
+
+    for(unsigned int i = 0; i < n; i++) {
+        distances[i] = UINT_MAX;
+    }
+
+    distances[source] = 0;
+
+    auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> q(cmp);
+    q.push(IntegerDijkstraNode(source, 0));
+
+    while(! q.empty() ) {
+        const IntegerDijkstraNode current = q.top();
+
+        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
+            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            if (newDistance < distances[neighbours.at(i).first]) {
+                distances[neighbours.at(i).first] = newDistance;
+                q.push(IntegerDijkstraNode(neighbours.at(i).first, newDistance));
+            }
+        }
+
+        q.pop();
+
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void BasicIntegerDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int source, const IntegerGraph & graph, vector<unsigned int> & distances) {
+    unsigned int n = graph.nodes();
+
+    for(unsigned int i = 0; i < n; i++) {
+        distances[i] = UINT_MAX;
+    }
+
+    distances[source] = 0;
+
+    auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> q(cmp);
+    q.push(IntegerDijkstraNode(source, 0));
+
+    while(! q.empty() ) {
+        const IntegerDijkstraNode current = q.top();
+
+        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(current.ID);
+        for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
+            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            if (newDistance < distances[neighbours.at(i).first]) {
+                distances[neighbours.at(i).first] = newDistance;
+                q.push(IntegerDijkstraNode(neighbours.at(i).first, newDistance));
+            }
+        }
+
+        q.pop();
+
+    }
+}

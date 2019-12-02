@@ -18,7 +18,7 @@ public:
     TNRDistanceQueryManager(TransitNodeRoutingGraph & graph);
     unsigned int findDistance(const unsigned int source, const unsigned int target);
     void printQueriesAnalysis();
-private:
+protected:
     TransitNodeRoutingGraph & graph;
     IntegerCHDistanceQueryManager fallbackCHmanager;
     unsigned int globalQueries;

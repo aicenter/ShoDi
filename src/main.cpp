@@ -19,6 +19,7 @@
 #include "CH/Integer/IntegerCHPreprocessor.h"
 #include "CH/FloatingPoint/FPointCHPreprocessor.h"
 #include "TNR/TNRPreprocessor.h"
+#include "TNRAF/TNRAFPreprocessor.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
 #include "GraphBuilding/Loaders/DDSGLoader.h"
 #include "Benchmarking/Integer/IntegerCHBenchmark.h"
@@ -133,6 +134,26 @@ void createTNR() {
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
     TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_n500_unpack", 500);
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
+// Creates a TNR structure based on the given XenGraph file.
+//______________________________________________________________________________________________________________________
+void createTNRAF() {
+    Timer timer("Whole TNR AF construction timer");
+    timer.begin();
+
+    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    IntegerGraph * originalGraph = graph->createCopy();
+    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n500_unpack", 500);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -528,13 +549,14 @@ void validateCHPaths() {
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     //createTNR();
+    createTNRAF();
     //compareMethods();
     //compareFourMethods();
     //compareCHandTNR();
     //compareVariousTransitSetSizes();
 
     //validateCHPathCorectness();
-    validateTNRPathCorectness();
+    //validateTNRPathCorectness();
 
     //memoryUsageOfDijkstra();
     //memoryUsageOfCH();

@@ -11,6 +11,7 @@
 #include "IntegerPreprocessingEdgeData.h"
 #include "IntegerOutputEdge.h"
 #include "IntegerOutputShortcutEdge.h"
+#include "IntegerGraph.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ protected:
     vector< unordered_map < unsigned int, long long unsigned int > > previousNodes;
     vector< unsigned int > ranks;
 public:
+    IntegerGraph * createCopy();
     void prepareEdgesForFlushing(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts);
     void prepareEdgesForFlushingWithReinsert(vector < IntegerOutputEdge > & edges, vector < IntegerOutputShortcutEdge > & shortcuts);
     IntegerUpdateableGraph(unsigned int n);

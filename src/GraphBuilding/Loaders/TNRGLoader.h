@@ -17,7 +17,7 @@ using namespace std;
 // probably change it to some binary format instead later.
 //______________________________________________________________________________________________________________________
 class TNRGLoader {
-private:
+protected:
     void parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount);
     void parseEdgesForDistanceQueries(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges);
     void parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int edges);

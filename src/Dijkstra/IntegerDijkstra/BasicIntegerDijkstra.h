@@ -15,6 +15,9 @@ class BasicIntegerDijkstra {
 public:
     static long long unsigned int run(const unsigned int source, const unsigned int target, const IntegerGraph & graph);
     static long long unsigned int runWithPathOutput(const unsigned int source, const unsigned int target, const IntegerGraph & graph);
+    static void computeOneToAllDistances(const unsigned int source, const IntegerGraph & graph, vector<unsigned int> & distances);
+    static void computeOneToAllDistancesInReversedGraph(const unsigned int source, const IntegerGraph & graph, vector<unsigned int> & distances);
+
 private:
     static void outputPath(const unsigned int x, const long long unsigned int * dist, const vector < vector < unsigned int > > & prev);
 };

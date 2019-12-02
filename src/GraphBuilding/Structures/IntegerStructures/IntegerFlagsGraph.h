@@ -35,7 +35,7 @@ public:
     void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
     const vector< IntegerQueryEdge > & nextNodes(const unsigned int x)const;
-    IntegerNodeData & data(unsigned int node);
+    virtual IntegerNodeData & data(unsigned int node);
     void resetForwardInfo(const unsigned int node);
     void resetBackwardInfo(const unsigned int node);
     void resetForwardStall(const unsigned int node);

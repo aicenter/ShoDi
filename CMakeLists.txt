@@ -116,6 +116,10 @@ add_library(contractionHierarchies SHARED
         src/TNR/Structures/AccessNodeData.h
         src/TNR/TNRDistanceQueryManager.cpp
         src/TNR/TNRDistanceQueryManager.h
+        src/TNRAF/TNRAFPreprocessor.cpp
+        src/TNRAF/TNRAFPreprocessor.h
+        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+        src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/Timer/Timer.cpp
         src/Timer/Timer.h
         src/GraphBuilding/Structures/constants_defines.h
@@ -125,7 +129,7 @@ add_library(contractionHierarchies SHARED
         src/DistanceMatrix/IntegerDistanceMatrix.h
         src/DistanceMatrix/IntegerDistanceMatrixComputor.cpp
         src/DistanceMatrix/IntegerDistanceMatrixComputor.h
-        )
+        src/GraphBuilding/Loaders/TGAFLoader.cpp src/GraphBuilding/Loaders/TGAFLoader.h src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.cpp src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.h src/TNRAF/Structures/IntegerNodeDataRegions.cpp src/TNRAF/Structures/IntegerNodeDataRegions.h src/TNRAF/TNRAFPathQueryManager.cpp src/TNRAF/TNRAFPathQueryManager.h src/TNRAF/TNRAFDistanceQueryManager.cpp src/TNRAF/TNRAFDistanceQueryManager.h src/TNRAF/Structures/RegionsStructure.cpp src/TNRAF/Structures/RegionsStructure.h)
 
 add_executable(contractionHierarchiesPreprocessor
         src/Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.cpp
@@ -250,4 +254,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/Timer/Timer.h
         src/TNR/TNRPathQueryManager.cpp
         src/TNR/TNRPathQueryManager.h
+        src/TNRAF/TNRAFPreprocessor.cpp
+        src/TNRAF/TNRAFPreprocessor.h
+        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+        src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/main.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.h src/Benchmarking/Integer/PathCorrectnessValidator.cpp src/Benchmarking/Integer/PathCorrectnessValidator.h)

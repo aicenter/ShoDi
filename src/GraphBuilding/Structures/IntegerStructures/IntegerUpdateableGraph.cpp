@@ -6,6 +6,19 @@
 #include <fstream>
 #include "IntegerUpdateableGraph.h"
 
+//______________________________________________________________________________________________________________________
+IntegerGraph * IntegerUpdateableGraph::createCopy() {
+    unsigned int n = nodes();
+    IntegerGraph * newInst = new IntegerGraph(n);
+    for (unsigned int i = 0; i < n; i++) {
+        for (auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
+            unsigned int target = (*iter).first;
+            long long unsigned int weight = (*iter).second.weight;
+            newInst->addEdge(i, target, weight);
+        }
+    }
+    return newInst;
+}
 
 //______________________________________________________________________________________________________________________
 IntegerUpdateableGraph::IntegerUpdateableGraph(unsigned int n) {
