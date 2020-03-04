@@ -129,6 +129,7 @@ add_library(contractionHierarchies SHARED
         src/DistanceMatrix/IntegerDistanceMatrix.h
         src/DistanceMatrix/IntegerDistanceMatrixComputor.cpp
         src/DistanceMatrix/IntegerDistanceMatrixComputor.h
+        src/Benchmarking/Integer/TNRAFBenchmark.cpp src/Benchmarking/Integer/TNRAFBenchmark.h
         src/GraphBuilding/Loaders/TGAFLoader.cpp src/GraphBuilding/Loaders/TGAFLoader.h src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.cpp src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.h src/TNRAF/Structures/IntegerNodeDataRegions.cpp src/TNRAF/Structures/IntegerNodeDataRegions.h src/TNRAF/TNRAFPathQueryManager.cpp src/TNRAF/TNRAFPathQueryManager.h src/TNRAF/TNRAFDistanceQueryManager.cpp src/TNRAF/TNRAFDistanceQueryManager.h src/TNRAF/Structures/RegionsStructure.cpp src/TNRAF/Structures/RegionsStructure.h)
 
 add_executable(contractionHierarchiesPreprocessor
@@ -260,4 +261,5 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
-        src/main.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.h src/Benchmarking/Integer/PathCorrectnessValidator.cpp src/Benchmarking/Integer/PathCorrectnessValidator.h)
+        src/main.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.cpp src/Benchmarking/Integer/DistanceMatrixBenchmark.h src/Benchmarking/Integer/PathCorrectnessValidator.cpp src/Benchmarking/Integer/PathCorrectnessValidator.h src/Benchmarking/Integer/TNRAFBenchmark.cpp src/Benchmarking/Integer/TNRAFBenchmark.h
+        src/GraphBuilding/Loaders/TGAFLoader.cpp src/GraphBuilding/Loaders/TGAFLoader.h src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.cpp src/GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.h src/TNRAF/Structures/IntegerNodeDataRegions.cpp src/TNRAF/Structures/IntegerNodeDataRegions.h src/TNRAF/TNRAFPathQueryManager.cpp src/TNRAF/TNRAFPathQueryManager.h src/TNRAF/TNRAFDistanceQueryManager.cpp src/TNRAF/TNRAFDistanceQueryManager.h src/TNRAF/Structures/RegionsStructure.cpp src/TNRAF/Structures/RegionsStructure.h)

@@ -7,6 +7,7 @@
 #define CONTRACTION_HIERARCHIES_INTEGERDISTANCEMATRIXCOMPUTOR_H
 
 #include "../GraphBuilding/Structures/IntegerStructures/IntegerGraph.h"
+#include "IntegerDistanceMatrix.h"
 
 using namespace std;
 
@@ -20,9 +21,11 @@ using namespace std;
 class IntegerDistanceMatrixComputor {
 public:
     void computeDistanceMatrix(const IntegerGraph & graph);
+    void computeDistanceMatrixInReversedGraph(const IntegerGraph & graph);
     void outputDistanceMatrixToFile(string path);
+    IntegerDistanceMatrix * getDistanceMatrixInstance();
 private:
-    void fillDistanceMatrixRow(const unsigned int rowID, const IntegerGraph & graph);
+    void fillDistanceMatrixRow(const unsigned int rowID, const IntegerGraph & graph, bool useReversedGraph = false);
     vector<vector<unsigned int>> distanceTable;
 };
 

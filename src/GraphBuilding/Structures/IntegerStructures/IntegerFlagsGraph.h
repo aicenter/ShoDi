@@ -36,10 +36,10 @@ public:
     const unsigned int nodes() const;
     const vector< IntegerQueryEdge > & nextNodes(const unsigned int x)const;
     virtual IntegerNodeData & data(unsigned int node);
-    void resetForwardInfo(const unsigned int node);
-    void resetBackwardInfo(const unsigned int node);
-    void resetForwardStall(const unsigned int node);
-    void resetBackwardStall(const unsigned int node);
+    virtual void resetForwardInfo(const unsigned int node);
+    virtual void resetBackwardInfo(const unsigned int node);
+    virtual void resetForwardStall(const unsigned int node);
+    virtual void resetBackwardStall(const unsigned int node);
 };
 
 

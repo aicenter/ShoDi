@@ -26,6 +26,7 @@
 #include "Benchmarking/Integer/IntegerDijkstraBenchmark.h"
 #include "Benchmarking/Integer/IntegerCorrectnessValidator.h"
 #include "Benchmarking/Integer/TNRBenchmark.h"
+#include "Benchmarking/Integer/TNRAFBenchmark.h"
 #include "Benchmarking/Integer/DistanceCorrectnessValidator.h"
 #include "Benchmarking/Integer/PathCorrectnessValidator.h"
 #include "CH/Integer/IntegerCHPathQueryManager.h"
@@ -34,6 +35,8 @@
 #include "DistanceMatrix/IntegerDistanceMatrixComputor.h"
 #include "GraphBuilding/Loaders/IntegerDistanceMatrixLoader.h"
 #include "Benchmarking/Integer/DistanceMatrixBenchmark.h"
+#include "GraphBuilding/Loaders/TGAFLoader.h"
+#include "TNRAF/TNRAFDistanceQueryManager.h"
 
 
 using namespace std;
@@ -141,6 +144,25 @@ void createTNR() {
     delete graph;
 }
 
+//______________________________________________________________________________________________________________________
+void createTNRwithValidation() {
+    Timer timer("Whole TNR construction timer");
+    timer.begin();
+
+    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    IntegerGraph * originalGraph = graph->createCopy();
+    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+
+    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n500_DM_mar", 500);
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
 // Creates a TNR structure based on the given XenGraph file.
 //______________________________________________________________________________________________________________________
 void createTNRAF() {
@@ -153,7 +175,7 @@ void createTNRAF() {
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n500_unpack", 500);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n500_useDM_mar", 500, 32, true);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -299,8 +321,8 @@ void compareFourMethods() {
 // Compares the running times of Contraction Hierarchies and Transit Node Routing on a given set of trips (queries).
 //______________________________________________________________________________________________________________________
 void compareCHandTNR() {
-    //TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
-    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
@@ -312,7 +334,8 @@ void compareCHandTNR() {
 
     delete ch;
 
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_n2000_debug.tnrg");
+    //TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_unpack.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -322,6 +345,36 @@ void compareCHandTNR() {
     printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
 
     delete tnrGraph;
+
+}
+
+//______________________________________________________________________________________________________________________
+void compareTNRandTNRAF() {
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    //TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_unpack.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_DM_mar.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    vector<long long unsigned int> tnrDistances(trips.size());
+    double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
+
+    delete tnrGraph;
+
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    vector<long long unsigned int> tnrafDistances(trips.size());
+    double tnrafTime = TNRAFBenchmark::runAndMeasureOutputAndRetval(trips, *tnrafGraph, tnrafDistances);
+
+    delete tnrafGraph;
+
+    IntegerCorrectnessValidator::validateVerbose(tnrDistances, tnrafDistances);
+    printf("TNR with Arc Flags was %lf times faster than basic TNR!\n", tnrTime/tnrafTime);
+
 
 }
 
@@ -434,9 +487,26 @@ void memoryUsageOfTNR() {
 }
 
 //______________________________________________________________________________________________________________________
+void memoryUsageOfTNRAF() {
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_feb_v2.tgaf");
+    TransitNodeRoutingGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    delete tnrafGraph;
+}
+
+//______________________________________________________________________________________________________________________
 void memoryUsageOfDM() {
     IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
     IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+
+    delete distanceMatrix;
+}
+
+//______________________________________________________________________________________________________________________
+void checkDMBigValues() {
+    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+    distanceMatrix -> printInfo();
 
     delete distanceMatrix;
 }
@@ -518,6 +588,46 @@ void getTNRPathForTrip(unsigned int tripNum) {
 
 }
 
+//______________________________________________________________________________________________________________________
+void computeTNRAFPathForTrip(unsigned int tripNum, unsigned int expectedDistance) {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    TNRAFDistanceQueryManager queryManager(*tnrafGraph);
+
+    unsigned int distance = queryManager.findDistance(trips[tripNum].first, trips[tripNum].second);
+    printf("Returned distance: %u\n", distance);
+    printf("Expected distance was: %u\n", expectedDistance);
+
+    delete tnrafGraph;
+}
+
+//______________________________________________________________________________________________________________________
+void computeTNRAFPath3Times(unsigned int tripNum, unsigned int expectedDistance) {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    TNRAFDistanceQueryManager queryManager(*tnrafGraph);
+
+    unsigned int distance = queryManager.findDistance(trips[tripNum].first, trips[tripNum].second);
+    printf("1st try: Returned distance: %u\n", distance);
+    distance = queryManager.findDistance(trips[tripNum].first, trips[tripNum].second);
+    printf("2nd try: Returned distance: %u\n", distance);
+    distance = queryManager.findDistance(trips[tripNum].first, trips[tripNum].second);
+    printf("3rd try: Returned distance: %u\n", distance);
+    printf("Expected distance was: %u\n", expectedDistance);
+
+    delete tnrafGraph;
+}
+
 // This function runs Contraction Hierarchies on a given set of path queries. Each returned path is validated in order
 // to check if the paths actually exists in the original graph. This ensures that the unpacking routine for the path
 // queries in Contraction Hierarchies works correctly and only valid paths are returned.
@@ -545,23 +655,43 @@ void validateCHPaths() {
     delete dijkstraGraph;
 }
 
+//______________________________________________________________________________________________________________________
+void validateTNRAccessNodes() {
+    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_unpack.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    tnrGraph->accessNodesTest(*distanceMatrix);
+
+    delete distanceMatrix;
+    delete tnrGraph;
+}
+
 // Simple main function parsing the command line input and invoking the relevant functions if needed.
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     //createTNR();
-    createTNRAF();
+    //createTNRwithValidation();
+    //createTNRAF();
     //compareMethods();
     //compareFourMethods();
     //compareCHandTNR();
+    compareTNRandTNRAF();
     //compareVariousTransitSetSizes();
 
     //validateCHPathCorectness();
     //validateTNRPathCorectness();
+    //validateTNRAccessNodes();
 
     //memoryUsageOfDijkstra();
     //memoryUsageOfCH();
     //memoryUsageOfTNR();
+    //memoryUsageOfTNRAF();
     //memoryUsageOfDM();
+
+    //checkDMBigValues();
 
     //createDM();
 
@@ -571,6 +701,12 @@ int main(int argc, char * argv[]) {
     //getCHPathForTrip(172);
     //checkDijkstraDistances(23993, 18595, 22059, 23696);
     //getTNRPathForTrip(0);
+    //computeTNRAFPathForTrip(4939, 649324);
+    //computeTNRAFPathForTrip(4369, 692498);
+    //computeTNRAFPathForTrip(4510, 494056);
+    //computeTNRAFPath3Times(4369, 692498);
+    //computeTNRAFPath3Times(4510, 494056);
+    //computeTNRAFPath3Times(4939, 649324);
 
     /*if (argc != 6) {
         printUsageInfo(argv[0]);

@@ -32,7 +32,7 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
 
     TransitNodeRoutingGraph * graph = new TransitNodeRoutingGraph(nodes, tnodesAmount);
     parseEdgesForDistanceQueries(input, *graph, edges);
-    parseRanks(input, *graph, nodes);
+    parseRanks(input, graph, nodes);
     parseTransitNodesMapping(input, *graph, tnodesAmount);
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
     parseAccessNodes(input, *graph, nodes);
@@ -138,11 +138,11 @@ void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGr
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
+void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraph * graph, unsigned int nodes) {
     unsigned int rank;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &rank, sizeof(rank));
-        graph.data(i).rank = rank;
+        graph->data(i).rank = rank;
     }
 }
 

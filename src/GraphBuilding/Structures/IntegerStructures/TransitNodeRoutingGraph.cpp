@@ -83,3 +83,20 @@ void TransitNodeRoutingGraph::addForwardSearchSpaceNode(unsigned int sourceNode,
 void TransitNodeRoutingGraph::addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
     backwardSearchSpaces[sourceNode].push_back(searchSpaceNode);
 }
+
+//______________________________________________________________________________________________________________________
+void TransitNodeRoutingGraph::accessNodesTest(IntegerDistanceMatrix & dm) {
+    unsigned int allAccessNodes = 0;
+    unsigned int invalidDistanceNodes = 0;
+
+    for(unsigned int i = 0; i < forwardAccessNodes.size(); ++i) {
+        for(unsigned int j = 0; j < forwardAccessNodes[i].size(); ++j) {
+            allAccessNodes++;
+            if(forwardAccessNodes[i][j].distanceToNode != dm.findDistance(i, forwardAccessNodes[i][j].accessNodeID)) {
+                invalidDistanceNodes++;
+            }
+        }
+    }
+
+    printf("There are %u out of %u access nodes that have invalid distances. This means %lf %%.\n", invalidDistanceNodes, allAccessNodes, ((double) invalidDistanceNodes / allAccessNodes) * 100);
+}

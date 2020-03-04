@@ -9,6 +9,7 @@
 
 #include "IntegerFlagsGraph.h"
 #include "../../../TNR/Structures/AccessNodeData.h"
+#include "../../../DistanceMatrix/IntegerDistanceMatrix.h"
 
 // A Transit Node Routing data-structure. This basically contains all data required for the TNR queries. For non-local
 // queries, this structure contains the distance table for transit nodes, access nodes for all nodes, and also the
@@ -27,6 +28,7 @@ public:
     void addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
     void addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
     void addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
+    void accessNodesTest(IntegerDistanceMatrix & dm);
 protected:
     vector < vector < AccessNodeData > > forwardAccessNodes;
     vector < vector < AccessNodeData > > backwardAccessNodes;

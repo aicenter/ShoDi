@@ -22,6 +22,7 @@ public:
     IntegerDistanceMatrix(const unsigned int nodes);
     unsigned int findDistance(const unsigned int source, const unsigned int target);
     void setDistance(unsigned int source, unsigned int target, unsigned int distance);
+    void printInfo();
 private:
     vector<vector<unsigned int>> distances;
 };

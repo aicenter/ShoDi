@@ -24,11 +24,24 @@ void IntegerDistanceMatrixComputor::computeDistanceMatrix(const IntegerGraph & g
     }
 }
 
+//______________________________________________________________________________________________________________________
+void IntegerDistanceMatrixComputor::computeDistanceMatrixInReversedGraph(const IntegerGraph & graph) {
+    unsigned int nodesCnt = graph.nodes();
+    distanceTable.resize(nodesCnt, vector<unsigned int>(nodesCnt));
+
+    for(unsigned int i = 0; i < nodesCnt; i++) {
+        if (i % 1000 == 0) {
+            printf("Computed %u rows of the distance matrix.\n", i);
+        }
+        fillDistanceMatrixRow(i, graph, true);
+    }
+}
+
 // This function will compute one row of the full distance matrix. This is done by running a simple Dijkstra from the
 // node corresponding to the row, which is not stopped until all reachable nodes have been visited. The distances
 // to all the other nodes found by this Dijkstra run are then used as values for the row.
 //______________________________________________________________________________________________________________________
-void IntegerDistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int rowID, const IntegerGraph & graph) {
+void IntegerDistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int rowID, const IntegerGraph & graph, bool useReversedGraph) {
     unsigned int n = graph.nodes();
     unsigned int * distance = new unsigned int[n];
 
@@ -45,12 +58,23 @@ void IntegerDistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int row
     while(! q.empty() ) {
         const IntegerDijkstraNode current = q.top();
 
-        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
-        for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
-            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
-            if (newDistance < distance[neighbours.at(i).first]) {
-                distance[neighbours.at(i).first] = newDistance;
-                q.push(IntegerDijkstraNode(neighbours.at(i).first, newDistance));
+        if (useReversedGraph) {
+            const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(current.ID);
+            for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
+                long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+                if (newDistance < distance[neighbours.at(i).first]) {
+                    distance[neighbours.at(i).first] = newDistance;
+                    q.push(IntegerDijkstraNode(neighbours.at(i).first, newDistance));
+                }
+            }
+        } else {
+            const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+            for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
+                long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+                if (newDistance < distance[neighbours.at(i).first]) {
+                    distance[neighbours.at(i).first] = newDistance;
+                    q.push(IntegerDijkstraNode(neighbours.at(i).first, newDistance));
+                }
             }
         }
 
@@ -96,4 +120,16 @@ void IntegerDistanceMatrixComputor::outputDistanceMatrixToFile(string path) {
     }
 
     output.close();
+}
+
+//______________________________________________________________________________________________________________________
+IntegerDistanceMatrix * IntegerDistanceMatrixComputor::getDistanceMatrixInstance() {
+    unsigned int n = distanceTable.size();
+    IntegerDistanceMatrix * retval = new IntegerDistanceMatrix(n);
+    for(unsigned int i = 0; i < n; ++i) {
+        for(unsigned int j = 0; j < n; ++j) {
+            retval->setDistance(i, j, distanceTable[i][j]);
+        }
+    }
+    return retval;
 }

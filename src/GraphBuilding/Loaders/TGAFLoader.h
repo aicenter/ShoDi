@@ -17,9 +17,10 @@ public:
     TransitNodeRoutingArcFlagsGraph * loadTNRAFforDistanceQueries();
 protected:
     void parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount, unsigned int & regionsCnt);
+    void parseRanks(ifstream & input, TransitNodeRoutingArcFlagsGraph * graph, unsigned int nodes);
     void parseRegions(ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes);
     void parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes, unsigned int regionsCnt);
-}
+};
 
 
 #endif //CONTRACTION_HIERARCHIES_TGAFLOADER_H

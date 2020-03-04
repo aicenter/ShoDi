@@ -4,13 +4,16 @@
 //
 
 #include <climits>
+#include <iostream>
 #include "TransitNodeRoutingArcFlagsGraph.h"
 #include "../../../TNRAF/Structures/AccessNodeDataArcFlags.h"
 
-TransitNodeRoutingArcFlagsGraph::TransitNodeRoutingArcFlagsGraph(unsigned int nodes, unsigned int transitNodesAmount) : TransitNodeRoutingGraph(nodes, transitNodesAmount) {
+//______________________________________________________________________________________________________________________
+TransitNodeRoutingArcFlagsGraph::TransitNodeRoutingArcFlagsGraph(unsigned int nodes, unsigned int transitNodesAmount) : TransitNodeRoutingGraph(nodes, transitNodesAmount), forwardAccessNodes(nodes), backwardAccessNodes(nodes), nodesData(nodes) {
 
 }
 
+//______________________________________________________________________________________________________________________
 IntegerNodeDataRegions & TransitNodeRoutingArcFlagsGraph::data(unsigned int node) {
     return nodesData[node];
 }
@@ -28,11 +31,23 @@ void TransitNodeRoutingArcFlagsGraph::addBackwardAccessNode(unsigned int node, u
 //______________________________________________________________________________________________________________________
 unsigned int TransitNodeRoutingArcFlagsGraph::findTNRAFDistance(unsigned int source, unsigned int target) {
     unsigned int shortestDistance = UINT_MAX;
-    unsigned int sourceRegion = regions[source];
-    unsigned int targetRegion = regions[target];
+    unsigned int sourceRegion = nodesData[source].region;
+    unsigned int targetRegion = nodesData[target].region;
 
     //printf("Finding shortest distance between '%u' (rank: %u, %lu access nodes) and '%u' (rank: %u, %lu access nodes) via TNR.\n", source, data(source).rank, forwardAccessNodes[source].size(), target, data(target).rank, backwardAccessNodes[target].size());
     for(unsigned int i = 0; i < forwardAccessNodes[source].size(); i++) {
+
+        // FIXME only debug print
+        /*printf("Access node %u - ID: %u, distance: %u, region flag to source: ", i,
+                forwardAccessNodes[source][i].accessNodeID,
+                forwardAccessNodes[source][i].distanceToNode);
+        cout << forwardAccessNodes[source][i].regionFlags[sourceRegion] << endl << "Region flags:";
+        for(unsigned int q = 0; q < forwardAccessNodes[source][i].regionFlags.size(); q++) {
+            cout << " " << forwardAccessNodes[source][i].regionFlags[q];
+        }
+        printf("\n");*/
+        // end of FIXME
+
         if (forwardAccessNodes[source][i].regionFlags[targetRegion]) {
             for (unsigned int j = 0; j < backwardAccessNodes[target].size(); j++) {
                 if (backwardAccessNodes[target][j].regionFlags[sourceRegion]) {
@@ -51,4 +66,23 @@ unsigned int TransitNodeRoutingArcFlagsGraph::findTNRAFDistance(unsigned int sou
     }
 
     return shortestDistance;
+}
+
+// FIXME: Trying this for debug purposes.
+
+//______________________________________________________________________________________________________________________
+void TransitNodeRoutingArcFlagsGraph::resetForwardInfo(const unsigned int node) {
+    //printf("TransitNodeRoutingArcFlagsGraph resetForwardInfo was called.\n");
+    nodesData[node].forwardDist = ULLONG_MAX;
+    nodesData[node].forwardSettled = false;
+    nodesData[node].forwardReached = false;
+}
+
+
+//______________________________________________________________________________________________________________________
+void TransitNodeRoutingArcFlagsGraph::resetBackwardInfo(const unsigned int node) {
+    //printf("TransitNodeRoutingArcFlagsGraph resetBackwardInfo was called.\n");
+    nodesData[node].backwardDist = ULLONG_MAX;
+    nodesData[node].backwardSettled = false;
+    nodesData[node].backwardReached = false;
 }

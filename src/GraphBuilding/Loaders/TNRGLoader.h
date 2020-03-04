@@ -21,7 +21,7 @@ protected:
     void parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount);
     void parseEdgesForDistanceQueries(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges);
     void parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int edges);
-    void parseRanks(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes);
+    void parseRanks(ifstream & input, TransitNodeRoutingGraph * graph, unsigned int nodes);
     void parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount);
     void parseTransitNodesDistanceTable(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount);
     void parseAccessNodes(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes);
