@@ -7,6 +7,7 @@
 #define CONTRACTION_HIERARCHIES_TNRAFPREPROCESSOR_H
 
 
+#include <queue>
 #include "../TNR/TNRPreprocessor.h"
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "Structures/RegionsStructure.h"
@@ -28,6 +29,7 @@ protected:
     static void computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix);
     static void computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix);
     static void generateClustering(IntegerGraph & originalGraph, RegionsStructure & regions, unsigned int clustersCnt);
+    static const unsigned int getNewNodeForCluster( vector < unsigned int > & assignedClusters, queue < unsigned int > & q);
     static void initPowersOf2(vector<uint32_t> & powersOf2);
     static IntegerDistanceMatrix * distanceMatrix;
 
@@ -39,6 +41,7 @@ protected:
     static long long unsigned int triedCombinations;
     static unsigned int incorrectANdistances;
     static unsigned int ANdistances;
+    static unsigned int clusteringSkips;
 };
 
 

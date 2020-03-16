@@ -155,7 +155,7 @@ void createTNRwithValidation() {
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n500_DM_mar", 500);
+    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n2000_DM_mar", 2000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -175,7 +175,7 @@ void createTNRAF() {
     IntegerCHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n500_useDM_mar", 500, 32, true);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n2000_useDM_mar_clust_var2", 2000, 32, true);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -335,7 +335,7 @@ void compareCHandTNR() {
     delete ch;
 
     //TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_unpack.tnrg");
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_DM_mar.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -356,7 +356,7 @@ void compareTNRandTNRAF() {
     tripsLoader.loadTrips(trips);
 
     //TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_unpack.tnrg");
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_DM_mar.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     vector<long long unsigned int> tnrDistances(trips.size());
@@ -364,7 +364,8 @@ void compareTNRandTNRAF() {
 
     delete tnrGraph;
 
-    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar.tgaf");
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n2000_useDM_mar_clust_var2.tgaf");
+    //TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar_clust_var2.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     vector<long long unsigned int> tnrafDistances(trips.size());

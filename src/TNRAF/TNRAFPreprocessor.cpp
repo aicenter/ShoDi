@@ -22,6 +22,7 @@ unsigned int TNRAFPreprocessor::uselessAccessNodes;
 long long unsigned int TNRAFPreprocessor::triedCombinations;
 unsigned int TNRAFPreprocessor::incorrectANdistances;
 unsigned int TNRAFPreprocessor::ANdistances;
+unsigned int TNRAFPreprocessor::clusteringSkips;
 IntegerDistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 
 //______________________________________________________________________________________________________________________
@@ -579,9 +580,84 @@ void TNRAFPreprocessor::generateClustering(IntegerGraph & originalGraph, Regions
     }*/
 
     // Testing dumb clustering
-    for(unsigned int i = 0; i < originalGraph.nodes(); i++) {
+    /*for(unsigned int i = 0; i < originalGraph.nodes(); i++) {
         for(unsigned int j = 0; j < clustersCnt; j++) {
             regions.addNode(i, j);
+        }
+    }*/
+
+    unsigned int nodesCnt = originalGraph.nodes();
+    unsigned int approxNodesPerCluster = nodesCnt / clustersCnt;
+    unsigned int unassignedNodes = nodesCnt - clustersCnt;
+    vector < unsigned int > assignedClusters(nodesCnt, UINT_MAX);
+    vector < queue < unsigned int > > q(clustersCnt, queue<unsigned int>());
+
+    clusteringSkips = 0;
+
+    for(unsigned int i = 0; i < clustersCnt; ++i) {
+        const unsigned int nodeID = approxNodesPerCluster * i;
+        assignedClusters[nodeID] = i;
+        const vector<pair<unsigned int, unsigned long long int>> & neighboursFW = originalGraph.outgoingEdges(nodeID);
+        for(unsigned int j = 0; j < neighboursFW.size(); ++j) {
+            q[i].push(neighboursFW[j].first);
+        }
+        const vector<pair<unsigned int, unsigned long long int>> & neighboursBW = originalGraph.incomingEdges(nodeID);
+        for(unsigned int j = 0; j < neighboursBW.size(); ++j) {
+            q[i].push(neighboursBW[j].first);
+        }
+    }
+
+    bool jumpout = false;
+    while(! jumpout) {
+        for(unsigned int i = 0; i < clustersCnt; ++i) {
+            const unsigned int newNodeForCluster = getNewNodeForCluster(assignedClusters, q[i]);
+
+            assignedClusters[newNodeForCluster] = i;
+            const vector<pair<unsigned int, unsigned long long int>> & neighboursFW = originalGraph.outgoingEdges(newNodeForCluster);
+            for(unsigned int j = 0; j < neighboursFW.size(); ++j) {
+                q[i].push(neighboursFW[j].first);
+            }
+            const vector<pair<unsigned int, unsigned long long int>> & neighboursBW = originalGraph.incomingEdges(newNodeForCluster);
+            for(unsigned int j = 0; j < neighboursBW.size(); ++j) {
+                q[i].push(neighboursBW[j].first);
+            }
+
+            unassignedNodes--;
+            if(unassignedNodes == 0) {
+                jumpout = true;
+                break;
+            }
+
+            if(unassignedNodes % 2000 == 0) {
+                printf("There are %u nodes left to be assigned to clusters.\n", unassignedNodes);
+            }
+        }
+    }
+
+    for(unsigned int i = 0; i < nodesCnt; ++i) {
+        regions.addNode(i, assignedClusters[i]);
+    }
+
+    printf("%u skips occured during the clustering process. That is %lf %% of nodes.\n", clusteringSkips, ((double) clusteringSkips / nodesCnt) * 100);
+
+}
+
+// Finds a node to add into the currently expanded cluster. First tries to get an unassigned node from the queue, if no
+// such node exists, assigns some other unassigned node.
+//______________________________________________________________________________________________________________________
+const unsigned int TNRAFPreprocessor::getNewNodeForCluster( vector < unsigned int > & assignedClusters, queue < unsigned int > & q) {
+    while(! q.empty()) {
+        unsigned int nodeID = q.front();
+        q.pop();
+        if(assignedClusters[nodeID] == UINT_MAX) {
+            return nodeID;
+        }
+    }
+
+    for(unsigned int i = 0; i < assignedClusters.size(); ++i) {
+        if(assignedClusters[i] == UINT_MAX) {
+            clusteringSkips++;
+            return i;
         }
     }
 }
