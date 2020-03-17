@@ -7,7 +7,7 @@
 #include <iostream>
 #include "TNRGLoader.h"
 #include "../../Timer/Timer.h"
-#include "../Structures/IntegerStructures/IntegerGraph.h"
+#include "../Structures/IntegerGraph.h"
 
 //______________________________________________________________________________________________________________________
 TNRGLoader::TNRGLoader(string inputFile) : inputFile(inputFile) {

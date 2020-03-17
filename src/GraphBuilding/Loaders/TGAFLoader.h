@@ -8,7 +8,7 @@
 
 
 #include "TNRGLoader.h"
-#include "../Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.h"
+#include "../Structures/TransitNodeRoutingArcFlagsGraph.h"
 
 //______________________________________________________________________________________________________________________
 class TGAFLoader : public TNRGLoader {

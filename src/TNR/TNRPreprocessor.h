@@ -7,9 +7,9 @@
 #define CONTRACTION_HIERARCHIES_TNRPREPROCESSOR_H
 
 #include <unordered_set>
-#include "../GraphBuilding/Structures/IntegerStructures/IntegerUpdateableGraph.h"
+#include "../GraphBuilding/Structures/IntegerUpdateableGraph.h"
 #include "Structures/AccessNodeData.h"
-#include "../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
+#include "../GraphBuilding/Structures/IntegerFlagsGraph.h"
 #include "../GraphBuilding/Loaders/IntegerXenGraphLoader.h"
 #include "../DistanceMatrix/IntegerDistanceMatrix.h"
 

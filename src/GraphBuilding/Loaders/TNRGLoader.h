@@ -7,8 +7,8 @@
 #define CONTRACTION_HIERARCHIES_TNRGLOADER_H
 
 #include <string>
-#include "../Structures/IntegerStructures/TransitNodeRoutingGraph.h"
-#include "../Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.h"
+#include "../Structures/TransitNodeRoutingGraph.h"
+#include "../Structures/TransitNodeRoutingGraphForPathQueries.h"
 
 using namespace std;
 

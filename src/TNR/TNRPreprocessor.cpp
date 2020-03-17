@@ -7,10 +7,10 @@
 #include <fstream>
 #include <iostream>
 #include "TNRPreprocessor.h"
-#include "../GraphBuilding/Structures/IntegerStructures/IntegerFlagsGraph.h"
-#include "../CH/Integer/IntegerCHDistanceQueryManager.h"
+#include "../GraphBuilding/Structures/IntegerFlagsGraph.h"
+#include "../CH/IntegerCHDistanceQueryManager.h"
 #include "Structures/AccessNodeData.h"
-#include "../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
+#include "../Dijkstra/IntegerDijkstraNode.h"
 #include "../DistanceMatrix/IntegerDistanceMatrix.h"
 #include "../DistanceMatrix/IntegerDistanceMatrixComputor.h"
 

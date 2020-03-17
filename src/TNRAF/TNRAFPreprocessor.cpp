@@ -7,10 +7,10 @@
 #include <climits>
 #include <fstream>
 #include "TNRAFPreprocessor.h"
-#include "../CH/Integer/IntegerCHDistanceQueryManager.h"
+#include "../CH/IntegerCHDistanceQueryManager.h"
 #include "Structures/AccessNodeDataArcFlags.h"
-#include "../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
-#include "../Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
+#include "../Dijkstra/IntegerDijkstraNode.h"
+#include "../Dijkstra/BasicIntegerDijkstra.h"
 #include "../DistanceMatrix/IntegerDistanceMatrixComputor.h"
 #include "../DistanceMatrix/IntegerDistanceMatrix.h"
 

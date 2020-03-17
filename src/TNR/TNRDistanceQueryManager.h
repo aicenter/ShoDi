@@ -7,8 +7,8 @@
 #define CONTRACTION_HIERARCHIES_TNRDISTANCEQUERYMANAGER_H
 
 
-#include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h"
-#include "../CH/Integer/IntegerCHDistanceQueryManager.h"
+#include "../GraphBuilding/Structures/TransitNodeRoutingGraph.h"
+#include "../CH/IntegerCHDistanceQueryManager.h"
 
 // This class handles distance queries over the TNR data structure (that means queries where we don't want to find the
 // actual shortest path, but instead we are only interested in its distance).

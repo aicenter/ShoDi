@@ -6,7 +6,7 @@
 #ifndef CONTRACTION_HIERARCHIES_INTEGERDISTANCEMATRIXCOMPUTOR_H
 #define CONTRACTION_HIERARCHIES_INTEGERDISTANCEMATRIXCOMPUTOR_H
 
-#include "../GraphBuilding/Structures/IntegerStructures/IntegerGraph.h"
+#include "../GraphBuilding/Structures/IntegerGraph.h"
 #include "IntegerDistanceMatrix.h"
 
 using namespace std;

@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include "TGAFLoader.h"
-#include "../Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.h"
+#include "../Structures/TransitNodeRoutingArcFlagsGraph.h"
 #include "../../Timer/Timer.h"
 #include "../../TNRAF/TNRAFPreprocessor.h"
 

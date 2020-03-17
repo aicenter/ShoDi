@@ -8,9 +8,9 @@
 
 #include <string>
 #include <map>
-#include "../Structures/IntegerStructures/IntegerGraph.h"
-#include "../Structures/IntegerStructures/IntegerSimpleGraph.h"
-#include "../Structures/IntegerStructures/IntegerUpdateableGraph.h"
+#include "../Structures/IntegerGraph.h"
+#include "../Structures/IntegerSimpleGraph.h"
+#include "../Structures/IntegerUpdateableGraph.h"
 
 // Loader used for loading integer graphs in the XenGraph format. The format is a really simple text format and is
 // described in the README.md of this project. This loader allows the loading into an IntegerGraph, which can be used

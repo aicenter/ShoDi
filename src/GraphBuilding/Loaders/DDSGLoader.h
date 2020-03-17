@@ -7,9 +7,9 @@
 #define TRANSIT_NODE_ROUTING_DDSGLOADER_H
 
 #include <string>
-#include "../Structures/IntegerStructures/IntegerGraph.h"
-#include "../Structures/IntegerStructures/IntegerFlagsGraph.h"
-#include "../Structures/IntegerStructures/IntegerFlagsGraphWithUnpackingData.h"
+#include "../Structures/IntegerGraph.h"
+#include "../Structures/IntegerFlagsGraph.h"
+#include "../Structures/IntegerFlagsGraphWithUnpackingData.h"
 
 using namespace std;
 

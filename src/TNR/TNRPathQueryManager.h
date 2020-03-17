@@ -6,11 +6,11 @@
 #ifndef CONTRACTION_HIERARCHIES_TNRPATHQUERYMANAGER_H
 #define CONTRACTION_HIERARCHIES_TNRPATHQUERYMANAGER_H
 
-#include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraph.h"
-#include "../CH/Integer/IntegerCHDistanceQueryManager.h"
-#include "../CH/Integer/IntegerCHPathQueryManager.h"
-#include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingGraphForPathQueries.h"
-#include "../GraphBuilding/Structures/IntegerStructures/SimpleEdge.h"
+#include "../GraphBuilding/Structures/TransitNodeRoutingGraph.h"
+#include "../CH/IntegerCHDistanceQueryManager.h"
+#include "../CH/IntegerCHPathQueryManager.h"
+#include "../GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.h"
+#include "../GraphBuilding/Structures/SimpleEdge.h"
 
 // This class handles Path queries over the TNR data structure (that means queries where we are interested in the actual
 // shortest path and not just the shortest distance).

@@ -6,7 +6,7 @@
 #ifndef CONTRACTION_HIERARCHIES_TNRAFDISTANCEQUERYMANAGER_H
 #define CONTRACTION_HIERARCHIES_TNRAFDISTANCEQUERYMANAGER_H
 
-#include "../GraphBuilding/Structures/IntegerStructures/TransitNodeRoutingArcFlagsGraph.h"
+#include "../GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h"
 #include "../TNR/TNRDistanceQueryManager.h"
 
 class TNRAFDistanceQueryManager {

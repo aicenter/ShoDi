@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_INTEGERNODEDATAREGIONS_H
 
 
-#include "../../CH/Integer/Structures/IntegerNodeData.h"
+#include "../../CH/Structures/IntegerNodeData.h"
 
 class IntegerNodeDataRegions : public IntegerNodeData {
 public:

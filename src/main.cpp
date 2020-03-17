@@ -12,29 +12,26 @@
 #include <iomanip>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
-#include "GraphBuilding/Loaders/FloatingPointXenGraphLoader.h"
 #include "GraphBuilding/Loaders/IntegerXenGraphLoader.h"
-#include "Benchmarking/FloatingPoint/FPointCorrectnessValidator.h"
 #include "Timer/Timer.h"
-#include "CH/Integer/IntegerCHPreprocessor.h"
-#include "CH/FloatingPoint/FPointCHPreprocessor.h"
+#include "CH/IntegerCHPreprocessor.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
 #include "GraphBuilding/Loaders/DDSGLoader.h"
-#include "Benchmarking/Integer/IntegerCHBenchmark.h"
-#include "Benchmarking/Integer/IntegerDijkstraBenchmark.h"
-#include "Benchmarking/Integer/IntegerCorrectnessValidator.h"
-#include "Benchmarking/Integer/TNRBenchmark.h"
-#include "Benchmarking/Integer/TNRAFBenchmark.h"
-#include "Benchmarking/Integer/DistanceCorrectnessValidator.h"
-#include "Benchmarking/Integer/PathCorrectnessValidator.h"
-#include "CH/Integer/IntegerCHPathQueryManager.h"
-#include "Dijkstra/IntegerDijkstra/BasicIntegerDijkstra.h"
+#include "Benchmarking/IntegerCHBenchmark.h"
+#include "Benchmarking/IntegerDijkstraBenchmark.h"
+#include "Benchmarking/IntegerCorrectnessValidator.h"
+#include "Benchmarking/TNRBenchmark.h"
+#include "Benchmarking/TNRAFBenchmark.h"
+#include "Benchmarking/DistanceCorrectnessValidator.h"
+#include "Benchmarking/PathCorrectnessValidator.h"
+#include "CH/IntegerCHPathQueryManager.h"
+#include "Dijkstra/BasicIntegerDijkstra.h"
 #include "TNR/TNRPathQueryManager.h"
 #include "DistanceMatrix/IntegerDistanceMatrixComputor.h"
 #include "GraphBuilding/Loaders/IntegerDistanceMatrixLoader.h"
-#include "Benchmarking/Integer/DistanceMatrixBenchmark.h"
+#include "Benchmarking/DistanceMatrixBenchmark.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "TNRAF/TNRAFDistanceQueryManager.h"
 
@@ -107,23 +104,7 @@ void createIntegerDIMACSHierarchy(char * inputFilePath, char * outputFilePath) {
     delete graph;
 }
 
-// Creates a floating point Contraction Hierarchy (.chf) for an input file in a XenGraph format.
-//______________________________________________________________________________________________________________________
-void createFloatingPointXenGraphHierarchy(char * inputFilePath, char * outputFilePath) {
-    Timer timer("Whole CH construction timer");
-    timer.begin();
 
-    FloatingPointXenGraphLoader graphLoader = FloatingPointXenGraphLoader(inputFilePath);
-    FPointUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    FPointCHPreprocessor::preprocessForDDSGF(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgfFormat(outputFilePath);
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
 
 // Creates a TNR structure based on the given XenGraph file.
 //______________________________________________________________________________________________________________________

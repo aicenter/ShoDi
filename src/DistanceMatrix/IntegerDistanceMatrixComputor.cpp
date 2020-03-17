@@ -7,7 +7,7 @@
 #include <fstream>
 #include <queue>
 #include "IntegerDistanceMatrixComputor.h"
-#include "../Dijkstra/IntegerDijkstra/IntegerDijkstraNode.h"
+#include "../Dijkstra/IntegerDijkstraNode.h"
 
 // This function will compute the full distance matrix for the given graph. The matrix will be stored in the instance
 // of the IntegerDistanceMatrixComputor class, so that it can be output or used further.
