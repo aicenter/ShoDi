@@ -8,7 +8,7 @@
 
 #include <utility>
 #include <vector>
-#include "../DistanceMatrix/IntegerDistanceMatrix.h"
+#include "../DistanceMatrix/DistanceMatrix.h"
 
 using namespace std;
 
@@ -16,7 +16,7 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class DistanceMatrixBenchmark {
 public:
-    static double runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, IntegerDistanceMatrix & matrix, vector < long long unsigned int > & distances);
+    static double runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, DistanceMatrix & matrix, vector < long long unsigned int > & distances);
 };
 
 

@@ -10,7 +10,7 @@
 void IntegerDistanceQueryManagerWithMappingAPI::initializeCH(string chFile, string mappingFile) {
     DDSGLoader chLoader = DDSGLoader(chFile);
     graph = chLoader.loadFlagsGraph();
-    qm = new IntegerCHDistanceQueryManagerWithMapping(*graph, mappingFile);
+    qm = new CHDistanceQueryManagerWithMapping(*graph, mappingFile);
 }
 
 //______________________________________________________________________________________________________________________

@@ -7,12 +7,12 @@
 #include <climits>
 #include <fstream>
 #include "TNRAFPreprocessor.h"
-#include "../CH/IntegerCHDistanceQueryManager.h"
+#include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeDataArcFlags.h"
-#include "../Dijkstra/IntegerDijkstraNode.h"
-#include "../Dijkstra/BasicIntegerDijkstra.h"
-#include "../DistanceMatrix/IntegerDistanceMatrixComputor.h"
-#include "../DistanceMatrix/IntegerDistanceMatrix.h"
+#include "../Dijkstra/DijkstraNode.h"
+#include "../Dijkstra/BasicDijkstra.h"
+#include "../DistanceMatrix/DistanceMatrixComputor.h"
+#include "../DistanceMatrix/DistanceMatrix.h"
 
 // FIXME debug stuff
 unsigned int TNRAFPreprocessor::totalArcFlags;
@@ -23,22 +23,22 @@ long long unsigned int TNRAFPreprocessor::triedCombinations;
 unsigned int TNRAFPreprocessor::incorrectANdistances;
 unsigned int TNRAFPreprocessor::ANdistances;
 unsigned int TNRAFPreprocessor::clusteringSkips;
-IntegerDistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
+DistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, IntegerGraph & originalGraph, string outputPath, unsigned int transitNodesAmount, unsigned int regionsCnt, bool useDistanceMatrix) {
+void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & originalGraph, string outputPath, unsigned int transitNodesAmount, unsigned int regionsCnt, bool useDistanceMatrix) {
     cout << "Getting transit nodes" << endl;
     vector<unsigned int> transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
     cout << "Computing transit nodes distance table" << endl;
-    IntegerFlagsGraph chGraph(graph);
-    IntegerCHDistanceQueryManager qm(chGraph);
+    FlagsGraph chGraph(graph);
+    CHDistanceQueryManager qm(chGraph);
     vector<vector<unsigned int> > transitNodesDistanceTable(transitNodesAmount,
                                                             vector<unsigned int>(transitNodesAmount));
     if (useDistanceMatrix) {
         cout << "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction." << endl;
-        IntegerDistanceMatrixComputor dmComputor;
+        DistanceMatrixComputor dmComputor;
         dmComputor.computeDistanceMatrix(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
         cout << "Distance matrix computed." << endl;
@@ -98,7 +98,7 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
     if(useDistanceMatrix) {
         cout << "Computing the auxiliary distance matrix for backward direction." << endl;
         delete distanceMatrix;
-        IntegerDistanceMatrixComputor dmComputor;
+        DistanceMatrixComputor dmComputor;
         dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
         cout << "Distance matrix computed." << endl;
@@ -122,21 +122,21 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
     vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
     prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);*/
 
-    vector < pair < unsigned int, IntegerQueryEdge > > allEdges;
+    vector < pair < unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
     outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount, regions, regionsCnt);
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, IntegerGraph & originalGraph) {
+void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, Graph & originalGraph) {
     for(unsigned int i = 0; i < transitNodesCnt; i++) {
         if(i % 100 == 0) {
             cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
         }
 
         vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
-        BasicIntegerDijkstra::computeOneToAllDistances(transitNodes[i], originalGraph, distancesFromNodeI);
+        BasicDijkstra::computeOneToAllDistances(transitNodes[i], originalGraph, distancesFromNodeI);
         for(unsigned int j = 0; j < transitNodesCnt; j++) {
             distanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
         }
@@ -155,7 +155,7 @@ void TNRAFPreprocessor::fillTransitNodeDistanceTable(vector<unsigned int> & tran
 // Outputs the created Transit Node Routing data-structure with all the information required for the query algorithm
 // into a binary file.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & graph, vector < pair < unsigned int, IntegerQueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes, vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount, RegionsStructure & regions, unsigned int regionsCnt) {
+void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, vector < pair < unsigned int, QueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes, vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount, RegionsStructure & regions, unsigned int regionsCnt) {
     cout << "Outputting TNR" << endl;
     ofstream output;
     output.open ( outputPath + ".tgaf", ios::binary );
@@ -307,13 +307,13 @@ void TNRAFPreprocessor::outputGraph(string outputPath, IntegerUpdateableGraph & 
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
 // some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph, IntegerGraph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
-    auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> forwardQ(cmp);
+void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
     vector<bool> settled(graph.nodes(), false);
 
-    forwardQ.push(IntegerDijkstraNode(source, 0));
+    forwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
@@ -334,7 +334,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
         } else {
             forwardSearchSpaces.push_back(curNode);
 
-            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).forward) {
@@ -351,7 +351,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
                     long long unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
-                        forwardQ.push(IntegerDijkstraNode((*iter).targetNode, newlen));
+                        forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
                     }
                 }
             }
@@ -396,7 +396,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
     if(useDistanceMatrix) {
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -430,11 +430,11 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
         }
     } else {
         vector<unsigned int> distancesFromNode(originalGraph.nodes());
-        BasicIntegerDijkstra::computeOneToAllDistances(node, originalGraph, distancesFromNode);
+        BasicDijkstra::computeOneToAllDistances(node, originalGraph, distancesFromNode);
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
             unsigned int accessNode = accessNodes[i].accessNodeID;
-            BasicIntegerDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
+            BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
             unsigned int distanceToAccessNode = distancesFromAccessNode[node];
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
@@ -456,13 +456,13 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
 // some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, IntegerFlagsGraph & graph, IntegerGraph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
-    auto cmp = [](IntegerDijkstraNode left, IntegerDijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<IntegerDijkstraNode, vector<IntegerDijkstraNode>, decltype(cmp)> backwardQ(cmp);
+void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
     vector<bool> settled(graph.nodes(), false);
 
-    backwardQ.push(IntegerDijkstraNode(source, 0));
+    backwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
@@ -483,7 +483,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
         } else {
             backwardSearchSpaces.push_back(curNode);
 
-            const vector<IntegerQueryEdge> & neighbours = graph.nextNodes(curNode);
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).backward) {
@@ -500,7 +500,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
                     long long unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
-                        backwardQ.push(IntegerDijkstraNode((*iter).targetNode, newlen));
+                        backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
                     }
                 }
             }
@@ -545,7 +545,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, IntegerGraph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
     if (useDistanceMatrix) {
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -563,12 +563,12 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
         }
     } else {
         vector<unsigned int> distancesFromNode(originalGraph.nodes());
-        BasicIntegerDijkstra::computeOneToAllDistancesInReversedGraph(node, originalGraph, distancesFromNode);
+        BasicDijkstra::computeOneToAllDistancesInReversedGraph(node, originalGraph, distancesFromNode);
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
             unsigned int accessNode = accessNodes[i].accessNodeID;
-            BasicIntegerDijkstra::computeOneToAllDistancesInReversedGraph(accessNode, originalGraph,
-                                                                          distancesFromAccessNode);
+            BasicDijkstra::computeOneToAllDistancesInReversedGraph(accessNode, originalGraph,
+                                                                   distancesFromAccessNode);
             unsigned int distanceToAccessNode = distancesFromAccessNode[node];
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
@@ -586,7 +586,7 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
 
 // Completely random clustering just for testing purposes. FIXME
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::generateClustering(IntegerGraph & originalGraph, RegionsStructure & regions, unsigned int clustersCnt) {
+void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructure & regions, unsigned int clustersCnt) {
     /*for(unsigned int i = 0; i < originalGraph.nodes(); i++) {
         regions.addNode(i, i % clustersCnt);
     }*/

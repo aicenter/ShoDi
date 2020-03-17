@@ -13,10 +13,10 @@ DIMACSLoader::DIMACSLoader(string inputFile) {
 }
 
 // Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
-// into an 'IntegerSimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct a 'IntegerGraph'
+// into an 'SimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct a 'Graph'
 // from that.
 //______________________________________________________________________________________________________________________
-IntegerGraph * DIMACSLoader::loadGraph() {
+Graph * DIMACSLoader::loadGraph() {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
@@ -25,16 +25,16 @@ IntegerGraph * DIMACSLoader::loadGraph() {
 
     printf("Started loading graph!\n");
 
-    Timer graphLoadTimer("IntegerGraph loading");
+    Timer graphLoadTimer("Graph loading");
     graphLoadTimer.begin();
 
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
 
-    IntegerSimpleGraph * graph = new IntegerSimpleGraph(nodes);
+    SimpleGraph * graph = new SimpleGraph(nodes);
     parseEdges(input, *graph, edges);
 
-    IntegerGraph * retvalGraph = new IntegerGraph(*graph);
+    Graph * retvalGraph = new Graph(*graph);
 
     delete graph;
 
@@ -47,10 +47,10 @@ IntegerGraph * DIMACSLoader::loadGraph() {
 
 }
 
-// This function is used to load the graph data into an 'IntegerUpdateableGraph' instance, which can be used for the
+// This function is used to load the graph data into an 'UpdateableGraph' instance, which can be used for the
 // preprocessing to create a Contraction Hierarchy from the input graph.
 //______________________________________________________________________________________________________________________
-IntegerUpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
+UpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
@@ -59,13 +59,13 @@ IntegerUpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
 
     printf("Started loading graph!\n");
 
-    Timer graphLoadTimer("IntegerGraph loading");
+    Timer graphLoadTimer("Graph loading");
     graphLoadTimer.begin();
 
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
 
-    IntegerUpdateableGraph * graph = new IntegerUpdateableGraph(nodes);
+    UpdateableGraph * graph = new UpdateableGraph(nodes);
     parseEdges(input, *graph, edges);
 
     graphLoadTimer.finish();
@@ -78,7 +78,7 @@ IntegerUpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
 
 // This function is used to reinsert all the original edges into the graph after the preprocessing has been finished.
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::putAllEdgesIntoUpdateableGraph(IntegerUpdateableGraph & graph) {
+void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
@@ -181,7 +181,7 @@ void DIMACSLoader::transformEdges(ifstream & input, ofstream & output, unsigned 
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(ifstream & input, IntegerSimpleGraph & graph, unsigned int edges) {
+void DIMACSLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges) {
     unsigned int loadededgescnt = 0;
     while (loadededgescnt < edges) {
         string buffer;
@@ -199,7 +199,7 @@ void DIMACSLoader::parseEdges(ifstream & input, IntegerSimpleGraph & graph, unsi
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(ifstream & input, IntegerUpdateableGraph & graph, unsigned int edges) {
+void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges) {
     unsigned int loadededgescnt = 0;
     while (loadededgescnt < edges) {
         string buffer;

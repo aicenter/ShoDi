@@ -8,7 +8,7 @@
 
 
 #include "../GraphBuilding/Structures/TransitNodeRoutingGraph.h"
-#include "../CH/IntegerCHDistanceQueryManager.h"
+#include "../CH/CHDistanceQueryManager.h"
 
 // This class handles distance queries over the TNR data structure (that means queries where we don't want to find the
 // actual shortest path, but instead we are only interested in its distance).
@@ -20,7 +20,7 @@ public:
     void printQueriesAnalysis();
 protected:
     TransitNodeRoutingGraph & graph;
-    IntegerCHDistanceQueryManager fallbackCHmanager;
+    CHDistanceQueryManager fallbackCHmanager;
     unsigned int globalQueries;
     unsigned int localQueries;
 };

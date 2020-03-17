@@ -18,16 +18,16 @@ add_library(contractionHierarchies SHARED
         src/API/FPointDistanceQueryManagerWithMappingAPI.cpp
         src/API/FPointDistanceQueryManagerWithMappingAPI.h
         src/API/CHinterface_wrap.cxx
-        src/Dijkstra/BasicIntegerDijkstra.cpp
-        src/Dijkstra/BasicIntegerDijkstra.h
+        src/Dijkstra/BasicDijkstra.cpp
+        src/Dijkstra/BasicDijkstra.h
         src/Benchmarking/TNRBenchmark.cpp
         src/Benchmarking/TNRBenchmark.h
-        src/Benchmarking/IntegerCHBenchmark.h
-        src/Benchmarking/IntegerCHBenchmark.cpp
-        src/Benchmarking/IntegerDijkstraBenchmark.h
-        src/Benchmarking/IntegerDijkstraBenchmark.cpp
-        src/Benchmarking/IntegerCorrectnessValidator.h
-        src/Benchmarking/IntegerCorrectnessValidator.cpp
+        src/Benchmarking/CHBenchmark.h
+        src/Benchmarking/CHBenchmark.cpp
+        src/Benchmarking/DijkstraBenchmark.h
+        src/Benchmarking/DijkstraBenchmark.cpp
+        src/Benchmarking/CorrectnessValidator.h
+        src/Benchmarking/CorrectnessValidator.cpp
         src/Benchmarking/DistanceCorrectnessValidator.h
         src/Benchmarking/DistanceCorrectnessValidator.cpp
         src/Benchmarking/DistanceMatrixBenchmark.cpp
@@ -42,60 +42,60 @@ add_library(contractionHierarchies SHARED
         src/CH/Structures/CHpriorityQueue.h
         src/CH/EdgeDifferenceManager.cpp
         src/CH/EdgeDifferenceManager.h
-        src/CH/Structures/IntegerHopsDijkstraNode.cpp
-        src/CH/Structures/IntegerHopsDijkstraNode.h
-        src/CH/Structures/IntegerNodeData.cpp
-        src/CH/Structures/IntegerNodeData.h
-        src/CH/IntegerCHDistanceQueryManager.cpp
-        src/CH/IntegerCHDistanceQueryManager.h
-        src/CH/IntegerCHDistanceQueryManagerWithMapping.cpp
-        src/CH/IntegerCHDistanceQueryManagerWithMapping.h
-        src/CH/IntegerCHPathQueryManager.cpp
-        src/CH/IntegerCHPathQueryManager.h
-        src/CH/IntegerCHPreprocessor.cpp
-        src/CH/IntegerCHPreprocessor.h
-        src/Dijkstra/IntegerDijkstraNode.cpp
-        src/Dijkstra/IntegerDijkstraNode.h
-        src/DistanceMatrix/IntegerDistanceMatrix.cpp
-        src/DistanceMatrix/IntegerDistanceMatrix.h
-        src/DistanceMatrix/IntegerDistanceMatrixComputor.cpp
-        src/DistanceMatrix/IntegerDistanceMatrixComputor.h
+        src/CH/Structures/HopsDijkstraNode.cpp
+        src/CH/Structures/HopsDijkstraNode.h
+        src/CH/Structures/NodeData.cpp
+        src/CH/Structures/NodeData.h
+        src/CH/CHDistanceQueryManager.cpp
+        src/CH/CHDistanceQueryManager.h
+        src/CH/CHDistanceQueryManagerWithMapping.cpp
+        src/CH/CHDistanceQueryManagerWithMapping.h
+        src/CH/CHPathQueryManager.cpp
+        src/CH/CHPathQueryManager.h
+        src/CH/CHPreprocessor.cpp
+        src/CH/CHPreprocessor.h
+        src/Dijkstra/DijkstraNode.cpp
+        src/Dijkstra/DijkstraNode.h
+        src/DistanceMatrix/DistanceMatrix.cpp
+        src/DistanceMatrix/DistanceMatrix.h
+        src/DistanceMatrix/DistanceMatrixComputor.cpp
+        src/DistanceMatrix/DistanceMatrixComputor.h
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.h
         src/GraphBuilding/Loaders/DIMACSLoader.cpp
         src/GraphBuilding/Loaders/DIMACSLoader.h
-        src/GraphBuilding/Loaders/IntegerDistanceMatrixLoader.cpp
-        src/GraphBuilding/Loaders/IntegerDistanceMatrixLoader.h
-        src/GraphBuilding/Loaders/IntegerXenGraphLoader.cpp
-        src/GraphBuilding/Loaders/IntegerXenGraphLoader.h
+        src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
+        src/GraphBuilding/Loaders/DistanceMatrixLoader.h
+        src/GraphBuilding/Loaders/XenGraphLoader.cpp
+        src/GraphBuilding/Loaders/XenGraphLoader.h
         src/GraphBuilding/Loaders/TripsLoader.cpp
         src/GraphBuilding/Loaders/TripsLoader.h
         src/GraphBuilding/Loaders/TNRGLoader.cpp
         src/GraphBuilding/Loaders/TNRGLoader.h
         src/GraphBuilding/Loaders/TGAFLoader.cpp
         src/GraphBuilding/Loaders/TGAFLoader.h
-        src/GraphBuilding/Structures/IntegerFlagsGraph.cpp
-        src/GraphBuilding/Structures/IntegerFlagsGraph.h
-        src/GraphBuilding/Structures/IntegerFlagsGraphWithUnpackingData.cpp
-        src/GraphBuilding/Structures/IntegerFlagsGraphWithUnpackingData.h
-        src/GraphBuilding/Structures/IntegerGraph.cpp
-        src/GraphBuilding/Structures/IntegerGraph.h
-        src/GraphBuilding/Structures/IntegerOutputEdge.cpp
-        src/GraphBuilding/Structures/IntegerOutputEdge.h
-        src/GraphBuilding/Structures/IntegerOutputShortcutEdge.cpp
-        src/GraphBuilding/Structures/IntegerOutputShortcutEdge.h
-        src/GraphBuilding/Structures/IntegerPreprocessingEdgeData.cpp
-        src/GraphBuilding/Structures/IntegerPreprocessingEdgeData.h
-        src/GraphBuilding/Structures/IntegerQueryEdge.cpp
-        src/GraphBuilding/Structures/IntegerQueryEdge.h
-        src/GraphBuilding/Structures/IntegerQueryEdgeWithUnpackingData.cpp
-        src/GraphBuilding/Structures/IntegerQueryEdgeWithUnpackingData.h
-        src/GraphBuilding/Structures/IntegerShortcutEdge.cpp
-        src/GraphBuilding/Structures/IntegerShortcutEdge.h
-        src/GraphBuilding/Structures/IntegerSimpleGraph.cpp
-        src/GraphBuilding/Structures/IntegerSimpleGraph.h
-        src/GraphBuilding/Structures/IntegerUpdateableGraph.cpp
-        src/GraphBuilding/Structures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/FlagsGraph.cpp
+        src/GraphBuilding/Structures/FlagsGraph.h
+        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
+        src/GraphBuilding/Structures/Graph.cpp
+        src/GraphBuilding/Structures/Graph.h
+        src/GraphBuilding/Structures/OutputEdge.cpp
+        src/GraphBuilding/Structures/OutputEdge.h
+        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+        src/GraphBuilding/Structures/OutputShortcutEdge.h
+        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+        src/GraphBuilding/Structures/PreprocessingEdgeData.h
+        src/GraphBuilding/Structures/QueryEdge.cpp
+        src/GraphBuilding/Structures/QueryEdge.h
+        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.h
+        src/GraphBuilding/Structures/ShortcutEdge.cpp
+        src/GraphBuilding/Structures/ShortcutEdge.h
+        src/GraphBuilding/Structures/SimpleGraph.cpp
+        src/GraphBuilding/Structures/SimpleGraph.h
+        src/GraphBuilding/Structures/UpdateableGraph.cpp
+        src/GraphBuilding/Structures/UpdateableGraph.h
         src/GraphBuilding/Structures/SimpleEdge.cpp
         src/GraphBuilding/Structures/SimpleEdge.h
         src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
@@ -124,23 +124,23 @@ add_library(contractionHierarchies SHARED
         src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
-        src/TNRAF/Structures/IntegerNodeDataRegions.cpp
-        src/TNRAF/Structures/IntegerNodeDataRegions.h
+        src/TNRAF/Structures/NodeDataRegions.cpp
+        src/TNRAF/Structures/NodeDataRegions.h
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         )
 
 add_executable(contractionHierarchiesPreprocessor
-        src/Dijkstra/BasicIntegerDijkstra.cpp
-        src/Dijkstra/BasicIntegerDijkstra.h
+        src/Dijkstra/BasicDijkstra.cpp
+        src/Dijkstra/BasicDijkstra.h
         src/Benchmarking/TNRBenchmark.cpp
         src/Benchmarking/TNRBenchmark.h
-        src/Benchmarking/IntegerCHBenchmark.h
-        src/Benchmarking/IntegerCHBenchmark.cpp
-        src/Benchmarking/IntegerDijkstraBenchmark.h
-        src/Benchmarking/IntegerDijkstraBenchmark.cpp
-        src/Benchmarking/IntegerCorrectnessValidator.h
-        src/Benchmarking/IntegerCorrectnessValidator.cpp
+        src/Benchmarking/CHBenchmark.h
+        src/Benchmarking/CHBenchmark.cpp
+        src/Benchmarking/DijkstraBenchmark.h
+        src/Benchmarking/DijkstraBenchmark.cpp
+        src/Benchmarking/CorrectnessValidator.h
+        src/Benchmarking/CorrectnessValidator.cpp
         src/Benchmarking/DistanceCorrectnessValidator.h
         src/Benchmarking/DistanceCorrectnessValidator.cpp
         src/Benchmarking/DistanceMatrixBenchmark.cpp
@@ -155,60 +155,60 @@ add_executable(contractionHierarchiesPreprocessor
         src/CH/Structures/CHpriorityQueue.h
         src/CH/EdgeDifferenceManager.cpp
         src/CH/EdgeDifferenceManager.h
-        src/CH/Structures/IntegerHopsDijkstraNode.cpp
-        src/CH/Structures/IntegerHopsDijkstraNode.h
-        src/CH/Structures/IntegerNodeData.cpp
-        src/CH/Structures/IntegerNodeData.h
-        src/CH/IntegerCHDistanceQueryManager.cpp
-        src/CH/IntegerCHDistanceQueryManager.h
-        src/CH/IntegerCHDistanceQueryManagerWithMapping.cpp
-        src/CH/IntegerCHDistanceQueryManagerWithMapping.h
-        src/CH/IntegerCHPathQueryManager.cpp
-        src/CH/IntegerCHPathQueryManager.h
-        src/CH/IntegerCHPreprocessor.cpp
-        src/CH/IntegerCHPreprocessor.h
-        src/Dijkstra/IntegerDijkstraNode.cpp
-        src/Dijkstra/IntegerDijkstraNode.h
-        src/DistanceMatrix/IntegerDistanceMatrix.cpp
-        src/DistanceMatrix/IntegerDistanceMatrix.h
-        src/DistanceMatrix/IntegerDistanceMatrixComputor.cpp
-        src/DistanceMatrix/IntegerDistanceMatrixComputor.h
+        src/CH/Structures/HopsDijkstraNode.cpp
+        src/CH/Structures/HopsDijkstraNode.h
+        src/CH/Structures/NodeData.cpp
+        src/CH/Structures/NodeData.h
+        src/CH/CHDistanceQueryManager.cpp
+        src/CH/CHDistanceQueryManager.h
+        src/CH/CHDistanceQueryManagerWithMapping.cpp
+        src/CH/CHDistanceQueryManagerWithMapping.h
+        src/CH/CHPathQueryManager.cpp
+        src/CH/CHPathQueryManager.h
+        src/CH/CHPreprocessor.cpp
+        src/CH/CHPreprocessor.h
+        src/Dijkstra/DijkstraNode.cpp
+        src/Dijkstra/DijkstraNode.h
+        src/DistanceMatrix/DistanceMatrix.cpp
+        src/DistanceMatrix/DistanceMatrix.h
+        src/DistanceMatrix/DistanceMatrixComputor.cpp
+        src/DistanceMatrix/DistanceMatrixComputor.h
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.h
         src/GraphBuilding/Loaders/DIMACSLoader.cpp
         src/GraphBuilding/Loaders/DIMACSLoader.h
-        src/GraphBuilding/Loaders/IntegerDistanceMatrixLoader.cpp
-        src/GraphBuilding/Loaders/IntegerDistanceMatrixLoader.h
-        src/GraphBuilding/Loaders/IntegerXenGraphLoader.cpp
-        src/GraphBuilding/Loaders/IntegerXenGraphLoader.h
+        src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
+        src/GraphBuilding/Loaders/DistanceMatrixLoader.h
+        src/GraphBuilding/Loaders/XenGraphLoader.cpp
+        src/GraphBuilding/Loaders/XenGraphLoader.h
         src/GraphBuilding/Loaders/TripsLoader.cpp
         src/GraphBuilding/Loaders/TripsLoader.h
         src/GraphBuilding/Loaders/TNRGLoader.cpp
         src/GraphBuilding/Loaders/TNRGLoader.h
         src/GraphBuilding/Loaders/TGAFLoader.cpp
         src/GraphBuilding/Loaders/TGAFLoader.h
-        src/GraphBuilding/Structures/IntegerFlagsGraph.cpp
-        src/GraphBuilding/Structures/IntegerFlagsGraph.h
-        src/GraphBuilding/Structures/IntegerFlagsGraphWithUnpackingData.cpp
-        src/GraphBuilding/Structures/IntegerFlagsGraphWithUnpackingData.h
-        src/GraphBuilding/Structures/IntegerGraph.cpp
-        src/GraphBuilding/Structures/IntegerGraph.h
-        src/GraphBuilding/Structures/IntegerOutputEdge.cpp
-        src/GraphBuilding/Structures/IntegerOutputEdge.h
-        src/GraphBuilding/Structures/IntegerOutputShortcutEdge.cpp
-        src/GraphBuilding/Structures/IntegerOutputShortcutEdge.h
-        src/GraphBuilding/Structures/IntegerPreprocessingEdgeData.cpp
-        src/GraphBuilding/Structures/IntegerPreprocessingEdgeData.h
-        src/GraphBuilding/Structures/IntegerQueryEdge.cpp
-        src/GraphBuilding/Structures/IntegerQueryEdge.h
-        src/GraphBuilding/Structures/IntegerQueryEdgeWithUnpackingData.cpp
-        src/GraphBuilding/Structures/IntegerQueryEdgeWithUnpackingData.h
-        src/GraphBuilding/Structures/IntegerShortcutEdge.cpp
-        src/GraphBuilding/Structures/IntegerShortcutEdge.h
-        src/GraphBuilding/Structures/IntegerSimpleGraph.cpp
-        src/GraphBuilding/Structures/IntegerSimpleGraph.h
-        src/GraphBuilding/Structures/IntegerUpdateableGraph.cpp
-        src/GraphBuilding/Structures/IntegerUpdateableGraph.h
+        src/GraphBuilding/Structures/FlagsGraph.cpp
+        src/GraphBuilding/Structures/FlagsGraph.h
+        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
+        src/GraphBuilding/Structures/Graph.cpp
+        src/GraphBuilding/Structures/Graph.h
+        src/GraphBuilding/Structures/OutputEdge.cpp
+        src/GraphBuilding/Structures/OutputEdge.h
+        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+        src/GraphBuilding/Structures/OutputShortcutEdge.h
+        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+        src/GraphBuilding/Structures/PreprocessingEdgeData.h
+        src/GraphBuilding/Structures/QueryEdge.cpp
+        src/GraphBuilding/Structures/QueryEdge.h
+        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.h
+        src/GraphBuilding/Structures/ShortcutEdge.cpp
+        src/GraphBuilding/Structures/ShortcutEdge.h
+        src/GraphBuilding/Structures/SimpleGraph.cpp
+        src/GraphBuilding/Structures/SimpleGraph.h
+        src/GraphBuilding/Structures/UpdateableGraph.cpp
+        src/GraphBuilding/Structures/UpdateableGraph.h
         src/GraphBuilding/Structures/SimpleEdge.cpp
         src/GraphBuilding/Structures/SimpleEdge.h
         src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
@@ -237,8 +237,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
-        src/TNRAF/Structures/IntegerNodeDataRegions.cpp
-        src/TNRAF/Structures/IntegerNodeDataRegions.h
+        src/TNRAF/Structures/NodeDataRegions.cpp
+        src/TNRAF/Structures/NodeDataRegions.h
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         src/main.cpp

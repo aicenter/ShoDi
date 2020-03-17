@@ -7,7 +7,7 @@
 #include "TransitNodeRoutingGraph.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : IntegerFlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes) {
+TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes) {
 
 }
 
@@ -85,7 +85,7 @@ void TransitNodeRoutingGraph::addBackwardSearchSpaceNode(unsigned int sourceNode
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::accessNodesTest(IntegerDistanceMatrix & dm) {
+void TransitNodeRoutingGraph::accessNodesTest(DistanceMatrix & dm) {
     unsigned int allAccessNodes = 0;
     unsigned int invalidDistanceNodes = 0;
 

@@ -8,7 +8,7 @@
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-void PathCorrectnessValidator::validateTNRPaths(IntegerGraph * originalGraph, TNRPathQueryManager & tnrQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
+void PathCorrectnessValidator::validateTNRPaths(Graph * originalGraph, TNRPathQueryManager & tnrQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
     for(unsigned int i = 0; i < trips.size(); i++) {
         vector<SimpleEdge> path;
         unsigned int distance = tnrQueryManager.findPath(trips[i].first, trips[i].second, path);
@@ -41,7 +41,7 @@ void PathCorrectnessValidator::validateTNRPaths(IntegerGraph * originalGraph, TN
 }
 
 //______________________________________________________________________________________________________________________
-void PathCorrectnessValidator::validateCHPaths(IntegerGraph * originalGraph, IntegerCHPathQueryManager & chQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
+void PathCorrectnessValidator::validateCHPaths(Graph * originalGraph, CHPathQueryManager & chQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
     for(unsigned int i = 0; i < trips.size(); i++) {
         vector<SimpleEdge> path;
         unsigned int distance = chQueryManager.findPath(trips[i].first, trips[i].second, path);
@@ -74,7 +74,7 @@ void PathCorrectnessValidator::validateCHPaths(IntegerGraph * originalGraph, Int
 }
 
 //______________________________________________________________________________________________________________________
-bool PathCorrectnessValidator::validatePath(IntegerGraph * originalGraph, const unsigned int distance, vector<SimpleEdge> & tnrPath) {
+bool PathCorrectnessValidator::validatePath(Graph * originalGraph, const unsigned int distance, vector<SimpleEdge> & tnrPath) {
     if (distance == UINT_MAX && tnrPath.empty()) {
         return true;
     }
@@ -99,7 +99,7 @@ bool PathCorrectnessValidator::validatePath(IntegerGraph * originalGraph, const 
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int PathCorrectnessValidator::checkIfEdgeExists(const unsigned int from, const unsigned int to, IntegerGraph * originalGraph) {
+unsigned int PathCorrectnessValidator::checkIfEdgeExists(const unsigned int from, const unsigned int to, Graph * originalGraph) {
     const vector<pair<unsigned int, long long unsigned int>> & edges = originalGraph->outgoingEdges(from);
     for(unsigned int i = 0; i < edges.size(); i++) {
         if(edges[i].first == to) {

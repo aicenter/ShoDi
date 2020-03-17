@@ -12,9 +12,9 @@ DDSGLoader::DDSGLoader(string inputFile) : inputFile(inputFile) {
 
 }
 
-// This function reads the input file and puts all the Contraction Hierarchies data into a IntegerFlagsGraph instance.
+// This function reads the input file and puts all the Contraction Hierarchies data into a FlagsGraph instance.
 //______________________________________________________________________________________________________________________
-IntegerFlagsGraph * DDSGLoader::loadFlagsGraph() {
+FlagsGraph * DDSGLoader::loadFlagsGraph() {
     ifstream input;
     input.open(inputFile, ios::binary);
 
@@ -23,7 +23,7 @@ IntegerFlagsGraph * DDSGLoader::loadFlagsGraph() {
         exit(1);
     }
 
-    Timer loadTimer("DDSG IntegerGraph loading timer");
+    Timer loadTimer("DDSG Graph loading timer");
     loadTimer.begin();
 
     if ( verifyHeader(input) == false ) {
@@ -36,7 +36,7 @@ IntegerFlagsGraph * DDSGLoader::loadFlagsGraph() {
 
     unsigned int nodes, edges, shortcutEdges;
     loadCnts(input, nodes, edges, shortcutEdges);
-    IntegerFlagsGraph * graph = new IntegerFlagsGraph(nodes);
+    FlagsGraph * graph = new FlagsGraph(nodes);
 
     loadRanks(input, nodes, *graph);
     loadOriginalEdges(input, edges, *graph);
@@ -51,13 +51,13 @@ IntegerFlagsGraph * DDSGLoader::loadFlagsGraph() {
     loadTimer.finish();
     loadTimer.printMeasuredTime();
 
-    printf("IntegerGraph seems to be loaded correctly!\n");
+    printf("Graph seems to be loaded correctly!\n");
 
     return graph;
 }
 
 //______________________________________________________________________________________________________________________
-IntegerFlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
+FlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
     ifstream input;
     input.open(inputFile, ios::binary);
 
@@ -66,7 +66,7 @@ IntegerFlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData
         exit(1);
     }
 
-    Timer loadTimer("DDSG IntegerGraph loading timer");
+    Timer loadTimer("DDSG Graph loading timer");
     loadTimer.begin();
 
     if ( verifyHeader(input) == false ) {
@@ -79,8 +79,8 @@ IntegerFlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData
 
     unsigned int nodes, edges, shortcutEdges;
     loadCnts(input, nodes, edges, shortcutEdges);
-    printf("IntegerGraph should have %u unpacking pairs\n", shortcutEdges);
-    IntegerFlagsGraphWithUnpackingData * graph = new IntegerFlagsGraphWithUnpackingData(nodes);
+    printf("Graph should have %u unpacking pairs\n", shortcutEdges);
+    FlagsGraphWithUnpackingData * graph = new FlagsGraphWithUnpackingData(nodes);
 
     printf("Will be loading %u edges and %u shortcut edges.\n", edges, shortcutEdges);
 
@@ -97,13 +97,13 @@ IntegerFlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData
     loadTimer.finish();
     loadTimer.printMeasuredTime();
 
-    printf("IntegerGraph seems to be loaded correctly!\n");
+    printf("Graph seems to be loaded correctly!\n");
 
     return graph;
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraph & graph) {
+void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraph & graph) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int rank;
         input.read((char*)&rank, sizeof(rank));
@@ -112,7 +112,7 @@ void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGra
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraphWithUnpackingData & graph) {
+void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraphWithUnpackingData & graph) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int rank;
         input.read((char*)&rank, sizeof(rank));
@@ -121,7 +121,7 @@ void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGra
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraph & graph) {
+void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
         input.read((char*)&from, sizeof(from));
@@ -147,7 +147,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, Integer
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraphWithUnpackingData & graph) {
+void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraphWithUnpackingData & graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
         input.read((char*)&from, sizeof(from));
@@ -174,7 +174,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, Integer
 
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraph & graph) {
+void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph) {
     for(unsigned int i = 0; i < shortcutEdges; i++) {
         unsigned int from, to, weight, flags, middleNode;
         input.read((char*)&from, sizeof(from));
@@ -201,7 +201,7 @@ void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges,
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraphWithUnpackingData & graph) {
+void DDSGLoader::loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, FlagsGraphWithUnpackingData & graph) {
     for(unsigned int i = 0; i < shortcutEdges; i++) {
         unsigned int from, to, weight, flags, middleNode;
         input.read((char*)&from, sizeof(from));

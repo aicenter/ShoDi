@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERAPI_H
 
 
-#include "../CH/Integer/IntegerCHDistanceQueryManager.h"
+#include "../CH/CHDistanceQueryManager.h"
 #include <string>
 
 using namespace std;
@@ -24,8 +24,8 @@ public:
     unsigned int distanceQuery(unsigned int source, unsigned int target);
     void clearStructures();
 private:
-    IntegerCHDistanceQueryManager * qm;
-    IntegerFlagsGraph * graph;
+    CHDistanceQueryManager * qm;
+    FlagsGraph * graph;
 };
 
 

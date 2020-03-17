@@ -6,7 +6,7 @@
 #include "TransitNodeRoutingGraphForPathQueries.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraphForPathQueries::TransitNodeRoutingGraphForPathQueries(unsigned int nodes, unsigned int transitNodesAmount) : IntegerFlagsGraphWithUnpackingData(nodes), unpackingGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes) {
+TransitNodeRoutingGraphForPathQueries::TransitNodeRoutingGraphForPathQueries(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraphWithUnpackingData(nodes), unpackingGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes) {
 
 }
 

@@ -7,9 +7,9 @@
 #define TRANSIT_NODE_ROUTING_DDSGLOADER_H
 
 #include <string>
-#include "../Structures/IntegerGraph.h"
-#include "../Structures/IntegerFlagsGraph.h"
-#include "../Structures/IntegerFlagsGraphWithUnpackingData.h"
+#include "../Structures/Graph.h"
+#include "../Structures/FlagsGraph.h"
+#include "../Structures/FlagsGraphWithUnpackingData.h"
 
 using namespace std;
 
@@ -23,16 +23,16 @@ private:
     bool verifyHeader(ifstream & input);
     bool verifyFooter(ifstream & input);
     void loadCnts(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & shortcutEdges);
-    void loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraph & graph);
-    void loadRanks(ifstream & input, unsigned int nodes, IntegerFlagsGraphWithUnpackingData & graph);
-    void loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraph & graph);
-    void loadOriginalEdges(ifstream & input, unsigned int edges, IntegerFlagsGraphWithUnpackingData & graph);
-    void loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraph & graph);
-    void loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, IntegerFlagsGraphWithUnpackingData & graph);
+    void loadRanks(ifstream & input, unsigned int nodes, FlagsGraph & graph);
+    void loadRanks(ifstream & input, unsigned int nodes, FlagsGraphWithUnpackingData & graph);
+    void loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph);
+    void loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraphWithUnpackingData & graph);
+    void loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph);
+    void loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, FlagsGraphWithUnpackingData & graph);
 public:
     DDSGLoader(string inputFile);
-    IntegerFlagsGraph * loadFlagsGraph();
-    IntegerFlagsGraphWithUnpackingData * loadFlagsGraphWithUnpackingData();
+    FlagsGraph * loadFlagsGraph();
+    FlagsGraphWithUnpackingData * loadFlagsGraphWithUnpackingData();
 };
 
 // ~~~ DESCRIPTION OF THE CH FORMAT ~~~

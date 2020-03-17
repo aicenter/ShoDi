@@ -36,7 +36,7 @@ unsigned int TNRPathQueryManager::findDistance(const unsigned int source, const 
         return UINT_MAX;
     }
 
-    /*vector< IntegerQueryEdgeWithUnpackingData > nextNodes = graph.nextNodes(source);
+    /*vector< QueryEdgeWithUnpackingData > nextNodes = graph.nextNodes(source);
     //printf("Current distance left: %u, we have %lu neighbours to try.\n", distance, nextNodes.size());
     for(unsigned int i = 0; i < nextNodes.size(); i++) {
         //printf("Trying %u (rank %u) as middle node. Distances: %llu and %u, that is: %llu\n", nextNodes[i].targetNode, graph.data(nextNodes[i].targetNode).rank, nextNodes[i].weight, quickFindDistance(nextNodes[i].targetNode, target), quickFindDistance(nextNodes[i].targetNode, target) + nextNodes[i].weight);

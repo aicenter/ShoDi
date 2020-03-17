@@ -16,7 +16,7 @@ public:
     void printQueriesAnalysis();
 private:
     TransitNodeRoutingArcFlagsGraph & graph;
-    IntegerCHDistanceQueryManager fallbackCHmanager;
+    CHDistanceQueryManager fallbackCHmanager;
     unsigned int globalQueries;
     unsigned int localQueries;
 };

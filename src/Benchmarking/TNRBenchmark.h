@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_TNRBENCHMARK_H
 
 #include <vector>
-#include "../GraphBuilding/Structures/IntegerFlagsGraph.h"
+#include "../GraphBuilding/Structures/FlagsGraph.h"
 #include "../GraphBuilding/Structures/TransitNodeRoutingGraph.h"
 
 using namespace std;

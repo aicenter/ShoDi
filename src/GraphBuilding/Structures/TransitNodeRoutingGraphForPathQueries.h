@@ -6,11 +6,11 @@
 #ifndef CONTRACTION_HIERARCHIES_TRANSITNODEROUTINGGRAPHFORPATHQUERIES_H
 #define CONTRACTION_HIERARCHIES_TRANSITNODEROUTINGGRAPHFORPATHQUERIES_H
 
-#include "IntegerFlagsGraphWithUnpackingData.h"
+#include "FlagsGraphWithUnpackingData.h"
 #include "../../TNR/Structures/AccessNodeData.h"
 
 //______________________________________________________________________________________________________________________
-class TransitNodeRoutingGraphForPathQueries : public IntegerFlagsGraphWithUnpackingData {
+class TransitNodeRoutingGraphForPathQueries : public FlagsGraphWithUnpackingData {
 public:
     TransitNodeRoutingGraphForPathQueries(unsigned int nodes, unsigned int transitNodesAmount);
     void addUnpackingEdge(unsigned int from, unsigned int to, unsigned int weight);

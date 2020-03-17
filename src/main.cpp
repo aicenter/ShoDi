@@ -12,25 +12,25 @@
 #include <iomanip>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
-#include "GraphBuilding/Loaders/IntegerXenGraphLoader.h"
+#include "GraphBuilding/Loaders/XenGraphLoader.h"
 #include "Timer/Timer.h"
-#include "CH/IntegerCHPreprocessor.h"
+#include "CH/CHPreprocessor.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
 #include "GraphBuilding/Loaders/DDSGLoader.h"
-#include "Benchmarking/IntegerCHBenchmark.h"
-#include "Benchmarking/IntegerDijkstraBenchmark.h"
-#include "Benchmarking/IntegerCorrectnessValidator.h"
+#include "Benchmarking/CHBenchmark.h"
+#include "Benchmarking/DijkstraBenchmark.h"
+#include "Benchmarking/CorrectnessValidator.h"
 #include "Benchmarking/TNRBenchmark.h"
 #include "Benchmarking/TNRAFBenchmark.h"
 #include "Benchmarking/DistanceCorrectnessValidator.h"
 #include "Benchmarking/PathCorrectnessValidator.h"
-#include "CH/IntegerCHPathQueryManager.h"
-#include "Dijkstra/BasicIntegerDijkstra.h"
+#include "CH/CHPathQueryManager.h"
+#include "Dijkstra/BasicDijkstra.h"
 #include "TNR/TNRPathQueryManager.h"
-#include "DistanceMatrix/IntegerDistanceMatrixComputor.h"
-#include "GraphBuilding/Loaders/IntegerDistanceMatrixLoader.h"
+#include "DistanceMatrix/DistanceMatrixComputor.h"
+#include "GraphBuilding/Loaders/DistanceMatrixLoader.h"
 #include "Benchmarking/DistanceMatrixBenchmark.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "TNRAF/TNRAFDistanceQueryManager.h"
@@ -73,10 +73,10 @@ void createIntegerXenGraphHierarchy(char * inputFilePath, char * outputFilePath)
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader(inputFilePath);
+    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
     //DIMACSLoader graphLoader = DIMACSLoader("../input/graph.gr");
-    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat(outputFilePath);
 
@@ -93,8 +93,8 @@ void createIntegerDIMACSHierarchy(char * inputFilePath, char * outputFilePath) {
     timer.begin();
 
     DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat(outputFilePath);
 
@@ -112,9 +112,9 @@ void createTNR() {
     Timer timer("Whole TNR construction timer");
     timer.begin();
 
-    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
     TNRPreprocessor::preprocessUsingCH(*graph, "../input/Prague_n500_unpack", 500);
@@ -130,10 +130,10 @@ void createTNRwithValidation() {
     Timer timer("Whole TNR construction timer");
     timer.begin();
 
-    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    IntegerGraph * originalGraph = graph->createCopy();
-    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    Graph * originalGraph = graph->createCopy();
+    CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
     TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n2000_DM_mar", 2000);
@@ -150,10 +150,10 @@ void createTNRAF() {
     Timer timer("Whole TNR AF construction timer");
     timer.begin();
 
-    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    IntegerGraph * originalGraph = graph->createCopy();
-    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    Graph * originalGraph = graph->createCopy();
+    CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
     TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n5000_useDM_mar_clust", 5000, 32, true);
@@ -170,9 +170,9 @@ void createCH() {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    IntegerXenGraphLoader graphLoader = IntegerXenGraphLoader("../input/Debug_graph.xeng");
-    IntegerUpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    IntegerCHPreprocessor::preprocessForDDSG(*graph);
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Debug_graph.xeng");
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat("../input/Debug_graph");
 
@@ -188,10 +188,10 @@ void createDM() {
     Timer timer("Whole Distance Matrix computation timer");
     timer.begin();
 
-    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * graph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * graph = dijkstraGraphLoader.loadGraph();
 
-    IntegerDistanceMatrixComputor dmComputor;
+    DistanceMatrixComputor dmComputor;
     dmComputor.computeDistanceMatrix(*graph);
     dmComputor.outputDistanceMatrixToFile("../input/Prague_int_1000prec");
 
@@ -212,21 +212,21 @@ void compareMethods() {
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<long long unsigned int> chDistances(trips.size());
-    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
 
     //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
-    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<long long unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
 
-    IntegerCorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    CorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
 
     delete dijkstraGraph;
@@ -237,7 +237,7 @@ void compareMethods() {
     vector<long long unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
-    IntegerCorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
+    CorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
     printf("TNR was %lf times faster than Dijkstra!\n", dijkstraTime/tnrTime);
     printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
 
@@ -255,21 +255,21 @@ void compareFourMethods() {
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<long long unsigned int> chDistances(trips.size());
-    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
 
     //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
-    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraLoader.loadGraph();
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraLoader.loadGraph();
 
     vector<long long unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = IntegerDijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
 
-    IntegerCorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    CorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
     printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
 
     delete dijkstraGraph;
@@ -280,19 +280,19 @@ void compareFourMethods() {
     vector<long long unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
-    IntegerCorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
+    CorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
     printf("TNR was %lf times faster than Dijkstra!\n", dijkstraTime/tnrTime);
     printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
 
     delete tnrGraph;
 
-    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
-    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+    DistanceMatrixLoader distanceMatrixLoader = DistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    DistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
 
     vector<long long unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(trips, *distanceMatrix, dmDistances);
 
-    IntegerCorrectnessValidator::validateVerbose(dmDistances, dijkstraDistances);
+    CorrectnessValidator::validateVerbose(dmDistances, dijkstraDistances);
     printf("Distance Matrix was %lf times faster than Dijkstra!\n", dijkstraTime/dmTime);
     printf("Distance Matrix was %lf times faster than CH!\n", chTime/dmTime);
     printf("Distance Matrix was %lf times faster than TNR!\n", tnrTime/dmTime);
@@ -308,10 +308,10 @@ void compareCHandTNR() {
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<long long unsigned int> chDistances(trips.size());
-    double chTime = IntegerCHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
 
@@ -322,7 +322,7 @@ void compareCHandTNR() {
     vector<long long unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
-    IntegerCorrectnessValidator::validateVerbose(tnrDistances, chDistances);
+    CorrectnessValidator::validateVerbose(tnrDistances, chDistances);
     printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
 
     delete tnrGraph;
@@ -354,7 +354,7 @@ void compareTNRandTNRAF() {
 
     delete tnrafGraph;
 
-    IntegerCorrectnessValidator::validateVerbose(tnrDistances, tnrafDistances);
+    CorrectnessValidator::validateVerbose(tnrDistances, tnrafDistances);
     printf("TNR with Arc Flags was %lf times faster than basic TNR!\n", tnrTime/tnrafTime);
 
 
@@ -393,8 +393,8 @@ void compareVariousTransitSetSizes() {
 
     delete tnr2000Graph;
 
-    IntegerCorrectnessValidator::validateVerbose(tnr500Distances, tnr1000Distances);
-    IntegerCorrectnessValidator::validateVerbose(tnr500Distances, tnr2000Distances);
+    CorrectnessValidator::validateVerbose(tnr500Distances, tnr1000Distances);
+    CorrectnessValidator::validateVerbose(tnr500Distances, tnr2000Distances);
 
     printf("TNR with  500 transit nodes time: %lf (%lf for one query)\n", tnr500Time, tnr500Time/trips.size());
     printf("TNR with 1000 transit nodes time: %lf (%lf for one query)\n", tnr1000Time, tnr1000Time/trips.size());
@@ -407,11 +407,11 @@ void compareVariousTransitSetSizes() {
 //______________________________________________________________________________________________________________________
 void validateCHPathCorectness() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
-    IntegerCHPathQueryManager queryManager = IntegerCHPathQueryManager(*chGraph);
+    FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
+    CHPathQueryManager queryManager = CHPathQueryManager(*chGraph);
 
-    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * originalGraph = dijkstraLoader.loadGraph();
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * originalGraph = dijkstraLoader.loadGraph();
 
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
@@ -430,8 +430,8 @@ void validateTNRPathCorectness() {
     TransitNodeRoutingGraphForPathQueries * tnrGraph = tnrLoader.loadTNRforPathQueries();
     TNRPathQueryManager queryManager(*tnrGraph);
 
-    IntegerXenGraphLoader dijkstraLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * originalGraph = dijkstraLoader.loadGraph();
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * originalGraph = dijkstraLoader.loadGraph();
 
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
@@ -446,8 +446,8 @@ void validateTNRPathCorectness() {
 
 //______________________________________________________________________________________________________________________
 void memoryUsageOfDijkstra() {
-    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     delete dijkstraGraph;
 }
@@ -455,7 +455,7 @@ void memoryUsageOfDijkstra() {
 //______________________________________________________________________________________________________________________
 void memoryUsageOfCH() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraph * ch = chLoader.loadFlagsGraph();
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
 
     delete ch;
 }
@@ -478,16 +478,16 @@ void memoryUsageOfTNRAF() {
 
 //______________________________________________________________________________________________________________________
 void memoryUsageOfDM() {
-    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
-    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+    DistanceMatrixLoader distanceMatrixLoader = DistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    DistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
 
     delete distanceMatrix;
 }
 
 //______________________________________________________________________________________________________________________
 void checkDMBigValues() {
-    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
-    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+    DistanceMatrixLoader distanceMatrixLoader = DistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    DistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
     distanceMatrix -> printInfo();
 
     delete distanceMatrix;
@@ -498,13 +498,13 @@ void checkDMBigValues() {
 // incorrectly in TNR.
 //______________________________________________________________________________________________________________________
 void checkDijkstraDistances(unsigned int sourceNode, unsigned int sourceAccess, unsigned int targetAccess, unsigned int targetNode) {
-    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     printf("~~~ Computing distances using Dijkstra ~~~\n");
-    printf("%u -> %u: %llu\n", sourceNode, sourceAccess, BasicIntegerDijkstra::run(sourceNode, sourceAccess, *dijkstraGraph));
-    printf("%u -> %u: %llu\n", sourceAccess, targetAccess, BasicIntegerDijkstra::run(sourceAccess, targetAccess, *dijkstraGraph));
-    printf("%u -> %u: %llu\n", targetAccess, targetNode, BasicIntegerDijkstra::run(targetAccess, targetNode, *dijkstraGraph));
+    printf("%u -> %u: %llu\n", sourceNode, sourceAccess, BasicDijkstra::run(sourceNode, sourceAccess, *dijkstraGraph));
+    printf("%u -> %u: %llu\n", sourceAccess, targetAccess, BasicDijkstra::run(sourceAccess, targetAccess, *dijkstraGraph));
+    printf("%u -> %u: %llu\n", targetAccess, targetNode, BasicDijkstra::run(targetAccess, targetNode, *dijkstraGraph));
     printf("~~~ End of Dijkstra computation ~~~\n");
     delete dijkstraGraph;
 
@@ -512,15 +512,15 @@ void checkDijkstraDistances(unsigned int sourceNode, unsigned int sourceAccess, 
 
 //______________________________________________________________________________________________________________________
 void getDijkstraPathForTrip(unsigned int tripNum) {
-    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    //BasicIntegerDijkstra::runWithPathOutput(trips[tripNum].first, trips[tripNum].second, *dijkstraGraph);
-    BasicIntegerDijkstra::runWithPathOutput(trips[tripNum].first /*20652*/, trips[tripNum].second, *dijkstraGraph);
+    //BasicDijkstra::runWithPathOutput(trips[tripNum].first, trips[tripNum].second, *dijkstraGraph);
+    BasicDijkstra::runWithPathOutput(trips[tripNum].first /*20652*/, trips[tripNum].second, *dijkstraGraph);
 
     delete dijkstraGraph;
 
@@ -531,13 +531,13 @@ void getDijkstraPathForTrip(unsigned int tripNum) {
 //______________________________________________________________________________________________________________________
 void getCHPathForTrip(unsigned int tripNum) {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
+    FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
 
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    IntegerCHPathQueryManager queryManager(*chGraph);
+    CHPathQueryManager queryManager(*chGraph);
     //chGraph->debugPrint();
     long long unsigned int distance = queryManager.findDistanceOutputPath(trips[tripNum].first,
                                                                           trips[tripNum].second);
@@ -616,10 +616,10 @@ void computeTNRAFPath3Times(unsigned int tripNum, unsigned int expectedDistance)
 //______________________________________________________________________________________________________________________
 void validateCHPaths() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
-    IntegerFlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
+    FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
 
-    IntegerXenGraphLoader dijkstraGraphLoader = IntegerXenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
-    IntegerGraph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
@@ -639,8 +639,8 @@ void validateCHPaths() {
 
 //______________________________________________________________________________________________________________________
 void validateTNRAccessNodes() {
-    IntegerDistanceMatrixLoader distanceMatrixLoader = IntegerDistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
-    IntegerDistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+    DistanceMatrixLoader distanceMatrixLoader = DistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    DistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
 
     TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n500_unpack.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();

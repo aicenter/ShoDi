@@ -7,8 +7,8 @@
 #define CONTRACTION_HIERARCHIES_TNRPATHQUERYMANAGER_H
 
 #include "../GraphBuilding/Structures/TransitNodeRoutingGraph.h"
-#include "../CH/IntegerCHDistanceQueryManager.h"
-#include "../CH/IntegerCHPathQueryManager.h"
+#include "../CH/CHDistanceQueryManager.h"
+#include "../CH/CHPathQueryManager.h"
 #include "../GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.h"
 #include "../GraphBuilding/Structures/SimpleEdge.h"
 
@@ -23,7 +23,7 @@ public:
     unsigned int quickFindDistance(const unsigned int source, const unsigned int target);
 private:
     TransitNodeRoutingGraphForPathQueries & graph;
-    IntegerCHPathQueryManager fallbackCHmanager;
+    CHPathQueryManager fallbackCHmanager;
 };
 
 

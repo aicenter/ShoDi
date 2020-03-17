@@ -7,15 +7,15 @@
 #define CONTRACTION_HIERARCHIES_DISTANCECORRECTNESSVALIDATOR_H
 
 
-#include "../GraphBuilding/Structures/IntegerFlagsGraphWithUnpackingData.h"
-#include "../GraphBuilding/Structures/IntegerGraph.h"
+#include "../GraphBuilding/Structures/FlagsGraphWithUnpackingData.h"
+#include "../GraphBuilding/Structures/Graph.h"
 
 // Auxiliary class used for validating that the paths computed by Contraction Hierarchies also exist in the original
 // graph.
 //______________________________________________________________________________________________________________________
 class DistanceCorrectnessValidator {
 public:
-    static void validateOnGivenTrips(vector< pair < unsigned int, unsigned int > > & trips, IntegerFlagsGraphWithUnpackingData & chGraph, IntegerGraph & originalGraph);
+    static void validateOnGivenTrips(vector< pair < unsigned int, unsigned int > > & trips, FlagsGraphWithUnpackingData & chGraph, Graph & originalGraph);
 };
 
 

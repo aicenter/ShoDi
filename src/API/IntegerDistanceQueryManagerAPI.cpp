@@ -7,13 +7,13 @@
 #include "../GraphBuilding/Loaders/DDSGLoader.h"
 
 // Initializes the Contraction Hierarchy for queries. This means loading the graph from the given input file, creating
-// an instance of a 'IntegerFlagsGraph', and then also creating an instance of the 'IntegerCHDistanceQueryManager', which
+// an instance of a 'FlagsGraph', and then also creating an instance of the 'CHDistanceQueryManager', which
 // can then be used to answer queries.
 //______________________________________________________________________________________________________________________
 void IntegerDistanceQueryManagerAPI::initializeCH(string chFile) {
     DDSGLoader chLoader = DDSGLoader(chFile);
     graph = chLoader.loadFlagsGraph();
-    qm = new IntegerCHDistanceQueryManager(*graph);
+    qm = new CHDistanceQueryManager(*graph);
 }
 
 // Queries after initialization are pretty straightforward, we just let the initialized QueryManager instance answer
