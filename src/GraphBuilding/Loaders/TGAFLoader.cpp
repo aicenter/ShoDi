@@ -105,8 +105,11 @@ void TGAFLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGr
     unsigned int processedFlags = 0;
     unsigned int processedAcessNodes = 0;
     unsigned int noTrueFlags = 0;
+    unsigned int forwardAccessNodesCnt = 0;
+    unsigned int backwardAccessNodesCnt = 0;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char *) &forwardNodes, sizeof(forwardNodes));
+        forwardAccessNodesCnt += forwardNodes;
         for(unsigned int j = 0; j < forwardNodes; j++) {
             input.read ((char *) &nodeID, sizeof(nodeID));
             input.read ((char *) &nodeDistance, sizeof(nodeDistance));
@@ -124,6 +127,7 @@ void TGAFLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGr
             }
         }
         input.read ((char *) &backwardNodes, sizeof(backwardNodes));
+        backwardAccessNodesCnt += backwardNodes;
         for(unsigned int j = 0; j < backwardNodes; j++) {
             input.read ((char *) &nodeID, sizeof(nodeID));
             input.read ((char *) &nodeDistance, sizeof(nodeDistance));
@@ -131,6 +135,7 @@ void TGAFLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGr
             graph.addBackwardAccessNode(i, nodeID, nodeDistance, regionsCnt, regionFlags, powersOf2);
         }
     }
+    printf("Average forward access nodes: %lf, average backward access nodes: %lf, average total access nodes: %lf.\n", (double) forwardAccessNodesCnt / nodes, (double) backwardAccessNodesCnt / nodes, (double) (forwardAccessNodesCnt + backwardAccessNodesCnt) / nodes);
     printf("%u flags out of %u were True. That is %lf %%.\n", validFlags, processedFlags, ((double) validFlags / processedFlags) * 100);
     printf("%u acess nodes out of %u had no True region flags. That is %lf %%.\n", noTrueFlags, processedAcessNodes, ((double) noTrueFlags / processedAcessNodes) * 100);
 }

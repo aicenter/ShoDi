@@ -28,14 +28,26 @@ IntegerDistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, IntegerGraph & originalGraph, string outputPath, unsigned int transitNodesAmount, unsigned int regionsCnt, bool useDistanceMatrix) {
     cout << "Getting transit nodes" << endl;
-    vector < unsigned int > transitNodes(transitNodesAmount);
+    vector<unsigned int> transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
     cout << "Computing transit nodes distance table" << endl;
     IntegerFlagsGraph chGraph(graph);
     IntegerCHDistanceQueryManager qm(chGraph);
-    vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
-    computeTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount, originalGraph);
+    vector<vector<unsigned int> > transitNodesDistanceTable(transitNodesAmount,
+                                                            vector<unsigned int>(transitNodesAmount));
+    if (useDistanceMatrix) {
+        cout << "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction." << endl;
+        IntegerDistanceMatrixComputor dmComputor;
+        dmComputor.computeDistanceMatrix(originalGraph);
+        distanceMatrix = dmComputor.getDistanceMatrixInstance();
+        cout << "Distance matrix computed." << endl;
+
+        fillTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount);
+    } else {
+        computeTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount, originalGraph);
+    }
+
     /*for(unsigned int i = 0; i < transitNodesAmount; i++) {
         if(i % 100 == 0) {
             cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
@@ -70,14 +82,6 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
     totalAccessNodes = 0;
     uselessAccessNodes = 0;
     triedCombinations = 0;
-
-    if(useDistanceMatrix) {
-        cout << "Computing the auxiliary distance matrix for forward direction." << endl;
-        IntegerDistanceMatrixComputor dmComputor;
-        dmComputor.computeDistanceMatrix(originalGraph);
-        distanceMatrix = dmComputor.getDistanceMatrixInstance();
-        cout << "Distance matrix computed." << endl;
-    }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if(i % 200 == 0) {
@@ -125,8 +129,7 @@ void TNRAFPreprocessor::preprocessUsingCH(IntegerUpdateableGraph & graph, Intege
 }
 
 //______________________________________________________________________________________________________________________
-void
-TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, IntegerGraph & originalGraph) {
+void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, IntegerGraph & originalGraph) {
     for(unsigned int i = 0; i < transitNodesCnt; i++) {
         if(i % 100 == 0) {
             cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
@@ -136,6 +139,15 @@ TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transi
         BasicIntegerDijkstra::computeOneToAllDistances(transitNodes[i], originalGraph, distancesFromNodeI);
         for(unsigned int j = 0; j < transitNodesCnt; j++) {
             distanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRAFPreprocessor::fillTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt) {
+    for(unsigned int i = 0; i < transitNodesCnt; i++) {
+        for(unsigned int j = 0; j < transitNodesCnt; j++) {
+            distanceTable[i][j] = distanceMatrix->findDistance(transitNodes[i], transitNodes[j]);
         }
     }
 }
