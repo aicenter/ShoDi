@@ -10,7 +10,7 @@
 // vector. Returns the time it took to answer all queries in seconds. The distances are not validated inside this
 // function, user is advised to validate that the results are correct somewhere outside this function.
 //______________________________________________________________________________________________________________________
-double DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, DistanceMatrix & matrix, vector < long long unsigned int > & distances) {
+double DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, DistanceMatrix & matrix, vector < unsigned int > & distances) {
     Timer dijkstraTimer("Distance Matrix trips benchmark");
     dijkstraTimer.begin();
 

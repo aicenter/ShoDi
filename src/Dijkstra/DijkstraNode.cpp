@@ -6,6 +6,6 @@
 #include "DijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-DijkstraNode::DijkstraNode(unsigned int x, long long unsigned int y) : ID(x), weight(y) {
+DijkstraNode::DijkstraNode(unsigned int x, unsigned int y) : ID(x), weight(y) {
 
 }

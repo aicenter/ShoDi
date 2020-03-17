@@ -8,7 +8,7 @@
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-double CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < long long unsigned int > & distances) {
+double CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < unsigned int > & distances) {
     CHDistanceQueryManager queryManager(graph);
 
     Timer chTimer("Contraction hierarchies trips benchmark");

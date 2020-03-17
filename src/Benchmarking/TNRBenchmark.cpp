@@ -11,7 +11,7 @@
 // vector. Returns the time it took to answer all queries in seconds. The distances are not validated inside this
 // function, user is advised to validate that the results are correct somewhere outside this function.
 //______________________________________________________________________________________________________________________
-double TNRBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingGraph & graph, vector < long long unsigned int > & distances) {
+double TNRBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingGraph & graph, vector < unsigned int > & distances) {
     TNRDistanceQueryManager queryManager(graph);
 
     Timer tnrTimer("Transit Node Routing trips benchmark");

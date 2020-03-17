@@ -12,7 +12,7 @@ SimpleGraph::SimpleGraph(unsigned int n) {
 
 // Only add edges if they don't exist already. If an edge exists already, check it weight and possibly adjust it.
 //______________________________________________________________________________________________________________________
-void SimpleGraph::addEdge(unsigned int from, unsigned int to, long long unsigned int weight) {
+void SimpleGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to) > weight) {
             followingNodes.at(from).at(to) = weight;
@@ -28,7 +28,7 @@ const unsigned int SimpleGraph::nodes()const {
 }
 
 //______________________________________________________________________________________________________________________
-const map<unsigned int, long long unsigned int> & SimpleGraph::edges(const unsigned int x)const {
+const map<unsigned int, unsigned int> & SimpleGraph::edges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }
 

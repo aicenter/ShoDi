@@ -11,9 +11,9 @@
 //______________________________________________________________________________________________________________________
 class QueryEdge {
 public:
-    QueryEdge(const unsigned int a, const long long unsigned int b, const bool c, const bool d);
+    QueryEdge(const unsigned int a, const unsigned int b, const bool c, const bool d);
     QueryEdge(const QueryEdge & x);
-    long long unsigned int weight;
+    unsigned int weight;
     unsigned int targetNode;
     bool forward;
     bool backward;

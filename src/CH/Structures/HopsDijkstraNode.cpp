@@ -6,6 +6,6 @@
 #include "HopsDijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-HopsDijkstraNode::HopsDijkstraNode(unsigned int x, long long unsigned int y, unsigned int z) : DijkstraNode(x, y), hops(z) {
+HopsDijkstraNode::HopsDijkstraNode(unsigned int x, unsigned int y, unsigned int z) : DijkstraNode(x, y), hops(z) {
 
 }

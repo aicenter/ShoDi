@@ -11,8 +11,8 @@
 //______________________________________________________________________________________________________________________
 class ShortcutEdge {
 public:
-    ShortcutEdge(unsigned int a, unsigned int b, long long unsigned int c, unsigned int d);
-    long long unsigned int weight;
+    ShortcutEdge(unsigned int a, unsigned int b, unsigned int c, unsigned int d);
+    unsigned int weight;
     unsigned int sourceNode;
     unsigned int targetNode;
     unsigned int middleNode;

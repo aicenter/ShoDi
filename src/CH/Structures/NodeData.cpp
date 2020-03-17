@@ -7,6 +7,6 @@
 #include "NodeData.h"
 
 //______________________________________________________________________________________________________________________
-NodeData::NodeData() : forwardDist(ULLONG_MAX), backwardDist(ULLONG_MAX), forwardReached(false), backwardReached(false), forwardSettled(false), backwardSettled(false), forwardStalled(false), backwardStalled(false) {
+NodeData::NodeData() : forwardDist(UINT_MAX), backwardDist(UINT_MAX), forwardReached(false), backwardReached(false), forwardSettled(false), backwardSettled(false), forwardStalled(false), backwardStalled(false) {
 
 }

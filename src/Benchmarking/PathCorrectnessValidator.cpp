@@ -100,7 +100,7 @@ bool PathCorrectnessValidator::validatePath(Graph * originalGraph, const unsigne
 
 //______________________________________________________________________________________________________________________
 unsigned int PathCorrectnessValidator::checkIfEdgeExists(const unsigned int from, const unsigned int to, Graph * originalGraph) {
-    const vector<pair<unsigned int, long long unsigned int>> & edges = originalGraph->outgoingEdges(from);
+    const vector<pair<unsigned int, unsigned int>> & edges = originalGraph->outgoingEdges(from);
     for(unsigned int i = 0; i < edges.size(); i++) {
         if(edges[i].first == to) {
             return edges[i].second;

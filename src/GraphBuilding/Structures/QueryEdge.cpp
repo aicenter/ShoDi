@@ -6,7 +6,7 @@
 #include "QueryEdge.h"
 
 //______________________________________________________________________________________________________________________
-QueryEdge::QueryEdge(const unsigned int a, const long long unsigned int b, const bool c, const bool d) : weight(b), targetNode(a), forward(c), backward(d) {
+QueryEdge::QueryEdge(const unsigned int a, const unsigned int b, const bool c, const bool d) : weight(b), targetNode(a), forward(c), backward(d) {
 
 }
 

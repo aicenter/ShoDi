@@ -19,12 +19,12 @@ using namespace std;
 class CHDistanceQueryManager {
 public:
     CHDistanceQueryManager(FlagsGraph & g);
-    long long unsigned int findDistance(const unsigned int source, const unsigned int target);
+    unsigned int findDistance(const unsigned int source, const unsigned int target);
 protected:
-    void forwardStall(unsigned int stallnode, long long unsigned int stalldistance);
-    void backwardStall(unsigned int stallnode, long long unsigned int stalldistance);
+    void forwardStall(unsigned int stallnode, unsigned int stalldistance);
+    void backwardStall(unsigned int stallnode, unsigned int stalldistance);
     FlagsGraph & graph;
-    long long unsigned int upperbound;
+    unsigned int upperbound;
     vector<unsigned int> forwardChanged;
     vector<unsigned int> backwardChanged;
     vector<unsigned int> forwardStallChanged;

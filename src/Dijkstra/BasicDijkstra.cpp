@@ -10,12 +10,12 @@
 #include "DijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-long long unsigned int BasicDijkstra::run(const unsigned int source, const unsigned int target, const Graph & graph) {
+unsigned int BasicDijkstra::run(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();
-    long long unsigned int * distance = new long long unsigned int[n];
+    unsigned int * distance = new unsigned int[n];
 
     for(unsigned int i = 0; i < n; i++) {
-        distance[i] = ULLONG_MAX;
+        distance[i] = UINT_MAX;
     }
 
     distance[source] = 0;
@@ -32,9 +32,9 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
             return current.weight;
         }
 
-        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
-            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distance[neighbours.at(i).first]) {
                 distance[neighbours.at(i).first] = newDistance;
                 q.push(DijkstraNode(neighbours.at(i).first, newDistance));
@@ -46,18 +46,18 @@ long long unsigned int BasicDijkstra::run(const unsigned int source, const unsig
     }
 
     delete [] distance;
-    return ULLONG_MAX;
+    return UINT_MAX;
 
 }
 
 //______________________________________________________________________________________________________________________
-long long unsigned int BasicDijkstra::runWithPathOutput(const unsigned int source, const unsigned int target, const Graph & graph) {
+unsigned int BasicDijkstra::runWithPathOutput(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();
-    long long unsigned int * distance = new long long unsigned int[n];
+    unsigned int * distance = new unsigned int[n];
     vector < vector < unsigned int > > previous(n);
 
     for(unsigned int i = 0; i < n; i++) {
-        distance[i] = ULLONG_MAX;
+        distance[i] = UINT_MAX;
     }
 
     distance[source] = 0;
@@ -75,9 +75,9 @@ long long unsigned int BasicDijkstra::runWithPathOutput(const unsigned int sourc
             return current.weight;
         }
 
-        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
-            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distance[neighbours.at(i).first]) {
                 distance[neighbours.at(i).first] = newDistance;
                 q.push(DijkstraNode(neighbours.at(i).first, newDistance));
@@ -91,18 +91,18 @@ long long unsigned int BasicDijkstra::runWithPathOutput(const unsigned int sourc
 
     printf("Did not find path from %u to %u.\n", source, target);
     delete [] distance;
-    return ULLONG_MAX;
+    return UINT_MAX;
 
 
 
 }
 
 //______________________________________________________________________________________________________________________
-void BasicDijkstra::outputPath(const unsigned int x, const long long unsigned int * dist, const vector < vector < unsigned int > > & prev) {
-    vector<pair<pair<unsigned int, unsigned int>, long long unsigned int> > path;
+void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, const vector < vector < unsigned int > > & prev) {
+    vector<pair<pair<unsigned int, unsigned int>, unsigned int> > path;
     unsigned int current = x;
     while (prev[current].size() > 0) {
-        long long unsigned int distance = dist[prev[current].at(0)];
+        unsigned int distance = dist[prev[current].at(0)];
         unsigned int pos = 0;
         for (unsigned int i = 1; i < prev[current].size(); i++) {
             if (dist[prev[current].at(i)] < distance) {
@@ -114,9 +114,9 @@ void BasicDijkstra::outputPath(const unsigned int x, const long long unsigned in
         current = prev[current].at(pos);
     }
 
-    printf("~~~ Outputting path from %u to %u (distance %llu) ~~~\n", path[path.size()-1].first.first, x, dist[x]);
+    printf("~~~ Outputting path from %u to %u (distance %u) ~~~\n", path[path.size()-1].first.first, x, dist[x]);
     for(int i = path.size()-1; i >= 0; i--) {
-        printf("%u -> %u (%llu)\n", path[i].first.first, path[i].first.second, path[i].second);
+        printf("%u -> %u (%u)\n", path[i].first.first, path[i].first.second, path[i].second);
     }
     printf("~~~ End of path ~~~\n");
 
@@ -139,9 +139,9 @@ void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Gr
     while(! q.empty() ) {
         const DijkstraNode current = q.top();
 
-        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
-            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distances[neighbours.at(i).first]) {
                 distances[neighbours.at(i).first] = newDistance;
                 q.push(DijkstraNode(neighbours.at(i).first, newDistance));
@@ -170,9 +170,9 @@ void BasicDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int s
     while(! q.empty() ) {
         const DijkstraNode current = q.top();
 
-        const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(current.ID);
+        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.incomingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
-            long long unsigned int newDistance = current.weight + neighbours.at(i).second;
+            unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distances[neighbours.at(i).first]) {
                 distances[neighbours.at(i).first] = newDistance;
                 q.push(DijkstraNode(neighbours.at(i).first, newDistance));

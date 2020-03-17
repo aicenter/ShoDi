@@ -18,15 +18,15 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class Graph{
 private:
-    vector< vector < pair< unsigned int, long long unsigned int > > > followingNodes;
-    vector< vector < pair< unsigned int, long long unsigned int > > > previousNodes;
+    vector< vector < pair< unsigned int, unsigned int > > > followingNodes;
+    vector< vector < pair< unsigned int, unsigned int > > > previousNodes;
 public:
     Graph(unsigned int n);
     Graph(SimpleGraph & x);
-    void addEdge(unsigned int from, unsigned int to, long long unsigned int weight);
+    void addEdge(unsigned int from, unsigned int to, unsigned int weight);
     const unsigned int nodes() const;
-    const vector<pair<unsigned int, long long unsigned int>> & incomingEdges(const unsigned int x)const;
-    const vector<pair<unsigned int, long long unsigned int>> & outgoingEdges(const unsigned int x)const;
+    const vector<pair<unsigned int, unsigned int>> & incomingEdges(const unsigned int x)const;
+    const vector<pair<unsigned int, unsigned int>> & outgoingEdges(const unsigned int x)const;
 };
 
 #endif //TRANSIT_NODE_ROUTING_GRAPH_H

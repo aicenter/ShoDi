@@ -8,7 +8,7 @@
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-double TNRAFBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < long long unsigned int > & distances) {
+double TNRAFBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances) {
     TNRAFDistanceQueryManager queryManager(graph);
 
     Timer tnrTimer("Transit Node Routing trips benchmark");

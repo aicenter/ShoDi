@@ -11,9 +11,9 @@
 //______________________________________________________________________________________________________________________
 class PreprocessingEdgeData {
 public:
-    PreprocessingEdgeData(const long long unsigned int b, const unsigned int c, const bool d);
+    PreprocessingEdgeData(const unsigned int b, const unsigned int c, const bool d);
     PreprocessingEdgeData(const PreprocessingEdgeData & data);
-    long long unsigned int weight;
+    unsigned int weight;
     unsigned int middleNode;
     bool isShortcut;
 };

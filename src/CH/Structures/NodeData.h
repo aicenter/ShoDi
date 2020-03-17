@@ -12,8 +12,8 @@
 class NodeData {
 public:
     NodeData();
-    long long unsigned int forwardDist;
-    long long unsigned int backwardDist;
+    unsigned int forwardDist;
+    unsigned int backwardDist;
     unsigned int rank;
     bool forwardReached;
     bool backwardReached;

@@ -172,7 +172,7 @@ void DIMACSLoader::transformEdges(ifstream & input, ofstream & output, unsigned 
         getline(input, buffer);
         if (buffer[0] == 'a') {
             unsigned int from, to;
-            long long unsigned int weight;
+            unsigned int weight;
             getEdge(buffer, from, to, weight);
             output << from << " " << to << " " << weight << " 1" << endl;
             loadededgescnt++;
@@ -188,7 +188,7 @@ void DIMACSLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned in
         getline(input, buffer);
         if (buffer[0] == 'a') {
             unsigned int from, to;
-            long long unsigned int weight;
+            unsigned int weight;
             getEdge(buffer, from, to, weight);
             if(from != to) {
                 graph.addEdge(from, to, weight);
@@ -206,7 +206,7 @@ void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigne
         getline(input, buffer);
         if (buffer[0] == 'a') {
             unsigned int from, to;
-            long long unsigned int weight;
+            unsigned int weight;
             getEdge(buffer, from, to, weight);
             if(from != to) {
                 graph.addEdge(from, to, weight);
@@ -217,7 +217,7 @@ void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigne
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & to, long long unsigned int & weight) {
+void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight) {
     unsigned int position = 2;
     unsigned int tmpfrom = 0;
     while (buffer[position] != ' ') {
@@ -235,7 +235,7 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
     }
 
     position++;
-    long long unsigned int tmpweight = 0;
+    unsigned int tmpweight = 0;
     while(position < buffer.size()) {
         tmpweight *= 10;
         tmpweight += (buffer[position] - 48);

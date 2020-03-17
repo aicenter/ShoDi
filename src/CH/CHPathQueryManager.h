@@ -27,17 +27,17 @@ using namespace std;
 class CHPathQueryManager {
 public:
     CHPathQueryManager(FlagsGraphWithUnpackingData & g);
-    long long unsigned int findDistanceOutputPath(const unsigned int source, const unsigned int target);
-    long long unsigned int findDistanceOnly(const unsigned int source, const unsigned int target);
-    long long unsigned int findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
-    long long unsigned int findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges);
-    long long unsigned int findPath(const unsigned int source, const unsigned int target, vector<SimpleEdge> & path);
+    unsigned int findDistanceOutputPath(const unsigned int source, const unsigned int target);
+    unsigned int findDistanceOnly(const unsigned int source, const unsigned int target);
+    unsigned int findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
+    unsigned int findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges);
+    unsigned int findPath(const unsigned int source, const unsigned int target, vector<SimpleEdge> & path);
     void printEdgesForwardShortcut(const unsigned int source, const unsigned int target);
     void printEdgesBackwardShortcut(const unsigned int source, const unsigned int target);
 protected:
-    long long unsigned int processQuery(const unsigned int source, const unsigned int target);
-    void forwardStall(unsigned int stallnode, long long unsigned int stalldistance);
-    void backwardStall(unsigned int stallnode, long long unsigned int stalldistance);
+    unsigned int processQuery(const unsigned int source, const unsigned int target);
+    void forwardStall(unsigned int stallnode, unsigned int stalldistance);
+    void backwardStall(unsigned int stallnode, unsigned int stalldistance);
     void outputPath(const unsigned int meetingNode);
     void fillPathInfo(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths);
     void fillPathInfoEdgesOnly(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int>> & edges);
@@ -61,7 +61,7 @@ protected:
     void getForwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<SimpleEdge> & path);
     void getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<SimpleEdge> & path);
     FlagsGraphWithUnpackingData & graph;
-    long long unsigned int upperbound;
+    unsigned int upperbound;
     unsigned int meetingNode;
     vector<unsigned int> forwardChanged;
     vector<unsigned int> backwardChanged;

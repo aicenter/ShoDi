@@ -17,12 +17,12 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class SimpleGraph{
 private:
-    vector< map < unsigned int, long long unsigned int > > followingNodes;
+    vector< map < unsigned int, unsigned int > > followingNodes;
 public:
     SimpleGraph(unsigned int n);
-    void addEdge(unsigned int from, unsigned int to, long long unsigned int weight);
+    void addEdge(unsigned int from, unsigned int to, unsigned int weight);
     const unsigned int nodes() const;
-    const map<unsigned int, long long unsigned int> & edges(const unsigned int x)const;
+    const map<unsigned int, unsigned int> & edges(const unsigned int x)const;
 };
 
 

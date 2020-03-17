@@ -12,9 +12,9 @@
 //______________________________________________________________________________________________________________________
 class QueryEdgeWithUnpackingData {
 public:
-    QueryEdgeWithUnpackingData(const unsigned int a, const long long unsigned int b, const bool c, const bool d, const unsigned int mNode = UINT_MAX);
+    QueryEdgeWithUnpackingData(const unsigned int a, const unsigned int b, const bool c, const bool d, const unsigned int mNode = UINT_MAX);
     QueryEdgeWithUnpackingData(const QueryEdgeWithUnpackingData & x);
-    long long unsigned int weight;
+    unsigned int weight;
     unsigned int targetNode;
     unsigned int middleNode;
     bool forward;

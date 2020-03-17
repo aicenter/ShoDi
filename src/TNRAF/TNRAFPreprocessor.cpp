@@ -19,7 +19,7 @@ unsigned int TNRAFPreprocessor::totalArcFlags;
 unsigned int TNRAFPreprocessor::trueArcFlags;
 unsigned int TNRAFPreprocessor::totalAccessNodes;
 unsigned int TNRAFPreprocessor::uselessAccessNodes;
-long long unsigned int TNRAFPreprocessor::triedCombinations;
+unsigned int TNRAFPreprocessor::triedCombinations;
 unsigned int TNRAFPreprocessor::incorrectANdistances;
 unsigned int TNRAFPreprocessor::ANdistances;
 unsigned int TNRAFPreprocessor::clusteringSkips;
@@ -92,7 +92,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
     }
 
     //printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
-    printf("Tried %llu combinations when determining access nodes.\n", triedCombinations);
+    printf("Tried %u combinations when determining access nodes.\n", triedCombinations);
     printf("Additionally, %u out of %u access nodes have incorrect distances. That is %lf %%.\n", incorrectANdistances, ANdistances, ((double) incorrectANdistances / ANdistances) * 100);
 
     if(useDistanceMatrix) {
@@ -266,7 +266,7 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
     }
 
     printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
-    printf("Tried %llu combinations when determining access nodes.\n", triedCombinations);
+    printf("Tried %u combinations when determining access nodes.\n", triedCombinations);
 
     printf("Will now output search spaces.\n");
 
@@ -321,7 +321,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
 
     while (! forwardQ.empty() ) {
         unsigned int curNode = forwardQ.top().ID;
-        long long unsigned int curLen = forwardQ.top().weight;
+        unsigned int curLen = forwardQ.top().weight;
         forwardQ.pop();
 
         if(settled[curNode]) {
@@ -348,7 +348,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
@@ -470,7 +470,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
 
     while (! backwardQ.empty() ) {
         unsigned int curNode = backwardQ.top().ID;
-        long long unsigned int curLen = backwardQ.top().weight;
+        unsigned int curLen = backwardQ.top().weight;
         backwardQ.pop();
 
         if(settled[curNode]) {
@@ -497,7 +497,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
@@ -609,11 +609,11 @@ void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructu
     for(unsigned int i = 0; i < clustersCnt; ++i) {
         const unsigned int nodeID = approxNodesPerCluster * i;
         assignedClusters[nodeID] = i;
-        const vector<pair<unsigned int, unsigned long long int>> & neighboursFW = originalGraph.outgoingEdges(nodeID);
+        const vector<pair<unsigned int, unsigned int>> & neighboursFW = originalGraph.outgoingEdges(nodeID);
         for(unsigned int j = 0; j < neighboursFW.size(); ++j) {
             q[i].push(neighboursFW[j].first);
         }
-        const vector<pair<unsigned int, unsigned long long int>> & neighboursBW = originalGraph.incomingEdges(nodeID);
+        const vector<pair<unsigned int, unsigned int>> & neighboursBW = originalGraph.incomingEdges(nodeID);
         for(unsigned int j = 0; j < neighboursBW.size(); ++j) {
             q[i].push(neighboursBW[j].first);
         }
@@ -625,11 +625,11 @@ void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructu
             const unsigned int newNodeForCluster = getNewNodeForCluster(assignedClusters, q[i]);
 
             assignedClusters[newNodeForCluster] = i;
-            const vector<pair<unsigned int, unsigned long long int>> & neighboursFW = originalGraph.outgoingEdges(newNodeForCluster);
+            const vector<pair<unsigned int, unsigned int>> & neighboursFW = originalGraph.outgoingEdges(newNodeForCluster);
             for(unsigned int j = 0; j < neighboursFW.size(); ++j) {
                 q[i].push(neighboursFW[j].first);
             }
-            const vector<pair<unsigned int, unsigned long long int>> & neighboursBW = originalGraph.incomingEdges(newNodeForCluster);
+            const vector<pair<unsigned int, unsigned int>> & neighboursBW = originalGraph.incomingEdges(newNodeForCluster);
             for(unsigned int j = 0; j < neighboursBW.size(); ++j) {
                 q[i].push(neighboursBW[j].first);
             }

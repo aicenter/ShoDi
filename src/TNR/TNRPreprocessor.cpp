@@ -276,7 +276,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
     while (! forwardQ.empty() ) {
         unsigned int curNode = forwardQ.top().ID;
-        long long unsigned int curLen = forwardQ.top().weight;
+        unsigned int curLen = forwardQ.top().weight;
         forwardQ.pop();
 
         if(settled[curNode]) {
@@ -303,7 +303,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
@@ -350,7 +350,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
     while (! forwardQ.empty() ) {
         unsigned int curNode = forwardQ.top().ID;
-        long long unsigned int curLen = forwardQ.top().weight;
+        unsigned int curLen = forwardQ.top().weight;
         forwardQ.pop();
 
         if(settled[curNode]) {
@@ -377,7 +377,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
@@ -419,7 +419,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
     while (! forwardQ.empty() ) {
         unsigned int curNode = forwardQ.top().ID;
-        long long unsigned int curLen = forwardQ.top().weight;
+        unsigned int curLen = forwardQ.top().weight;
         forwardQ.pop();
 
         if(settled[curNode]) {
@@ -444,7 +444,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
                 // We change the distances here, but don't push into the queue if the distance improves.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                     }
@@ -467,7 +467,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
@@ -518,7 +518,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 
     while (! backwardQ.empty() ) {
         unsigned int curNode = backwardQ.top().ID;
-        long long unsigned int curLen = backwardQ.top().weight;
+        unsigned int curLen = backwardQ.top().weight;
         backwardQ.pop();
 
         if(settled[curNode]) {
@@ -545,7 +545,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
@@ -593,7 +593,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 
     while (! backwardQ.empty() ) {
         unsigned int curNode = backwardQ.top().ID;
-        long long unsigned int curLen = backwardQ.top().weight;
+        unsigned int curLen = backwardQ.top().weight;
         backwardQ.pop();
 
         if(settled[curNode]) {
@@ -620,7 +620,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
                         backwardQ.push(DijkstraNode((*iter).targetNode, newlen));

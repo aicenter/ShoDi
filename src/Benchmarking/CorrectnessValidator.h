@@ -18,8 +18,8 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class CorrectnessValidator {
 public:
-    static bool validate(vector < long long unsigned int > & a, vector < long long unsigned int > & b);
-    static bool validateVerbose(vector < long long unsigned int > & a, vector < long long unsigned int > & b);
+    static bool validate(vector < unsigned int > & a, vector < unsigned int > & b);
+    static bool validateVerbose(vector < unsigned int > & a, vector < unsigned int > & b);
 private:
 };
 

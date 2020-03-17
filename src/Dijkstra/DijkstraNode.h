@@ -12,9 +12,9 @@
 //______________________________________________________________________________________________________________________
 class DijkstraNode {
 public:
-    DijkstraNode(unsigned int x, long long unsigned int y);
+    DijkstraNode(unsigned int x, unsigned int y);
     unsigned int ID;
-    long long unsigned int weight;
+    unsigned int weight;
 
 };
 

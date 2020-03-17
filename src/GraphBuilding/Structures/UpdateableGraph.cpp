@@ -13,7 +13,7 @@ Graph * UpdateableGraph::createCopy() {
     for (unsigned int i = 0; i < n; i++) {
         for (auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             unsigned int target = (*iter).first;
-            long long unsigned int weight = (*iter).second.weight;
+            unsigned int weight = (*iter).second.weight;
             newInst->addEdge(i, target, weight);
         }
     }
@@ -28,7 +28,7 @@ UpdateableGraph::UpdateableGraph(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
-bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, long long unsigned int weight) {
+bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to).weight > weight) {
             followingNodes.at(from).at(to).weight = weight;
@@ -44,7 +44,7 @@ bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, long long unsi
 }
 
 //______________________________________________________________________________________________________________________
-bool UpdateableGraph::addShortcutEdge(unsigned int from, unsigned int to, long long unsigned int weight, unsigned int middlenode) {
+bool UpdateableGraph::addShortcutEdge(unsigned int from, unsigned int to, unsigned int weight, unsigned int middlenode) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to).weight > weight) {
             followingNodes.at(from).at(to).weight = weight;
@@ -83,7 +83,7 @@ bool UpdateableGraph::isShortcut(const unsigned int from, const unsigned int to)
 }
 
 //______________________________________________________________________________________________________________________
-const unordered_map<unsigned int, long long unsigned int> & UpdateableGraph::incomingEdges(const unsigned int x)const {
+const unordered_map<unsigned int, unsigned int> & UpdateableGraph::incomingEdges(const unsigned int x)const {
     return previousNodes.at(x);
 }
 

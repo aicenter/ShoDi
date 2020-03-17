@@ -16,10 +16,10 @@ FlagsGraphWithUnpackingData::FlagsGraphWithUnpackingData(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw, unsigned int mNode) {
+void FlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw, unsigned int mNode) {
     neighbours.at(from).push_back(QueryEdgeWithUnpackingData(to, weight, fw, bw, mNode));
     if(to == 4294967295) {
-        printf("Adding edge from %u to %u. (Weight %llu, fw: %s, bw: %s, middle node: %u)\n", from, to, weight, fw ? "true" : "false", bw ? "true" : "false", mNode);
+        printf("Adding edge from %u to %u. (Weight %u, fw: %s, bw: %s, middle node: %u)\n", from, to, weight, fw ? "true" : "false", bw ? "true" : "false", mNode);
     }
 }
 
@@ -43,7 +43,7 @@ NodeData & FlagsGraphWithUnpackingData::data(unsigned int node) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraphWithUnpackingData::resetForwardInfo(const unsigned int node) {
-    nodesData[node].forwardDist = ULLONG_MAX;
+    nodesData[node].forwardDist = UINT_MAX;
     nodesData[node].forwardSettled = false;
     nodesData[node].forwardReached = false;
 
@@ -51,7 +51,7 @@ void FlagsGraphWithUnpackingData::resetForwardInfo(const unsigned int node) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraphWithUnpackingData::resetBackwardInfo(const unsigned int node) {
-    nodesData[node].backwardDist = ULLONG_MAX;
+    nodesData[node].backwardDist = UINT_MAX;
     nodesData[node].backwardSettled = false;
     nodesData[node].backwardReached = false;
 }

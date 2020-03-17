@@ -31,8 +31,8 @@ private:
     static unsigned long long int longestPossibleShortcut(const unsigned int source);
     static void updateNeighboursPriorities(const unsigned int x, UpdateableGraph & graph, CHpriorityQueue & priorityQueue);
     static void manyToManyWithBuckets(UpdateableGraph & graph, bool deep);
-    static void initBuckets(const unsigned int x, UpdateableGraph & graph, long long unsigned int & lowestBucketVal);
-    static void oneToManyWithBuckets(const unsigned int source, const long long unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit = 5, unsigned int maxexpanded = 1000);
+    static void initBuckets(const unsigned int x, UpdateableGraph & graph, unsigned int & lowestBucketVal);
+    static void oneToManyWithBuckets(const unsigned int source, const unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit = 5, unsigned int maxexpanded = 1000);
     static void getPossibleShortcuts(const unsigned int i, UpdateableGraph & graph, bool deep);
     static unsigned int calculateShortcutsAmount();
     static void actuallyAddShortcutsWithUnpackingData(UpdateableGraph & graph, unsigned int x);
@@ -51,14 +51,14 @@ private:
 
     static vector<bool> contracted;
     static vector<unsigned int> preprocessingDegrees;
-    static vector<long long unsigned int> dijkstraDistance;
+    static vector<unsigned int> dijkstraDistance;
     static vector<ShortcutEdge> allShortcuts;
-    static unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, pair_hash> distances;
-    static unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, pair_hash> distancesWithoutX;
+    static unordered_map<pair<unsigned int, unsigned int>, unsigned int, pair_hash> distances;
+    static unordered_map<pair<unsigned int, unsigned int>, unsigned int, pair_hash> distancesWithoutX;
     static vector<unsigned int> sources;
     static vector<unsigned int> targets;
     static unordered_set<unsigned int> targetsSet;
-    static unordered_map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > buckets;
+    static unordered_map<unsigned int, vector<pair<unsigned int, unsigned int > > > buckets;
 
 
 

@@ -13,13 +13,13 @@
 //______________________________________________________________________________________________________________________
 class BasicDijkstra {
 public:
-    static long long unsigned int run(const unsigned int source, const unsigned int target, const Graph & graph);
-    static long long unsigned int runWithPathOutput(const unsigned int source, const unsigned int target, const Graph & graph);
+    static unsigned int run(const unsigned int source, const unsigned int target, const Graph & graph);
+    static unsigned int runWithPathOutput(const unsigned int source, const unsigned int target, const Graph & graph);
     static void computeOneToAllDistances(const unsigned int source, const Graph & graph, vector<unsigned int> & distances);
     static void computeOneToAllDistancesInReversedGraph(const unsigned int source, const Graph & graph, vector<unsigned int> & distances);
 
 private:
-    static void outputPath(const unsigned int x, const long long unsigned int * dist, const vector < vector < unsigned int > > & prev);
+    static void outputPath(const unsigned int x, const unsigned int * dist, const vector < vector < unsigned int > > & prev);
 };
 
 

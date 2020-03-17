@@ -14,7 +14,7 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 class TNRAFBenchmark {
 public:
-    static double runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < long long unsigned int > & distances);
+    static double runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances);
 };
 
 

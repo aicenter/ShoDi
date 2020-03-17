@@ -21,18 +21,18 @@ void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned 
     for(unsigned int i = 0; i < trips.size(); i++) {
         vector < pair < unsigned int, unsigned int > > path;
         vector < unsigned int > distances;
-        long long unsigned int reportedDistance = qm.findPath(trips[i].first, trips[i].second, path, distances);
+        unsigned int reportedDistance = qm.findPath(trips[i].first, trips[i].second, path, distances);
 
         for(unsigned int j = 0; j < path.size(); j++) {
             unsigned int curSource = path[j].first;
-            vector<pair<unsigned int, long long unsigned int>> neighbours = originalGraph.outgoingEdges(curSource);
+            vector<pair<unsigned int, unsigned int>> neighbours = originalGraph.outgoingEdges(curSource);
 
             bool found = false;
             for(unsigned int k = 0; k < neighbours.size(); k++) {
                 if (neighbours[k].first == path[j].second) {
                     found = true;
                     if (neighbours[k].second != distances[j]) {
-                        printf("Found mismatch in trip '%u': length of edge '%u -> %u' reported by CH was %u, actual length is %llu.\n", i, curSource, path[j].second, distances[j], neighbours[k].second);
+                        printf("Found mismatch in trip '%u': length of edge '%u -> %u' reported by CH was %u, actual length is %u.\n", i, curSource, path[j].second, distances[j], neighbours[k].second);
                         pathMismatches++;
                     }
                     break;
@@ -47,13 +47,13 @@ void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned 
 
         }
 
-        long long unsigned int sumDistance = 0;
+        unsigned int sumDistance = 0;
         for(unsigned int j = 0; j < distances.size(); j++) {
             sumDistance += distances[j];
         }
 
-        if (sumDistance != reportedDistance && reportedDistance != ULLONG_MAX) {
-            printf("Found mismatch in trip '%u': Reported distance was %llu while the sum of all the reported edges was %llu\n", i, reportedDistance, sumDistance);
+        if (sumDistance != reportedDistance && reportedDistance != UINT_MAX) {
+            printf("Found mismatch in trip '%u': Reported distance was %u while the sum of all the reported edges was %u\n", i, reportedDistance, sumDistance);
             distanceSumMismatches++;
         }
 

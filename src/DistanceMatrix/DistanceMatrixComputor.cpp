@@ -59,7 +59,7 @@ void DistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int rowID, con
         const DijkstraNode current = q.top();
 
         if (useReversedGraph) {
-            const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.incomingEdges(current.ID);
+            const vector < pair < unsigned int, unsigned int > > & neighbours = graph.incomingEdges(current.ID);
             for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
                 long long unsigned int newDistance = current.weight + neighbours.at(i).second;
                 if (newDistance < distance[neighbours.at(i).first]) {
@@ -68,7 +68,7 @@ void DistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int rowID, con
                 }
             }
         } else {
-            const vector < pair < unsigned int, long long unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+            const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
             for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
                 long long unsigned int newDistance = current.weight + neighbours.at(i).second;
                 if (newDistance < distance[neighbours.at(i).first]) {

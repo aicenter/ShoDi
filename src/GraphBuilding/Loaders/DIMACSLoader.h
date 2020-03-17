@@ -29,7 +29,7 @@ private:
     void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
     void parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges);
     void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
-    void getEdge(string & buffer, unsigned int & from, unsigned int & to, long long unsigned int & weight);
+    void getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight);
     void transformEdges(ifstream & input, ofstream & output, unsigned int edges);
 public:
     DIMACSLoader(string inputFile);

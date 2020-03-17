@@ -19,14 +19,14 @@ using namespace std;
 //______________________________________________________________________________________________________________________
 vector<bool> CHPreprocessor::contracted(0);
 vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
-vector<long long unsigned int> CHPreprocessor::dijkstraDistance(0);
+vector<unsigned int> CHPreprocessor::dijkstraDistance(0);
 vector<ShortcutEdge> CHPreprocessor::allShortcuts;
-unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distances;
-unordered_map<pair<unsigned int, unsigned int>, long long unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distancesWithoutX;
+unordered_map<pair<unsigned int, unsigned int>, unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distances;
+unordered_map<pair<unsigned int, unsigned int>, unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distancesWithoutX;
 vector<unsigned int> CHPreprocessor::sources(0);
 vector<unsigned int> CHPreprocessor::targets(0);
 unordered_set<unsigned int> CHPreprocessor::targetsSet;
-unordered_map<unsigned int, vector<pair<unsigned int, long long unsigned int > > > CHPreprocessor::buckets;
+unordered_map<unsigned int, vector<pair<unsigned int, unsigned int > > > CHPreprocessor::buckets;
 
 // The 'main' preprocessing function. The result of calling this function is the UpdateableGraph containing all the
 // given shortcuts. During this function, the original edges will be removed from the graph, so don't forget to
@@ -41,7 +41,7 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
 
     CHPreprocessor::contracted.resize(graph.nodes(), false);
     CHPreprocessor::preprocessingDegrees.resize(graph.nodes());
-    CHPreprocessor::dijkstraDistance.resize(graph.nodes(), ULLONG_MAX);
+    CHPreprocessor::dijkstraDistance.resize(graph.nodes(), UINT_MAX);
     EdgeDifferenceManager::init(graph.nodes());
 
     initializePriorityQueue(priorityQueue, graph);
@@ -134,7 +134,7 @@ void CHPreprocessor::reinsertShortcuts(UpdateableGraph & graph) {
 // Helper function that adjust neighbourg degrees when a node is contracted.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, UpdateableGraph & graph) {
-    unordered_map < unsigned int, long long unsigned int > previousNodes = graph.incomingEdges(x);
+    unordered_map < unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
     unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
     for(auto iter = previousNodes.begin(); iter != previousNodes.end(); ++iter) {
@@ -153,7 +153,7 @@ void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, UpdateableGra
 // might have changed, because those neighbours might now have a different amount of edges than before.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, UpdateableGraph & graph, CHpriorityQueue & priorityQueue) {
-    unordered_map < unsigned int, long long unsigned int > previousNodes = graph.incomingEdges(x);
+    unordered_map < unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
     unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
     unordered_set < unsigned int > alreadyUpdated;
@@ -259,7 +259,7 @@ void CHPreprocessor::clearStructures() {
 // of the shortcut that could be added between those two neighbours if the node i was contracted.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph & graph ) {
-    unordered_map <unsigned int, long long unsigned int> i_sources = graph.incomingEdges(i);
+    unordered_map <unsigned int, unsigned int> i_sources = graph.incomingEdges(i);
     unordered_map <unsigned int, PreprocessingEdgeData> i_targets = graph.outgoingEdges(i);
     for(auto iter1 = i_sources.begin(); iter1 != i_sources.end(); ++iter1) {
         for(auto iter2 = i_targets.begin(); iter2 != i_targets.end(); ++iter2) {
@@ -294,7 +294,7 @@ void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph
 // upper bound during the oneToManyWithBuckets() function.
 //______________________________________________________________________________________________________________________
 unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned int source) {
-    long long unsigned int longest = 0;
+    unsigned int longest = 0;
     for(auto iter = targets.begin(); iter != targets.end(); ++iter) {
         //printf("Will find distance for: %u -> %u\n", source, *iter);
         if(*iter != source) {
@@ -312,7 +312,7 @@ unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned in
 // as the proposed shortcut.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
-    long long unsigned int lowestBucketVal = ULLONG_MAX;
+    unsigned int lowestBucketVal = UINT_MAX;
     for(unsigned int i = 0; i < targets.size(); i++) {
         initBuckets(targets[i], graph, lowestBucketVal);
     }
@@ -325,7 +325,7 @@ void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
     }
 
     for(unsigned int i = 0; i < sources.size(); i++) {
-        long long unsigned int longestShortcut = longestPossibleShortcut(sources[i]);
+        unsigned int longestShortcut = longestPossibleShortcut(sources[i]);
         oneToManyWithBuckets(sources[i], longestShortcut - lowestBucketVal, graph, hops, searchspace);
     }
 }
@@ -335,12 +335,12 @@ void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
 // exists a bucket entry for a node we're expanding, if yes, we immediately know that there exists a path from that
 // node to some target node and we also have it's length.
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, long long unsigned int & lowestBucketVal) {
-    const unordered_map<unsigned int, long long unsigned int> neighbours = graph.incomingEdges(x);
+void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, unsigned int & lowestBucketVal) {
+    const unordered_map<unsigned int, unsigned int> neighbours = graph.incomingEdges(x);
     for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
         if (! contracted[(*iter).first]) {
             if (buckets.count((*iter).first) == 0) {
-                buckets.insert(make_pair((*iter).first, vector<pair<unsigned int, long long unsigned int>>()));
+                buckets.insert(make_pair((*iter).first, vector<pair<unsigned int, unsigned int>>()));
             }
             buckets.at((*iter).first).push_back(make_pair(x, (*iter).second));
             if((*iter).second < lowestBucketVal) {
@@ -358,7 +358,7 @@ void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, 
 // 3) We have reached the space search limit - that means we have either expanded to much nodes or all our paths already
 //    have more hops (edges) than the limit.
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const long long unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
+void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
     vector<unsigned int> nodesWithChangedDistances;
     unsigned int targetsAmount = targets.size();
     unsigned int targetsFound = 0;
@@ -398,14 +398,14 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const long 
         for ( auto n_iter = neighbours.begin(); n_iter != neighbours.end(); ++n_iter ) {
             if (buckets.count((*n_iter).first) == 1 ) {
                 for(auto iter = buckets[(*n_iter).first].begin(); iter != buckets[(*n_iter).first].end(); ++iter) {
-                    long long unsigned int newDistUsingBucket = current.weight + (*n_iter).second.weight + (*iter).second;
+                    unsigned int newDistUsingBucket = current.weight + (*n_iter).second.weight + (*iter).second;
                     if (newDistUsingBucket < dijkstraDistance[(*iter).first]) {
                         dijkstraDistance[(*iter).first] = newDistUsingBucket;
                         nodesWithChangedDistances.push_back((*iter).first);
                     }
                 }
             }
-            long long unsigned int newDistance = current.weight + (*n_iter).second.weight;
+            unsigned int newDistance = current.weight + (*n_iter).second.weight;
             if (! CHPreprocessor::contracted[(*n_iter).first] && newDistance < dijkstraDistance[(*n_iter).first]) {
                 dijkstraDistance[(*n_iter).first] = newDistance;
                 nodesWithChangedDistances.push_back((*n_iter).first);
@@ -422,7 +422,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const long 
     }
 
     for(unsigned int i = 0; i < nodesWithChangedDistances.size(); i++) {
-        dijkstraDistance[nodesWithChangedDistances[i]] = ULLONG_MAX;
+        dijkstraDistance[nodesWithChangedDistances[i]] = UINT_MAX;
     }
 
 }

@@ -73,7 +73,7 @@ unsigned int TransitNodeRoutingArcFlagsGraph::findTNRAFDistance(unsigned int sou
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingArcFlagsGraph::resetForwardInfo(const unsigned int node) {
     //printf("TransitNodeRoutingArcFlagsGraph resetForwardInfo was called.\n");
-    nodesData[node].forwardDist = ULLONG_MAX;
+    nodesData[node].forwardDist = UINT_MAX;
     nodesData[node].forwardSettled = false;
     nodesData[node].forwardReached = false;
 }
@@ -82,7 +82,7 @@ void TransitNodeRoutingArcFlagsGraph::resetForwardInfo(const unsigned int node) 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingArcFlagsGraph::resetBackwardInfo(const unsigned int node) {
     //printf("TransitNodeRoutingArcFlagsGraph resetBackwardInfo was called.\n");
-    nodesData[node].backwardDist = ULLONG_MAX;
+    nodesData[node].backwardDist = UINT_MAX;
     nodesData[node].backwardSettled = false;
     nodesData[node].backwardReached = false;
 }

@@ -136,7 +136,7 @@ void createTNRwithValidation() {
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n2000_DM_mar", 2000);
+    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n1000_DM_mar", 1000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -214,7 +214,7 @@ void compareMethods() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     FlagsGraph * ch = chLoader.loadFlagsGraph();
 
-    vector<long long unsigned int> chDistances(trips.size());
+    vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
@@ -223,7 +223,7 @@ void compareMethods() {
     XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
     Graph * dijkstraGraph = dijkstraLoader.loadGraph();
 
-    vector<long long unsigned int> dijkstraDistances(trips.size());
+    vector<unsigned int> dijkstraDistances(trips.size());
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
 
     CorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
@@ -234,7 +234,7 @@ void compareMethods() {
     TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_sept.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnrDistances(trips.size());
+    vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
     CorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
@@ -257,7 +257,7 @@ void compareFourMethods() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     FlagsGraph * ch = chLoader.loadFlagsGraph();
 
-    vector<long long unsigned int> chDistances(trips.size());
+    vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
@@ -266,7 +266,7 @@ void compareFourMethods() {
     XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
     Graph * dijkstraGraph = dijkstraLoader.loadGraph();
 
-    vector<long long unsigned int> dijkstraDistances(trips.size());
+    vector<unsigned int> dijkstraDistances(trips.size());
     double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
 
     CorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
@@ -274,10 +274,10 @@ void compareFourMethods() {
 
     delete dijkstraGraph;
 
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnrDistances(trips.size());
+    vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
     CorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
@@ -289,14 +289,83 @@ void compareFourMethods() {
     DistanceMatrixLoader distanceMatrixLoader = DistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
     DistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
 
-    vector<long long unsigned int> dmDistances(trips.size());
+    vector<unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(trips, *distanceMatrix, dmDistances);
 
     CorrectnessValidator::validateVerbose(dmDistances, dijkstraDistances);
     printf("Distance Matrix was %lf times faster than Dijkstra!\n", dijkstraTime/dmTime);
     printf("Distance Matrix was %lf times faster than CH!\n", chTime/dmTime);
     printf("Distance Matrix was %lf times faster than TNR!\n", tnrTime/dmTime);
+}
 
+// Compares the running times of Dijkstra, Contraction Hierarchies, Transit Node Routing and Distance Matrix on a given
+// set of trips (queries).
+//______________________________________________________________________________________________________________________
+void compareFiveMethods() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<unsigned int> chDistances(trips.size());
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    Graph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    CorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
+
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    vector<unsigned int> tnrDistances(trips.size());
+    double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
+
+    CorrectnessValidator::validateVerbose(tnrDistances, dijkstraDistances);
+    printf("TNR was %lf times faster than Dijkstra!\n", dijkstraTime/tnrTime);
+    printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
+
+    delete tnrGraph;
+
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n2000_useDM_mar_clust.tgaf");
+    //TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar_clust_var2.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    vector<unsigned int> tnrafDistances(trips.size());
+    double tnrafTime = TNRAFBenchmark::runAndMeasureOutputAndRetval(trips, *tnrafGraph, tnrafDistances);
+
+    CorrectnessValidator::validateVerbose(tnrafDistances, dijkstraDistances);
+    printf("TNRAF was %lf times faster than Dijkstra!\n", dijkstraTime/tnrafTime);
+    printf("TNRAF was %lf times faster than CH!\n", chTime/tnrafTime);
+    printf("TNRAF was %lf times faster than TNR!\n", tnrTime/tnrafTime);
+
+    delete tnrafGraph;
+
+    DistanceMatrixLoader distanceMatrixLoader = DistanceMatrixLoader("../input/Prague_int_1000prec.xdm");
+    DistanceMatrix * distanceMatrix = distanceMatrixLoader.loadDistanceMatrix();
+
+    vector<unsigned int> dmDistances(trips.size());
+    double dmTime = DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(trips, *distanceMatrix, dmDistances);
+
+    CorrectnessValidator::validateVerbose(dmDistances, dijkstraDistances);
+    printf("Distance Matrix was %lf times faster than Dijkstra!\n", dijkstraTime/dmTime);
+    printf("Distance Matrix was %lf times faster than CH!\n", chTime/dmTime);
+    printf("Distance Matrix was %lf times faster than TNR!\n", tnrTime/dmTime);
+    printf("Distance Matrix was %lf times faster than TNRAF!\n", tnrafTime/dmTime);
+
+    delete distanceMatrix;
 }
 
 // Compares the running times of Contraction Hierarchies and Transit Node Routing on a given set of trips (queries).
@@ -310,7 +379,7 @@ void compareCHandTNR() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     FlagsGraph * ch = chLoader.loadFlagsGraph();
 
-    vector<long long unsigned int> chDistances(trips.size());
+    vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
 
     delete ch;
@@ -319,7 +388,7 @@ void compareCHandTNR() {
     TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnrDistances(trips.size());
+    vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
     CorrectnessValidator::validateVerbose(tnrDistances, chDistances);
@@ -340,7 +409,7 @@ void compareTNRandTNRAF() {
     TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnrDistances(trips.size());
+    vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
 
     delete tnrGraph;
@@ -349,7 +418,7 @@ void compareTNRandTNRAF() {
     //TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n500_useDM_mar_clust_var2.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
-    vector<long long unsigned int> tnrafDistances(trips.size());
+    vector<unsigned int> tnrafDistances(trips.size());
     double tnrafTime = TNRAFBenchmark::runAndMeasureOutputAndRetval(trips, *tnrafGraph, tnrafDistances);
 
     delete tnrafGraph;
@@ -372,7 +441,7 @@ void compareVariousTransitSetSizes() {
     TNRGLoader tnr500Loader = TNRGLoader("../input/Prague_map_1000_newFilter_500nodes.tnrg");
     TransitNodeRoutingGraph * tnr500Graph = tnr500Loader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnr500Distances(trips.size());
+    vector<unsigned int> tnr500Distances(trips.size());
     double tnr500Time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr500Graph, tnr500Distances);
 
     delete tnr500Graph;
@@ -380,7 +449,7 @@ void compareVariousTransitSetSizes() {
     TNRGLoader tnr1000Loader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
     TransitNodeRoutingGraph * tnr1000Graph = tnr1000Loader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnr1000Distances(trips.size());
+    vector<unsigned int> tnr1000Distances(trips.size());
     double tnr1000Time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr1000Graph, tnr1000Distances);
 
     delete tnr1000Graph;
@@ -388,7 +457,7 @@ void compareVariousTransitSetSizes() {
     TNRGLoader tnr2000Loader = TNRGLoader("../input/Prague_map_1000_newFilter_2000nodes.tnrg");
     TransitNodeRoutingGraph * tnr2000Graph = tnr2000Loader.loadTNRforDistanceQueries();
 
-    vector<long long unsigned int> tnr2000Distances(trips.size());
+    vector<unsigned int> tnr2000Distances(trips.size());
     double tnr2000Time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr2000Graph, tnr2000Distances);
 
     delete tnr2000Graph;
@@ -502,9 +571,9 @@ void checkDijkstraDistances(unsigned int sourceNode, unsigned int sourceAccess, 
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     printf("~~~ Computing distances using Dijkstra ~~~\n");
-    printf("%u -> %u: %llu\n", sourceNode, sourceAccess, BasicDijkstra::run(sourceNode, sourceAccess, *dijkstraGraph));
-    printf("%u -> %u: %llu\n", sourceAccess, targetAccess, BasicDijkstra::run(sourceAccess, targetAccess, *dijkstraGraph));
-    printf("%u -> %u: %llu\n", targetAccess, targetNode, BasicDijkstra::run(targetAccess, targetNode, *dijkstraGraph));
+    printf("%u -> %u: %u\n", sourceNode, sourceAccess, BasicDijkstra::run(sourceNode, sourceAccess, *dijkstraGraph));
+    printf("%u -> %u: %u\n", sourceAccess, targetAccess, BasicDijkstra::run(sourceAccess, targetAccess, *dijkstraGraph));
+    printf("%u -> %u: %u\n", targetAccess, targetNode, BasicDijkstra::run(targetAccess, targetNode, *dijkstraGraph));
     printf("~~~ End of Dijkstra computation ~~~\n");
     delete dijkstraGraph;
 
@@ -539,9 +608,9 @@ void getCHPathForTrip(unsigned int tripNum) {
 
     CHPathQueryManager queryManager(*chGraph);
     //chGraph->debugPrint();
-    long long unsigned int distance = queryManager.findDistanceOutputPath(trips[tripNum].first,
+    unsigned int distance = queryManager.findDistanceOutputPath(trips[tripNum].first,
                                                                           trips[tripNum].second);
-    printf("Returned distance: %llu\n", distance);
+    printf("Returned distance: %u\n", distance);
 
     printf("Rank of node %u: %u\n", trips[tripNum].first, chGraph->data(trips[tripNum].first).rank);
     printf("Rank of node %u: %u\n", trips[tripNum].second, chGraph->data(trips[tripNum].second).rank);
@@ -655,12 +724,13 @@ void validateTNRAccessNodes() {
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     //createTNR();
-    //createTNRwithValidation();
+    createTNRwithValidation();
     //createTNRAF();
     //compareMethods();
     //compareFourMethods();
+    //compareFiveMethods();
     //compareCHandTNR();
-    compareTNRandTNRAF();
+    //compareTNRandTNRAF();
     //compareVariousTransitSetSizes();
 
     //validateCHPathCorectness();

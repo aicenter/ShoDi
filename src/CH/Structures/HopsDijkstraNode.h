@@ -14,7 +14,7 @@
 //______________________________________________________________________________________________________________________
 class HopsDijkstraNode : public DijkstraNode {
 public:
-    HopsDijkstraNode(unsigned int x, long long unsigned int y, unsigned int z);
+    HopsDijkstraNode(unsigned int x, unsigned int y, unsigned int z);
     unsigned int hops;
 };
 

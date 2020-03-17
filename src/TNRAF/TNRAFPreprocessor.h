@@ -39,7 +39,7 @@ protected:
     static unsigned int trueArcFlags;
     static unsigned int totalAccessNodes;
     static unsigned int uselessAccessNodes;
-    static long long unsigned int triedCombinations;
+    static unsigned int triedCombinations;
     static unsigned int incorrectANdistances;
     static unsigned int ANdistances;
     static unsigned int clusteringSkips;

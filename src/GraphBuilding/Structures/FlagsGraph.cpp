@@ -93,7 +93,7 @@ void FlagsGraph::processShortcuts( vector < OutputShortcutEdge > & shortcuts) {
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw) {
+void FlagsGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw) {
     neighbours.at(from).push_back(QueryEdge(to, weight, fw, bw));
 }
 
@@ -117,7 +117,7 @@ NodeData & FlagsGraph::data(unsigned int node) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::resetForwardInfo(const unsigned int node) {
-    nodesData[node].forwardDist = ULLONG_MAX;
+    nodesData[node].forwardDist = UINT_MAX;
     nodesData[node].forwardSettled = false;
     nodesData[node].forwardReached = false;
 
@@ -125,7 +125,7 @@ void FlagsGraph::resetForwardInfo(const unsigned int node) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::resetBackwardInfo(const unsigned int node) {
-    nodesData[node].backwardDist = ULLONG_MAX;
+    nodesData[node].backwardDist = UINT_MAX;
     nodesData[node].backwardSettled = false;
     nodesData[node].backwardReached = false;
 }

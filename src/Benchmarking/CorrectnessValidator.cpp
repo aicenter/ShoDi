@@ -7,7 +7,7 @@
 #include "CorrectnessValidator.h"
 
 //______________________________________________________________________________________________________________________
-bool CorrectnessValidator::validate(vector < long long unsigned int > & a, vector < long long unsigned int > & b) {
+bool CorrectnessValidator::validate(vector < unsigned int > & a, vector < unsigned int > & b) {
     for (unsigned int i = 0; i < a.size(); i++) {
         if (a.at(i) != b.at(i)) {
             return false;
@@ -17,12 +17,12 @@ bool CorrectnessValidator::validate(vector < long long unsigned int > & a, vecto
 }
 
 //______________________________________________________________________________________________________________________
-bool CorrectnessValidator::validateVerbose(vector < long long unsigned int > & a, vector < long long unsigned int > & b) {
+bool CorrectnessValidator::validateVerbose(vector < unsigned int > & a, vector < unsigned int > & b) {
     unsigned int mmcnt = 0;
     for (unsigned int i = 0; i < a.size(); i++) {
-        if ((unsigned int) a.at(i) != (unsigned int) b.at(i)) {
+        if (a.at(i) != b.at(i)) {
             printf("Found mismatch at trip %u (indexing trips from 0).\n", i);
-            printf("Vector 'a' contains: %llu, while vector 'b' contains: %llu.\n", a.at(i), b.at(i));
+            printf("Vector 'a' contains: %u, while vector 'b' contains: %u.\n", a.at(i), b.at(i));
             mmcnt++;//return false;
         }
     }

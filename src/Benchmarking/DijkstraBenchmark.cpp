@@ -22,7 +22,7 @@ void DijkstraBenchmark::runAndMeasure(const vector < pair < unsigned int, unsign
 }
 
 //______________________________________________________________________________________________________________________
-void DijkstraBenchmark::runAndMeasureWithOutput(const vector<pair<unsigned int, unsigned int> > &trips, const Graph &graph, vector<long long unsigned int> &distances) {
+void DijkstraBenchmark::runAndMeasureWithOutput(const vector<pair<unsigned int, unsigned int> > &trips, const Graph &graph, vector<unsigned int> &distances) {
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 
@@ -35,7 +35,7 @@ void DijkstraBenchmark::runAndMeasureWithOutput(const vector<pair<unsigned int, 
 }
 
 //______________________________________________________________________________________________________________________
-double DijkstraBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < long long unsigned int > & distances) {
+double DijkstraBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & distances) {
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 

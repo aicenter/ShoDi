@@ -32,7 +32,7 @@ public:
     FlagsGraph(unsigned int n);
     FlagsGraph(UpdateableGraph & g);
     void getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges);
-    void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw);
+    void addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw);
     const unsigned int nodes() const;
     const vector< QueryEdge > & nextNodes(const unsigned int x)const;
     virtual NodeData & data(unsigned int node);

@@ -20,7 +20,7 @@ CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
 // contraction rank from all nodes in the path. This implementation additionaly uses the 'stall-on-demand' technique
 // described in the same article which noticeably improved the query times.
 //______________________________________________________________________________________________________________________
-long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
+unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
@@ -40,7 +40,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
     graph.data(target).backwardReached = true;
 
     bool forward = false;
-    upperbound = ULLONG_MAX;
+    upperbound = UINT_MAX;
 
     while (! (forwardQ.empty() && backwardQ.empty())) {
         // Determine the search direction for the current iteration (forward of backward)
@@ -61,7 +61,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
             }
 
             unsigned int curNode = forwardQ.top().ID;
-            long long unsigned int curLen = forwardQ.top().weight;
+            unsigned int curLen = forwardQ.top().weight;
             forwardQ.pop();
 
             if (graph.data(curNode).forwardSettled || graph.data(curNode).forwardStalled) {
@@ -73,7 +73,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
             // Check if the node was already settled in the opposite direction - if yes, we get a new candidate
             // for the shortest path.
             if ( graph.data(curNode).backwardSettled ) {
-                long long unsigned int newUpperboundCandidate = curLen +  graph.data(curNode).backwardDist;
+                unsigned int newUpperboundCandidate = curLen +  graph.data(curNode).backwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
                 }
@@ -87,7 +87,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
                 // we reach a node on a suboptimal path in the forward direction, because the actual optimal path
                 // will be later found in the backward direction)
                 if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
-                    long long unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
+                    unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         graph.data(curNode).forwardDist = newdistance;
                         //forwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
@@ -101,11 +101,11 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
                 // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
                 // if it was stalled previously, because it might be now reached on the optimal path.
                 if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
 
                     if (newlen < graph.data((*iter).targetNode).forwardDist) {
                         forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
-                        if (graph.data((*iter).targetNode).forwardDist == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).forwardDist == UINT_MAX) {
                             forwardChanged.push_back((*iter).targetNode);
                         }
                         graph.data((*iter).targetNode).forwardDist = newlen;
@@ -125,7 +125,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
             }
 
             unsigned int curNode = backwardQ.top().ID;
-            long long unsigned int curLen = backwardQ.top().weight;
+            unsigned int curLen = backwardQ.top().weight;
             backwardQ.pop();
 
             if (graph.data(curNode).backwardSettled || graph.data(curNode).backwardStalled) {
@@ -134,7 +134,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
 
             graph.data(curNode).backwardSettled = true;
             if (graph.data(curNode).forwardSettled) {
-                long long unsigned int newUpperboundCandidate = curLen + graph.data(curNode).forwardDist;
+                unsigned int newUpperboundCandidate = curLen + graph.data(curNode).forwardDist;
                 if (newUpperboundCandidate < upperbound) {
                     upperbound = newUpperboundCandidate;
                 }
@@ -143,7 +143,7 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
             const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
-                    long long unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
+                    unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         graph.data(curNode).backwardDist = newdistance;
                         //backwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
@@ -155,11 +155,11 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
                 }
 
                 if(graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    long long unsigned int newlen = curLen + (*iter).weight;
+                    unsigned int newlen = curLen + (*iter).weight;
 
                     if (newlen < graph.data((*iter).targetNode).backwardDist) {
                         backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
-                        if (graph.data((*iter).targetNode).backwardDist == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).backwardDist == UINT_MAX) {
                             backwardChanged.push_back((*iter).targetNode);
                         }
                         graph.data((*iter).targetNode).backwardDist = newlen;
@@ -188,13 +188,13 @@ long long unsigned int CHDistanceQueryManager::findDistance(const unsigned int s
 // Code for stalling a node in the forward distance. We try to stall additional nodes using BFS as long as we don't
 // reach already stalled nodes or nodes that can't be stalled.
 //______________________________________________________________________________________________________________________
-void CHDistanceQueryManager::forwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+void CHDistanceQueryManager::forwardStall(unsigned int stallnode, unsigned int stalldistance) {
     queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
     while (! stallQueue.empty()) {
         unsigned int curNode = stallQueue.front().ID;
-        long long unsigned int curDist = stallQueue.front().weight;
+        unsigned int curDist = stallQueue.front().weight;
         stallQueue.pop();
         graph.data(curNode).forwardStalled = true;
         forwardStallChanged.push_back(curNode);
@@ -206,12 +206,12 @@ void CHDistanceQueryManager::forwardStall(unsigned int stallnode, long long unsi
             }
 
             if (graph.data((*iter).targetNode).forwardReached) {
-                long long unsigned int newdistance = curDist + (*iter).weight;
+                unsigned int newdistance = curDist + (*iter).weight;
 
                 if (newdistance < graph.data((*iter).targetNode).forwardDist) {
                     if (! graph.data((*iter).targetNode).forwardStalled) {
                         stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
-                        if (graph.data((*iter).targetNode).forwardDist == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).forwardDist == UINT_MAX) {
                             forwardChanged.push_back((*iter).targetNode);
                         }
                         graph.data((*iter).targetNode).forwardDist = newdistance;
@@ -226,13 +226,13 @@ void CHDistanceQueryManager::forwardStall(unsigned int stallnode, long long unsi
 // Code for stalling a node in the backward distance. We try to stall additional nodes using BFS as long as we don't
 // reach already stalled nodes or nodes that can't be stalled.
 //______________________________________________________________________________________________________________________
-void CHDistanceQueryManager::backwardStall(unsigned int stallnode, long long unsigned int stalldistance) {
+void CHDistanceQueryManager::backwardStall(unsigned int stallnode, unsigned int stalldistance) {
     queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
     while (! stallQueue.empty()) {
         unsigned int curNode = stallQueue.front().ID;
-        long long unsigned int curDist = stallQueue.front().weight;
+        unsigned int curDist = stallQueue.front().weight;
         stallQueue.pop();
         graph.data(curNode).backwardStalled = true;
         backwardStallChanged.push_back(curNode);
@@ -244,12 +244,12 @@ void CHDistanceQueryManager::backwardStall(unsigned int stallnode, long long uns
             }
 
             if (graph.data((*iter).targetNode).backwardReached) {
-                long long unsigned int newdistance = curDist + (*iter).weight;
+                unsigned int newdistance = curDist + (*iter).weight;
 
                 if (newdistance < graph.data((*iter).targetNode).backwardDist) {
                     if (! graph.data((*iter).targetNode).backwardStalled) {
                         stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
-                        if (graph.data((*iter).targetNode).backwardDist == ULLONG_MAX) {
+                        if (graph.data((*iter).targetNode).backwardDist == UINT_MAX) {
                             backwardChanged.push_back((*iter).targetNode);
                         }
                         graph.data((*iter).targetNode).backwardDist = newdistance;

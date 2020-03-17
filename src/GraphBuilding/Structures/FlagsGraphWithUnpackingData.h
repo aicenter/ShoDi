@@ -26,7 +26,7 @@ public:
     unsigned int getBackwardPrev(unsigned int x);
     void resetForwardPrev(unsigned int x);
     void resetBackwardPrev(unsigned int x);
-    void addEdge(unsigned int from, unsigned int to, long long unsigned int weight, bool fw, bool bw, unsigned int mNode = UINT_MAX);
+    void addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw, unsigned int mNode = UINT_MAX);
     const unsigned int nodes() const;
     const vector< QueryEdgeWithUnpackingData > & nextNodes(const unsigned int x)const;
     NodeData & data(unsigned int node);
