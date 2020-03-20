@@ -13,6 +13,8 @@
 
 using namespace std;
 
+// Extension of the AccessNodeData class. In this case, each instance represents an access node, for the Arc Flags we
+// need the actual flags which are stored in a vector of bools.
 //______________________________________________________________________________________________________________________
 class AccessNodeDataArcFlags : public AccessNodeData {
 public:

@@ -15,6 +15,10 @@
 
 using namespace std;
 
+// This class is responsible for creating a Transit Node Routing with Arc Flags data-structure based on a given
+// UpdateableGraph. The user can specify the size of the transit node set, and also two preprocessing modes are present,
+// both giving the exact same results, but one mode is quite fast but requires a lot of memory, while the other mode is
+// significantly slower, but can requires less memory.
 //______________________________________________________________________________________________________________________
 class TNRAFPreprocessor : public TNRPreprocessor {
 public:
@@ -27,8 +31,8 @@ protected:
     static void fillTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt);
     static void findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix);
     static void findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix);
-    static void computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix);
-    static void computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix);
+    static void computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix, vector<unsigned int> & optionalDistancesFromNode);
+    static void computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix, vector<unsigned int> & optionalDistancesFromNode);
     static void generateClustering(Graph & originalGraph, RegionsStructure & regions, unsigned int clustersCnt);
     static const unsigned int getNewNodeForCluster( vector < unsigned int > & assignedClusters, queue < unsigned int > & q);
     static void initPowersOf2(vector<uint32_t> & powersOf2);

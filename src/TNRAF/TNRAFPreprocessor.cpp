@@ -25,6 +25,19 @@ unsigned int TNRAFPreprocessor::ANdistances;
 unsigned int TNRAFPreprocessor::clusteringSkips;
 DistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 
+// The main workhorse function. The result of this function will be the data-structure required for the Transit Node
+// Routing with Arc Flags query algorithm saved in a binary file. Since we are working with Transit Node Routing based
+// on Contraction Hierarchies, this function expects that the UpdateableGraph instance was already processed by the
+// CHPreprocessor and therefore already contains Contraction Hierarchies information such as ranks and shortcut edges.
+// The user can set the amount of transit nodes that will be used, this is done by setting the transitNodesAmount
+// variable. The regionsCnt variable should control the amount of regions that will be used for the Arc Flags
+// functionality, but only 32 are working currently due to the way the output is handled right now. The bool variable
+// useDistanceMatrix allows the user to switch between two preprocessing modes. If the flag is set to true,
+// preprocessing uses the a full Distance Matrix to speed up the process. This leads to significant memory requirements,
+// but the preprocessing itself can then be very fast. This should be used if you have more resources available during
+// the preprocessing phase than during the actual queries. If the flag is set to false, the preprocessing will be much
+// slower, but will require less memory and it should then be possible to complete it even on machines where there is
+// not enough memory for the faster mode.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & originalGraph, string outputPath, unsigned int transitNodesAmount, unsigned int regionsCnt, bool useDistanceMatrix) {
     cout << "Getting transit nodes" << endl;
@@ -48,21 +61,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
         computeTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount, originalGraph);
     }
 
-    /*for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        if(i % 100 == 0) {
-            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
-        }
-        for(unsigned int j = 0; j < transitNodesAmount; j++) {
-            if (i == j) {
-                transitNodesDistanceTable[i][j] = 0;
-            } else {
-                transitNodesDistanceTable[i][j] = qm.findDistance(transitNodes[i], transitNodes[j]);
-            }
-        }
-    }*/
-
     cout << "Generating regions for the nodes" << endl;
-    //vector<unsigned int> clusters(originalGraph.nodes());
     RegionsStructure regions(graph.nodes(), regionsCnt);
     generateClustering(originalGraph, regions, regionsCnt);
 
@@ -118,16 +117,14 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
         distanceMatrix = NULL;
     }
 
-    /*cout << "Computing locality filter" << endl;
-    vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
-    prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);*/
-
     vector < pair < unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
     outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount, regions, regionsCnt);
 }
 
+// Computes the full distance matrix for the transit node set. This is done by t runs of one-to-all Dijkstra (where t
+// denotes the amount of transit nodes).
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, Graph & originalGraph) {
     for(unsigned int i = 0; i < transitNodesCnt; i++) {
@@ -143,6 +140,8 @@ void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & t
     }
 }
 
+// Fills the full distance matrix for the transit node set using value from the full distance matrix for the graph,
+// when the distance matrix is used to speed up the preprocessing phase.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::fillTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt) {
     for(unsigned int i = 0; i < transitNodesCnt; i++) {
@@ -152,8 +151,8 @@ void TNRAFPreprocessor::fillTransitNodeDistanceTable(vector<unsigned int> & tran
     }
 }
 
-// Outputs the created Transit Node Routing data-structure with all the information required for the query algorithm
-// into a binary file.
+// Outputs the created Transit Node Routing with Arc Flags data-structure with all the information required for
+// the query algorithm into a binary file.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, vector < pair < unsigned int, QueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes, vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount, RegionsStructure & regions, unsigned int regionsCnt) {
     cout << "Outputting TNR" << endl;
@@ -163,6 +162,8 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
         printf("Couldn't open file '%s'!", (outputPath + ".tgaf").c_str());
     }
 
+    // Output the header consisting of a predefined string, and then the numbers of nodes, edges, the size of the
+    // transit node set and the number of regions.
     char c1, c2, c3, c4;
     c1 = 'T';
     c2 = 'G';
@@ -179,8 +180,7 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
     output.write((char *) &transitNodesAmount, sizeof(transitNodesAmount));
     output.write((char *) &regionsCnt, sizeof(regionsCnt));
 
-    // Fixme - will need to actually output the regions for all nodes somewhere here
-
+    // Output all edges, this means the original edges as well as the shorctut edges.
     for(unsigned int i = 0; i < allEdges.size(); i++) {
         output.write((char *) &allEdges[i].first, sizeof(allEdges[i].first));
         output.write((char *) &allEdges[i].second.targetNode, sizeof(allEdges[i].second.targetNode));
@@ -190,15 +190,12 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
         output.write((char *) &allEdges[i].second.backward, sizeof(allEdges[i].second.backward));
         bool t = true;
         bool f = false;
-        //printf("Check forward shortcut.\n");
-        //printf("Check forward shortcut. (%u -> %u, fwflag: %u)\n", allEdges[i].first, allEdges[i].second.targetNode, allEdges[i].second.forward);
         if (allEdges[i].second.forward && graph.isShortcut(allEdges[i].first, allEdges[i].second.targetNode)) {
             output.write((char *) &t, sizeof(t));
         } else {
             output.write((char *) &f, sizeof(f));
         }
 
-        //printf("Check backward shortcut. (%u -> %u, bwflag: %u)\n", allEdges[i].second.targetNode, allEdges[i].first, allEdges[i].second.backward);
         if (allEdges[i].second.backward && graph.isShortcut(allEdges[i].second.targetNode, allEdges[i].first)) {
             output.write((char *) &t, sizeof(t));
         } else {
@@ -206,30 +203,32 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
         }
     }
 
+    // Output ranks for all nodes in the graph.
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         unsigned int rank = graph.getRank(i);
         output.write((char *) &rank, sizeof(rank));
     }
 
+    // Output regions for all nodes in the graph (used for Arc Flags).
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         unsigned int region = regions.getRegion(i);
         output.write((char *) &region, sizeof(region));
     }
 
+    // Output the transit nodes ids and then the full transit node set distance matrix (distances between all pairs of
+    // transit nodes).
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         output.write((char *) &transitNodes[i], sizeof(transitNodes[i]));
     }
-
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
             output.write((char *) &transitNodesDistanceTable[i][j], sizeof(transitNodesDistanceTable[i][j]));
         }
     }
 
-    // FIXME: For access nodes, one will need to output the arc flags somehow.
+    // Output the access nodes (their arc flags are also output here).
     vector<uint32_t> powersOf2(regionsCnt);
     initPowersOf2(powersOf2);
-
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         unsigned int fwSize = forwardAccessNodes[i].size();
         output.write((char *) &fwSize, sizeof(fwSize));
@@ -268,8 +267,8 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
     printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
     printf("Tried %u combinations when determining access nodes.\n", triedCombinations);
 
+    // Output search spaces (those are needed for the locality filter).
     printf("Will now output search spaces.\n");
-
     unsigned int fwSearchSpaceSum = 0;
     unsigned int bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
@@ -292,20 +291,13 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
     printf("Average forward search space size: %lf\n", (double)fwSearchSpaceSum/nodes);
     printf("Average backward search space size: %lf\n", (double)bwSearchSpaceSum/nodes);
 
-
-    /*for(unsigned int i = 0; i < graph.nodes(); i++) {
-        for(unsigned int j = 0; j < graph.nodes(); j++) {
-            bool flag = isLocal[i][j];
-            output.write((char *) &flag, sizeof(flag));
-        }
-    }*/
-
     output.close();
 }
 
 // Auxiliary function that will find forward access nodes for a given node. The process consists of first finding all
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
-// some of the candidates can then be removed by a simple stalling process.
+// some of the candidates can then be removed if their distances are incorrect.
+// Arc Flags then have to be computed for the actual set of access nodes.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
@@ -359,6 +351,11 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
 
     }
 
+    vector<unsigned int> distancesFromNode;
+    if(! useDistanceMatrix) {
+        distancesFromNode.resize(originalGraph.nodes());
+        BasicDijkstra::computeOneToAllDistances(source, originalGraph, distancesFromNode);
+    }
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
         if(useDistanceMatrix) {
             unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
@@ -368,35 +365,27 @@ void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <Acce
                 accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
             }
         } else {
-            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
+            unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
+            unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
+            unsigned int realDistance = distancesFromNode[accessNode];
+            if (realDistance == accessNodeDistance) {
+                accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
+            }
         }
     }
 
-    /*for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        bool validAccessNode = true;
-        for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
-            if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
-                if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    //validAccessNode = false;
-                    break;
-                }
-            }
-        }
-
-        if (validAccessNode) {
-            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
-        }
-
-    }*/
-
-    computeForwardArcFlags(source, accessNodes, originalGraph, regions, useDistanceMatrix);
+    computeForwardArcFlags(source, accessNodes, originalGraph, regions, useDistanceMatrix, distancesFromNode);
 
 }
 
+// Computes Arc Flags for a set of forward access nodes of a given node. This is done simply by comparing the distances.
+// If the distance from node to the access node plus the distance from the access node to some node from the region
+// is equal to the distance from node to the same node from the region, then the flag for that region is set to true
+// because we have found a shortest path to some node in the region going through our access node. If we do not find any
+// node from some region for which the access node would be on a shortest path, then the Arc Flag for this region can be
+// set to false.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix, vector<unsigned int> & optionalDistancesFromNode) {
     if(useDistanceMatrix) {
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -404,19 +393,11 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> & nodesInRegion = regions.nodesInRegion(j);
                 totalArcFlags++;
-                //printf("Determining arc flag %u for %u (access node of %u). Amount of nodes in region: %lu\n", j, accessNode, node, nodesInRegion.size());
                 if(distanceToAccessNode != distanceMatrix->findDistance(node, accessNode)) {
                     incorrectANdistances++;
                 }
                 ANdistances++;
                 for (unsigned int k = 0; k < nodesInRegion.size(); k++) {
-                    /*if(nodesInRegion[k] == accessNode) {
-                        printf("Distance %u -> %u: %u while distance %u -> %u: %u + %u -> %u: %u = %u\n",
-                               node, nodesInRegion[k], distanceMatrix->findDistance(node, nodesInRegion[k]),
-                               node, accessNode, distanceToAccessNode,
-                               accessNode, nodesInRegion[k], distanceMatrix->findDistance(accessNode, nodesInRegion[k]),
-                               distanceMatrix->findDistance(accessNode, nodesInRegion[k]) + distanceToAccessNode);
-                    }*/
                     triedCombinations++;
                     if (distanceMatrix->findDistance(node, nodesInRegion[k]) ==
                         distanceMatrix->findDistance(accessNode, nodesInRegion[k]) + distanceToAccessNode) {
@@ -429,8 +410,6 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
             }
         }
     } else {
-        vector<unsigned int> distancesFromNode(originalGraph.nodes());
-        BasicDijkstra::computeOneToAllDistances(node, originalGraph, distancesFromNode);
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
             unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -440,7 +419,7 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
                 totalArcFlags++;
                 for (unsigned int k = 0; k < nodesInRegion.size(); k++) {
-                    if (distancesFromNode[nodesInRegion[k]] ==
+                    if (optionalDistancesFromNode[nodesInRegion[k]] ==
                         distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
                         accessNodes[i].regionFlags[j] = true;
                         trueArcFlags++;
@@ -454,7 +433,8 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
 
 // Auxiliary function that will find backward access nodes for a given node. The process consists of first finding all
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
-// some of the candidates can then be removed by a simple stalling process.
+// some of the candidates can then be removed if their distances are incorrect.
+// Arc Flags then have to be computed for the actual set of access nodes.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
@@ -508,6 +488,11 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
 
     }
 
+    vector<unsigned int> distancesFromNode;
+    if(! useDistanceMatrix) {
+        vector<unsigned int> distancesFromNode(originalGraph.nodes());
+        BasicDijkstra::computeOneToAllDistancesInReversedGraph(source, originalGraph, distancesFromNode);
+    }
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
         if(useDistanceMatrix) {
             unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
@@ -517,35 +502,23 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
                 accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
             }
         } else {
-            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
+            unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
+            unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
+            unsigned int realDistance = distancesFromNode[accessNode];
+            if (realDistance == accessNodeDistance) {
+                accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
+            }
         }
     }
 
-    /*for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        bool validAccessNode = true;
-        for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
-            if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
-                if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    //validAccessNode = false;
-                    break;
-                }
-            }
-        }
-
-        if (validAccessNode) {
-            accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode, regions.getRegionsCnt()));
-        }
-
-    }*/
-
-    computeBackwardArcFlags(source, accessNodes, originalGraph, regions, useDistanceMatrix);
+    computeBackwardArcFlags(source, accessNodes, originalGraph, regions, useDistanceMatrix, distancesFromNode);
 
 }
 
+// Computes the backward Arc Flags for a set of access nodes of a given node. This is similar to the forward direction,
+// so check computeForwardArcFlags for more information.
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<AccessNodeDataArcFlags> & accessNodes, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix, vector<unsigned int> & optionalDistancesFromNode) {
     if (useDistanceMatrix) {
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -562,8 +535,6 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
             }
         }
     } else {
-        vector<unsigned int> distancesFromNode(originalGraph.nodes());
-        BasicDijkstra::computeOneToAllDistancesInReversedGraph(node, originalGraph, distancesFromNode);
         for (unsigned int i = 0; i < accessNodes.size(); i++) {
             vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
             unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -573,7 +544,7 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
                 for (unsigned int k = 0; k < nodesInRegion.size(); k++) {
-                    if (distancesFromNode[nodesInRegion[k]] ==
+                    if (optionalDistancesFromNode[nodesInRegion[k]] ==
                         distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
                         accessNodes[i].regionFlags[j] = true;
                         break;
@@ -584,20 +555,16 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
     }
 }
 
-// Completely random clustering just for testing purposes. FIXME
+// Generates a clustering that is used for the regions (and those are used for Arc Flags). The query algorithm will work
+// with any clustering where each node is assigned to exactly one cluster. Clusterings where we have clusters of equal
+// sizes and nodes that are close to each other are also in the same cluster give better performance though.
+// Here we use a very simple clustering that is based on the k-means idea. We first initialize our k clusters
+// by assigning one node to each of them. We then try to expand each cluster by adding some node that is connected to
+// some node already in the cluster that has not been assigned to any cluster so far. If no such node can be found,
+// we just randomly add some other node that does not have a cluster yet to the cluster in order to keep the size
+// of the clusters somewhat balanced. This approach seems to give solid results.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructure & regions, unsigned int clustersCnt) {
-    /*for(unsigned int i = 0; i < originalGraph.nodes(); i++) {
-        regions.addNode(i, i % clustersCnt);
-    }*/
-
-    // Testing dumb clustering
-    /*for(unsigned int i = 0; i < originalGraph.nodes(); i++) {
-        for(unsigned int j = 0; j < clustersCnt; j++) {
-            regions.addNode(i, j);
-        }
-    }*/
-
     unsigned int nodesCnt = originalGraph.nodes();
     unsigned int approxNodesPerCluster = nodesCnt / clustersCnt;
     unsigned int unassignedNodes = nodesCnt - clustersCnt;
@@ -674,11 +641,15 @@ const unsigned int TNRAFPreprocessor::getNewNodeForCluster( vector < unsigned in
     }
 }
 
+// Auxiliary function in order to make sure the powers of 2 are precomputed.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::getPowersOf2(vector<uint32_t> & powersOf2) {
     initPowersOf2(powersOf2);
 }
 
+// Auxiliary function that precomputes powers of 2 up to 2^32. This is used for the Arc Flags output. In order to output
+// Arc Flags efficiently, we output 32 Arc Flags as one unsigned int. To set individual Arc Flags, we can add or
+// subtract powers of 2. We prepare those powers of 2 using this function to speed up the process.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::initPowersOf2(vector<uint32_t> & powersOf2) {
     uint32_t val = 1;

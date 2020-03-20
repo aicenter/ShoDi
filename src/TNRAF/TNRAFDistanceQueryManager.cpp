@@ -14,8 +14,8 @@ TNRAFDistanceQueryManager::TNRAFDistanceQueryManager(TransitNodeRoutingArcFlagsG
 // filter to determine whether the query is local. If it is local, we fallback to the Contraction Hierarchies query
 // algorithm. This is slightly slower, but the local queries already guarantee that the source and target nodes will
 // be reasonably close to each other and in that case the query should take relatively short time. If the query is not
-// local, Transit Node Routing structure can be used to determine the shortest distance, and in that case it is invoked
-// to do so.
+// local, Transit Node Routing wirth Arc Flags data structure can be used to determine the shortest distance,
+// and in that case it is invoked to do so.
 //______________________________________________________________________________________________________________________
 unsigned int TNRAFDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
     if(source == target) {

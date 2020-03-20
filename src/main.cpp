@@ -531,7 +531,7 @@ void memoryUsageOfCH() {
 
 //______________________________________________________________________________________________________________________
 void memoryUsageOfTNR() {
-    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_map_1000_newFilter.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_n2000_DM_mar.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     delete tnrGraph;
@@ -539,7 +539,7 @@ void memoryUsageOfTNR() {
 
 //______________________________________________________________________________________________________________________
 void memoryUsageOfTNRAF() {
-    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n5000_useDM_mar_clust.tgaf");
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_n2000_useDM_mar_clust.tgaf");
     TransitNodeRoutingGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     delete tnrafGraph;
@@ -724,8 +724,8 @@ void validateTNRAccessNodes() {
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     //createTNR();
-    createTNRwithValidation();
-    //createTNRAF();
+    //createTNRwithValidation();
+    createTNRAF();
     //compareMethods();
     //compareFourMethods();
     //compareFiveMethods();
@@ -741,7 +741,7 @@ int main(int argc, char * argv[]) {
     //memoryUsageOfCH();
     //memoryUsageOfTNR();
     //memoryUsageOfTNRAF();
-    //memoryUsageOfDM();
+    memoryUsageOfDM();
 
     //checkDMBigValues();
 

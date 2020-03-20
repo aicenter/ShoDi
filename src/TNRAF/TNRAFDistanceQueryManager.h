@@ -9,6 +9,10 @@
 #include "../GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h"
 #include "../TNR/TNRDistanceQueryManager.h"
 
+// This class uses the Transit Node Routing with Arc Flags data structures to answer distance queries. This handles
+// queries where we are interested in the distance from some start to some goal, but we are not interested in the
+// actual path.
+//______________________________________________________________________________________________________________________
 class TNRAFDistanceQueryManager {
 public:
     TNRAFDistanceQueryManager(TransitNodeRoutingArcFlagsGraph & graph);
