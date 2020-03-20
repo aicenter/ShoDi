@@ -126,6 +126,26 @@ void createTNR() {
 }
 
 //______________________________________________________________________________________________________________________
+void createTNRslower() {
+    Timer timer("Whole TNR construction timer");
+    timer.begin();
+
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    Graph * originalGraph = graph->createCopy();
+    CHPreprocessor::preprocessForDDSG(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+
+    TNRPreprocessor::preprocessUsingCHslower(*graph, *originalGraph, "../input/Prague_n1000_slower_mar", 1000);
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete graph;
+}
+
+
+//______________________________________________________________________________________________________________________
 void createTNRwithValidation() {
     Timer timer("Whole TNR construction timer");
     timer.begin();
@@ -724,8 +744,9 @@ void validateTNRAccessNodes() {
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     //createTNR();
+    createTNRslower();
     //createTNRwithValidation();
-    createTNRAF();
+    //createTNRAF();
     //compareMethods();
     //compareFourMethods();
     //compareFiveMethods();

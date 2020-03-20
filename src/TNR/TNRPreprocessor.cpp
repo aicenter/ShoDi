@@ -13,6 +13,7 @@
 #include "../Dijkstra/DijkstraNode.h"
 #include "../DistanceMatrix/DistanceMatrix.h"
 #include "../DistanceMatrix/DistanceMatrixComputor.h"
+#include "../Dijkstra/BasicDijkstra.h"
 
 unsigned int TNRPreprocessor::accessNodesFw;
 unsigned int TNRPreprocessor::removedAccessNodesFw;
@@ -56,13 +57,61 @@ void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPa
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
-        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph);
+        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping,chGraph);
+        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph);
     }
 
-    /*cout << "Computing locality filter" << endl;
-    vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
-    prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);*/
+    vector < pair < unsigned int, QueryEdge > > allEdges;
+    chGraph.getEdgesForFlushing(allEdges);
+
+    outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount);
+}
+
+// Builds Transit Node Routing structures based on Contraction Hierarchies. User can set the amount of Transit Nodes.
+// Generally, more transit nodes mean more memory consumption as more distances must be present in the distance table,
+// but could potentially speed up the queries as more queries will hit those new transit nodes. This variant is slower
+// but validates that the obtained access nodes have correct distances which allows us to discard some access nodes,
+// meaning the obtained Transit Node Routing data structure will provide better performance.
+//______________________________________________________________________________________________________________________
+void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & originalGraph, string outputPath, unsigned int transitNodesAmount) {
+    cout << "Getting transit nodes" << endl;
+    vector < unsigned int > transitNodes(transitNodesAmount);
+    graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
+
+    cout << "Computing transit nodes distance table" << endl;
+    FlagsGraph chGraph(graph);
+    CHDistanceQueryManager qm(chGraph);
+    vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
+    for(unsigned int i = 0; i < transitNodesAmount; i++) {
+        if(i % 100 == 0) {
+            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
+        }
+
+        vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
+        BasicDijkstra::computeOneToAllDistances(transitNodes[i], originalGraph, distancesFromNodeI);
+        for(unsigned int j = 0; j < transitNodesAmount; j++) {
+            transitNodesDistanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
+        }
+    }
+
+    cout << "Computing access nodes" << endl;
+    vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
+    vector < vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
+    vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
+    vector < vector < unsigned int > > backwardSearchSpaces(graph.nodes());
+    unordered_map < unsigned int, unsigned int > transitNodesMapping;
+    for(unsigned int i = 0; i < transitNodesAmount; i++) {
+        transitNodesMapping.insert(make_pair(transitNodes[i], i));
+    }
+
+    for(unsigned int i = 0; i < graph.nodes(); i++) {
+        vector<unsigned int> forwardDistsFromNode(graph.nodes());
+        BasicDijkstra::computeOneToAllDistances(i, originalGraph, forwardDistsFromNode);
+        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, forwardDistsFromNode, chGraph);
+        vector<unsigned int> backwardDistsFromNode(graph.nodes());
+        BasicDijkstra::computeOneToAllDistancesInReversedGraph(i, originalGraph, backwardDistsFromNode);
+        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, backwardDistsFromNode, chGraph);
+    }
 
     vector < pair < unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
@@ -247,14 +296,6 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     printf("Average forward search space size: %lf\n", (double)fwSearchSpaceSum/nodes);
     printf("Average backward search space size: %lf\n", (double)bwSearchSpaceSum/nodes);
 
-
-    /*for(unsigned int i = 0; i < graph.nodes(); i++) {
-        for(unsigned int j = 0; j < graph.nodes(); j++) {
-            bool flag = isLocal[i][j];
-            output.write((char *) &flag, sizeof(flag));
-        }
-    }*/
-
     output.close();
 }
 
@@ -262,7 +303,59 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
 // the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
 // some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph) {
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph) {
+    auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    vector<bool> settled(graph.nodes(), false);
+
+    forwardQ.push(DijkstraNode(source, 0));
+
+    distances[source] = 0;
+
+    while (! forwardQ.empty() ) {
+        unsigned int curNode = forwardQ.top().ID;
+        unsigned int curLen = forwardQ.top().weight;
+        forwardQ.pop();
+
+        if(settled[curNode]) {
+            continue;
+        }
+
+        settled[curNode] = true;
+        if(transitNodes.count(curNode) == 1) {
+            accessNodes.push_back(AccessNodeData(curNode, curLen));
+        } else {
+            forwardSearchSpaces.push_back(curNode);
+
+            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
+                // Skip edge if it is only in the other direction.
+                if (! (*iter).forward) {
+                    continue;
+                }
+
+                if (settled[(*iter).targetNode]) {
+                    continue;
+                }
+
+                // This is basically the dijkstra edge relaxation process. Additionaly, we unstall the node
+                // if it was stalled previously, because it might be now reached on the optimal path.
+                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
+                    unsigned int newlen = curLen + (*iter).weight;
+                    if (newlen < distances[(*iter).targetNode]) {
+                        distances[(*iter).targetNode] = newlen;
+                        forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData> & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < unsigned int > & distsFromNode, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -315,24 +408,13 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
     }
 
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        bool validAccessNode = true;
-        for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
-            if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
-                if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    //validAccessNode = false;
-                    break;
-                }
-            }
-        }
-
-        if (validAccessNode) {
+        unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
+        unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
+        unsigned int realDistance = distsFromNode[accessNode];
+        if (realDistance == accessNodeDistance) {
             accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
         }
-
     }
-
 }
 
 //______________________________________________________________________________________________________________________
@@ -403,60 +485,39 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
 }
 
-// Alternative approach, does not seem to be working correctly.
-/*
-void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph) {
+// Auxiliary function that will find backward access nodes for a given node. The process consists of first finding all
+// the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
+// some of the candidates can then be removed by a simple stalling process.
+//______________________________________________________________________________________________________________________
+void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
     vector<bool> settled(graph.nodes(), false);
 
-    forwardQ.push(DijkstraNode(source, 0));
+    backwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
-    vector < AccessNodeData > accessNodesSuperset;
-
-    while (! forwardQ.empty() ) {
-        unsigned int curNode = forwardQ.top().ID;
-        unsigned int curLen = forwardQ.top().weight;
-        forwardQ.pop();
+    while (! backwardQ.empty() ) {
+        unsigned int curNode = backwardQ.top().ID;
+        unsigned int curLen = backwardQ.top().weight;
+        backwardQ.pop();
 
         if(settled[curNode]) {
             continue;
         }
 
         settled[curNode] = true;
-        if(transitNodes.count(curNode) == 1 && curNode != source) {
-            accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
-
-            // Check distances of neighbours for possible improvements.
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
-            for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                // Skip edge if it is only in the other direction.
-                if (!(*iter).forward) {
-                    continue;
-                }
-
-                if (settled[(*iter).targetNode]) {
-                    continue;
-                }
-
-                // We change the distances here, but don't push into the queue if the distance improves.
-                if (graph.data((*iter).targetNode).rank > graph.data(curNode).rank) {
-                    unsigned int newlen = curLen + (*iter).weight;
-                    if (newlen < distances[(*iter).targetNode]) {
-                        distances[(*iter).targetNode] = newlen;
-                    }
-                }
-            }
+        if(transitNodes.count(curNode) == 1) {
+            accessNodes.push_back(AccessNodeData(curNode, curLen));
         } else {
-            forwardSearchSpaces.push_back(curNode);
+            backwardSearchSpaces.push_back(curNode);
 
             const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
-                if (! (*iter).forward) {
+                if (! (*iter).backward) {
                     continue;
                 }
 
@@ -470,41 +531,17 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
                     unsigned int newlen = curLen + (*iter).weight;
                     if (newlen < distances[(*iter).targetNode]) {
                         distances[(*iter).targetNode] = newlen;
-                        forwardQ.push(DijkstraNode((*iter).targetNode, newlen));
+                        backwardQ.push(DijkstraNode((*iter).targetNode, newlen));
                     }
                 }
             }
         }
 
     }
-
-    for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        bool validAccessNode = true;
-        for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
-            if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
-                if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    //validAccessNode = false;
-                    break;
-                }
-            }
-        }
-
-        if (validAccessNode) {
-            accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
-        }
-
-    }
-
 }
-*/
 
-// Auxiliary function that will find backward access nodes for a given node. The process consists of first finding all
-// the access nodes candidates using a simplified version of the Contraction Hierarchies query algorithm,
-// some of the candidates can then be removed by a simple stalling process.
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph) {
+void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData> & accessNodes, vector < unsigned int > & backwardSearchSpaces, unordered_map< unsigned int, unsigned int > & transitNodes, vector < unsigned int > & distsFromNode, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -558,24 +595,13 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 
 
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        bool validAccessNode = true;
-        for(unsigned int j = 0; j < accessNodesSuperset.size(); j++) {
-            if (j != i) {
-                unsigned int t1 = transitNodes[accessNodesSuperset[j].accessNodeID];
-                unsigned int t2 = transitNodes[accessNodesSuperset[i].accessNodeID];
-                if (accessNodesSuperset[j].distanceToNode + transitNodesDistanceTable[t1][t2] <= accessNodesSuperset[i].distanceToNode) {
-                    //validAccessNode = false;
-                    break;
-                }
-            }
-        }
-
-        if (validAccessNode) {
+        unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
+        unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
+        unsigned int realDistance = distsFromNode[accessNode];
+        if (realDistance == accessNodeDistance) {
             accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
         }
-
     }
-
 }
 
 //______________________________________________________________________________________________________________________

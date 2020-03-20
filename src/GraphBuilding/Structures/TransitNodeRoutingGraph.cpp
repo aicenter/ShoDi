@@ -11,6 +11,10 @@ TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned in
 
 }
 
+// Determines whether the query is local or global. Global queries can be answered using the transit node set, local
+// queries must be answered using some fallback algorithm (Contraction Hierarchies are used here). In our case, a query
+// is considered local if the intersection of the forward search space of source and the backward search space of target
+// is unempty (this function then returns true). If it is empty, the query is global (this function returns false).
 //______________________________________________________________________________________________________________________
 bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int target) {
     for(unsigned int k = 0; k < forwardSearchSpaces[source].size(); k++) {
@@ -21,9 +25,6 @@ bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int tar
         }
     }
     return false;
-
-
-    //return isLocal[source][target];
 }
 
 // Finds the distance between two nodes based on the TNR data-structure. This is used for the non-local queries.
@@ -33,13 +34,11 @@ bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int tar
 unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int source, unsigned int target) {
     unsigned int shortestDistance = UINT_MAX;
 
-    //printf("Finding shortest distance between '%u' (rank: %u, %lu access nodes) and '%u' (rank: %u, %lu access nodes) via TNR.\n", source, data(source).rank, forwardAccessNodes[source].size(), target, data(target).rank, backwardAccessNodes[target].size());
     for(unsigned int i = 0; i < forwardAccessNodes[source].size(); i++) {
         for(unsigned int j = 0; j < backwardAccessNodes[target].size(); j++) {
             unsigned int id1 = transitNodeMapping[forwardAccessNodes[source][i].accessNodeID];
             unsigned int id2 = transitNodeMapping[backwardAccessNodes[target][j].accessNodeID];
             unsigned int newDistance = forwardAccessNodes[source][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[target][j].distanceToNode;
-            //printf("Possible candidate is pair of transit nodes: %u -> %u, distance %u (%u, %u, %u)\n", forwardAccessNodes[source][i].accessNodeID, backwardAccessNodes[target][j].accessNodeID, newDistance, forwardAccessNodes[source][i].distanceToNode, transitNodesDistanceTable[id1][id2], backwardAccessNodes[target][j].distanceToNode);
             if(newDistance < shortestDistance && transitNodesDistanceTable[id1][id2] != UINT_MAX) {
                 shortestDistance = newDistance;
             }
@@ -57,11 +56,6 @@ void TransitNodeRoutingGraph::addMappingPair(unsigned int realID, unsigned int t
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraph::setDistanceTableValue(unsigned int i, unsigned int j, unsigned int value) {
     transitNodesDistanceTable[i][j] = value;
-}
-
-//______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::setLocalityFilterValue(unsigned int i, unsigned int j, bool value) {
-    //isLocal[i][j] = value;
 }
 
 //______________________________________________________________________________________________________________________

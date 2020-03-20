@@ -11,6 +11,11 @@
 #include "../../TNRAF/Structures/NodeDataRegions.h"
 #include "../../TNRAF/Structures/AccessNodeDataArcFlags.h"
 
+// This class contains all the information required for the Transit Node Routing with Arc Flags query algorithm.
+// This class is an extension of the TransitNodeRoutingGraph. Additionally we have to store regions for all the nodes
+// in the graph, and for each access node we need to store its Arc Flags. The findTNRAFDistance function then utilises
+// those additional information to compute the shortest distance even quicker.
+//______________________________________________________________________________________________________________________
 class TransitNodeRoutingArcFlagsGraph : public TransitNodeRoutingGraph {
 public:
     TransitNodeRoutingArcFlagsGraph(unsigned int nodes, unsigned int transitNodesAmount);

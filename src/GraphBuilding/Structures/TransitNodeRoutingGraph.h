@@ -23,7 +23,6 @@ public:
     unsigned int findTNRDistance(unsigned int source, unsigned int target);
     void addMappingPair(unsigned int realID, unsigned int transitNodesID);
     void setDistanceTableValue(unsigned int i, unsigned int j, unsigned int value);
-    void setLocalityFilterValue(unsigned int i, unsigned int j, bool value);
     void addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
     void addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
     void addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
@@ -35,7 +34,6 @@ protected:
     vector < vector < unsigned int > > forwardSearchSpaces;
     vector < vector < unsigned int > > backwardSearchSpaces;
     vector < vector < unsigned int > > transitNodesDistanceTable;
-    //vector < vector < bool > > isLocal;
     unordered_map < unsigned int, unsigned int > transitNodeMapping;
 };
 

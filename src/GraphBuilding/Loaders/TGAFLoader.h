@@ -10,6 +10,9 @@
 #include "TNRGLoader.h"
 #include "../Structures/TransitNodeRoutingArcFlagsGraph.h"
 
+// Class used for loading the Transit Node Routing with Arc Flags data structure. I use a simple binary format for the
+// structure, this function can load those files and initialize TransitNodeRoutingArcFlagsGraph instances from them,
+// which can then be used to answer queries.
 //______________________________________________________________________________________________________________________
 class TGAFLoader : public TNRGLoader {
 public:
