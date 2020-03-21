@@ -490,7 +490,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <Acc
 
     vector<unsigned int> distancesFromNode;
     if(! useDistanceMatrix) {
-        vector<unsigned int> distancesFromNode(originalGraph.nodes());
+        distancesFromNode.resize(originalGraph.nodes());
         BasicDijkstra::computeOneToAllDistancesInReversedGraph(source, originalGraph, distancesFromNode);
     }
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
