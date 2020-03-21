@@ -11,6 +11,11 @@
 
 using namespace std;
 
+// This class can check whether a path found using some more complex method is valid in the original graph.
+// Since Transit Node Routing or Contraction Hierarchies work with a graph that contains shortcut edges, we need to
+// ensure that those methods can also reconstruct the path in the original graph. This is only required if we are
+// interested in the actual shortest paths. Often we only need to know the shortest distance.
+//______________________________________________________________________________________________________________________
 class PathCorrectnessValidator {
 public:
     static void validateTNRPaths(Graph * originalGraph, TNRPathQueryManager & tnrQueryManager, vector< pair < unsigned int, unsigned int > > & trips);

@@ -9,6 +9,8 @@
 #include "BasicDijkstra.h"
 #include "DijkstraNode.h"
 
+// A simple Dijkstra implementation that finds the shortest distance from source to target. This should be used with the
+// original graph.
 //______________________________________________________________________________________________________________________
 unsigned int BasicDijkstra::run(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();
@@ -50,6 +52,7 @@ unsigned int BasicDijkstra::run(const unsigned int source, const unsigned int ta
 
 }
 
+// Finds the shortest path from source to target in the Graph and also outputs the actual path.
 //______________________________________________________________________________________________________________________
 unsigned int BasicDijkstra::runWithPathOutput(const unsigned int source, const unsigned int target, const Graph & graph) {
     unsigned int n = graph.nodes();
@@ -97,6 +100,8 @@ unsigned int BasicDijkstra::runWithPathOutput(const unsigned int source, const u
 
 }
 
+// Auxiliary function used for the path output. This function reconstructs the path and then outputs it in a simple
+// human readable text format. This could be useful for manual debug on small graphs.
 //______________________________________________________________________________________________________________________
 void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, const vector < vector < unsigned int > > & prev) {
     vector<pair<pair<unsigned int, unsigned int>, unsigned int> > path;
@@ -122,6 +127,9 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
 
 }
 
+// Compute distances from source to all nodes in the graph. Fills those distances into the parameter vector distances.
+// Can be used for example to fill the full distance matrix - each call of this function will compute one row of the
+// matrix.
 //______________________________________________________________________________________________________________________
 void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Graph & graph, vector<unsigned int> & distances) {
     unsigned int n = graph.nodes();
@@ -153,6 +161,8 @@ void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Gr
     }
 }
 
+// Computes distances to source from all other nodes in the graph. This is useful for example when computing access
+// access nodes for the backward direction.
 //______________________________________________________________________________________________________________________
 void BasicDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int source, const Graph & graph, vector<unsigned int> & distances) {
     unsigned int n = graph.nodes();

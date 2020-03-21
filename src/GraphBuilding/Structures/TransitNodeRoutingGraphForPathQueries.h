@@ -9,6 +9,8 @@
 #include "FlagsGraphWithUnpackingData.h"
 #include "../../TNR/Structures/AccessNodeData.h"
 
+// A Transit Node Routing data structure. This variant can be used to also obtain the actual shortest paths and not
+// just the shortest distances.
 //______________________________________________________________________________________________________________________
 class TransitNodeRoutingGraphForPathQueries : public FlagsGraphWithUnpackingData {
 public:
@@ -21,7 +23,6 @@ public:
     unsigned int findTNRDistance(unsigned int source, unsigned int target);
     void addMappingPair(unsigned int realID, unsigned int transitNodesID);
     void setDistanceTableValue(unsigned int i, unsigned int j, unsigned int value);
-    void setLocalityFilterValue(unsigned int i, unsigned int j, bool value);
     void addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
     void addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance);
     void addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);

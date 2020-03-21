@@ -105,6 +105,10 @@ void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & o
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
+        if (i % 1000 == 0) {
+            cout << "Computed access nodes for '" << i << "' nodes." << endl;
+        }
+
         vector<unsigned int> forwardDistsFromNode(graph.nodes());
         BasicDijkstra::computeOneToAllDistances(i, originalGraph, forwardDistsFromNode);
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, forwardDistsFromNode, chGraph);

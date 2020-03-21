@@ -127,7 +127,7 @@ void createTNR() {
 
 //______________________________________________________________________________________________________________________
 void createTNRslower() {
-    Timer timer("Whole TNR construction timer");
+    Timer timer("Whole TNR construction timer (slower preprocessing mode)");
     timer.begin();
 
     XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
@@ -176,7 +176,7 @@ void createTNRAF() {
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n5000_useDM_mar_clust", 5000, 32, true);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n1000_slowr_mar", 1000, 32, false);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -494,6 +494,35 @@ void compareVariousTransitSetSizes() {
 }
 
 //______________________________________________________________________________________________________________________
+void compareTwoTNRinstances() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    TNRGLoader tnr1loader = TNRGLoader("../input/Prague_n1000_DM_mar.tnrg");
+    TransitNodeRoutingGraph * tnr1graph = tnr1loader.loadTNRforDistanceQueries();
+
+    vector<unsigned int> tnr1distances(trips.size());
+    double tnr1time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr1graph, tnr1distances);
+
+    delete tnr1graph;
+
+    TNRGLoader tnr2loader = TNRGLoader("../input/Prague_n1000_slower_mar.tnrg");
+    TransitNodeRoutingGraph * tnr2graph = tnr2loader.loadTNRforDistanceQueries();
+
+    vector<unsigned int> tnr2distances(trips.size());
+    double tnr2time = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnr2graph, tnr2distances);
+
+    delete tnr2graph;
+
+    CorrectnessValidator::validateVerbose(tnr1distances, tnr2distances);
+
+    printf("TNR instance 1 time: %lf (%lf for one query)\n", tnr1time, tnr1time / trips.size());
+    printf("TNR instance 2 time: %lf (%lf for one query)\n", tnr2time, tnr2time / trips.size());
+}
+
+//______________________________________________________________________________________________________________________
 void validateCHPathCorectness() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
@@ -744,14 +773,15 @@ void validateTNRAccessNodes() {
 //______________________________________________________________________________________________________________________
 int main(int argc, char * argv[]) {
     //createTNR();
-    createTNRslower();
+    //createTNRslower();
     //createTNRwithValidation();
-    //createTNRAF();
+    createTNRAF();
     //compareMethods();
     //compareFourMethods();
     //compareFiveMethods();
     //compareCHandTNR();
     //compareTNRandTNRAF();
+    //compareTwoTNRinstances();
     //compareVariousTransitSetSizes();
 
     //validateCHPathCorectness();
@@ -762,7 +792,7 @@ int main(int argc, char * argv[]) {
     //memoryUsageOfCH();
     //memoryUsageOfTNR();
     //memoryUsageOfTNRAF();
-    memoryUsageOfDM();
+    //memoryUsageOfDM();
 
     //checkDMBigValues();
 

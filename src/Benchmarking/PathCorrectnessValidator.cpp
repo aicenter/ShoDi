@@ -7,16 +7,13 @@
 #include "../GraphBuilding/Structures/SimpleEdge.h"
 #include "../Timer/Timer.h"
 
+// Validates that the paths reconstructed by the Transit Node Routing query algorithm are also valid in the original
+// graph.
 //______________________________________________________________________________________________________________________
 void PathCorrectnessValidator::validateTNRPaths(Graph * originalGraph, TNRPathQueryManager & tnrQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
     for(unsigned int i = 0; i < trips.size(); i++) {
         vector<SimpleEdge> path;
         unsigned int distance = tnrQueryManager.findPath(trips[i].first, trips[i].second, path);
-
-        /*printf("Path for trip %u:\n", i);
-        for(unsigned int j = 0; j < path.size(); j++) {
-            printf("%u -> %u\n", path[j].from, path[j].to);
-        }*/
 
         if(validatePath(originalGraph, distance, path) == false) {
             printf("Path returned by TNR for trip %u is not valid!\n", i);
@@ -40,16 +37,13 @@ void PathCorrectnessValidator::validateTNRPaths(Graph * originalGraph, TNRPathQu
     printf("This means one query took %f (sec).\n", time / trips.size());
 }
 
+// Validates that the paths reconstructed by the Contraction Hierarchies query algorithm are also valid in the original
+// graph.
 //______________________________________________________________________________________________________________________
 void PathCorrectnessValidator::validateCHPaths(Graph * originalGraph, CHPathQueryManager & chQueryManager, vector< pair < unsigned int, unsigned int > > & trips) {
     for(unsigned int i = 0; i < trips.size(); i++) {
         vector<SimpleEdge> path;
         unsigned int distance = chQueryManager.findPath(trips[i].first, trips[i].second, path);
-
-        /*printf("Path for trip %u:\n", i);
-        for(unsigned int j = 0; j < path.size(); j++) {
-            printf("%u -> %u\n", path[j].from, path[j].to);
-        }*/
 
         if(validatePath(originalGraph, distance, path) == false) {
             printf("Path returned by CH for trip %u is not valid!\n", i);
@@ -73,6 +67,7 @@ void PathCorrectnessValidator::validateCHPaths(Graph * originalGraph, CHPathQuer
     printf("This means one query took %f (sec).\n", time / trips.size());
 }
 
+// Auxiliary function used to validate one path reconstructed by some query algorithm.
 //______________________________________________________________________________________________________________________
 bool PathCorrectnessValidator::validatePath(Graph * originalGraph, const unsigned int distance, vector<SimpleEdge> & tnrPath) {
     if (distance == UINT_MAX && tnrPath.empty()) {
@@ -98,6 +93,8 @@ bool PathCorrectnessValidator::validatePath(Graph * originalGraph, const unsigne
     return true;
 }
 
+// Auxiliary function that checks if an edge exists in the original graph. This is used to check if edges obtained
+// during the reconstruction are actually valid in the original graph.
 //______________________________________________________________________________________________________________________
 unsigned int PathCorrectnessValidator::checkIfEdgeExists(const unsigned int from, const unsigned int to, Graph * originalGraph) {
     const vector<pair<unsigned int, unsigned int>> & edges = originalGraph->outgoingEdges(from);

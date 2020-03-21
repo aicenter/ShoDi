@@ -70,11 +70,6 @@ void TransitNodeRoutingGraphForPathQueries::setDistanceTableValue(unsigned int i
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraphForPathQueries::setLocalityFilterValue(unsigned int i, unsigned int j, bool value) {
-    //isLocal[i][j] = value;
-}
-
-//______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraphForPathQueries::addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance) {
     forwardAccessNodes[node].push_back(AccessNodeData(accessNodeID, accessNodeDistance));
 }

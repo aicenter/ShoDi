@@ -9,6 +9,9 @@
 
 #include <climits>
 
+// Represents an edge in the graph in a way that makes sense for the Contraction Hierarchies query algorithm.
+// Similar to QueryEdge, but this class also contains additional information that can be utilised when searching for the
+// actual shortest path and not just the shortest distance.
 //______________________________________________________________________________________________________________________
 class QueryEdgeWithUnpackingData {
 public:

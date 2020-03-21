@@ -9,7 +9,8 @@
 
 #include "../GraphBuilding/Structures/Graph.h"
 
-// A simple implementation of a basic Dijkstra's algorithm, which we compare the CH with.
+// A simple implementation of a basic Dijkstra's algorithm, which we mainly use as a baseline to compare the other
+// methods with, but it is also used during the preprocessing phases of some of the more complex methods.
 //______________________________________________________________________________________________________________________
 class BasicDijkstra {
 public:
