@@ -9,14 +9,10 @@ include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_library(contractionHierarchies SHARED
-        src/API/IntegerDistanceQueryManagerAPI.cpp
-        src/API/IntegerDistanceQueryManagerAPI.h
-        src/API/IntegerDistanceQueryManagerWithMappingAPI.cpp
-        src/API/IntegerDistanceQueryManagerWithMappingAPI.h
-        src/API/FPointDistanceQueryManagerAPI.cpp
-        src/API/FPointDistanceQueryManagerAPI.h
-        src/API/FPointDistanceQueryManagerWithMappingAPI.cpp
-        src/API/FPointDistanceQueryManagerWithMappingAPI.h
+        src/API/CHDistanceQueryManagerNoMappingAPI.cpp
+        src/API/CHDistanceQueryManagerNoMappingAPI.h
+        src/API/CHDistanceQueryManagerAPI.cpp
+        src/API/CHDistanceQueryManagerAPI.h
         src/API/CHinterface_wrap.cxx
         src/Dijkstra/BasicDijkstra.cpp
         src/Dijkstra/BasicDijkstra.h

@@ -3,14 +3,14 @@
 // Created on: 31.07.19
 //
 
-#include "IntegerDistanceQueryManagerAPI.h"
+#include "CHDistanceQueryManagerAPI.h"
 #include "../GraphBuilding/Loaders/DDSGLoader.h"
 
 // Initializes the Contraction Hierarchy for queries. This means loading the graph from the given input file, creating
 // an instance of a 'FlagsGraph', and then also creating an instance of the 'CHDistanceQueryManager', which
 // can then be used to answer queries.
 //______________________________________________________________________________________________________________________
-void IntegerDistanceQueryManagerAPI::initializeCH(string chFile) {
+void CHDistanceQueryManagerAPI::initializeCH(string chFile) {
     DDSGLoader chLoader = DDSGLoader(chFile);
     graph = chLoader.loadFlagsGraph();
     qm = new CHDistanceQueryManager(*graph);
@@ -19,7 +19,7 @@ void IntegerDistanceQueryManagerAPI::initializeCH(string chFile) {
 // Queries after initialization are pretty straightforward, we just let the initialized QueryManager instance answer
 // the queries.
 //______________________________________________________________________________________________________________________
-unsigned int IntegerDistanceQueryManagerAPI::distanceQuery(unsigned int source, unsigned int target) {
+unsigned int CHDistanceQueryManagerAPI::distanceQuery(unsigned int source, unsigned int target) {
     return qm -> findDistance(source, target);
 }
 
@@ -29,7 +29,7 @@ unsigned int IntegerDistanceQueryManagerAPI::distanceQuery(unsigned int source, 
 // this function, memory leaks will be possible and since the structures can be pretty big, it could lead to some
 // serious problems.
 //______________________________________________________________________________________________________________________
-void IntegerDistanceQueryManagerAPI::clearStructures() {
+void CHDistanceQueryManagerAPI::clearStructures() {
     delete qm;
     delete graph;
 }

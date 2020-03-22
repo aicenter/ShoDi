@@ -523,6 +523,35 @@ void compareTwoTNRinstances() {
 }
 
 //______________________________________________________________________________________________________________________
+void compareTwoTNRAFinstances() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    TGAFLoader tnraf1Loader = TGAFLoader("../input/Prague_n1000_useDM_mar_clust.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnraf1Graph = tnraf1Loader.loadTNRAFforDistanceQueries();
+
+    vector<unsigned int> tnraf1Distances(trips.size());
+    double tnraf1Time = TNRAFBenchmark::runAndMeasureOutputAndRetval(trips, *tnraf1Graph, tnraf1Distances);
+
+    delete tnraf1Graph;
+
+    TGAFLoader tnraf2Loader = TGAFLoader("../input/Prague_n1000_slowr_mar.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnraf2Graph = tnraf2Loader.loadTNRAFforDistanceQueries();
+
+    vector<unsigned int> tnraf2Distances(trips.size());
+    double tnraf2Time = TNRAFBenchmark::runAndMeasureOutputAndRetval(trips, *tnraf2Graph, tnraf2Distances);
+
+    delete tnraf2Graph;
+
+    CorrectnessValidator::validateVerbose(tnraf1Distances, tnraf2Distances);
+
+    printf("TNRAF instance 1 time: %lf (%lf for one query)\n", tnraf1Time, tnraf1Time / trips.size());
+    printf("TNRAF instance 2 time: %lf (%lf for one query)\n", tnraf2Time, tnraf2Time / trips.size());
+}
+
+//______________________________________________________________________________________________________________________
 void validateCHPathCorectness() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
@@ -775,13 +804,14 @@ int main(int argc, char * argv[]) {
     //createTNR();
     //createTNRslower();
     //createTNRwithValidation();
-    createTNRAF();
+    //createTNRAF();
     //compareMethods();
     //compareFourMethods();
     //compareFiveMethods();
     //compareCHandTNR();
     //compareTNRandTNRAF();
     //compareTwoTNRinstances();
+    compareTwoTNRAFinstances();
     //compareVariousTransitSetSizes();
 
     //validateCHPathCorectness();
