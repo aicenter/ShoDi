@@ -2,9 +2,9 @@
 %include "std_string.i"
  %{
  /* Includes the header in the wrapper code */
- #include "CHDistanceQueryManagerAPI.h"
+ #include "CHDistanceQueryManagerNoMappingAPI.h"
 
  %}
  
  /* Parse the header file to generate wrappers */
- %include "CHDistanceQueryManagerAPI.h"
+ %include "CHDistanceQueryManagerNoMappingAPI.h"

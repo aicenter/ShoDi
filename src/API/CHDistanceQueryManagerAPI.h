@@ -3,8 +3,8 @@
 // Created on: 31.07.19
 //
 
-#ifndef CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERWITHMAPPINGAPI_H
-#define CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERWITHMAPPINGAPI_H
+#ifndef SHORTEST_PATHS_CHDISTANCEQUERYMANAGERAPI_H
+#define SHORTEST_PATHS_CHDISTANCEQUERYMANAGERAPI_H
 
 
 #include "../CH/CHDistanceQueryManagerWithMapping.h"
@@ -18,7 +18,7 @@ using namespace std;
 // then realize the actual queries, and then clean the structures when they are no longer needed.
 // Please note, that if you do not call the 'clearStructures' function manually from Java, memory leaks will occur.
 //______________________________________________________________________________________________________________________
-class IntegerDistanceQueryManagerWithMappingAPI {
+class CHDistanceQueryManagerAPI {
 public:
     void initializeCH(string chFile, string mappingFile);
     unsigned int distanceQuery(long long unsigned int source, long long unsigned int target);
@@ -29,4 +29,4 @@ private:
 };
 
 
-#endif //CONTRACTION_HIERARCHIES_INTEGERDISTANCEQUERYMANAGERWITHMAPPINGAPI_H
+#endif //SHORTEST_PATHS_CHDISTANCEQUERYMANAGERAPI_H
