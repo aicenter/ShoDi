@@ -15,6 +15,7 @@
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
 #include "Timer/Timer.h"
 #include "CH/CHPreprocessor.h"
+#include "CH/CHDistanceQueryManagerWithMapping.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
@@ -176,7 +177,7 @@ void createTNRAF() {
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n1000_slowr_mar", 1000, 32, false);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n1000_slower_mar_v2", 1000, 32, false);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -552,6 +553,43 @@ void compareTwoTNRAFinstances() {
 }
 
 //______________________________________________________________________________________________________________________
+void testCHWithMapping() {
+    TripsLoader tripsLoader = TripsLoader("../input/test5000queries.txt");
+    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    tripsLoader.loadLongLongTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    CHDistanceQueryManagerWithMapping qm(*ch, "../input/Prague_int_graph.xeni");
+
+    printf("Printing distances:\n");
+    for(unsigned int i = 0; i < trips.size(); ++i) {
+        printf("%lf\n", (double) qm.findDistance(trips[i].first, trips[i].second));
+    }
+
+    delete ch;
+
+}
+
+//______________________________________________________________________________________________________________________
+void generateRandomTestset(unsigned int queriesCnt = 5000) {
+    XenGraphLoader mappingLoader("../input/Prague_int_graph.xeni");
+    unordered_map <long long unsigned int, unsigned int> mapping;
+    mappingLoader.loadNodesMapping(mapping);
+
+    vector<long long unsigned int> reversedMapping;
+    for(auto iter = mapping.begin(); iter != mapping.end(); ++iter) {
+        reversedMapping.push_back((*iter).first);
+    }
+
+    printf("%u\n", queriesCnt);
+    for(unsigned int i = 0; i < queriesCnt; ++i) {
+        printf("%llu %llu\n", reversedMapping[rand() % static_cast<int>(queriesCnt)], reversedMapping[rand() % static_cast<int>(queriesCnt)]);
+    }
+}
+
+//______________________________________________________________________________________________________________________
 void validateCHPathCorectness() {
     DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
     FlagsGraphWithUnpackingData * chGraph = chLoader.loadFlagsGraphWithUnpackingData();
@@ -811,8 +849,12 @@ int main(int argc, char * argv[]) {
     //compareCHandTNR();
     //compareTNRandTNRAF();
     //compareTwoTNRinstances();
-    compareTwoTNRAFinstances();
+    //compareTwoTNRAFinstances();
     //compareVariousTransitSetSizes();
+
+    testCHWithMapping();
+
+    //generateRandomTestset();
 
     //validateCHPathCorectness();
     //validateTNRPathCorectness();

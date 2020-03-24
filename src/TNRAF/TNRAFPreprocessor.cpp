@@ -417,7 +417,7 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
             vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
             unsigned int accessNode = accessNodes[i].accessNodeID;
             BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
-            unsigned int distanceToAccessNode = distancesFromAccessNode[node];
+            unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
                 totalArcFlags++;
@@ -543,7 +543,7 @@ void TNRAFPreprocessor::computeBackwardArcFlags(unsigned int node, vector<Access
             unsigned int accessNode = accessNodes[i].accessNodeID;
             BasicDijkstra::computeOneToAllDistancesInReversedGraph(accessNode, originalGraph,
                                                                    distancesFromAccessNode);
-            unsigned int distanceToAccessNode = distancesFromAccessNode[node];
+            unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
                 for (unsigned int k = 0; k < nodesInRegion.size(); k++) {
