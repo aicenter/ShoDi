@@ -538,7 +538,7 @@ void compareTwoTNRAFinstances() {
 
     delete tnraf1Graph;
 
-    TGAFLoader tnraf2Loader = TGAFLoader("../input/Prague_n1000_slowr_mar.tgaf");
+    TGAFLoader tnraf2Loader = TGAFLoader("../input/Prague_n1000_slower_mar_v2.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf2Graph = tnraf2Loader.loadTNRAFforDistanceQueries();
 
     vector<unsigned int> tnraf2Distances(trips.size());
@@ -849,10 +849,10 @@ int main(int argc, char * argv[]) {
     //compareCHandTNR();
     //compareTNRandTNRAF();
     //compareTwoTNRinstances();
-    //compareTwoTNRAFinstances();
+    compareTwoTNRAFinstances();
     //compareVariousTransitSetSizes();
 
-    testCHWithMapping();
+    //testCHWithMapping();
 
     //generateRandomTestset();
 

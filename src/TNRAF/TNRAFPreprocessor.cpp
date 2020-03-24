@@ -40,9 +40,6 @@ DistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 // not enough memory for the faster mode.
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & originalGraph, string outputPath, unsigned int transitNodesAmount, unsigned int regionsCnt, bool useDistanceMatrix) {
-    // FIXME: When the useDistanceMatrix flag is set to false, the resulting structure does not work correctly. Needs
-    // further investigation.
-
     cout << "Getting transit nodes" << endl;
     vector<unsigned int> transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
