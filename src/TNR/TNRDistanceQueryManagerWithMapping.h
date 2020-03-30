@@ -18,7 +18,7 @@ using namespace std;
 class TNRDistanceQueryManagerWithMapping {
 public:
     TNRDistanceQueryManagerWithMapping(TransitNodeRoutingGraph & g, string mappingFilepath);
-    double findDistance(const long long unsigned int source, const long long unsigned int target);
+    unsigned int findDistance(const long long unsigned int source, const long long unsigned int target);
 private:
     TNRDistanceQueryManager qm;
     unordered_map<long long unsigned int, unsigned int> mapping;

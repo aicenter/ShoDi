@@ -22,7 +22,7 @@ using namespace std;
 class CHDistanceQueryManagerWithMapping {
 public:
     CHDistanceQueryManagerWithMapping(FlagsGraph & g, string mappingFilepath);
-    double findDistance(const long long unsigned int source, const long long unsigned int target);
+    unsigned int findDistance(const long long unsigned int source, const long long unsigned int target);
 private:
     CHDistanceQueryManager qm;
     unordered_map<long long unsigned int, unsigned int> mapping;

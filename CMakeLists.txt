@@ -13,7 +13,6 @@ add_library(contractionHierarchies SHARED
         src/API/CHDistanceQueryManagerNoMappingAPI.h
         src/API/CHDistanceQueryManagerAPI.cpp
         src/API/CHDistanceQueryManagerAPI.h
-        src/API/CHinterface_wrap.cxx
         src/Dijkstra/BasicDijkstra.cpp
         src/Dijkstra/BasicDijkstra.h
         src/Benchmarking/TNRBenchmark.cpp
@@ -238,4 +237,7 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         src/main.cpp
+
+        src/API/CHDistanceQueryManagerAPI.cpp
+        src/API/CHDistanceQueryManagerAPI.h
         )

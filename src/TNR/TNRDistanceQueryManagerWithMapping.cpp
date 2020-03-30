@@ -15,6 +15,6 @@ TNRDistanceQueryManagerWithMapping::TNRDistanceQueryManagerWithMapping(TransitNo
 
 // Used to find the shortest distance from source to target where source and target are the original indices.
 //______________________________________________________________________________________________________________________
-double TNRDistanceQueryManagerWithMapping::findDistance(const long long unsigned int source, const long long unsigned int target) {
+unsigned int TNRDistanceQueryManagerWithMapping::findDistance(const long long unsigned int source, const long long unsigned int target) {
     return qm.findDistance(mapping.at(source), mapping.at(target));
 }

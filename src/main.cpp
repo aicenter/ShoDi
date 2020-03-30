@@ -35,6 +35,7 @@
 #include "Benchmarking/DistanceMatrixBenchmark.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "TNRAF/TNRAFDistanceQueryManager.h"
+#include "API/CHDistanceQueryManagerAPI.h"
 
 
 using namespace std;
@@ -151,13 +152,14 @@ void createTNRwithValidation() {
     Timer timer("Whole TNR construction timer");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    //XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague1mar.xeng");
     UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     Graph * originalGraph = graph->createCopy();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_n1000_DM_mar", 1000);
+    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, "../input/Prague_mar_2000_prec1", 2000);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -171,13 +173,13 @@ void createTNRAF() {
     Timer timer("Whole TNR AF construction timer");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague1mar.xeng");
     UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     Graph * originalGraph = graph->createCopy();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_n1000_slower_mar_v2", 1000, 32, false);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, "../input/Prague_mar_2000_prec1", 2000, 32, true);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -191,11 +193,12 @@ void createCH() {
     Timer timer("Whole CH construction timer");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader("../input/Debug_graph.xeng");
+    XenGraphLoader graphLoader = XenGraphLoader("../input/Prague1mar.xeng");
+    //XenGraphLoader graphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
     UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat("../input/Debug_graph");
+    graph->flushInDdsgFormat("../input/Prague_mar_prec1");
 
     timer.finish();
     timer.printMeasuredTime();
@@ -220,6 +223,33 @@ void createDM() {
     timer.printMeasuredTime();
 
     delete graph;
+}
+
+//______________________________________________________________________________________________________________________
+void compareCHwithDijkstra() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_mar_5000_trips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_mar_prec1.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<unsigned int> chDistances(trips.size());
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    //DIMACSLoader dijkstraLoader = DIMACSLoader("../input/graph.gr");
+    XenGraphLoader dijkstraLoader = XenGraphLoader("../input/Prague1mar.xeng");
+    Graph * dijkstraGraph = dijkstraLoader.loadGraph();
+
+    vector<unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = DijkstraBenchmark::runAndMeasureOutputAndRetval(trips, *dijkstraGraph, dijkstraDistances);
+
+    CorrectnessValidator::validateVerbose(chDistances, dijkstraDistances);
+    printf("Contraction Hierarchies were %lf times faster than Dijkstra!\n", dijkstraTime/chTime);
+
+    delete dijkstraGraph;
 }
 
 // Compares the running times of Dijkstra, Contraction Hierarchies and Transit Node Routing on a given set of trips
@@ -319,6 +349,42 @@ void compareFourMethods() {
     printf("Distance Matrix was %lf times faster than TNR!\n", tnrTime/dmTime);
 }
 
+//______________________________________________________________________________________________________________________
+void compareThreeOnNewPrague() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_mar_5000_trips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_mar_prec1.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<unsigned int> chDistances(trips.size());
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    TNRGLoader tnrLoader = TNRGLoader("../input/Prague_mar_2000_prec1.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    vector<unsigned int> tnrDistances(trips.size());
+    double tnrTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrGraph, tnrDistances);
+
+    CorrectnessValidator::validateVerbose(tnrDistances, chDistances);
+    printf("TNR was %lf times faster than CH!\n", chTime/tnrTime);
+
+    delete tnrGraph;
+
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_mar_2000_prec1.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    vector<unsigned int> tnrafDistances(trips.size());
+    double tnrafTime = TNRAFBenchmark::runAndMeasureOutputAndRetval(trips, *tnrafGraph, tnrafDistances);
+
+    CorrectnessValidator::validateVerbose(tnrafDistances, chDistances);
+    printf("TNRAF was %lf times faster than CH!\n", chTime/tnrafTime);
+    printf("TNRAF was %lf times faster than TNR!\n", tnrTime/tnrafTime);
+}
+
 // Compares the running times of Dijkstra, Contraction Hierarchies, Transit Node Routing and Distance Matrix on a given
 // set of trips (queries).
 //______________________________________________________________________________________________________________________
@@ -391,13 +457,43 @@ void compareFiveMethods() {
 
 // Compares the running times of Contraction Hierarchies and Transit Node Routing on a given set of trips (queries).
 //______________________________________________________________________________________________________________________
+void compareNewPragueCHandTNRAF() {
+    TripsLoader tripsLoader = TripsLoader("../input/Prague_mar_50000_trips.txt");
+    //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_mar.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    vector<unsigned int> chDistances(trips.size());
+    double chTime = CHBenchmark::runAndMeasureFlagsGraphOutputAndRetval(trips, *ch, chDistances);
+
+    delete ch;
+
+    TGAFLoader tnrafLoader = TGAFLoader("../input/Prague_mar_2000_integ.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    vector<unsigned int> tnrafDistances(trips.size());
+    double tnrafTime = TNRBenchmark::runAndMeasureOutputAndRetval(trips, *tnrafGraph, tnrafDistances);
+
+    CorrectnessValidator::validateVerbose(tnrafDistances, chDistances);
+    printf("TNRAF was %lf times faster than CH!\n", chTime/tnrafTime);
+
+    delete tnrafGraph;
+}
+
+
+// Compares the running times of Contraction Hierarchies and Transit Node Routing on a given set of trips (queries).
+//______________________________________________________________________________________________________________________
 void compareCHandTNR() {
     TripsLoader tripsLoader = TripsLoader("../input/Prague_50000_randomTrips.txt");
     //TripsLoader tripsLoader = TripsLoader("../input/Prague_map_5000randomTrips.txt");
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
 
-    DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    //DDSGLoader chLoader = DDSGLoader("../input/Prague_map_int_prec1000.ch");
+    DDSGLoader chLoader = DDSGLoader("../input/old_Prague_mar.ch");
     FlagsGraph * ch = chLoader.loadFlagsGraph();
 
     vector<unsigned int> chDistances(trips.size());
@@ -630,6 +726,36 @@ void validateTNRPathCorectness() {
 }
 
 //______________________________________________________________________________________________________________________
+void perform10CHqueries() {
+    DDSGLoader chLoader = DDSGLoader("../input/Prague_mar_prec1.ch");
+    FlagsGraph * ch = chLoader.loadFlagsGraph();
+
+    CHDistanceQueryManager dqm = CHDistanceQueryManager(*ch);
+    for(unsigned int i = 0; i < 10; ++i) {
+        unsigned int dist = dqm.findDistance(i*100,i*1000+500);
+        printf("Returned distance %u for query %u.\n", dist, i);
+    }
+
+    delete ch;
+}
+
+//______________________________________________________________________________________________________________________
+void perform5CHqueriesUsingAPI() {
+    CHDistanceQueryManagerAPI api;
+    api.initializeCH("../input/Prague_mar_prec1.ch", "../input/Prague1mar.xeni");
+    printf("Returned distance %u for a query.\n", api.distanceQuery(1440730650034861,1467438550039272));
+    printf("Returned distance %u for a query.\n", api.distanceQuery(1444249950054331,1443750050126777));
+    printf("Returned distance %u for a query.\n", api.distanceQuery(1450395350122241,1464074449944693));
+    printf("Returned distance %u for a query.\n", api.distanceQuery(1464451550153981,1453186149972638));
+    printf("Returned distance %u for a query.\n", api.distanceQuery(1432635949952211, 1456436050112046));
+    //printf("Returned distance %u for a query.\n", api.distanceQuery(1432635949952211, 1456436050112046));
+    //printf("Returned distance %u for a query.\n", api.distanceQuery(1432635949952211, 1456436050112046));
+    //printf("Returned distance %u for a query.\n", api.distanceQuery(1432635949952211, 1456436050112046));
+    api.clearStructures();
+}
+
+
+//______________________________________________________________________________________________________________________
 void memoryUsageOfDijkstra() {
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../input/Prague_int_graph_1000prec.xeng");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
@@ -843,14 +969,17 @@ int main(int argc, char * argv[]) {
     //createTNRslower();
     //createTNRwithValidation();
     //createTNRAF();
+    //compareCHwithDijkstra();
     //compareMethods();
+    //compareThreeOnNewPrague();
     //compareFourMethods();
     //compareFiveMethods();
     //compareCHandTNR();
     //compareTNRandTNRAF();
     //compareTwoTNRinstances();
-    compareTwoTNRAFinstances();
+    //compareTwoTNRAFinstances();
     //compareVariousTransitSetSizes();
+    //compareNewPragueCHandTNRAF();
 
     //testCHWithMapping();
 
@@ -859,6 +988,9 @@ int main(int argc, char * argv[]) {
     //validateCHPathCorectness();
     //validateTNRPathCorectness();
     //validateTNRAccessNodes();
+
+    //perform10CHqueries();
+    perform5CHqueriesUsingAPI();
 
     //memoryUsageOfDijkstra();
     //memoryUsageOfCH();
