@@ -21,7 +21,6 @@ CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
 // described in the same article which noticeably improved the query times.
 //______________________________________________________________________________________________________________________
 unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
-
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
@@ -118,7 +117,7 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, con
             if(! forwardQ.empty() && forwardQ.top().weight > upperbound) {
                 forwardFinished = true;
             }
-        // The backward direction is symmetrical to the forward direction.
+            // The backward direction is symmetrical to the forward direction.
         } else {
             if (backwardQ.empty()) {
                 break;
