@@ -129,20 +129,20 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
     vector < unsigned int > transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
-    cout << "Computing transit nodes distance table" << endl;
     FlagsGraph chGraph(graph);
-    CHDistanceQueryManager qm(chGraph);
+
+    DistanceMatrix * distanceMatrix;
+    {
+        DistanceMatrixComputor dmComputor;
+        dmComputor.computeDistanceMatrix(originalGraph);
+        distanceMatrix = dmComputor.getDistanceMatrixInstance();
+    }
+
+    cout << "Computing transit nodes distance table" << endl;
     vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        if(i % 100 == 0) {
-            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
-        }
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
-            if (i == j) {
-                transitNodesDistanceTable[i][j] = 0;
-            } else {
-                transitNodesDistanceTable[i][j] = qm.findDistance(transitNodes[i], transitNodes[j]);
-            }
+            transitNodesDistanceTable[i][j] = distanceMatrix->findDistance(transitNodes[i], transitNodes[j]);
         }
     }
 
@@ -160,12 +160,6 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
     removedAccessNodesFw = 0;
     accessNodesBw = 0;
     removedAccessNodesBw = 0;
-    DistanceMatrix * distanceMatrix;
-    {
-        DistanceMatrixComputor dmComputor;
-        dmComputor.computeDistanceMatrix(originalGraph);
-        distanceMatrix = dmComputor.getDistanceMatrixInstance();
-    }
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, *distanceMatrix);
     }

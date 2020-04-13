@@ -6,15 +6,16 @@
 #include "TNRAFBenchmark.h"
 #include "../TNRAF/TNRAFDistanceQueryManager.h"
 #include "../Timer/Timer.h"
+#include "../TNRAF/TNRAFDistanceQueryManagerWithMapping.h"
 
 // Runs the Transit Node Routing with Arc Flags query algorithm on a set set of queries (trips). Returns the cumulative
 // time the queries took in seconds. Additionally stores the returned distances into a vector so that their correctness
 // can be later verified.
 //______________________________________________________________________________________________________________________
-double TNRAFBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances) {
+double TNRAFBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances) {
     TNRAFDistanceQueryManager queryManager(graph);
 
-    Timer tnrTimer("Transit Node Routing trips benchmark");
+    Timer tnrTimer("Transit Node Routing with Arc Flags trips benchmark");
     tnrTimer.begin();
 
     for(unsigned int i = 0; i < trips.size(); i++) {
@@ -24,6 +25,20 @@ double TNRAFBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsign
     queryManager.printQueriesAnalysis();
 
     tnrTimer.finish();
-    tnrTimer.printMeasuredTime();
+    //tnrTimer.printMeasuredTime();
+    return tnrTimer.getMeasuredTimeInSeconds();
+}
+
+double TNRAFBenchmark::benchmarkWithMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances, string mappingFilePath) {
+    TNRAFDistanceQueryManagerWithMapping queryManager(graph, mappingFilePath);
+
+    Timer tnrTimer("Transit Node Routing with Arc Flags trips benchmark with mapping");
+    tnrTimer.begin();
+
+    for(unsigned int i = 0; i < trips.size(); i++) {
+        distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second);
+    }
+
+    tnrTimer.finish();
     return tnrTimer.getMeasuredTimeInSeconds();
 }

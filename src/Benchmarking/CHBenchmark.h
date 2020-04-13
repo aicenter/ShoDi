@@ -15,7 +15,8 @@
 //______________________________________________________________________________________________________________________
 class CHBenchmark {
 public:
-    static double runAndMeasureFlagsGraphOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < unsigned int > & distances);
+    static double benchmark(const vector < pair < unsigned int, unsigned int> > & trips, FlagsGraph & graph, vector < unsigned int > & distances);
+    static double benchmarkUsingMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, FlagsGraph & graph, vector < unsigned int > & distances, string mappingFilePath);
 };
 
 

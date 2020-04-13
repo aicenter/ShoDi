@@ -8,7 +8,7 @@ find_package(JNI REQUIRED)
 include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-add_library(contractionHierarchies SHARED
+add_library(shortestPaths SHARED
         src/API/CHDistanceQueryManagerNoMappingAPI.cpp
         src/API/CHDistanceQueryManagerNoMappingAPI.h
         src/API/CHDistanceQueryManagerAPI.cpp
@@ -125,7 +125,7 @@ add_library(contractionHierarchies SHARED
         src/TNRAF/Structures/RegionsStructure.h
         )
 
-add_executable(contractionHierarchiesPreprocessor
+add_executable(shortestPathsPreprocessor
         src/Dijkstra/BasicDijkstra.cpp
         src/Dijkstra/BasicDijkstra.h
         src/Benchmarking/TNRBenchmark.cpp
@@ -218,6 +218,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNR/Structures/AccessNodeData.h
         src/TNR/TNRDistanceQueryManager.cpp
         src/TNR/TNRDistanceQueryManager.h
+        src/TNR/TNRDistanceQueryManagerWithMapping.cpp
+        src/TNR/TNRDistanceQueryManagerWithMapping.h
         src/Timer/Timer.cpp
         src/Timer/Timer.h
         src/TNR/TNRPathQueryManager.cpp
@@ -228,6 +230,8 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNRAF/TNRAFPathQueryManager.h
         src/TNRAF/TNRAFDistanceQueryManager.cpp
         src/TNRAF/TNRAFDistanceQueryManager.h
+        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
+        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.h
         src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
         src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/TNRAF/Structures/RegionsStructure.cpp
@@ -237,7 +241,4 @@ add_executable(contractionHierarchiesPreprocessor
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         src/main.cpp
-
-        src/API/CHDistanceQueryManagerAPI.cpp
-        src/API/CHDistanceQueryManagerAPI.h
         )
