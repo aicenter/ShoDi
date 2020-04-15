@@ -9,28 +9,13 @@ include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_library(shortestPaths SHARED
-        src/API/CHDistanceQueryManagerNoMappingAPI.cpp
-        src/API/CHDistanceQueryManagerNoMappingAPI.h
         src/API/CHDistanceQueryManagerAPI.cpp
         src/API/CHDistanceQueryManagerAPI.h
-        src/Dijkstra/BasicDijkstra.cpp
-        src/Dijkstra/BasicDijkstra.h
-        src/Benchmarking/TNRBenchmark.cpp
-        src/Benchmarking/TNRBenchmark.h
-        src/Benchmarking/CHBenchmark.h
-        src/Benchmarking/CHBenchmark.cpp
-        src/Benchmarking/DijkstraBenchmark.h
-        src/Benchmarking/DijkstraBenchmark.cpp
-        src/Benchmarking/CorrectnessValidator.h
-        src/Benchmarking/CorrectnessValidator.cpp
-        src/Benchmarking/DistanceCorrectnessValidator.h
-        src/Benchmarking/DistanceCorrectnessValidator.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.h
-        src/Benchmarking/PathCorrectnessValidator.cpp
-        src/Benchmarking/PathCorrectnessValidator.h
-        src/Benchmarking/TNRAFBenchmark.cpp
-        src/Benchmarking/TNRAFBenchmark.h
+        src/API/TNRDistanceQueryManagerAPI.cpp
+        src/API/TNRDistanceQueryManagerAPI.h
+        src/API/TNRAFDistanceQueryManagerAPI.cpp
+        src/API/TNRAFDistanceQueryManagerAPI.h
+        src/API/shortestPathsInterface_wrap.cxx
         src/CH/Structures/CHNode.cpp
         src/CH/Structures/CHNode.h
         src/CH/Structures/CHpriorityQueue.cpp
@@ -49,6 +34,8 @@ add_library(shortestPaths SHARED
         src/CH/CHPathQueryManager.h
         src/CH/CHPreprocessor.cpp
         src/CH/CHPreprocessor.h
+        src/Dijkstra/BasicDijkstra.cpp
+        src/Dijkstra/BasicDijkstra.h
         src/Dijkstra/DijkstraNode.cpp
         src/Dijkstra/DijkstraNode.h
         src/DistanceMatrix/DistanceMatrix.cpp
@@ -105,6 +92,8 @@ add_library(shortestPaths SHARED
         src/TNR/Structures/AccessNodeData.h
         src/TNR/TNRDistanceQueryManager.cpp
         src/TNR/TNRDistanceQueryManager.h
+        src/TNR/TNRDistanceQueryManagerWithMapping.cpp
+        src/TNR/TNRDistanceQueryManagerWithMapping.h
         src/Timer/Timer.cpp
         src/Timer/Timer.h
         src/TNR/TNRPathQueryManager.cpp
@@ -115,6 +104,8 @@ add_library(shortestPaths SHARED
         src/TNRAF/TNRAFPathQueryManager.h
         src/TNRAF/TNRAFDistanceQueryManager.cpp
         src/TNRAF/TNRAFDistanceQueryManager.h
+        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
+        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.h
         src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
         src/TNRAF/Structures/AccessNodeDataArcFlags.h
         src/TNRAF/Structures/RegionsStructure.cpp
@@ -126,8 +117,6 @@ add_library(shortestPaths SHARED
         )
 
 add_executable(shortestPathsPreprocessor
-        src/Dijkstra/BasicDijkstra.cpp
-        src/Dijkstra/BasicDijkstra.h
         src/Benchmarking/TNRBenchmark.cpp
         src/Benchmarking/TNRBenchmark.h
         src/Benchmarking/CHBenchmark.h
@@ -162,6 +151,8 @@ add_executable(shortestPathsPreprocessor
         src/CH/CHPathQueryManager.h
         src/CH/CHPreprocessor.cpp
         src/CH/CHPreprocessor.h
+        src/Dijkstra/BasicDijkstra.cpp
+        src/Dijkstra/BasicDijkstra.h
         src/Dijkstra/DijkstraNode.cpp
         src/Dijkstra/DijkstraNode.h
         src/DistanceMatrix/DistanceMatrix.cpp

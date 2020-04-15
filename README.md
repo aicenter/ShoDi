@@ -127,3 +127,5 @@ Javatests example
 -----------------
 A simple `Java` application that uses the library to answer queries can be found in the `javatests` subdirectory. This application was used to test that the API is functional and everything works as intended. You can however use this application as an example of how to use the library from `Java`. 
 
+For more information about how to integrate this project with other programming languages, please check the `README.md` in the `src/API` subdirectory.
+
