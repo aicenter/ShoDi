@@ -1,109 +1,129 @@
-Contraction hierarchies implementation in C++
-=============================================
+Shortest Paths computation library in C++
+=========================================
 
-Projekt obsahuje implementaci techniky `Contraction Hierarchies` inspirovanou článkem "Contraction Hierarchies: Faster and Simpler Hierarchical
-Routing in Road Networks" od čtveřice autorů Robert Geisberger, Peter Sanders, Dominik Schultes a Daniel Delling. Implementace umí předzpracovat
-zadaný graf, tedy vytvořit samotnou 'Contraction Hierarchy' a umí jí pak i použít pro vyhodnocování dotazů (queries). Momentálně jsou funkční
-dotazy na vzdálenost ('vrať nejkratší vzdálenost z bodu a do bodu b'). Teoreticky by se díky 'Contraction Hierarchies' dala vracet i samotná
-nejkratší cesta (tedy kromě vzdálenosti i posloupnost vrcholů na nejkratší cestě), to ale momentálně není korektně implementováno.
+This project implements multiple complex preprocessing methods for shortest distance computation in directed weighted graphs. The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies) and Transit Node Routing with Arc Flags (extension of Transit Node Routing).
 
-Samotná projekt je rozdělený na dva hlavní moduly. Spustitelnou C++ aplikaci, která umožňuje vygenerování 'Contraction Hierarchy' pro libovolný graf v jednom
-z podporovaných formátů, a dále shared library, která umožňuje volat dotazy nad danou Contraction Hierarchy z Javy. Toto dělení bylo zvoleno proto,
-že samotné generování Contraction Hierarchy je poměrně náročné a pro velké grafy může dlouho trvat, proto dává smysl si nejprve potřebnou hierarchii předgenerovat
-s využitím C++ aplikace, a následně už tuto hierarchii použít pro dotazy v Javě.
+The project is split into two major components. One component is the **preprocessor** (an executable called `shortestPathsPreprocessor`) which takes an arbitrary graph in a supported format (described later) and prepares the structures required for the query algorithms of one of the three methods. Additionally, the preprocessor allows the user to run a set of queries using some method and benchmark the time required to answer them. This way, the user can easily evaluate whether the performance is sufficient for his use case. The second component is the **library** (a shared library called `libshortestPaths.so` in Linux), which can load the structures prepared by the preprocessor to answer arbitrary queries using the query algorithms of the previously mentioned methods. The library can be used in some bigger `C++` application, but it can be also used from some other language. A simple example application written in `Java` which uses the library can be found in the `javatests` subdirectory.
 
+Preprocessor
+============
 
-Kompilace
+Compiling
 ---------
 
-### Nejjednodušší varianta
-Nejjednodušším způsobem jak zkompilovat celý projekt je přiložený `CMakeLists.txt`. Ten obsahuje dva targety, knihovnu `contractionHierarchies` a aplikaci `contractionHierarchiesPreprocessor`. Tyto targety mohou být použity samostatně. Postup při využití `CMakeLists.txt` je zhruba následující:
+To use the preprocessor, we first need to compile it. Compilation should be fairly easy. First, run `CMake` in the root of this project. This should create a `Makefile` with a target called `shortestPathsPreprocessor` that will build the preprocessor application.
 
-- Stáhněte si aktuální `master`
-- Využijte přiložený `CMakeLists.txt`. Ten by měl zajistit zkompilování knihovny `contractionHierarchies` pro Váš systém, kterou je následně možné volat z Javy pro vyhodnocování dotazů a dále zkompilování aplikace `contractionHierarchiesPreprocessor` která slouží ke generování hierarchií.
-- Při volání `contractionHierarchies` z Javy je pak potřeba zajistit, že cesta k dané knihovně (soubor `libcontractionHierarchies.so` v Linuxu, `contractionHierarchies.dll` ve Windows...) je obsažena v `java.library.path` při spouštění Java aplikace, která bude `contractionHierarchies` volat (dá se například použít přepínač `-Djava.library.path` při spouštění Java aplikace).
+In Linux, the process can be done as follows:
+* `mkdir cmakedata`
+* `cd cmakedata`
+* `cmake ..`
+* `make shortestPathsPreprocessor`
 
-### Alternativní způsob
+Usage
+-----
 
-- V případě, že z nějakého důvodu není možné použít CMake, například protože není na daném systému k dispozici, je možné aplikaci zkompilovat ručně.
-- V takovém případě je nejjednodušší v libovolném IDE zvolit něco jako 'build project from sources'
-- Následně je z projektu nutné odebrat soubory `RandomGraphGenerator.cpp`, `RandomTripsGenerator.cpp` a `AlternativeRandomTripsGenerator.cpp`. Jedná se o samostatné programy, které se dají samostatně zkompilovat a generují náhodné grafy nebo náhodné dvojice source - target v určité rozsahu. Dají se použít pro debugování. Pokud je necháte v projektu, nejspíše dostanete chybovou hlášku něco ve smyslu "multiple main definitions".
-- Pokud chcete vygenerovat pouze shared library pro následné volání z Javy, nezahrnujte `main.cpp` do kompilace. Naopak, je potřeba zkompilovat veškeré ostatní soubory s příponou `.cpp` a `.cxx` ve všech podadresářích `src`. Pokud chcete vygenerovat spustitelný program který dokáže zkonstruovat Contraction Hierarchy pro daný graf, pak je naopak potřeba `main.cpp` do kompilace zahrnout. 
+The preprocessor has a simple **command line interface** (CLI) that should make the process of preprocessing graphs quite simple.
 
-### Poznámka
+Let us now assume that you have a directed weighted graph in one of the given formats. The formats are described under this part. There is also a `Python` script prepared for transformation of `GeoJSON` data to one of the supported formats.
 
-Z C++ knihoven využívá program pouze `stl`, což by neměl být problém. Pro kompilaci je ovšem nutné mít na systému nainstalovaný `JDK`. V `CMakeLists.txt` je volání `find_package(JNI)`, pro které je potřeba `JDK` v daném systému.
+The command line interface requires you to use specific arguments in the correct order. The first argument determines whether you want to preprocess a graph file or benchmark a preprocessed graph using some method. The following arguments are specific to each of those two.
 
+### Graph preprocessing
 
-Použití
--------
+To preprocess a graph using Contraction Hierarchies, simply call the preprocessor with the following arguments:
+`./shortestPathsPreprocessor create ch [xengraph/dimacs] [input_file] [output_file]`.
+Here the third argument must be exactly `xengraph` or `dimacs` and it determines which input format is used. The fourth argument is your input file in the chosen format, and the last argument is the output file. A suffix `.ch` will be automatically added to the path. An example of a correct call is: `./shortestPathsPreprocessor create ch xengraph my_graph.xeng my_graph`.
 
-### Aplikace contractionHierarchiesPreprocessor
-Aplikace `contractionHierarchiesPreprocessor` umožňuje relativně snadné vytvoření 'Contraction Hierarchy' pro daný vstupní soubor. Po spuštění této aplikace bez dalších argumentů aplikace pouze vypíše správné použití. Momentálně aplikace umožňuje pouze generování hierarchií (v budoucnu by mohlo být například umožněno i nějaké benchmarkování).
+To preprocess a graph for Transit Node Routing, the arguments are as follows:
+`./shortestPathsPreprocessor create tnr [xengraph/dimacs] [fast/slow/dm] [tnodes_cnt] [input_file] [output_file]`. The third argument again determines which input format is used. The fourth argument determines which preprocessing mode should be used. The `fast` mode will precompute the structures in the smallest time out of the three, but the performance of the resulting data structure will be significantly lower than for the other two modes. Modes `slow` and `dm` will produce exactly the same result, but the `dm` mode uses distance matrix to speed up the precomputation. This means that the `dm` mode requires a lot of memory, but the precomputation will be fairly quick. The `slow` mode needs significantly less memory, but takes more time. The fifth argument determines the size of the transit nodes set. Therefore it must be an integer between 1 and the number of nodes in the graph. Less transit nodes usually mean lower memory requirements, but also worse query times. By choosing the appropriate size of the transit node set, you can find a great balance between memory requirements and performance. The sixth argument is your input file in the chosen format, and the last argument is the output file. A suffix `.tnrg` will be automatically added to the output path. An example of a correct call: `./shortestPathsPreprocessor create tnr xengraph dm 1000 my_graph.xeng my_graph`.
 
-- V případě, že chce člověk vygenerovat hierarchii, stačí v konzoli zavolat aplikaci s podobnými argumenty jako v následujícím příkladu: `./contractionHierarchiesPreprocessor c i X Prague_map.xeng Prague_map`.
-- V příkladu výše 'c' znamená create, 'i' znamená že se má tvořit integer 'Contraction Hierarchy' (alternativně 'f' by znamenalo floating point 'Contraction Hierarchy'), 'X' znamená že vstupní soubor je ve formátu XenGraph (alternativně 'D' znamená formát DIMACS), a konečně poslední dva argumenty jsou cesta ke vstupnímu souboru (buď relativní vzhledem k working directory, nebo absolutní) a cesta kam má být uložena výsledná hierarchie (na konec se automaticky přidá přípona '.ch' nebo '.chg', takže v případě daného příkladu by vznikl soubor 'Prague_map.ch', neboť jsme požádali o integer 'Contraction Hierarchy').
+To preprocess a graph for Transit Node Routing with Arc Flags, the arguments are as follows: `./shortestPathsPreprocessor create tnraf [xengraph/dimacs] [slow/dm] [tnodes_cnt] [input_file] [output_file]`. The third argument determines which input format is used. The fourth argument again switches between preprocessing modes. Both modes return the exact same result, but the `dm` mode is faster while requiring more memory. The fifth argument again determines the size of the transit node set (it must be an integer between 1 and the number of nodes in the graph). The sixth argument is your input file in the chosen format, the last argument is the output file. A suffix `.tgaf` will be automatically added to the output path. An example of a correct call: `./shortestPathsPreprocessor create tnraf xengraph dm 1000 my_graph.xeng my_graph`.
 
-### Knihovna contractionHierarchies
-Kromě spustitelné aplikace by měl `cmake` vygenerovat též příslušnou knihovnu. Knihovna se generuje samozřejmě v závislosti na systému, na kterém je `cmake` spuštěn, tedy výsledkem na Linuxu bude soubor `libcontractionHierarchies.so`, na Windows pravděpodobně `contractionHierarchies.dll`, na Macu pravděpodobně soubor s příponou `.dylib`. Tato knihovna vystavuje rozhraní pro volání dotazů na vzdálenost mezi dvěma vrcholy. Pro volání dotazů z Javy je nutné tuto knihovnu mít v `java.library.path`, například zkopírováním na vhodné místo, nebo upravením `java.library.path`, poté ji v Javě načíst pomocí `System.loadLibrary("contractionHierarchies")`, poté by již mělo být možné používat query algoritmus z Javy. Pro ukázku funkcionality a možnost ověření, že knihovna správně funguje, obsahuje tento projekt složku `javatest`, která obsahuje jednoduchou Java aplikaci, která by po volání `mnv compile` a následném `mvn test` měla provést několik testů, které ověří, že vše správně funguje. Samotný kód v daných testech pak může sloužit jako jakýsi vzor pro to, jak knihovnu z Javy správně použít. Pozor na to, že pokud uživatel v Javě vytvoří instanci nějakého QueryManageru, je potřeba na něm před ukončením programu zavolat funkci `clearStructures()`. Je to proto, že při vytvoření instance QueryManageru v Javě se za pomoci knihovny vytvoří též odpovídající instance QueryManageru v C++, která si alokuje nějakou paměť a pokud nedojde k zavolání `clearStructures()`, tato paměť nebude nikdy uvolněna.
+### Benchmarking
 
+For benchmarking, you will need a set of queries which can either use IDs in the range from 0 to n-1 (where n is the number of the nodes in the graph) or you can use arbitrary integer node IDs. In the second case, you also need to provide a mapping file. The formats of the query set file and the mapping file are described in the next part. During benchmarking, all of your queries are answered using chosen method, then the total time need to answer all the queries in seconds is printed alongside the average time needed to answer one query in milliseconds.
 
-Popis vstupních formátů
------------------------
+To benchmark without mapping, your call should look as follows: `./shortestPathsPreprocessor benchmark [ch/tnr/tnraf] nomapping [input_data_structure] [query_set]`. Here the second argument determines which method you will be benchmarking. The fourth argument is the path to the data structure used for the benchmark. You must provide a structure preprocessed for the method you are benchmarking, so for example if you want to benchmark `tnraf`, you must provide `your_structure.tgaf` as your fourth argument. The last argument is the path to your query set that will be used for the benchmark.
 
-### Formát XenGraph pro grafy vytvořené z edges.geojson a nodes.geojson
-Pro běžné použití na grafech pro které existuje dvojice souborů `edges.geojson` a `nodes.geojson` využívám velmi jednoduchý textový formát. Existuje Python skript, který dokáže pro danou dvojici souborů
-`edges.geojson` a `nodes.geojson` vygenerovat soubory `graph.xeng` a `graph.xeni` které mohou být následně přímo použity pro vygenerování 'Contraction Hierarchy'.
+If you want to benchmark with mapping, your call should look as follows: `./shortestPathsPreprocessor benchmark [ch/tnr/tnraf] mapping [input_data_structure] [query_set] [mapping_file]`. Here, the first five arguments have the same meaning as in the case without mapping. The additional last argument is the path to the mapping file, which will be used to transform node IDs from your query set to the corresponding node IDs used by the query algorithms.
 
-Hlavní je soubor pro grafy (přípona `.xeng`) jehož formát je následující:
-- Soubor začíná řádkou `XGI n e` v případě celočíselných vah hran, případně `XGF n e` v případě floating point vah hrat, s tím že 'n' je číslo určující počet vrcholů a 'e' je číslo určující počet hran.
-- Následuje 'e' řádek ve formátu `s t w f` reprezentujících jednotlivé hrany, pro které 's' je ID source uzlu (tedy z rozsahu 0 až 'n' - 1), 't' je ID target uzlu ze stejného rozsahu, 'w' je váha hrany, což je celé číslo v případě že soubor začíná `XGI` nebo desetinné číslo v případě `XGF`, a 'f' je flag určující, zda daná hrana je jednosměrná. Hodnota '1' flagu 'f' znamená, že daná hrana je jednosměrná, hodnota '0' znamená obousměrnou hranu. Při načítání grafu ze souboru se za každou hranu s hodnotou flagu '0' přidají do grafu dvě hrany, tedy hrana z 's' do 't' plus i opačná hrana z 't' do 's'.
+Example of a Transit Node Routing benchmark call without mapping: `./shortestPathsPreprocessor benchmark tnr nomapping my_graph.tnrg my_query_set.txt`
 
-Kromě samotného grafu ještě existuje soubor s příponou `.xeni` který slouží pro mapování uzlů. V `edges.geojson` a `nodes.geojson` se používají indexy uzlů které mají řádově 16 decimálních cifer. V rámci 'Contraction Hierarchies' pracuji s indexy uzlů od 0 do 'n' - 1. Tento soubor tedy slouží pro mapování z daných dlouhých indexů na indexy z rozsahu se kterým pracuji. Formát souboru je velice jednoduchý:
-- Soubor začíná řádkou `XID n`, kde opět 'n' odpovídá počtu vrcholů.
-- Následuje 'n' řádek, z nichž každá obsahuje pouze jedno číslo, odpovídající originálnímu ID vrcholu, který se mapuje na ID odpovídající danému řádku. Jinými slovy ID na druhém řádku se mapuje na ID 0, ID na třetím řádku se mapuje na ID 1, až ID na řádku 'n' + 1 se mapuje na ID 'n' - 1.
+Example of a Transit Node Routing with Arc Flags benchmark call with mapping: `./shortestPathsPreprocessor benchmark tnraf mapping my_graph.tgaf my_query_set.txt my_mapping.xeni`
 
-Toto mapování se momentálně využívá při dotazování z Javy. Protože v Javě (respektive v Agentpolis) se interně pro reprezentaci silniční sítě využívají ID z `edges.geojson` a `nodes.geojson`, je v tomto projektu implementován `IntegerDistanceQueryManagerWithMapping` a `FPointDistanceQueryManagerWithMapping`, u kterých platí, že je možné se dotazovat na vzdálenost mezi dvěmi nody pomocí jejich originálních dlouhých ID, a DistanceQueryManagerWithMapping sám převede ID. Pro tyto třídy je tedy logicky navíc potřeba soubor `.xeni`, ze kterého si načtou toto mapování (to probíhá v konstruktoru těchto tříd).
-
-### Formát grafu z implementační soutěže DIMACS 
-(Ukázkové grafy v tomto formátu mohou být staženy zde: http://www.dis.uniroma1.it/challenge9/download.shtml)
-
-- Soubor začíná řádkou `p sp n e` kde místo 'n' je číslo určující počet vrcholů a místo 'e' je číslo určující počet hran.
-- Následuje 'e' řádek ve tvaru `a u v w` reprezentujících jednotlivé hrany, s tím že 'u' je číslo source uzlu, 'v' je číslo target uzlu a 'w' je váha hrany (délka, čas potřebný pro její projetí...). Čísla 'u' a 'v' musí být z rozsahu 1 až n. V rámci formátu pro soutěž DIMACS se vrcholy indexovaly od jedničky. Program indexuje vrcholy od nuly, takže se každý načtený vrchol automaticky sníží o 1. Hrany se načítají orientovaně, takže pokud chci mít hranu 'u <-> v' obousměrnou, musím jí zadat jako hranu z 'u' do 'v' a znovu jako hranu z 'v' do 'u'.
-- Kdekoliv v soubrou se dále mouhou vyskytovat řádky začínající znakem `c`. Tyto řádky reprezentují komentáře a program je pouze zahazuje.
-
-
-### Formát souboru s dotazy
-- Na první řádce bude číslo `x` reprezentující počet párů source target (tedy dotazů)
-- Následuje 'x' řádek z nichž každá obsahuje dvě čísla oddělená mezerou `a b` kde 'a' je source a 'b' je target. Oba vrcholy musí být z rozsahu 0 až n-1 kde 'n' je počet vrcholů v pouužitém grafu. Zde se vrcholy indexují od nuly.
-- Pro vygenerování libovolně velké sady dotazů se dá využít soubor `RandomTripsGenerator.cpp`.
-
-### Formát 'Contraction Hierarchies'
-- Pro ukládání celočíselné 'Contraction Hierarchy' se používá binární formát, který je stručně popsaný na konci souboru `DDSGLoader.h`. Formát pro floating point 'Contraction Hierarchy' je identický, liší se pouze tím, že váhy jsou v něm ukládány jako doubly a ne jako unsigned inty. Na běžných architekturách to momentálně znamená, že každá hrana bude zabírat o 4 byty víc. Formát je stručně popsaný na konci souboru `DDSGLoader.h`.
-
-
-Kde co hledat
+Input formats
 -------------
-Zde ještě stručně popíšu, kde v C++ kódu zhruba hledat jednotlivé komponenty 'Contraction Hierarchies' pro snažší orientaci v případě, že by v budoucnu bylo potřeba do kódu zasahovat.
 
-Předně bych rád poznamenal, že aby aplikace mohla podporovat jak celočíselné tak floating point 'Contraction Hierarchies', existuje většina struktur dvakrát, tedy většina zdrojového kódu je rozdělena do podsložek 'Integer' a 'FloatingPoint' (nebo jen krátce 'FPoint'). Já tedy popíšu spíše celočíselnou variantu, ale ekvivalentní třídy existují i pro floating point variantu.
+In this part, we will describe all the input formats that can be used with the preprocessor application. The first two formats are two input formats for directed weighted graphs that can be used as input for the creation of data structures for one of the methods. The other two formats are related to benchmarking.
+
+### XenGraph input format
+
+Probably the simplier format for directed weighted graphs. Graphs are represented as plain text files in this format. The graph file looks as follows:
+
+* It begins with a line `XGI n e` where `XGI` is a fixed string which serves as a magic constant. `n` is then a positive integer denoting the number of nodes, while `e` is a positive integer denoting the number of edges.
+* After that follows exactly `e` lines in the format `s t w f` each representing one edge. In this case, `s` is the source node of the edge, `t` is the target node of the edge, both must be in the range from 0 to `n`-1 (nodes are indexed from 0). `w` is the weight of the edge, in our case a positive integer. `f` is a flag denoting whether the edge is a one way edge. It must be either 1 or 0. If `f` is one, the edge is a one way edge and only an edge from `s` to `t` is added to the graph. If `f` is 0, we treat the edge as a bidirectional edge and therefore two edges are added into the graph, an edge from `s` to `t` and an edge from `t` to `s`, both with the weight `w`. 
+
+The expected suffix for XenGraph files is `.xeng` although it is not enforced.
+
+### DIMACS input format
+
+This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. Example graphs in this format can therefore be downloaded from the website of the challenge: http://users.diag.uniroma1.it/challenge9/download.shtml . The graph file is a plain text file and it looks as follows:
+
+* Everywhere in the file lines beginning with the character `c` can occur. Those lines are comment lines and are skipped during loading.
+* First line of the file not starting with the character `c` must be in the format `p sp n e`. Here `p sp` is a fixed string which serves as a magic constant. `n` is a positive integer denoting the number of nodes, `e` is another positive integer denoting the number of edges.
+* Then there must be exactly `e` lines of the format `a s t w` each representing one edge. In this case, `a` is a fixed characted constant indicating that the line describes one edge (so it is not a comment line). `s` is the source node of the edge and `t` is the target node of the edge. In this format, nodes are indexed from 1, so both `s` and `t` must be in the range from 1 to `n` (Internally, nodes are indexed from 0, so during loading, each node ID is automatically decreased by one). In this format, each edge is considered to be a one way edge, so if we want a bidirectional edge between `s` to `t`, we must provide two lines, one for an edge from `s` to `t` and one for an edge from `t` to `s`, both with the same weight.
+
+The expected suffix for DIMACS graph files is `.gr` although it is not enforced.
+
+### The query set input format
+
+For easier benchmarking, the user can provide a set of queries which will be used for the benchmark in a very simple plain text format:
+
+* The file begins with a line that contains only a single integer `cnt` denoting the number of queries.
+* The first line is followed by exactly `cnt` lines in the format `s g` each denoting one query. `s` and `g` are both positive integers. When benchmarking without mapping, `s` and `g` must be in the range from 0 to `n`-1 where `n` is the number of nodes in the graph. When benchmarking with mapping, `s` and `g` can be arbitrary positive integers as long as they fit in the long long unsigned int datatype (usually 64 bit).
+
+### The mapping file format
+
+If your application internally for some reason uses some node IDs that are not in the range from 0 to `n`-1 (where `n` is the number of nodes in the graph), you can use a mapping file that will allow the application to transform node IDs from your application to IDs in the range from 0 to `n`-1. Using those mapping files, you can let the C++ application do all the mapping work, so will not need to change the IDs in your application. The mapping file is a plain text file in the following format:
+
+* The file begins with a line `XID n` where `XID` is a fixed string which serves as a magic constant and `n` is the amount of nodes in the graph. 
+* The first line is followed by exactly `n` lines each only containing one integer `i`. The `j`-th line represents the original ID of the `(j-2)`-th node. So the second line contains the original ID of the node with the ID 0 in our application. The third line contains the original ID of the node with the ID 1, and so on up to the line `n+1` contains the original ID for the node with the ID `n-1` in our application.
 
 
-### Předzpracování
-- V podstatě za veškerý preprocessing grafu na 'Contraction Hierarchy' je zodpovědná třída `CHPreprocessor` s malou pomocí třídy `EdgeDifferenceManager` (ta je generická a používá se ta samá jak v integer tak ve floating point variantě). Při předzpracování se používá `UpdateableGraph` pro reprezentaci grafu, což je třída, která umožňuje snadné přidávání a odebírání hran. Fungování jednotlivých metod je stručně popsáno v kódu vždy nad každou metodou.
+Python script for transformation of GeoJSON to input graphs
+-----------------------------------------------------------
 
-### Dotazy
-- Vyhodnocování 'Contraction Hierarchy' dotazů řeší třída `CHDistanceQueryManager`. Ten dostane reprezentaci 'Contraction Hierarchy' jakožto instanci třídy `FlagsGraph` a následně se na něj dají volat dotazy pomocí funkce `findDistance`. V rámci `FlagsGraph` je každá hrana uložena pouze jednou a sice u vrcholu s menším rankem v rámci 'Contraction Hierarchies' společně s flagy v kterém směru tato hrana existuje. Navíc tato reprezentace grafu obsahuje různé pomocné informace o jednotlivých vrcholech potřebné pro vyhodnocování dotazů.
-- Třída `CHDistanceQueryManagerWithMapping` umožňuje dotazování stejně jako `CHDistanceQueryManager`, avšak zatímco v `CHDistanceQueryManager` je potřeba používat indexy z rozsahu 0 až 'n' - 1, třídě `CHDistanceQueryManagerWithMapping` je možné předat libovolné mapování indexů vrcholů a poté se dotazovat těmito indexy.
-- Třídy `CHDistanceQueryManager` a `CHDistanceQueryManagerWithMapping` řeší pouze dotazy na vzdálenost, tedy dotaz typu 'vrať nejkratší vzdálenost z bodu a do bodu b'. V budoucnu by třída `CHPathQueryManager` mohla vracet i posloupnost vrcholů na nalezené nejkratší cestě. Momentálně `CHPathQueryManager` nefunguje správně (nevrací správné cesty).
+In our case, we want to preprocess real road networks which are represented in `GeoJSON`. Therefore the `Python` subdirectory contains two simple `Python` scripts that can transform the GeoJSON input files into graph files in either the XenGraph or the DIMACS format that can be further processed by the preprocessor.
 
-### Načítání
-- Načítání grafů řeší jednotlivé 'Loadery'. Při vytváření hierarchií se používají `XenGraphLoader`, `FloatingPointXenGraphLoader` a `DIMACSLoader`. Při dotazech se využívá `DDSGLoader` a `DDSGFLoader` pro načtení hierarchie, nad kterou se následně dají dělat dotazy.
+We recommend the `transformGeoJSONtoXenGraph.py` which takes a pair of files `edges.geojson` and `nodes.geojson` as input and creates two files `graph.xeng` and `graph.xeni`. The first of the created files `graph.xeng` is the road network represented in the XenGraph format, so this file can be immediately used by the preprocessor to precompute structures for one of the methods. The second file `graph.xeni` contains the mapping from the IDs present in the GeoJSON files to the IDs assigned for our application. You will need this file if you want to answer queries using the original IDs.
 
-### API - kód pro propojení s Javou
-- Trochu samostatnou kapitolou je zajištění toho, že se bude dát C++ kód v podstatě volat z Javy. K tomuto jsem nejprve vytvořil s podsložce `src/API` třídy, které slouží jako jakési rozhraní, vystavují pouze takové funkce, které bude potřeba volat z Javy a nic navíc.
-- Pro tyto funkce je pak potřeba vygenerovat jakýsi 'glue' kód, k tomu využíván nástroj `SWIG`. Ten pracuje s vlastními soubory s příponou `.i`, v rámci kterých se dá specifikovat, jak má vypadat dané rozhraní. V mém případě jsou tyto soubory velice jednoduché, vše pak do jednoho zabaluje soubor `CHinterface.i`.
-- Pokud by bylo potřeba do API volaného z Javy něco přidat, případně by se třeba změnily signatury funkcí ve stávajících QueryManagerech, bude potřeba znovu vygenerovat 'glue' kód pomocí SWIGu. Na Linuxu je pro toto připraven skript `generateSWIGcode.sh`. Na jiných systémech doporučuji inspirovat se tímto skriptem v kombinaci s dokumentací SWIGu.
-- SWIG vygeneruje jeden C++ soubor s příponou `.cxx` který je potřeba zahrnout do kompilace knihovny, a taky několik `.java` souborů, které je nutné mít zahrnuté v Java aplikaci, která bude knihovnu volat.
-- Ve složce `src/API` je ještě dodatečné `Readme.txt`, popisující generování SWIG kódu pomocí přiložených skriptů. Tato varianta by se dala použít v Linuxu, pokud by nebyl k dispozici `cmake`, jinak ji nedoporučuji.
+If you want to change the names of the input or output files, you can easily change the Python script, just change its `__main__`. Additionally, you can change the precision of the edge weights. Edge weights are computed as travel times, meaning we divide the lenght of the edge by the maximum speed along that edge to obtain the weight of the edge. Since the weights are integers internally, we can increase or decrease the precision by first multiplying or dividing the travel time by some power of ten before transforming it to an integer. You can do this by changing the precision variable. Precision 1000 means the travel times will be in millisecons while precision 1 means the travel times will be in seconds. We recommend using bigger precision for smaller road networks to obtain the best possible results, for large networks smaller precision might be necessary as the longest distance between two nodes should still fit into a 32 bit unsigned integer and this might not be the case for large networks with large precision.
+
+
+Library
+=======
+
+Compiling
+---------
+
+Let us now focus on the shared library. The library can be used to load the data structures precomputed by the preprocessor and then answer queries quickly using those structures. In order to use the library, we first need to compile it for our architecture. This can be again achieved easily using `CMake`. First, run `CMake` in the root of this project. This should create a `Makefile` with a target called `shortestPaths` that will build the shared library. 
+
+In Linux, the process can be done as follows:
+* `mkdir cmakedata`
+* `cd cmakedata`
+* `cmake ..`
+* `make shortestPaths`
+
+The output of this should be a `.so` file on Linux or a `.dll` file on Windows.
+
+The interface of the library
+----------------------------
+
+The library currently provides a query manager for each of the three methods (Contraction Hierarchies, Transit Node Routing and Transit Node Routing with Arc Flags). Those query managers serve as an interface that can be used from other applications. The managers are called `CHDistanceQueryManagerAPI`, `TNRDistanceQueryManagerAPI` and `TNRAFDistanceQueryManagerAPI`.
+
+Each manager provides three functions. The first function is called `initializeCH` (or `initializeTNR` or `initializeTNRAF` respectively). This function can load the data structure prepared by the preprocessor along with the mapping file and initialize the query manager for queries. The second function is `distanceQuery`. This function answers queries. It expects the original IDs of the start and the goal nodes as arguments, then returns the shortest distance from start to goal. The third function is called `clearStructures`. This function deallocates all the memory required for the data structure. This function should be always explicitly called from your application when you will not need to use the query manager anymore. This is necessary because for example when using the library from `Java`, the Java garbage collector is not able to clear the memory used by the library. Therefore you must free the memory explicitly by calling this function.
+
+Javatests example
+-----------------
+A simple `Java` application that uses the library to answer queries can be found in the `javatests` subdirectory. This application was used to test that the API is functional and everything works as intended. You can however use this application as an example of how to use the library from `Java`. 
 
