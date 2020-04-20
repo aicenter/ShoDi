@@ -1,3 +1,7 @@
+~~~ This should not be necessary in the current state ~~~ 
+~~~ Information described here could be interesting for people wanting ~~~
+~~~ to integrate the library with other programming languages though. ~~~ 
+
 Bash scripts in this directory allow you to generate the shared
 library which is required for the Contraction Hierarchies to
 work from Amodsim.
