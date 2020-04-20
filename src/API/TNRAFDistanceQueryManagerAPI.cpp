@@ -14,8 +14,8 @@ void TNRAFDistanceQueryManagerAPI::initializeTNRAF(string tnrafFile, string mapp
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int TNRAFDistanceQueryManagerAPI::distanceQuery(long long unsigned int source, long long unsigned int target) {
-    return qm -> findDistance(source, target);
+unsigned int TNRAFDistanceQueryManagerAPI::distanceQuery(long long unsigned int start, long long unsigned int goal) {
+    return qm -> findDistance(start, goal);
 }
 
 //______________________________________________________________________________________________________________________

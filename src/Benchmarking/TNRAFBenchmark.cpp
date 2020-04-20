@@ -8,9 +8,6 @@
 #include "../Timer/Timer.h"
 #include "../TNRAF/TNRAFDistanceQueryManagerWithMapping.h"
 
-// Runs the Transit Node Routing with Arc Flags query algorithm on a set set of queries (trips). Returns the cumulative
-// time the queries took in seconds. Additionally stores the returned distances into a vector so that their correctness
-// can be later verified.
 //______________________________________________________________________________________________________________________
 double TNRAFBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances) {
     TNRAFDistanceQueryManager queryManager(graph);
@@ -25,10 +22,10 @@ double TNRAFBenchmark::benchmark(const vector < pair < unsigned int, unsigned in
     queryManager.printQueriesAnalysis();
 
     tnrTimer.finish();
-    //tnrTimer.printMeasuredTime();
     return tnrTimer.getMeasuredTimeInSeconds();
 }
 
+//______________________________________________________________________________________________________________________
 double TNRAFBenchmark::benchmarkWithMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances, string mappingFilePath) {
     TNRAFDistanceQueryManagerWithMapping queryManager(graph, mappingFilePath);
 

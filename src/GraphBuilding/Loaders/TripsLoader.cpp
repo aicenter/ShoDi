@@ -6,15 +6,11 @@
 #include "TripsLoader.h"
 #include <fstream>
 
+//______________________________________________________________________________________________________________________
 TripsLoader::TripsLoader(string inputFile) {
     this->inputFile = inputFile;
 }
 
-// This function just loads trips in a simple format.
-// The trips file should be a text file starting with an unsigned int with the number of trips "n" and then
-// "n" rows should follow each row containing two integers "source" and "target" separated by a space.
-// This function doesn't validate that the sources and targets are valid (that means that they are lower number than
-// the amount of edges in the used graph), it just loads the pairs. Do any validations yourself, if necessary.
 //______________________________________________________________________________________________________________________
 void TripsLoader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
     ifstream input;

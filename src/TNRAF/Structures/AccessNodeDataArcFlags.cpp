@@ -11,7 +11,6 @@ AccessNodeDataArcFlags::AccessNodeDataArcFlags(unsigned int a, unsigned int b, u
 
 }
 
-// Initializes the arc flags based on the regFlags input variable.
 //______________________________________________________________________________________________________________________
 AccessNodeDataArcFlags::AccessNodeDataArcFlags(unsigned int a, unsigned int b, unsigned int regionsCnt, uint32_t regFlags, vector<unsigned int> & powersOf2) : AccessNodeData(a, b), regionFlags(regionsCnt, false) {
     for(unsigned int i = 0; i < regionsCnt; i++) {

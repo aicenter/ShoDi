@@ -6,12 +6,6 @@
 #include "DistanceCorrectnessValidator.h"
 #include "../CH/CHPathQueryManager.h"
 
-// Gets a vector of trips (pairs of source target queries), for each query it finds a path using Contraction Hierarchies
-// and then validates if the path exists in the original graph. The amount of wrong paths is counted. This does not
-// check if the returned distances are correct, only validates if the paths exist (those paths can still be suboptimal).
-// With that in mind, this should be always used after we are sure that the returned distances are correct, for example
-// by validating those using the 'CorrectnessValidator' to compare the distances with the distances computed
-// by Dijkstra.
 //______________________________________________________________________________________________________________________
 void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned int, unsigned int > > & trips, FlagsGraphWithUnpackingData & chGraph, Graph & originalGraph) {
     CHPathQueryManager qm(chGraph);

@@ -12,9 +12,6 @@ FlagsGraph::FlagsGraph(unsigned int n) {
     nodesData.resize(n);
 }
 
-// Build a FlagsGraph based on an instance of UpdateableGraph. This is intented to be used with an UpdateableGraph that
-// was already processed using the CHPreprocessor. This initializes a FlagsGraph which can be used for further CH
-// queries without the need to flush the CH into a file during the process.
 //______________________________________________________________________________________________________________________
 FlagsGraph::FlagsGraph(UpdateableGraph & g) {
     unsigned int nodesCnt = g.nodes();
@@ -102,14 +99,11 @@ const unsigned int FlagsGraph::nodes() const {
     return neighbours.size();
 }
 
-// Returns all neighbours of a given node 'x'. Keep in mind that this returns neighbour both in the forward and
-// backward direction, so we always have to check if the neighbour is in the correct direction when expanding a node.
 //______________________________________________________________________________________________________________________
 const vector< QueryEdge > & FlagsGraph::nextNodes(const unsigned int x)const {
     return neighbours.at(x);
 }
 
-// Returns the data for a certain node.
 //______________________________________________________________________________________________________________________
 NodeData & FlagsGraph::data(unsigned int node) {
     return nodesData[node];

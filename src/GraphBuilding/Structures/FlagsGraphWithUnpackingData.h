@@ -10,10 +10,11 @@
 #include "FlagsGraph.h"
 #include "QueryEdgeWithUnpackingData.h"
 
-// Class representing the data structure required for the Contraction Hierarchies query algorithm. This structure
-// contains additional information that can be used to obtain actual shortest paths and not just the shortest distances.
-// The downside of this is that the memory required by this class is bigger than in the case of the normal FlagsGraph.
-//______________________________________________________________________________________________________________________
+/**
+ * Class representing the data structure required for the Contraction Hierarchies query algorithm. This structure
+ * contains additional information that can be used to obtain actual shortest paths and not just the shortest distances.
+ * The downside of this is that the memory required by this class is bigger than in the case of the normal FlagsGraph.
+ */
 class FlagsGraphWithUnpackingData {
 protected:
     vector< vector < QueryEdgeWithUnpackingData > > neighbours;

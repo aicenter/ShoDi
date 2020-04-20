@@ -12,14 +12,11 @@ DistanceMatrix::DistanceMatrix(const unsigned int nodes) : distances(nodes, vect
 
 }
 
-// This is basically a query algorithm. Each query is answered using a single table lookup, as we already have all the
-// shortest distances precomputed in the matrix.
 //______________________________________________________________________________________________________________________
-unsigned int DistanceMatrix::findDistance(const unsigned int source, const unsigned int target) {
-    return distances[source][target];
+unsigned int DistanceMatrix::findDistance(const unsigned int start, const unsigned int goal) {
+    return distances[start][goal];
 }
 
-// Auxiliary function used during the initialization to set the distances.
 //______________________________________________________________________________________________________________________
 void DistanceMatrix::setDistance(unsigned int source, unsigned int target, unsigned int distance) {
     distances[source][target] = distance;

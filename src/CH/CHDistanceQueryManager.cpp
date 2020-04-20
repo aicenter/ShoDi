@@ -12,31 +12,24 @@ CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
 
 }
 
-// We use the query algorithm that was described in the "Contraction Hierarchies: Faster and Simpler Hierarchical
-// Routing in Road Networks" article by Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
-// Basically, the query is a modified bidirectional Dijkstra query, where from the source node we only expand following
-// nodes with higher contraction rank than the current node and from the target we only expand previous nodes with
-// higher contraction rank than the current node. Both scopes will eventually meet in the node with the highest
-// contraction rank from all nodes in the path. This implementation additionaly uses the 'stall-on-demand' technique
-// described in the same article which noticeably improved the query times.
 //______________________________________________________________________________________________________________________
-unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
+unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, const unsigned int goal) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
 
-    forwardQ.push(DijkstraNode(source, 0));
-    backwardQ.push(DijkstraNode(target, 0));
+    forwardQ.push(DijkstraNode(start, 0));
+    backwardQ.push(DijkstraNode(goal, 0));
 
     bool forwardFinished = false;
     bool backwardFinished = false;
 
-    graph.data(source).forwardDist = 0;
-    graph.data(target).backwardDist = 0;
-    forwardChanged.push_back(source);
-    backwardChanged.push_back(target);
-    graph.data(source).forwardReached = true;
-    graph.data(target).backwardReached = true;
+    graph.data(start).forwardDist = 0;
+    graph.data(goal).backwardDist = 0;
+    forwardChanged.push_back(start);
+    backwardChanged.push_back(goal);
+    graph.data(start).forwardReached = true;
+    graph.data(goal).backwardReached = true;
 
     bool forward = false;
     upperbound = UINT_MAX;
@@ -81,15 +74,10 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, con
             // Classic edges relaxation
             const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-                // Here we stall a node if it's reached on a suboptimal path. This can happen in the Contraction
-                // Hierarchies query algorithm, because we can reach a node from the wrong direction (for example
-                // we reach a node on a suboptimal path in the forward direction, because the actual optimal path
-                // will be later found in the backward direction)
                 if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
                     unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         graph.data(curNode).forwardDist = newdistance;
-                        //forwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
                     }
                 }
 
@@ -145,7 +133,6 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, con
                     unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
                     if (newdistance < curLen) {
                         graph.data(curNode).backwardDist = newdistance;
-                        //backwardStall(curNode, newdistance); // FIXME - currently fixed stalling giving mismatches by completely removing stalling.
                     }
                 }
 
@@ -184,82 +171,6 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int source, con
     return upperbound;
 }
 
-// Code for stalling a node in the forward distance. We try to stall additional nodes using BFS as long as we don't
-// reach already stalled nodes or nodes that can't be stalled.
-//______________________________________________________________________________________________________________________
-void CHDistanceQueryManager::forwardStall(unsigned int stallnode, unsigned int stalldistance) {
-    queue<DijkstraNode> stallQueue;
-    stallQueue.push(DijkstraNode(stallnode, stalldistance));
-
-    while (! stallQueue.empty()) {
-        unsigned int curNode = stallQueue.front().ID;
-        unsigned int curDist = stallQueue.front().weight;
-        stallQueue.pop();
-        graph.data(curNode).forwardStalled = true;
-        forwardStallChanged.push_back(curNode);
-
-        const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
-        for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-            if (! (*iter).forward) {
-                continue;
-            }
-
-            if (graph.data((*iter).targetNode).forwardReached) {
-                unsigned int newdistance = curDist + (*iter).weight;
-
-                if (newdistance < graph.data((*iter).targetNode).forwardDist) {
-                    if (! graph.data((*iter).targetNode).forwardStalled) {
-                        stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
-                        if (graph.data((*iter).targetNode).forwardDist == UINT_MAX) {
-                            forwardChanged.push_back((*iter).targetNode);
-                        }
-                        graph.data((*iter).targetNode).forwardDist = newdistance;
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-// Code for stalling a node in the backward distance. We try to stall additional nodes using BFS as long as we don't
-// reach already stalled nodes or nodes that can't be stalled.
-//______________________________________________________________________________________________________________________
-void CHDistanceQueryManager::backwardStall(unsigned int stallnode, unsigned int stalldistance) {
-    queue<DijkstraNode> stallQueue;
-    stallQueue.push(DijkstraNode(stallnode, stalldistance));
-
-    while (! stallQueue.empty()) {
-        unsigned int curNode = stallQueue.front().ID;
-        unsigned int curDist = stallQueue.front().weight;
-        stallQueue.pop();
-        graph.data(curNode).backwardStalled = true;
-        backwardStallChanged.push_back(curNode);
-
-        const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
-        for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
-            if (! (*iter).backward) {
-                continue;
-            }
-
-            if (graph.data((*iter).targetNode).backwardReached) {
-                unsigned int newdistance = curDist + (*iter).weight;
-
-                if (newdistance < graph.data((*iter).targetNode).backwardDist) {
-                    if (! graph.data((*iter).targetNode).backwardStalled) {
-                        stallQueue.push(DijkstraNode((*iter).targetNode, newdistance));
-                        if (graph.data((*iter).targetNode).backwardDist == UINT_MAX) {
-                            backwardChanged.push_back((*iter).targetNode);
-                        }
-                        graph.data((*iter).targetNode).backwardDist = newdistance;
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Reset information for the nodes that were changed in the current query.
 //______________________________________________________________________________________________________________________
 void CHDistanceQueryManager::prepareStructuresForNextQuery() {
     for (unsigned int i = 0; i < forwardChanged.size(); i++) {

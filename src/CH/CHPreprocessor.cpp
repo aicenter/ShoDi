@@ -14,8 +14,6 @@
 
 using namespace std;
 
-
-// Initialization only
 //______________________________________________________________________________________________________________________
 vector<bool> CHPreprocessor::contracted(0);
 vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
@@ -28,9 +26,6 @@ vector<unsigned int> CHPreprocessor::targets(0);
 unordered_set<unsigned int> CHPreprocessor::targetsSet;
 unordered_map<unsigned int, vector<pair<unsigned int, unsigned int > > > CHPreprocessor::buckets;
 
-// The 'main' preprocessing function. The result of calling this function is the UpdateableGraph containing all the
-// given shortcuts. During this function, the original edges will be removed from the graph, so don't forget to
-// add the original edges back into the graph before flushing it.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
     printf("Started preprocessing!\n");
@@ -60,8 +55,6 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
     dijkstraDistance.clear();
 }
 
-// This function is used at the beginning of the preprocessing process. It simply computes the initial weight of each
-// node and constructs a priority queue based on those weights.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, UpdateableGraph & graph) {
     Timer priorityQTimer("Priority queue initialization");
@@ -81,11 +74,6 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
     priorityQTimer.printMeasuredTime();
 }
 
-// This function actually contracts nodes. It simply contracts nodes one after each other until the priority queue is
-// empty. In each step, the node with the currently lowest weight has its weight updated, and if it still has the
-// lowest weight after the update, it's contracted and it's neighbours weights are updated. If it hasn't the lowest
-// weight after the update, we update the new lowest weight node and repeat this process until we find a constant
-// minimum. This variant additionaly generates unpacking data.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQueue, UpdateableGraph &graph) {
     unsigned int CHrank = 1;
@@ -103,7 +91,7 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
             priorityQueue.insert(current.id, newweight);
         } else {
             contracted[current.id] = true;
-            adjustNeighbourgDegrees(current.id, graph);
+            adjustNeighboursDegrees(current.id, graph);
             actuallyAddShortcutsWithUnpackingData(graph, current.id);
             removeContractedNodeEdges(graph, current.id);
             clearStructures();
@@ -122,8 +110,6 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
     }
 }
 
-// This auxiliary function puts all generated shortcuts back into the graph at the end of the preprocessing.
-// This is necessary, because most of the shortcuts will be later removed from the graph to create additional shortcuts.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::reinsertShortcuts(UpdateableGraph & graph) {
     for(unsigned int i = 0; i < allShortcuts.size(); i++) {
@@ -131,9 +117,8 @@ void CHPreprocessor::reinsertShortcuts(UpdateableGraph & graph) {
     }
 }
 
-// Helper function that adjust neighbourg degrees when a node is contracted.
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, UpdateableGraph & graph) {
+void CHPreprocessor::adjustNeighboursDegrees(const unsigned int x, UpdateableGraph & graph) {
     unordered_map < unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
     unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
@@ -149,8 +134,6 @@ void CHPreprocessor::adjustNeighbourgDegrees(const unsigned int x, UpdateableGra
     }
 }
 
-// This function is called after a node is contracted to recalculate the weights of it's neighbours. Those weights
-// might have changed, because those neighbours might now have a different amount of edges than before.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, UpdateableGraph & graph, CHpriorityQueue & priorityQueue) {
     unordered_map < unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
@@ -178,7 +161,6 @@ void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, Updateable
 
 }
 
-// This function will get all possible shortcuts than can be added after the contraction of a certain node i.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::getPossibleShortcuts(const unsigned int i, UpdateableGraph & graph, bool deep) {
     getDistancesUsingNode(i, graph);
@@ -187,13 +169,6 @@ void CHPreprocessor::getPossibleShortcuts(const unsigned int i, UpdateableGraph 
     CHPreprocessor::contracted[i] = false;
 }
 
-// This function calculates how many of the shortcuts found by the getPossibleShortcuts() function are actually needed.
-// This means validating if there exists a path which doesn't contain the contracted node which is shorter or equal
-// length as the possible shortcut. This function returns the number of shortcuts that will have to be added.
-// Take into consideration that for the Contraction Hierarchies to work correctly, we are pessimistic in a sense that
-// we always add shortcuts if we didn't find a path without the contracted node that is shorter or equal length as the
-// shortcut. But the path could exist, only we weren't able to find it, as we have a certain hop limit during our many
-// to many search.
 //______________________________________________________________________________________________________________________
 unsigned int CHPreprocessor::calculateShortcutsAmount() {
     unsigned int addedShortcuts = 0;
@@ -210,10 +185,6 @@ unsigned int CHPreprocessor::calculateShortcutsAmount() {
     return addedShortcuts;
 }
 
-// This function actually adds shortcuts to the graph - this is used when we're actually contracting the node and not
-// only calculating it's weight. The shortcuts are only added if they are necessary, that means only if we didn't find
-// a shorter or equal length path without the contracted node. This variant additionally saves the unpacking data,
-// that means the source and target of the shortcut and the node omitted by the shortcut.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::actuallyAddShortcutsWithUnpackingData(UpdateableGraph & graph, unsigned int x) {
     for(auto iter1 = sources.begin(); iter1 != sources.end(); ++iter1) {
@@ -231,8 +202,6 @@ void CHPreprocessor::actuallyAddShortcutsWithUnpackingData(UpdateableGraph & gra
     }
 }
 
-// Auxiliary function that removes all the edges containing the contracted node so they don't slow following runs
-// of the many to many shortest paths calls.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::removeContractedNodeEdges(UpdateableGraph & graph, unsigned int x) {
     for(auto iter = sources.begin(); iter != sources.end(); ++iter) {
@@ -244,7 +213,6 @@ void CHPreprocessor::removeContractedNodeEdges(UpdateableGraph & graph, unsigned
     }
 }
 
-// Auxiliary funtion that clears all the structures between contracting nodes or computing node weights.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::clearStructures() {
     distances.clear();
@@ -255,8 +223,6 @@ void CHPreprocessor::clearStructures() {
     buckets.clear();
 }
 
-// This function gets the shortcuts lengths, it takes every pair of neighbours of a node i and computes the weight
-// of the shortcut that could be added between those two neighbours if the node i was contracted.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph & graph ) {
     unordered_map <unsigned int, unsigned int> i_sources = graph.incomingEdges(i);
@@ -290,10 +256,8 @@ void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph
     targetsSet.insert(targets.begin(), targets.end());
 }
 
-// This function will get a longest shortcut from a specific source to one of the targets, which is then used as an
-// upper bound during the oneToManyWithBuckets() function.
 //______________________________________________________________________________________________________________________
-unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned int source) {
+unsigned int CHPreprocessor::longestPossibleShortcut(const unsigned int source) {
     unsigned int longest = 0;
     for(auto iter = targets.begin(); iter != targets.end(); ++iter) {
         //printf("Will find distance for: %u -> %u\n", source, *iter);
@@ -306,10 +270,6 @@ unsigned long long int CHPreprocessor::longestPossibleShortcut(const unsigned in
     return longest;
 }
 
-// This function computes the lengths of shortest paths between all source - target pairs that don't contain the
-// contracted node. The search space is limited, so we don't actually always find all shortest path, this isn't
-// a problem if we make sure to add a shortcut if we didn't find a shortest path that was shorter or equal length
-// as the proposed shortcut.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
     unsigned int lowestBucketVal = UINT_MAX;
@@ -330,10 +290,6 @@ void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
     }
 }
 
-// We use a simple extension of the oneToMany algorithm, we do a one edge backwards search from each of the targets
-// and save the information into buckets. When expanding nodes during oneToManyWithBuckets(), we can validate if there
-// exists a bucket entry for a node we're expanding, if yes, we immediately know that there exists a path from that
-// node to some target node and we also have it's length.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, unsigned int & lowestBucketVal) {
     const unordered_map<unsigned int, unsigned int> neighbours = graph.incomingEdges(x);
@@ -351,12 +307,6 @@ void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, 
 
 }
 
-// This function basically takes one source and tries to find shortest paths to all targets. The algorithm is stopped if
-// one of those things happen:
-// 1) All targets are found
-// 2) The current node weight is higher than the upperBound
-// 3) We have reached the space search limit - that means we have either expanded to much nodes or all our paths already
-//    have more hops (edges) than the limit.
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
     vector<unsigned int> nodesWithChangedDistances;

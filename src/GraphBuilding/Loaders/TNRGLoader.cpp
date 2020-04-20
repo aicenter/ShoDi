@@ -14,10 +14,6 @@ TNRGLoader::TNRGLoader(string inputFile) : inputFile(inputFile) {
 
 }
 
-// Can be used to load Transit Node Routing data structures from a file given to the loader during its initialization.
-// This function provides an initialized TransitNodeRoutingGraph instance as output, which can be used to answer
-// distance queries (queries, where we only care about the shortest path between two points and not about the actual
-// shortest path).
 //______________________________________________________________________________________________________________________
 TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
     ifstream input;
@@ -82,9 +78,6 @@ TransitNodeRoutingGraphForPathQueries * TNRGLoader::loadTNRforPathQueries() {
     return graph;
 }
 
-// Parses the header. The file should start with the string "TNRG" which is used as some sort of a magic number to check
-// the integrity of the file. Then three unsigned ints should follow denoting the number of nodes, the number of edges
-// and the size of the transit node set.
 //______________________________________________________________________________________________________________________
 void TNRGLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount) {
     char c1, c2, c3, c4;
@@ -104,7 +97,6 @@ void TNRGLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned
     input.read ((char *) &tnodesAmount, sizeof(tnodesAmount));
 }
 
-// Processes edges.
 //______________________________________________________________________________________________________________________
 void TNRGLoader::parseEdgesForDistanceQueries(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges) {
     unsigned int from, to, weight;
@@ -122,7 +114,6 @@ void TNRGLoader::parseEdgesForDistanceQueries(ifstream & input, TransitNodeRouti
     }
 }
 
-// Processes edges.
 //______________________________________________________________________________________________________________________
 void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int edges) {
     unsigned int from, to, weight;
@@ -146,7 +137,6 @@ void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGr
     }
 }
 
-// Gets ranks for all the nodes in the graph.
 //______________________________________________________________________________________________________________________
 void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraph * graph, unsigned int nodes) {
     unsigned int rank;

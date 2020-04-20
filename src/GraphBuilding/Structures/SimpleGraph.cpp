@@ -10,7 +10,6 @@ SimpleGraph::SimpleGraph(unsigned int n) {
     this->followingNodes.resize(n);
 }
 
-// Only add edges if they don't exist already. If an edge exists already, check it weight and possibly adjust it.
 //______________________________________________________________________________________________________________________
 void SimpleGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
     if (followingNodes.at(from).count(to) == 1) {

@@ -13,8 +13,8 @@ CHDistanceQueryManagerWithMapping::CHDistanceQueryManagerWithMapping(FlagsGraph 
     mappingLoader.loadNodesMapping(mapping);
 }
 
-// Used to find the shortest distance from source to target where source and target are the original indices.
+// Used to find the shortest distance from start to goal where start and goal are the original indices.
 //______________________________________________________________________________________________________________________
-unsigned int CHDistanceQueryManagerWithMapping::findDistance(const long long unsigned int source, const long long unsigned int target) {
-    return qm.findDistance(mapping.at(source), mapping.at(target));
+unsigned int CHDistanceQueryManagerWithMapping::findDistance(const long long unsigned int start, const long long unsigned int goal) {
+    return qm.findDistance(mapping.at(start), mapping.at(goal));
 }

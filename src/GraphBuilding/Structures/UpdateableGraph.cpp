@@ -102,9 +102,6 @@ void UpdateableGraph::setRank(unsigned int node, unsigned int rank) {
     ranks[node] = rank;
 }
 
-
-// Gets requested amount of highest rank nodes from the Contraction Hierarchy. Those are used in Transit Node Routing
-// as Transit Nodes.
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::getNodesWithHighestRank(vector< unsigned int > & highestNodes, unsigned int requestedAmount) {
     unsigned int curPosition = 0;
@@ -117,8 +114,7 @@ void UpdateableGraph::getNodesWithHighestRank(vector< unsigned int > & highestNo
     }
 }
 
-// Outputs the graph in the format used for the Contraction Hierarchies. This format is briefly described in the
-// 'DDSGLoader.h' file.
+//
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushInDdsgFormat(string filePath) {
     vector < OutputEdge > edges;

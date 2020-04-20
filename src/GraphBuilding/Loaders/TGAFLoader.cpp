@@ -15,8 +15,6 @@ TGAFLoader::TGAFLoader(string inputFile) : TNRGLoader(inputFile) {
 
 }
 
-// Loads the Transit Node Routing with Arc Flags data structures from the file that was given to the loader during its
-// initialization.
 //______________________________________________________________________________________________________________________
 TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
     ifstream input;
@@ -57,9 +55,6 @@ TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
     return graph;
 }
 
-// Parses the header of the file. The header starts with the string "TGAF" which is used as a some sort of a magic
-// constant to validate the integrity of the file. After that, four unsigned int numbers should follow, denoting the
-// number of nodes, number of edges, the size of the transit node set, and the number of regions for the Arc Flags.
 //______________________________________________________________________________________________________________________
 void TGAFLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount, unsigned int & regionsCnt) {
     char c1, c2, c3, c4;
@@ -80,7 +75,6 @@ void TGAFLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned
     input.read ((char *) &regionsCnt, sizeof(regionsCnt));
 }
 
-// Parses ranks of nodes.
 //______________________________________________________________________________________________________________________
 void TGAFLoader::parseRanks(ifstream & input, TransitNodeRoutingArcFlagsGraph * graph, unsigned int nodes) {
     unsigned int rank;
@@ -90,7 +84,6 @@ void TGAFLoader::parseRanks(ifstream & input, TransitNodeRoutingArcFlagsGraph * 
     }
 }
 
-// Parses the regions for each node (those are used for the Arc Flags).
 //______________________________________________________________________________________________________________________
 void TGAFLoader::parseRegions(ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes) {
     unsigned int region;
@@ -100,7 +93,6 @@ void TGAFLoader::parseRegions(ifstream & input, TransitNodeRoutingArcFlagsGraph 
     }
 }
 
-// Processes the access nodes. This means loading access nodes for all nodes along with their distances and Arc Flags.
 //______________________________________________________________________________________________________________________
 void TGAFLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes, unsigned int regionsCnt) {
     unsigned int forwardNodes, backwardNodes, nodeID, nodeDistance;

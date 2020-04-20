@@ -13,23 +13,47 @@
 
 using namespace std;
 
-// This class is responsible for the Contraction Hierarchies 'distance' queries - when we only require the 'distance'
-// between two points and don't care about the actual path.
-//______________________________________________________________________________________________________________________
+/**
+ * This class is responsible for the Contraction Hierarchies 'distance' queries - when we only require the 'distance'
+ * between two points and do not care about the actual path.
+ */
 class CHDistanceQueryManager {
 public:
+    /**
+     * A simple constructor.
+     *
+     * @param g[in] The FlagsGraph instance we will be using to answer shortest distance queries.
+     */
     CHDistanceQueryManager(FlagsGraph & g);
-    unsigned int findDistance(const unsigned int source, const unsigned int target);
+
+    /**
+     * We use the query algorithm that was described in the "Contraction Hierarchies: Faster and Simpler Hierarchical
+     * Routing in Road Networks" article by Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
+     * Basically, the query is a modified bidirectional Dijkstra query, where from the start node we only expand
+     * following nodes with higher contraction rank than the current node and from the goal we only expand previous
+     * nodes with higher contraction rank than the current node. Both scopes will eventually meet in the node with the
+     * highest contraction rank from all nodes in the path.
+     *
+     * @param start[in] The start node for the query.
+     * @param goal[in] The goal node for the query.
+     * @return Returns the shortest distance from start to goal or 'UINT_MAX' if goal is not reachable from start.
+     */
+    unsigned int findDistance(const unsigned int start, const unsigned int goal);
+
 protected:
-    void forwardStall(unsigned int stallnode, unsigned int stalldistance);
-    void backwardStall(unsigned int stallnode, unsigned int stalldistance);
+    /**
+     * Reset information for the nodes that were changed in the current query. This is required so that following
+     * queries are not influenced by the current query. Using this function ensures that following queries also
+     * give correct results.
+     */
+    void prepareStructuresForNextQuery();
+
     FlagsGraph & graph;
     unsigned int upperbound;
     vector<unsigned int> forwardChanged;
     vector<unsigned int> backwardChanged;
     vector<unsigned int> forwardStallChanged;
     vector<unsigned int> backwardStallChanged;
-    void prepareStructuresForNextQuery();
 };
 
 #endif //TRANSIT_NODE_ROUTING_CHFLAGSGRAPHQUERYMANAGER_H

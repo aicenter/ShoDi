@@ -12,7 +12,6 @@ DDSGLoader::DDSGLoader(string inputFile) : inputFile(inputFile) {
 
 }
 
-// This function reads the input file and puts all the Contraction Hierarchies data into a FlagsGraph instance.
 //______________________________________________________________________________________________________________________
 FlagsGraph * DDSGLoader::loadFlagsGraph() {
     ifstream input;

@@ -6,12 +6,17 @@
 #ifndef TRANSIT_NODE_ROUTING_NODEDATA_H
 #define TRANSIT_NODE_ROUTING_NODEDATA_H
 
-// A simple structure encapsulating all the important information about a node for the Contraction Hierarchies
-// query algorithm.
-//______________________________________________________________________________________________________________________
+/**
+ * A simple structure encapsulating all the important information about a node for the Contraction Hierarchies
+ * query algorithm.
+ */
 class NodeData {
 public:
+    /**
+     * A simple constructor that initializes the instance with default values.
+     */
     NodeData();
+
     unsigned int forwardDist;
     unsigned int backwardDist;
     unsigned int rank;

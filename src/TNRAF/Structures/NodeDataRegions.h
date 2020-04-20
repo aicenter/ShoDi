@@ -9,10 +9,14 @@
 
 #include "../../CH/Structures/NodeData.h"
 
-// Extension of the NodeData class that additionally stores information about the region of a node.
-//______________________________________________________________________________________________________________________
+/**
+ * Extension of the NodeData class that additionally stores information about the region of a node.
+ */
 class NodeDataRegions : public NodeData {
 public:
+    /**
+     * A simple constructor.
+     */
     NodeDataRegions();
     unsigned int region;
 };

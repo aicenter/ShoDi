@@ -12,9 +12,6 @@ DIMACSLoader::DIMACSLoader(string inputFile) {
     this->inputFile = inputFile;
 }
 
-// Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
-// into an 'SimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct a 'Graph'
-// from that.
 //______________________________________________________________________________________________________________________
 Graph * DIMACSLoader::loadGraph() {
     ifstream input;
@@ -47,8 +44,6 @@ Graph * DIMACSLoader::loadGraph() {
 
 }
 
-// This function is used to load the graph data into an 'UpdateableGraph' instance, which can be used for the
-// preprocessing to create a Contraction Hierarchy from the input graph.
 //______________________________________________________________________________________________________________________
 UpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
     ifstream input;
@@ -76,7 +71,6 @@ UpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
     return graph;
 }
 
-// This function is used to reinsert all the original edges into the graph after the preprocessing has been finished.
 //______________________________________________________________________________________________________________________
 void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     ifstream input;
@@ -100,34 +94,6 @@ void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
 
     input.close();
 
-}
-
-// This is used to transorm a file from the DIMACS challenge format to the format used for input graphs in the reference
-// implementation. Output of this function isn't used anywhere in this implementation, but can be useful for debug
-// purposes.
-//______________________________________________________________________________________________________________________
-void DIMACSLoader::transformToDDSG(string DIMACSfile) {
-    ifstream input;
-    ofstream output;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-    output.open(DIMACSfile);
-    if( ! output.is_open() ) {
-        printf("Couldn't open file '%s'!", DIMACSfile.c_str());
-    }
-
-    unsigned int nodes, edges;
-    parseGraphProblemLine(input, nodes, edges);
-
-    output << "d" << endl;
-    output << nodes << " " << edges << endl;
-
-    transformEdges(input, output, edges);
-
-    input.close();
-    output.close();
 }
 
 //______________________________________________________________________________________________________________________
@@ -162,22 +128,6 @@ void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes, 
 
     nodes = tmpnodes;
     edges = tmpedges;
-}
-
-//______________________________________________________________________________________________________________________
-void DIMACSLoader::transformEdges(ifstream & input, ofstream & output, unsigned int edges) {
-    unsigned int loadededgescnt = 0;
-    while (loadededgescnt < edges) {
-        string buffer;
-        getline(input, buffer);
-        if (buffer[0] == 'a') {
-            unsigned int from, to;
-            unsigned int weight;
-            getEdge(buffer, from, to, weight);
-            output << from << " " << to << " " << weight << " 1" << endl;
-            loadededgescnt++;
-        }
-    }
 }
 
 //______________________________________________________________________________________________________________________

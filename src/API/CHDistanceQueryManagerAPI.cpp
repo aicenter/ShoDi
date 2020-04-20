@@ -14,8 +14,8 @@ void CHDistanceQueryManagerAPI::initializeCH(string chFile, string mappingFile) 
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int CHDistanceQueryManagerAPI::distanceQuery(long long unsigned int source, long long unsigned int target) {
-    return qm -> findDistance(source, target);
+unsigned int CHDistanceQueryManagerAPI::distanceQuery(long long unsigned int start, long long unsigned int goal) {
+    return qm -> findDistance(start, goal);
 }
 
 //______________________________________________________________________________________________________________________

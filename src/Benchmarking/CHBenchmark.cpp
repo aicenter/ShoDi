@@ -20,7 +20,6 @@ double CHBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> 
     }
 
     chTimer.finish();
-    //chTimer.printMeasuredTime();
     return chTimer.getMeasuredTimeInSeconds();
 }
 
@@ -36,6 +35,5 @@ double CHBenchmark::benchmarkUsingMapping(const vector < pair < long long unsign
     }
 
     chTimer.finish();
-    //chTimer.printMeasuredTime();
     return chTimer.getMeasuredTimeInSeconds();
 }

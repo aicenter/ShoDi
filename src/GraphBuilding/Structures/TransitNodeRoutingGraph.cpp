@@ -11,15 +11,11 @@ TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned in
 
 }
 
-// Determines whether the query is local or global. Global queries can be answered using the transit node set, local
-// queries must be answered using some fallback algorithm (Contraction Hierarchies are used here). In our case, a query
-// is considered local if the intersection of the forward search space of source and the backward search space of target
-// is unempty (this function then returns true). If it is empty, the query is global (this function returns false).
 //______________________________________________________________________________________________________________________
-bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int target) {
-    for(unsigned int k = 0; k < forwardSearchSpaces[source].size(); k++) {
-        for(unsigned int m = 0; m < backwardSearchSpaces[target].size(); m++) {
-            if(forwardSearchSpaces[source][k] == backwardSearchSpaces[target][m]) {
+bool TransitNodeRoutingGraph::isLocalQuery(unsigned int start, unsigned int goal) {
+    for(unsigned int k = 0; k < forwardSearchSpaces[start].size(); k++) {
+        for(unsigned int m = 0; m < backwardSearchSpaces[goal].size(); m++) {
+            if(forwardSearchSpaces[start][k] == backwardSearchSpaces[goal][m]) {
                 return true;
             }
         }
@@ -27,18 +23,15 @@ bool TransitNodeRoutingGraph::isLocalQuery(unsigned int source, unsigned int tar
     return false;
 }
 
-// Finds the distance between two nodes based on the TNR data-structure. This is used for the non-local queries.
-// In that case, all pairs of access nodes of source and target are checked and the shortest distance from those
-// pairs is returned.
 //______________________________________________________________________________________________________________________
-unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int source, unsigned int target) {
+unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int start, unsigned int goal) {
     unsigned int shortestDistance = UINT_MAX;
 
-    for(unsigned int i = 0; i < forwardAccessNodes[source].size(); i++) {
-        for(unsigned int j = 0; j < backwardAccessNodes[target].size(); j++) {
-            unsigned int id1 = transitNodeMapping[forwardAccessNodes[source][i].accessNodeID];
-            unsigned int id2 = transitNodeMapping[backwardAccessNodes[target][j].accessNodeID];
-            unsigned int newDistance = forwardAccessNodes[source][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[target][j].distanceToNode;
+    for(unsigned int i = 0; i < forwardAccessNodes[start].size(); i++) {
+        for(unsigned int j = 0; j < backwardAccessNodes[goal].size(); j++) {
+            unsigned int id1 = transitNodeMapping[forwardAccessNodes[start][i].accessNodeID];
+            unsigned int id2 = transitNodeMapping[backwardAccessNodes[goal][j].accessNodeID];
+            unsigned int newDistance = forwardAccessNodes[start][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[goal][j].distanceToNode;
             if(newDistance < shortestDistance && transitNodesDistanceTable[id1][id2] != UINT_MAX) {
                 shortestDistance = newDistance;
             }

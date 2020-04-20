@@ -10,31 +10,23 @@ TNRAFDistanceQueryManager::TNRAFDistanceQueryManager(TransitNodeRoutingArcFlagsG
 
 }
 
-// Actually finds the distance between two targets. If source != target, this function first invokes the locality
-// filter to determine whether the query is local. If it is local, we fallback to the Contraction Hierarchies query
-// algorithm. This is slightly slower, but the local queries already guarantee that the source and target nodes will
-// be reasonably close to each other and in that case the query should take relatively short time. If the query is not
-// local, Transit Node Routing wirth Arc Flags data structure can be used to determine the shortest distance,
-// and in that case it is invoked to do so.
 //______________________________________________________________________________________________________________________
-unsigned int TNRAFDistanceQueryManager::findDistance(const unsigned int source, const unsigned int target) {
-    if(source == target) {
+unsigned int TNRAFDistanceQueryManager::findDistance(const unsigned int start, const unsigned int goal) {
+    if(start == goal) {
         return 0;
     } else {
-        if (graph.isLocalQuery(source, target)) { // Is local query, fallback to some other distance manager, here CH
+        if (graph.isLocalQuery(start, goal)) { // Is local query, fallback to some other distance manager, here CH
             //printf("Local query.\n");
             localQueries++;
-            return fallbackCHmanager.findDistance(source, target);
+            return fallbackCHmanager.findDistance(start, goal);
         } else { // Not local query, TNR can be used.
             //printf("Global query.\n");
             globalQueries++;
-            return graph.findTNRAFDistance(source, target);
+            return graph.findTNRAFDistance(start, goal);
         }
     }
 }
 
-// Auxiliary function only printing some info about the queries done since this manager was created. This is used
-// currently for debugging purposes and should be removed later. FIXME
 //______________________________________________________________________________________________________________________
 void TNRAFDistanceQueryManager::printQueriesAnalysis() {
     printf("Total queries answered: '%u', from that global: '%u', local: '%u', local percentage: '%f'.\n", globalQueries + localQueries, globalQueries, localQueries, (double) localQueries / (globalQueries + localQueries));

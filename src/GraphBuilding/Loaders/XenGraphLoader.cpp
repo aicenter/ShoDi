@@ -8,13 +8,11 @@
 #include <fstream>
 #include <iostream>
 
+//______________________________________________________________________________________________________________________
 XenGraphLoader::XenGraphLoader(string inputFile) {
     this->inputFile = inputFile;
 }
 
-// Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
-// into an 'SimpleGraph' instance, which automatically removes multiple (parallel) edges and then construct an
-// 'Graph' from that.
 //______________________________________________________________________________________________________________________
 Graph * XenGraphLoader::loadGraph() {
     ifstream input;
@@ -95,7 +93,6 @@ void XenGraphLoader::loadNodesMapping(unordered_map <long long unsigned int, uns
     input.close();
 }
 
-// This function is used to reinsert all the original edges into the graph after the preprocessing has been finished.
 //______________________________________________________________________________________________________________________
 void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     ifstream input;

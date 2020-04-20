@@ -9,8 +9,6 @@
 #include "DistanceMatrixComputor.h"
 #include "../Dijkstra/DijkstraNode.h"
 
-// This function will compute the full distance matrix for the given graph. The matrix will be stored in the instance
-// of the DistanceMatrixComputor class, so that it can be output or used further.
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputor::computeDistanceMatrix(const Graph & graph) {
     unsigned int nodesCnt = graph.nodes();
@@ -37,9 +35,6 @@ void DistanceMatrixComputor::computeDistanceMatrixInReversedGraph(const Graph & 
     }
 }
 
-// This function will compute one row of the full distance matrix. This is done by running a simple Dijkstra from the
-// node corresponding to the row, which is not stopped until all reachable nodes have been visited. The distances
-// to all the other nodes found by this Dijkstra run are then used as values for the row.
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int rowID, const Graph & graph, bool useReversedGraph) {
     unsigned int n = graph.nodes();
@@ -88,12 +83,6 @@ void DistanceMatrixComputor::fillDistanceMatrixRow(const unsigned int rowID, con
     delete [] distance;
 }
 
-// Allows to output the distance matrix in a simple binary format. The distance matrix will be saved into a file
-// specified by the path argument, suffix '.xdm' is added automatically.
-//
-// The format is as follows: First three bytes should contain the characters 'X', 'D' and 'M' respectively, following is
-// one unsigned int denoting the number of nodes 'n', and following are n*n unsigned int values representing the actual
-// distances for the matrix.
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputor::outputDistanceMatrixToFile(string path) {
     printf("Outputting the distance matrix.\n");
