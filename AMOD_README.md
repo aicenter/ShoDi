@@ -37,8 +37,8 @@ Alternatively if you do not want to copy `nodes.geojson` and `edges.geojson`, yo
 We will now continue with the file `graph.xeng` but save the other one, we will need it later. Now we can use the `preprocessor` with the `graph.xeng` file to precompute the data structures needed for the query algorithm.
 
 1. Run the `preprocessor` as one of the two: 
-  1. `./shortestPathsPreprocessor create tnraf xengraph dm 1000 graph.xeng my_graph`
-  2. `./shortestPathsPreprocessor create tnraf xengraph slow 1000 graph.xeng my_graph`
+   1. `./shortestPathsPreprocessor create tnraf xengraph dm 1000 graph.xeng my_graph`
+   2. `./shortestPathsPreprocessor create tnraf xengraph slow 1000 graph.xeng my_graph`
 
 The fourth argument (either `dm` or `slow`) switches between two preprocessing modes. The `dm` mode is faster but needs significantly more memory. The `slow` mode is slower but should work even on machines with less memory or for large graphs. For normal sized graphs we suggest using the `dm` mode if you have at least 16 GB of memory and the `slow` mode otherwise. The fifth argument determines the size of the transit node set. Usually more transit nodes mean better performance but higher memory requirements. For the graph of Prague, 2000 transit nodes are suggested. The sixth argument is the path to your `graph.xeng` from the previous step, so you can exchange it for the path on your machine and the last argument is the output path where the Transit Node Routing with Arc Flags data structure will be output, so you can choose it yourself. A `.tgaf` suffix will be automatically appended to your chosen path. 
 

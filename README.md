@@ -10,7 +10,7 @@ Links
 
 If you want to make this library running with Amod-to-agentpolis as fast as possible, you can check the [Amod readme](./AMOD_README.md) for step-by-step instructions on how to accomplish this.
 
-If you need to get some information about the formats for the files used in this library (for example the formats used for the Transit Node Routing data structure files), you can check [Amod readme](./FORMATS.md) text file which describes all the formats used by this library.
+If you need to get some information about the formats for the files used in this library (for example the formats used for the Transit Node Routing data structure files), you can check [this](./FORMATS.md) text file which describes all the formats used by this library.
 
 
 Preprocessor
