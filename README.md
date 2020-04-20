@@ -5,6 +5,14 @@ This project implements multiple complex preprocessing methods for shortest dist
 
 The project is split into two major components. One component is the **preprocessor** (an executable called `shortestPathsPreprocessor`) which takes an arbitrary graph in a supported format (described later) and prepares the structures required for the query algorithms of one of the three methods. Additionally, the preprocessor allows the user to run a set of queries using some method and benchmark the time required to answer them. This way, the user can easily evaluate whether the performance is sufficient for his use case. The second component is the **library** (a shared library called `libshortestPaths.so` in Linux), which can load the structures prepared by the preprocessor to answer arbitrary queries using the query algorithms of the previously mentioned methods. The library can be used in some bigger `C++` application, but it can be also used from some other language. A simple example application written in `Java` which uses the library can be found in the `javatests` subdirectory.
 
+Links
+=====
+
+If you want to make this library running with Amod-to-agentpolis as fast as possible, you can check the [Amod readme](./AMOD_README.md) for step-by-step instructions on how to accomplish this.
+
+If you need to get some information about the formats for the files used in this library (for example the formats used for the Transit Node Routing data structure files), you can check [Amod readme](./FORMATS.md) text file which describes all the formats used by this library.
+
+
 Preprocessor
 ============
 
