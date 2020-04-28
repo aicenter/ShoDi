@@ -3,7 +3,7 @@ Shortest Paths computation library in C++
 
 This project implements multiple complex preprocessing methods for shortest distance computation in directed weighted graphs. The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies) and Transit Node Routing with Arc Flags (extension of Transit Node Routing).
 
-The project is split into two major components. One component is the **preprocessor** (an executable called `shortestPathsPreprocessor`) which takes an arbitrary graph in a supported format (described later) and prepares the structures required for the query algorithms of one of the three methods. Additionally, the preprocessor allows the user to run a set of queries using some method and benchmark the time required to answer them. This way, the user can easily evaluate whether the performance is sufficient for his use case. The second component is the **library** (a shared library called `libshortestPaths.so` in Linux), which can load the structures prepared by the preprocessor to answer arbitrary queries using the query algorithms of the previously mentioned methods. The library can be used in some bigger `C++` application, but it can be also used from some other language. A simple example application written in `Java` which uses the library can be found in the `javatests` subdirectory.
+The project is split into two major components. One component is the **preprocessor** (an executable called `shortestPathsPreprocessor`) which takes an arbitrary graph in a supported format (described later) and prepares the structures required for the query algorithms of one of the three methods. Additionally, the preprocessor allows running a set of queries using some method and benchmark the time required to answer them. This way, the user can easily evaluate whether the performance is sufficient for his use case. The second component is the **library** (a shared library called `libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows), which can load the structures prepared by the preprocessor to answer arbitrary queries using the query algorithms of the previously mentioned methods. The library can be used in a `C++` application, but it can also be integrated into a `Java` application. A simple example application written in `Java` which uses the library can be found in the `javatests` subdirectory. This application also serves as a testing tool to check whether the project is working correctly on a given machine. Integration of this library into an application written in another language than `C++` and `Java` is also possible, but it will require you to generate new 'glue code' for the desired language using a tool called `SWIG`. You would also need to change the `CMakeLists.txt` file in order to compile the library for usage with another language than `Java`. The steps required for the integration with a different language are briefly described in [this file](./src/API/README.md).
 
 Links
 =====
@@ -11,6 +11,8 @@ Links
 If you want to make this library running with Amod-to-agentpolis as fast as possible, you can check the [Amod readme](./AMOD_README.md) for step-by-step instructions on how to accomplish this.
 
 If you need to get some information about the formats for the files used in this library (for example the formats used for the Transit Node Routing data structure files), you can check [this](./FORMATS.md) text file which describes all the formats used by this library.
+
+If you want to test that the library is working correctly on your machine (assuming you successfully compiled the shared library), you can use the prepared test `Java` application. Check its [readme here](./javatests/README.md).
 
 
 Preprocessor
@@ -21,11 +23,11 @@ Compiling
 
 To use the preprocessor, we first need to compile it. Compilation should be fairly easy. First, run `CMake` in the root of this project. This should create a `Makefile` with a target called `shortestPathsPreprocessor` that will build the preprocessor application.
 
-In Linux, the process can be done as follows:
-* `mkdir cmakedata`
-* `cd cmakedata`
+The process can be done as follows:
+* `mkdir build`
+* `cd build`
 * `cmake ..`
-* `make shortestPathsPreprocessor`
+* `cmake --build . --target shortestPathsPreprocessor`
 
 Usage
 -----
@@ -111,16 +113,18 @@ If you want to change the names of the input or output files, you can easily cha
 Library
 =======
 
+The library can be used to load the data structures precomputed by the preprocessor and then answer queries quickly using those structures. 
+
 Compiling
 ---------
 
-Let us now focus on the shared library. The library can be used to load the data structures precomputed by the preprocessor and then answer queries quickly using those structures. In order to use the library, we first need to compile it for our architecture. This can be again achieved easily using `CMake`. First, run `CMake` in the root of this project. This should create a `Makefile` with a target called `shortestPaths` that will build the shared library. 
+In order to use the library, we first need to compile it for our architecture. This can be again achieved easily using `CMake`. First, run `CMake` in the root of this project. This should create a `Makefile` with a target called `shortestPaths` that will build the shared library. 
 
-In Linux, the process can be done as follows:
-* `mkdir cmakedata`
-* `cd cmakedata`
+The process can be done as follows:
+* `mkdir build`
+* `cd build`
 * `cmake ..`
-* `make shortestPaths`
+* `cmake --build . --target shortestPaths`
 
 The output of this should be a `.so` file on Linux or a `.dll` file on Windows.
 
@@ -133,7 +137,7 @@ Each manager provides three functions. The first function is called `initializeC
 
 Javatests example
 -----------------
-A simple `Java` application that uses the library to answer queries can be found in the `javatests` subdirectory. This application was used to test that the API is functional and everything works as intended. You can however use this application as an example of how to use the library from `Java`. 
+A simple `Java` application that uses the library to answer queries can be found in the `javatests` subdirectory. This application was used to test that the API is functional and everything works as intended. You can however use this application as an example of how to use the library from `Java`. You can check the readme for this simple application [here](./javatests/README.md).
 
-For more information about how to integrate this project with other programming languages, please check the `README.md` in the `src/API` subdirectory.
+For more information about how to integrate this project with other programming languages, please check the [readme](./src/API/README.md) in the `src/API` subdirectory.
 
