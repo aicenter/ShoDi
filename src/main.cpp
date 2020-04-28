@@ -468,13 +468,19 @@ void createTNRAF(char * inputType, char * preprocessingMode, char * transitNodeS
 /**
  * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
  * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds.
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
  * XenGraph input format.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkDijkstra(char * inputFilePath, char * queriesFilePath) {
+void benchmarkDijkstra(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -489,20 +495,40 @@ void benchmarkDijkstra(char * inputFilePath, char * queriesFilePath) {
 
     printf("Run %lu queries using Dijkstra's algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), dijkstraTime, (dijkstraTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << dijkstraDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
  * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds.
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
  * XenGraph input format.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
  * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
  * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkDijkstraWithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath) {
+void benchmarkDijkstraWithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -518,17 +544,37 @@ void benchmarkDijkstraWithMapping(char * inputFilePath, char * queriesFilePath, 
     printf("Run %lu queries using Dijkstra's algorithm in %f seconds\n"
            "using '%s' as mapping."
            "That means %f ms per query.\n", trips.size(), dijkstraTime, mappingFilePath, (dijkstraTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << dijkstraDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the Contraction Hierarchies query algorithm using a given precomputed data structure and a given
  * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds.
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the file containing the precomputed Contraction Hierarchies data structure.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkCH(char * inputFilePath, char * queriesFilePath) {
+void benchmarkCH(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -543,19 +589,39 @@ void benchmarkCH(char * inputFilePath, char * queriesFilePath) {
 
     printf("Run %lu queries using Contraction Hierarchies query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), chTime, (chTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << chDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the Contraction Hierarchies query algorithm using a given precomputed data structure, a given
  * set of queries and a given mapping. Prints out the sum of the time required by all the queries in seconds
- * and the average time needed for one query in milliseconds.
+ * and the average time needed for one query in milliseconds. Additionally, the caller can specify an optional
+ * output file path, where all the computed distances will be output. Those distances can then be for example
+ * compared with distances computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the file containing the precomputed Contraction Hierarchies data structure.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
  * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
  * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkCHwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath) {
+void benchmarkCHwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -571,17 +637,37 @@ void benchmarkCHwithMapping(char * inputFilePath, char * queriesFilePath, char *
     printf("Run %lu queries using Contraction Hierarchies query algorithm in %f seconds\n"
            "using '%s' as mapping."
            "That means %f ms per query.\n", trips.size(), chTime, mappingFilePath, (chTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << chDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the Transit Node Routing query algorithm using a given precomputed data structure and a given
  * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds.
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the file containing the precomputed Transit Node Routing data structure.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNR(char * inputFilePath, char * queriesFilePath) {
+void benchmarkTNR(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -596,19 +682,39 @@ void benchmarkTNR(char * inputFilePath, char * queriesFilePath) {
 
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << tnrDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the Transit Node Routing query algorithm using a given precomputed data structure, a given set of queries
  * and a given mapping. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds.
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the file containing the precomputed Transit Node Routing data structure.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
  * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
  * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNRwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath) {
+void benchmarkTNRwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -623,18 +729,38 @@ void benchmarkTNRwithMapping(char * inputFilePath, char * queriesFilePath, char 
 
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << tnrDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the Transit Node Routing with Arc Flags query algorithm using a given precomputed data structure and
  * a given set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds.
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the file containing the precomputed Transit Node Routing with Arc Flags data
  * structure.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNRAF(char * inputFilePath, char * queriesFilePath) {
+void benchmarkTNRAF(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -649,20 +775,40 @@ void benchmarkTNRAF(char * inputFilePath, char * queriesFilePath) {
 
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << tnrafDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
  * Benchmarks the Transit Node Routing with Arc Flags query algorithm using a given precomputed data structure,
  * a given set of queries and a given mapping. Prints out the sum of the time required by all the queries in seconds
- * and the average time needed for one query in milliseconds.
+ * and the average time needed for one query in milliseconds. Additionally, the caller can specify an optional
+ * output file path, where all the computed distances will be output. Those distances can then be for example
+ * compared with distances computed by some other method to ensure correctness.
  *
  * @param inputFilePath[in] Path to the file containing the precomputed Transit Node Routing with Arc Flags data
  * structure.
  * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
  * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
  * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNRAFwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath) {
+void benchmarkTNRAFwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -677,6 +823,20 @@ void benchmarkTNRAFwithMapping(char * inputFilePath, char * queriesFilePath, cha
 
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
+
+    if(outputDistances) {
+        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+
+        ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << endl;
+        for(unsigned int i = 0; i < trips.size(); ++i) {
+            output << tnrafDistances[i] << endl;
+        }
+
+        output.close();
+    }
 }
 
 /**
@@ -753,8 +913,10 @@ int main(int argc, char * argv[]) {
         // Dijkstra benchmarking
         if(strcmp(argv[2], "dijkstra") == 0) {
             if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 6) {
-                    benchmarkDijkstra(argv[4], argv[5]);
+                if(argc == 7) {
+                    benchmarkDijkstra(argv[4], argv[5], argv[6], true);
+                } else if(argc == 6) {
+                    benchmarkDijkstra(argv[4], argv[5], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Dijkstra's Algorithm benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -762,8 +924,10 @@ int main(int argc, char * argv[]) {
                            "with examples.\n");
                 }
             } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 7) {
-                    benchmarkDijkstraWithMapping(argv[4], argv[5], argv[6]);
+                if(argc == 8) {
+                    benchmarkDijkstraWithMapping(argv[4], argv[5], argv[6], argv[7], true);
+                } else if(argc == 7) {
+                    benchmarkDijkstraWithMapping(argv[4], argv[5], argv[6], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Dijkstra's Algorithm  benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -779,10 +943,12 @@ int main(int argc, char * argv[]) {
             }
         }
         // Contraction Hierarchies benchmarking.
-        if(strcmp(argv[2], "ch") == 0) {
+        else if(strcmp(argv[2], "ch") == 0) {
             if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 6) {
-                    benchmarkCH(argv[4], argv[5]);
+                if(argc == 7) {
+                    benchmarkCH(argv[4], argv[5], argv[6], true);
+                } else if(argc == 6) {
+                    benchmarkCH(argv[4], argv[5], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Contraction Hierarchies benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -790,8 +956,10 @@ int main(int argc, char * argv[]) {
                            "with examples.\n");
                 }
             } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 7) {
-                    benchmarkCHwithMapping(argv[4], argv[5], argv[6]);
+                if(argc == 8) {
+                    benchmarkCHwithMapping(argv[4], argv[5], argv[6], argv[7], true);
+                } else if(argc == 7) {
+                    benchmarkCHwithMapping(argv[4], argv[5], argv[6], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Contraction Hierarchies benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -809,8 +977,10 @@ int main(int argc, char * argv[]) {
         // Transit Node Routing benchmarking.
         } else if(strcmp(argv[2], "tnr") == 0) {
             if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 6) {
-                    benchmarkTNR(argv[4], argv[5]);
+                if(argc == 7) {
+                    benchmarkTNR(argv[4], argv[5], argv[6], true);
+                } else if(argc == 6) {
+                    benchmarkTNR(argv[4], argv[5], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Transit Node Routing benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -818,8 +988,10 @@ int main(int argc, char * argv[]) {
                            "with examples.\n");
                 }
             } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 7) {
-                    benchmarkTNRwithMapping(argv[4], argv[5], argv[6]);
+                if(argc == 8) {
+                    benchmarkTNRwithMapping(argv[4], argv[5], argv[6], argv[7], true);
+                } else if(argc == 7) {
+                    benchmarkTNRwithMapping(argv[4], argv[5], argv[6], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Transit Node Routing benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -837,8 +1009,10 @@ int main(int argc, char * argv[]) {
         // Transit Node Routing with Arc Flags benchmarking.
         } else if(strcmp(argv[2], "tnraf") == 0) {
             if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 6) {
-                    benchmarkTNRAF(argv[4], argv[5]);
+                if(argc == 7) {
+                    benchmarkTNRAF(argv[4], argv[5], argv[6], true);
+                } else if(argc == 6) {
+                    benchmarkTNRAF(argv[4], argv[5], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Transit Node Routing with Arc Flags benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
@@ -846,8 +1020,10 @@ int main(int argc, char * argv[]) {
                            "with examples.\n");
                 }
             } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 7) {
-                    benchmarkTNRAFwithMapping(argv[4], argv[5], argv[6]);
+                if(argc == 8) {
+                    benchmarkTNRAFwithMapping(argv[4], argv[5], argv[6], argv[7], true);
+                } else if(argc == 7) {
+                    benchmarkTNRAFwithMapping(argv[4], argv[5], argv[6], nullptr, false);
                 } else {
                     printf("Invalid amount of arguments for Transit Node Routing with Arc Flags benchmarking.\n"
                            "Please, make sure that your call has the right format. If not sure,\n"
