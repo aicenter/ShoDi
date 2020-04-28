@@ -55,7 +55,7 @@ public:
      *
      * @return The number of nodes in the graph.
      */
-    const unsigned int nodes() const;
+    unsigned int nodes() const;
 
     /**
      * Returns all the edges with the node 'x' as their target node.

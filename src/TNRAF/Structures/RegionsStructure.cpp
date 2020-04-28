@@ -6,7 +6,7 @@
 #include "RegionsStructure.h"
 
 //______________________________________________________________________________________________________________________
-RegionsStructure::RegionsStructure(unsigned int nodesCnt, unsigned int regionsCnt) : mapping(nodesCnt), regions(regionsCnt), regionsCnt(regionsCnt) {
+RegionsStructure::RegionsStructure(unsigned int nodesCnt, unsigned int regionsCnt) : regions(regionsCnt), mapping(nodesCnt), regionsCnt(regionsCnt) {
 
 }
 

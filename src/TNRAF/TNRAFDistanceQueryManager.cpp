@@ -6,7 +6,7 @@
 #include "TNRAFDistanceQueryManager.h"
 
 //______________________________________________________________________________________________________________________
-TNRAFDistanceQueryManager::TNRAFDistanceQueryManager(TransitNodeRoutingArcFlagsGraph & graph) : fallbackCHmanager(graph), graph(graph), localQueries(0), globalQueries(0) {
+TNRAFDistanceQueryManager::TNRAFDistanceQueryManager(TransitNodeRoutingArcFlagsGraph & graph) : graph(graph), fallbackCHmanager(graph), globalQueries(0), localQueries(0) {
 
 }
 

@@ -6,7 +6,7 @@
 #include "TNRPathQueryManager.h"
 
 //______________________________________________________________________________________________________________________
-TNRPathQueryManager::TNRPathQueryManager(TransitNodeRoutingGraphForPathQueries & graph) : fallbackCHmanager(graph), graph(graph) {
+TNRPathQueryManager::TNRPathQueryManager(TransitNodeRoutingGraphForPathQueries & graph) : graph(graph), fallbackCHmanager(graph) {
 
 }
 

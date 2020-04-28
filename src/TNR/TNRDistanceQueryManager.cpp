@@ -6,7 +6,7 @@
 #include "TNRDistanceQueryManager.h"
 
 //______________________________________________________________________________________________________________________
-TNRDistanceQueryManager::TNRDistanceQueryManager(TransitNodeRoutingGraph & graph) : fallbackCHmanager(graph), graph(graph), localQueries(0), globalQueries(0) {
+TNRDistanceQueryManager::TNRDistanceQueryManager(TransitNodeRoutingGraph & graph) : graph(graph), fallbackCHmanager(graph), globalQueries(0), localQueries(0) {
 
 }
 

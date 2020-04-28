@@ -31,6 +31,9 @@ FlagsGraph::FlagsGraph(UpdateableGraph & g) {
 }
 
 //______________________________________________________________________________________________________________________
+FlagsGraph::~FlagsGraph() = default;
+
+//______________________________________________________________________________________________________________________
 void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges) {
     for(unsigned int i = 0; i < neighbours.size(); i++) {
         for(unsigned int j = 0; j < neighbours[i].size(); j++) {
@@ -95,7 +98,7 @@ void FlagsGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int FlagsGraph::nodes() const {
+unsigned int FlagsGraph::nodes() const {
     return neighbours.size();
 }
 

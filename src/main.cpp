@@ -33,7 +33,11 @@ void printUsageInfo(char * appName) {
     printf("Hello! This application allows the user to preprocess graphs to create data structures\n"
            "for Contraction Hierarchies, Transit Node Routing and Transit Node Routing with Arc Flags.\n"
            "Additionally, the user can also benchmark the obtained data structures using a given set of queries.\n"
-           "Please, see 'README.md' for a complete overview of use cases for this application.\n");
+           "Please, see 'README.md' for a complete overview of use cases for this application.\n"
+           "\n"
+           "Some common examples of usage:\n"
+           "  '%s create tnraf xengraph dm 1000 input_graph.xeng output_file'\n"
+           "  '%s create ch xengraph input_graph.xeng output_file'\n", appName, appName);
 }
 
 /**

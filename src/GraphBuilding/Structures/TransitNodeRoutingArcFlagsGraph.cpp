@@ -14,6 +14,9 @@ TransitNodeRoutingArcFlagsGraph::TransitNodeRoutingArcFlagsGraph(unsigned int no
 }
 
 //______________________________________________________________________________________________________________________
+TransitNodeRoutingArcFlagsGraph::~TransitNodeRoutingArcFlagsGraph() = default;
+
+//______________________________________________________________________________________________________________________
 NodeDataRegions & TransitNodeRoutingArcFlagsGraph::data(unsigned int node) {
     return nodesData[node];
 }

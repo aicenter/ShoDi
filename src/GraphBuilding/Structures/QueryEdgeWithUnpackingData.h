@@ -26,11 +26,11 @@ public:
      * @param mNode[in] A middle node for the edge. If the edge is not a shortcut edge, it will be set to 'UINT_MAX'.
      */
     QueryEdgeWithUnpackingData(
-            const unsigned int a,
-            const unsigned int b,
-            const bool c,
-            const bool d,
-            const unsigned int mNode = UINT_MAX);
+            unsigned int a,
+            unsigned int b,
+            bool c,
+            bool d,
+            unsigned int mNode = UINT_MAX);
 
     /**
      * A constructor used to create a copy of an edge.

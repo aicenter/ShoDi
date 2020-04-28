@@ -224,7 +224,7 @@ public:
      * @param nodeID[in] The node we are interested in.
      * @return The rank of the node we are interested int.
      */
-    const unsigned int getRank(
+    unsigned int getRank(
             unsigned int nodeID) const;
 
     /**
@@ -232,7 +232,7 @@ public:
      *
      * @return The number of nodes in the graph.
      */
-    const unsigned int nodes() const;
+    unsigned int nodes() const;
 
     /**
      * Returns all the edges with the node 'x' as their target node.
@@ -258,7 +258,7 @@ public:
      * @param node[in] The node we are interested in.
      * @return The degree of the node.
      */
-    const unsigned int degree(
+     unsigned int degree(
             unsigned int node)const;
 };
 

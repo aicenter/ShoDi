@@ -7,9 +7,12 @@
 #include "TransitNodeRoutingGraph.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes) {
+TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)) {
 
 }
+
+//______________________________________________________________________________________________________________________
+TransitNodeRoutingGraph::~TransitNodeRoutingGraph() = default;
 
 //______________________________________________________________________________________________________________________
 bool TransitNodeRoutingGraph::isLocalQuery(unsigned int start, unsigned int goal) {

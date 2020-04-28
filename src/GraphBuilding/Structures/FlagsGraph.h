@@ -48,7 +48,7 @@ public:
      *
      * @param n[in] The number of nodes in the graph.
      */
-    FlagsGraph(unsigned int n);
+    explicit FlagsGraph(unsigned int n);
 
     /**
      * A constructor that build a FlagsGraph based on an instance of UpdateableGraph. This is intented to be used with
@@ -57,7 +57,12 @@ public:
      *
      * @param g[in] An instance of the UpdateableGraph that will be used to initialize an instance of the Flags Graph.
      */
-    FlagsGraph(UpdateableGraph & g);
+    explicit FlagsGraph(UpdateableGraph & g);
+
+    /**
+     * An explicit virtual destructor to avoid undefined behavior.
+     */
+    virtual ~FlagsGraph();
 
     /**
      * Puts all edges currently present in the graph into one vector.
@@ -84,7 +89,7 @@ public:
      *
      * @return The number of nodes in the graph.
      */
-    const unsigned int nodes() const;
+    unsigned int nodes() const;
 
     /**
      * Returns all neighbours of a given node 'x'. Keep in mind that this returns neighbour both in the forward and
@@ -94,7 +99,7 @@ public:
      * @param x[in] The ID of the node we are interested in.
      * @return Vector of edges that are incident with 'x' (They can have 'x' both as source and as target).
      */
-    const vector< QueryEdge > & nextNodes(const unsigned int x)const;
+    const vector< QueryEdge > & nextNodes(unsigned int x)const;
 
     /**
      * Returns the data for a certain node.

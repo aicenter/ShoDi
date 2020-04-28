@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.14)
-project(contraction_hierarchies)
+project(shortest_paths)
 
 set(CMAKE_CXX_STANDARD 11)
 
 find_package(JNI REQUIRED)
 
 include_directories(${JNI_INCLUDE_DIRS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
 
 add_library(shortestPaths SHARED
         src/API/CHDistanceQueryManagerAPI.cpp

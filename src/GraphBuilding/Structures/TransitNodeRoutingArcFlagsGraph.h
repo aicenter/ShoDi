@@ -30,6 +30,11 @@ public:
             unsigned int transitNodesAmount);
 
     /**
+     * Explicit destructor to avoid undefined behavior.
+     */
+    ~TransitNodeRoutingArcFlagsGraph() override;
+
+    /**
      * Returns the data for some node.
      *
      * @param node[in] The node we are interested in.

@@ -38,8 +38,8 @@ public:
      * from start.
      */
     unsigned int findDistance(
-            const unsigned int start,
-            const unsigned int goal);
+            unsigned int start,
+            unsigned int goal);
 
     /**
      * Auxiliary function only printing some info about the queries done since this manager was created. This is used

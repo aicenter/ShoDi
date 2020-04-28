@@ -73,7 +73,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
             cout << "Computed forward access nodes for '" << i << "' transit nodes." << endl;
         }
 
-        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, originalGraph, regions, useDistanceMatrix);
+        findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph, originalGraph, regions, useDistanceMatrix);
     }
 
     //printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
@@ -94,7 +94,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
             cout << "Computed backward access nodes for '" << i << "' transit nodes." << endl;
         }
 
-        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, transitNodesDistanceTable, chGraph, originalGraph, regions, useDistanceMatrix);
+        findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph, originalGraph, regions, useDistanceMatrix);
     }
     cout << "True arc flags: " << trueArcFlags << ", total arc flags: " << totalArcFlags << ", that is: " << ((double) trueArcFlags / totalArcFlags) * 100 << "%." << endl;
 
@@ -275,7 +275,7 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+void TNRAFPreprocessor::findForwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & forwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -402,7 +402,7 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
+void TNRAFPreprocessor::findBackwardAccessNodes(unsigned int source, vector <AccessNodeDataArcFlags> & accessNodes, vector < unsigned int > & backwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph, Graph & originalGraph, RegionsStructure & regions, bool useDistanceMatrix) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -578,7 +578,7 @@ void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructu
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int TNRAFPreprocessor::getNewNodeForCluster( vector < unsigned int > & assignedClusters, queue < unsigned int > & q) {
+unsigned int TNRAFPreprocessor::getNewNodeForCluster( vector < unsigned int > & assignedClusters, queue < unsigned int > & q) {
     while(! q.empty()) {
         unsigned int nodeID = q.front();
         q.pop();
@@ -593,6 +593,8 @@ const unsigned int TNRAFPreprocessor::getNewNodeForCluster( vector < unsigned in
             return i;
         }
     }
+
+    return UINT_MAX;
 }
 
 //______________________________________________________________________________________________________________________

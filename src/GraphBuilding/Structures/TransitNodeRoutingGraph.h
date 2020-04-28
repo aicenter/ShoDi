@@ -30,6 +30,11 @@ public:
             unsigned int transitNodesAmount);
 
     /**
+     * Explicit destructor to avoid undefined behavior.
+     */
+    ~TransitNodeRoutingGraph() override;
+
+    /**
      * Determines whether the query is local or global. Global queries can be answered using the transit node set,
      * local queries must be answered using some fallback algorithm (Contraction Hierarchies are used here).
      * In our case, a query is considered local if the intersection of the forward search space of start and

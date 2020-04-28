@@ -68,12 +68,12 @@ void UpdateableGraph::removeEdge(unsigned int from, unsigned int to) {
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int UpdateableGraph::getRank(unsigned int nodeID) const {
+unsigned int UpdateableGraph::getRank(unsigned int nodeID) const {
     return ranks[nodeID];
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int UpdateableGraph::nodes() const {
+unsigned int UpdateableGraph::nodes() const {
     return followingNodes.size();
 }
 
@@ -93,7 +93,7 @@ const unordered_map<unsigned int, PreprocessingEdgeData> & UpdateableGraph::outg
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int UpdateableGraph::degree(unsigned int node)const {
+unsigned int UpdateableGraph::degree(unsigned int node)const {
     return followingNodes.at(node).size() + previousNodes.at(node).size();
 }
 

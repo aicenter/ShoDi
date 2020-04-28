@@ -43,7 +43,7 @@ public:
      *
      * @return The amoung of nodes in the graph.
      */
-    const unsigned int nodes() const;
+    unsigned int nodes() const;
 
     /**
      * Returns all the edges in the graph that have 'x' as their source node.
@@ -51,7 +51,7 @@ public:
      * @param x[in] The node we are interested in.
      * @return A map containing all the edges in the graph that have 'x' as their source node along with their weights.
      */
-    const map<unsigned int, unsigned int> & edges(const unsigned int x)const;
+    const map<unsigned int, unsigned int> & edges(unsigned int x)const;
 };
 
 

@@ -138,7 +138,6 @@ protected:
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
      * are not transit nodes are not present in this table.
-     * @param transitNodesDistanceTable[in] Contains the pairwise distances between all pairs of transit nodes.
      * @param graph[in]
      * @param originalGraph[in]
      * @param regions[in]
@@ -149,7 +148,6 @@ protected:
             vector <AccessNodeDataArcFlags> & accessNodes,
             vector < unsigned int > & forwardSearchSpace,
             unordered_map< unsigned int, unsigned int > & transitNodes,
-            vector < vector < unsigned int > > & transitNodesDistanceTable,
             FlagsGraph & graph,
             Graph & originalGraph,
             RegionsStructure & regions,
@@ -167,7 +165,6 @@ protected:
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
      * are not transit nodes are not present in this table.
-     * @param transitNodesDistanceTable[in] Contains the pairwise distances between all pairs of transit nodes.
      * @param graph[in]
      * @param originalGraph[in]
      * @param regions[in]
@@ -178,7 +175,6 @@ protected:
             vector <AccessNodeDataArcFlags> & accessNodes,
             vector < unsigned int > & backwardSearchSpace,
             unordered_map< unsigned int, unsigned int > & transitNodes,
-            vector < vector < unsigned int > > & transitNodesDistanceTable,
             FlagsGraph & graph, Graph & originalGraph,
             RegionsStructure & regions,
             bool useDistanceMatrix);
@@ -261,7 +257,7 @@ protected:
      * @param q The queue containing the IDs of the candidates that could be added into the currently processed cluster.
      * @return The ID of the node that should be added to the currently processed cluster.
      */
-    static const unsigned int getNewNodeForCluster(
+    static unsigned int getNewNodeForCluster(
             vector < unsigned int > & assignedClusters,
             queue < unsigned int > & q);
 

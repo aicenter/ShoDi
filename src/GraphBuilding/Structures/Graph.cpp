@@ -33,7 +33,7 @@ void Graph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int Graph::nodes()const {
+unsigned int Graph::nodes()const {
     return this->followingNodes.size();
 }
 

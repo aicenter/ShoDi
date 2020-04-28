@@ -24,7 +24,7 @@ void FlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, un
 }
 
 //______________________________________________________________________________________________________________________
-const unsigned int FlagsGraphWithUnpackingData::nodes() const {
+unsigned int FlagsGraphWithUnpackingData::nodes() const {
     return neighbours.size();
 }
 
