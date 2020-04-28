@@ -30,7 +30,8 @@ using namespace std;
  *
  * @param[in] appName
  */
-void printUsageInfo(char * appName) {
+void printUsageInfo(
+        char * appName) {
     printf("Hello! This application allows the user to preprocess graphs to create data structures\n"
            "for Contraction Hierarchies, Transit Node Routing and Transit Node Routing with Arc Flags.\n"
            "Additionally, the user can also benchmark the obtained data structures using a given set of queries.\n"
@@ -57,7 +58,9 @@ void printInvalidUsageInfo() {
  * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed CH data structure.
  */
-void createCHfromXenGraph(char * inputFilePath, char * outputFilePath) {
+void createCHfromXenGraph(
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Contraction Hierarchies from XenGraph preprocessing");
     timer.begin();
 
@@ -80,7 +83,9 @@ void createCHfromXenGraph(char * inputFilePath, char * outputFilePath) {
  * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed CH data structure.
  */
-void createCHfromDIMACS(char * inputFilePath, char * outputFilePath) {
+void createCHfromDIMACS(
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
     timer.begin();
 
@@ -106,7 +111,10 @@ void createCHfromDIMACS(char * inputFilePath, char * outputFilePath) {
  * @param inputFilePath[in] Contains the file path to the input graph in the chosen format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
-void createCH(char * inputType, char * inputFilePath, char * outputFilePath) {
+void createCH(
+        char * inputType,
+        char * inputFilePath,
+        char * outputFilePath) {
     if(strcmp(inputType, "xengraph") == 0) {
         createCHfromXenGraph(inputFilePath, outputFilePath);
     } else if(strcmp(inputType, "dimacs") == 0) {
@@ -127,7 +135,10 @@ void createCH(char * inputType, char * inputFilePath, char * outputFilePath) {
  * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromXenGraphFast(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRfromXenGraphFast(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing from XenGraph preprocessing (fast mode)");
     timer.begin();
 
@@ -152,7 +163,10 @@ void createTNRfromXenGraphFast(char * transitNodeSetSize, char * inputFilePath, 
  * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromXenGraphSlow(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRfromXenGraphSlow(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing from XenGraph preprocessing (slow mode)");
     timer.begin();
 
@@ -178,7 +192,10 @@ void createTNRfromXenGraphSlow(char * transitNodeSetSize, char * inputFilePath, 
  * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromXenGraphUsingDM(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRfromXenGraphUsingDM(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing from XenGraph preprocessing (using distance matrix)");
     timer.begin();
 
@@ -204,7 +221,10 @@ void createTNRfromXenGraphUsingDM(char * transitNodeSetSize, char * inputFilePat
  * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromDIMACSFast(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRfromDIMACSFast(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing from DIMACS preprocessing (fast mode)");
     timer.begin();
 
@@ -229,7 +249,10 @@ void createTNRfromDIMACSFast(char * transitNodeSetSize, char * inputFilePath, ch
  * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromDIMACSSlow(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRfromDIMACSSlow(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing from DIMACS preprocessing (slow mode)");
     timer.begin();
 
@@ -255,7 +278,10 @@ void createTNRfromDIMACSSlow(char * transitNodeSetSize, char * inputFilePath, ch
  * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromDIMACSUsingDM(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRfromDIMACSUsingDM(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing from DIMACS preprocessing (using distance matrix)");
     timer.begin();
 
@@ -284,7 +310,12 @@ void createTNRfromDIMACSUsingDM(char * transitNodeSetSize, char * inputFilePath,
  * @param inputFilePath[in] Contains the file path to the input graph in the chosen format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
-void createTNR(char * inputType, char * preprocessingMode, char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNR(
+        char * inputType,
+        char * preprocessingMode,
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     if(strcmp(inputType, "xengraph") == 0) {
         if(strcmp(preprocessingMode, "fast") == 0) {
             createTNRfromXenGraphFast(transitNodeSetSize, inputFilePath, outputFilePath);
@@ -327,7 +358,10 @@ void createTNR(char * inputType, char * preprocessingMode, char * transitNodeSet
  * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
  */
-void createTNRAFfromXenGraphSlow(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRAFfromXenGraphSlow(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing with Arc Flags from XenGraph preprocessing (slow mode)");
     timer.begin();
 
@@ -353,7 +387,10 @@ void createTNRAFfromXenGraphSlow(char * transitNodeSetSize, char * inputFilePath
  * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
  */
-void createTNRAFfromXenGraphUsingDM(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRAFfromXenGraphUsingDM(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing with Arc Flags from XenGraph preprocessing (using distance matrix)");
     timer.begin();
 
@@ -379,7 +416,10 @@ void createTNRAFfromXenGraphUsingDM(char * transitNodeSetSize, char * inputFileP
  * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
  */
-void createTNRAFfromDIMACSSlow(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRAFfromDIMACSSlow(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing with Arc Flags from DIMACS preprocessing (slow mode)");
     timer.begin();
 
@@ -405,7 +445,10 @@ void createTNRAFfromDIMACSSlow(char * transitNodeSetSize, char * inputFilePath, 
  * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
  */
-void createTNRAFfromDIMACSUsingDM(char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRAFfromDIMACSUsingDM(
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     Timer timer("Transit Node Routing with Arc Flags from DIMACS preprocessing (using distance matrix)");
     timer.begin();
 
@@ -434,7 +477,12 @@ void createTNRAFfromDIMACSUsingDM(char * transitNodeSetSize, char * inputFilePat
  * @param inputFilePath[in] Contains the file path to the input graph in the chosen format.
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
-void createTNRAF(char * inputType, char * preprocessingMode, char * transitNodeSetSize, char * inputFilePath, char * outputFilePath) {
+void createTNRAF(
+        char * inputType,
+        char * preprocessingMode,
+        char * transitNodeSetSize,
+        char * inputFilePath,
+        char * outputFilePath) {
     if(strcmp(inputType, "xengraph") == 0) {
         if(strcmp(preprocessingMode, "slow") == 0) {
             createTNRAFfromXenGraphSlow(transitNodeSetSize, inputFilePath, outputFilePath);
@@ -480,7 +528,11 @@ void createTNRAF(char * inputType, char * preprocessingMode, char * transitNodeS
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkDijkstra(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkDijkstra(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -528,7 +580,12 @@ void benchmarkDijkstra(char * inputFilePath, char * queriesFilePath, char * dist
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkDijkstraWithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkDijkstraWithMapping(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * mappingFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -574,7 +631,11 @@ void benchmarkDijkstraWithMapping(char * inputFilePath, char * queriesFilePath, 
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkCH(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkCH(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -621,7 +682,12 @@ void benchmarkCH(char * inputFilePath, char * queriesFilePath, char * distancesO
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkCHwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkCHwithMapping(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * mappingFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -667,7 +733,11 @@ void benchmarkCHwithMapping(char * inputFilePath, char * queriesFilePath, char *
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNR(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkTNR(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -714,7 +784,12 @@ void benchmarkTNR(char * inputFilePath, char * queriesFilePath, char * distances
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNRwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkTNRwithMapping(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * mappingFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
@@ -760,7 +835,11 @@ void benchmarkTNRwithMapping(char * inputFilePath, char * queriesFilePath, char 
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNRAF(char * inputFilePath, char * queriesFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkTNRAF(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < unsigned int, unsigned int > > trips;
     tripsLoader.loadTrips(trips);
@@ -808,7 +887,12 @@ void benchmarkTNRAF(char * inputFilePath, char * queriesFilePath, char * distanc
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
-void benchmarkTNRAFwithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath, char * distancesOutputPath = nullptr, bool outputDistances = false) {
+void benchmarkTNRAFwithMapping(
+        char * inputFilePath,
+        char * queriesFilePath,
+        char * mappingFilePath,
+        char * distancesOutputPath = nullptr,
+        bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     vector< pair < long long unsigned int, long long unsigned int > > trips;
     tripsLoader.loadLongLongTrips(trips);
