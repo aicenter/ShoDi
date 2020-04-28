@@ -86,7 +86,7 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
         unsigned int shortcuts = calculateShortcutsAmount();
         int newweight = EdgeDifferenceManager::difference(UINT_MAX, current.id, shortcuts, preprocessingDegrees[current.id]);
 
-        if(newweight > priorityQueue.front().weight) {
+        if( ! priorityQueue.empty() && newweight > priorityQueue.front().weight) {
             clearStructures();
             priorityQueue.insert(current.id, newweight);
         } else {
