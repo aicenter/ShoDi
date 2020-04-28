@@ -7,22 +7,10 @@
 #include "../Dijkstra/BasicDijkstra.h"
 #include "../Timer/Timer.h"
 #include "DijkstraBenchmark.h"
+#include "../GraphBuilding/Loaders/XenGraphLoader.h"
 
 //______________________________________________________________________________________________________________________
-void DijkstraBenchmark::runAndMeasure(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph) {
-    Timer dijkstraTimer("Dijkstra trips benchmark");
-    dijkstraTimer.begin();
-
-    for(unsigned int i = 0; i < trips.size(); i++) {
-        BasicDijkstra::run(trips.at(i).first, trips.at(i).second, graph);
-    }
-
-    dijkstraTimer.finish();
-    dijkstraTimer.printMeasuredTime();
-}
-
-//______________________________________________________________________________________________________________________
-void DijkstraBenchmark::runAndMeasureWithOutput(const vector<pair<unsigned int, unsigned int> > &trips, const Graph &graph, vector<unsigned int> &distances) {
+double DijkstraBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & distances) {
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 
@@ -31,19 +19,22 @@ void DijkstraBenchmark::runAndMeasureWithOutput(const vector<pair<unsigned int, 
     }
 
     dijkstraTimer.finish();
-    dijkstraTimer.printMeasuredTime();
+    return dijkstraTimer.getMeasuredTimeInSeconds();
 }
 
 //______________________________________________________________________________________________________________________
-double DijkstraBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & distances) {
+double DijkstraBenchmark::benchmarkUsingMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, const Graph & graph, vector < unsigned int > & distances, string mappingFilePath) {
+    XenGraphLoader mappingLoader(mappingFilePath);
+    unordered_map<long long unsigned int, unsigned int> mapping;
+    mappingLoader.loadNodesMapping(mapping);
+
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 
     for(unsigned int i = 0; i < trips.size(); i++) {
-        distances[i] = BasicDijkstra::run(trips.at(i).first, trips.at(i).second, graph);
+        distances[i] = BasicDijkstra::run(mapping.at(trips.at(i).first), mapping.at(trips.at(i).second), graph);
     }
 
     dijkstraTimer.finish();
-    dijkstraTimer.printMeasuredTime();
     return dijkstraTimer.getMeasuredTimeInSeconds();
 }

@@ -21,6 +21,7 @@
 #include "Benchmarking/TNRAFBenchmark.h"
 #include "GraphBuilding/Loaders/DistanceMatrixLoader.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
+#include "Benchmarking/DijkstraBenchmark.h"
 
 using namespace std;
 
@@ -465,6 +466,61 @@ void createTNRAF(char * inputType, char * preprocessingMode, char * transitNodeS
 }
 
 /**
+ * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
+ * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
+ * needed for one query in milliseconds.
+ *
+ * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
+ * XenGraph input format.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ */
+void benchmarkDijkstra(char * inputFilePath, char * queriesFilePath) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    vector< pair < unsigned int, unsigned int > > trips;
+    tripsLoader.loadTrips(trips);
+
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    vector<unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = DijkstraBenchmark::benchmark(trips, *dijkstraGraph, dijkstraDistances);
+
+    delete dijkstraGraph;
+
+    printf("Run %lu queries using Dijkstra's algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", trips.size(), dijkstraTime, (dijkstraTime / trips.size()) * 1000);
+}
+
+/**
+ * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
+ * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
+ * needed for one query in milliseconds.
+ *
+ * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
+ * XenGraph input format.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
+ * used internally in the data structure and the query algorithm.
+ */
+void benchmarkDijkstraWithMapping(char * inputFilePath, char * queriesFilePath, char * mappingFilePath) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    tripsLoader.loadLongLongTrips(trips);
+
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    vector<unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, *dijkstraGraph, dijkstraDistances, mappingFilePath);
+
+    delete dijkstraGraph;
+
+    printf("Run %lu queries using Dijkstra's algorithm in %f seconds\n"
+           "using '%s' as mapping."
+           "That means %f ms per query.\n", trips.size(), dijkstraTime, mappingFilePath, (dijkstraTime / trips.size()) * 1000);
+}
+
+/**
  * Benchmarks the Contraction Hierarchies query algorithm using a given precomputed data structure and a given
  * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
  * needed for one query in milliseconds.
@@ -694,6 +750,34 @@ int main(int argc, char * argv[]) {
 
     // The user has data structures computed using some method and wants to benchmark those using a set of queries.
     } else if (strcmp(argv[1], "benchmark") == 0) {
+        // Dijkstra benchmarking
+        if(strcmp(argv[2], "dijkstra") == 0) {
+            if(strcmp(argv[3], "nomapping") == 0) {
+                if(argc == 6) {
+                    benchmarkDijkstra(argv[4], argv[5]);
+                } else {
+                    printf("Invalid amount of arguments for Dijkstra's Algorithm benchmarking.\n"
+                           "Please, make sure that your call has the right format. If not sure,\n"
+                           "refer to 'README.md' for a complete overview of use cases for this application\n"
+                           "with examples.\n");
+                }
+            } else if(strcmp(argv[3], "mapping") == 0) {
+                if(argc == 7) {
+                    benchmarkDijkstraWithMapping(argv[4], argv[5], argv[6]);
+                } else {
+                    printf("Invalid amount of arguments for Dijkstra's Algorithm  benchmarking.\n"
+                           "Please, make sure that your call has the right format. If not sure,\n"
+                           "refer to 'README.md' for a complete overview of use cases for this application\n"
+                           "with examples.\n");
+                }
+            } else {
+                printf("Option '%s' does not make sense for benchmarking.\n"
+                       "Either 'mapping' or 'nomapping' is expected.\n"
+                       "Please, make sure that your call has the right format. If not sure,\n"
+                       "refer to 'README.md' for a complete overview of use cases for this application\n"
+                       "with examples.\n", argv[3]);
+            }
+        }
         // Contraction Hierarchies benchmarking.
         if(strcmp(argv[2], "ch") == 0) {
             if(strcmp(argv[3], "nomapping") == 0) {
