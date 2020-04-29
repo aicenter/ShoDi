@@ -51,15 +51,19 @@ To preprocess a graph for Transit Node Routing with Arc Flags, the arguments are
 
 ### Benchmarking
 
-For benchmarking, you will need a set of queries which can either use IDs in the range from 0 to n-1 (where n is the number of the nodes in the graph) or you can use arbitrary integer node IDs. In the second case, you also need to provide a mapping file. The formats of the query set file and the mapping file are described in the next part. During benchmarking, all of your queries are answered using chosen method, then the total time need to answer all the queries in seconds is printed alongside the average time needed to answer one query in milliseconds.
+For benchmarking, you will need a set of queries which can either use IDs in the range from 0 to n-1 (where n is the number of the nodes in the graph) or you can use arbitrary integer node IDs. In the second case, you also need to provide a mapping file. The formats of the query set file and the mapping file are described in the next part. During benchmarking, all of your queries are answered using chosen method, then the total time need to answer all the queries in seconds is printed alongside the average time needed to answer one query in milliseconds. Additionally, you can specify an output file, where the computed distances will be stored. Those distances can then be used to for example verify the correctness of the more complex methods.
 
-To benchmark without mapping, your call should look as follows: `./shortestPathsPreprocessor benchmark [ch/tnr/tnraf] nomapping [input_data_structure] [query_set]`. Here the second argument determines which method you will be benchmarking. The fourth argument is the path to the data structure used for the benchmark. You must provide a structure preprocessed for the method you are benchmarking, so for example if you want to benchmark `tnraf`, you must provide `your_structure.tgaf` as your fourth argument. The last argument is the path to your query set that will be used for the benchmark.
+To benchmark without mapping, your call should look as follows: `./shortestPathsPreprocessor benchmark [dijkstra/ch/tnr/tnraf] nomapping [input_data_structure] [query_set] (optional_output_file)`. Here the second argument determines which method you will be benchmarking. The fourth argument is the path to the data structure used for the benchmark. You must provide a structure preprocessed for the method you are benchmarking, so for example if you want to benchmark `tnraf`, you must provide `your_structure.tgaf` as your fourth argument. You can also use Dijkstra's algorithm for the benchmark (for example to determine the speedup of the other methods), in that case you must provide `your_graph.xeng` (a XenGraph file) as the fourth argument. The fifth argument is the path to your query set that will be used for the benchmark. 
 
-If you want to benchmark with mapping, your call should look as follows: `./shortestPathsPreprocessor benchmark [ch/tnr/tnraf] mapping [input_data_structure] [query_set] [mapping_file]`. Here, the first five arguments have the same meaning as in the case without mapping. The additional last argument is the path to the mapping file, which will be used to transform node IDs from your query set to the corresponding node IDs used by the query algorithms.
+If you want to benchmark with mapping, your call should look as follows: `./shortestPathsPreprocessor benchmark [dijkstra/ch/tnr/tnraf] mapping [input_data_structure] [query_set] [mapping_file] (optional_output_file)`. Here, the first five arguments have the same meaning as in the case without mapping. The sixth argument is the path to the mapping file, which will be used to transform node IDs from your query set to the corresponding node IDs used by the query algorithms.
+
+If you want to obtain the computed distances, you can always give an optional last argument. If you do so, the application will output a plain text file that will contain the name of the query set file used for the benchmark on the first line, and then on each following line the result of one query (the result of the first query on the second line, result of the second query on the third line...). You can use those files to ensure that various methods return the same values for example using `diff`. The application also contains an omni-directional Dijkstra's Algorithm implementation that can be used for benchmarking. You can use the values returned by Dijkstra as true values to compare the values returned by the other methods with. 
 
 Example of a Transit Node Routing benchmark call without mapping: `./shortestPathsPreprocessor benchmark tnr nomapping my_graph.tnrg my_query_set.txt`
 
 Example of a Transit Node Routing with Arc Flags benchmark call with mapping: `./shortestPathsPreprocessor benchmark tnraf mapping my_graph.tgaf my_query_set.txt my_mapping.xeni`
+
+Example of a Dijkstra's Algorithm benchmark call with mapping and with output of the computed distances into a file: `./shortestPathsPreprocessor benchmark dijkstra mapping my_graph.xeng my_query_set.txt my_mapping.xeni output_distances.txt`
 
 Input formats
 -------------
@@ -98,16 +102,6 @@ If your application internally for some reason uses some node IDs that are not i
 
 * The file begins with a line `XID n` where `XID` is a fixed string which serves as a magic constant and `n` is the amount of nodes in the graph. 
 * The first line is followed by exactly `n` lines each only containing one integer `i`. The `j`-th line represents the original ID of the `(j-2)`-th node. So the second line contains the original ID of the node with the ID 0 in our application. The third line contains the original ID of the node with the ID 1, and so on up to the line `n+1` contains the original ID for the node with the ID `n-1` in our application.
-
-
-Python script for transformation of GeoJSON to input graphs
------------------------------------------------------------
-
-In our case, we want to preprocess real road networks which are represented in `GeoJSON`. Therefore the `Python` subdirectory contains two simple `Python` scripts that can transform the GeoJSON input files into graph files in either the XenGraph or the DIMACS format that can be further processed by the preprocessor.
-
-We recommend the `transformGeoJSONtoXenGraph.py` which takes a pair of files `edges.geojson` and `nodes.geojson` as input and creates two files `graph.xeng` and `graph.xeni`. The first of the created files `graph.xeng` is the road network represented in the XenGraph format, so this file can be immediately used by the preprocessor to precompute structures for one of the methods. The second file `graph.xeni` contains the mapping from the IDs present in the GeoJSON files to the IDs assigned for our application. You will need this file if you want to answer queries using the original IDs.
-
-If you want to change the names of the input or output files, you can easily change the Python script, just change its `__main__`. Additionally, you can change the precision of the edge weights. Edge weights are computed as travel times, meaning we divide the lenght of the edge by the maximum speed along that edge to obtain the weight of the edge. Since the weights are integers internally, we can increase or decrease the precision by first multiplying or dividing the travel time by some power of ten before transforming it to an integer. You can do this by changing the precision variable. Precision 1000 means the travel times will be in millisecons while precision 1 means the travel times will be in seconds. We recommend using bigger precision for smaller road networks to obtain the best possible results, for large networks smaller precision might be necessary as the longest distance between two nodes should still fit into a 32 bit unsigned integer and this might not be the case for large networks with large precision.
 
 
 Library
