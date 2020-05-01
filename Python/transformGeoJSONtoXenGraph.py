@@ -41,8 +41,8 @@ def create_xengraph_file(nodes_feature_collection, edges_feature_collection, out
             else:
                 flag = 0
             print(mapping[edge['properties']['from_id']], mapping[edge['properties']['to_id']],
-                  str(int((edge['properties']['length'] / (edge['properties']['maxspeed'] / 3.60)) * precision
-                          )), str(flag), file=graph_file)
+                  str(int(round((edge['properties']['length'] / (edge['properties']['maxspeed'] / 3.60)) * precision
+                          ))), str(flag), file=graph_file)
 
 
 def create_xenindices_file(nodes_feature_collection, output_filepath: str):

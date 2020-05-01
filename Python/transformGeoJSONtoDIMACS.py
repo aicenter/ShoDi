@@ -34,8 +34,8 @@ def create_DIMACS_file(nodes_feature_collection, edges_feature_collection, outpu
         print("p sp", str(len(nodes_feature_collection['features'])), str(len(edges_feature_collection['features'])),
               file=graph_file)
         for edge in edges_feature_collection['features']:
-            print("a", str(int(mapping[edge['properties']['from_id']])+1), str(int(mapping[edge['properties']['to_id']])+1), str(int(
-                edge['properties']['length'] / (edge['properties']['maxspeed'] / 3.60))), file=graph_file)
+            print("a", str(int(mapping[edge['properties']['from_id']])+1), str(int(mapping[edge['properties']['to_id']])+1), str(int(round(
+                edge['properties']['length'] / (edge['properties']['maxspeed'] / 3.60)))), file=graph_file)
 
 
 if __name__ == '__main__':
