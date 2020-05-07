@@ -7,7 +7,7 @@
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-double DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(const vector < pair < unsigned int, unsigned int> > & trips, DistanceMatrix & matrix, vector < unsigned int > & distances) {
+double DistanceMatrixBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, DistanceMatrix & matrix, vector < unsigned int > & distances) {
     Timer dijkstraTimer("Distance Matrix trips benchmark");
     dijkstraTimer.begin();
 
@@ -16,6 +16,5 @@ double DistanceMatrixBenchmark::runAndMeasureOutputAndRetval(const vector < pair
     }
 
     dijkstraTimer.finish();
-    dijkstraTimer.printMeasuredTime();
     return dijkstraTimer.getMeasuredTimeInSeconds();
 }

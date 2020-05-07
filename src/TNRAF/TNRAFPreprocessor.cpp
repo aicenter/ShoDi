@@ -47,11 +47,9 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
         computeTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount, originalGraph);
     }
 
-    cout << "Generating regions for the nodes" << endl;
     RegionsStructure regions(graph.nodes(), regionsCnt);
     generateClustering(originalGraph, regions, regionsCnt);
 
-    cout << "Computing access nodes" << endl;
     vector < vector < AccessNodeDataArcFlags > > forwardAccessNodes(graph.nodes());
     vector < vector < AccessNodeDataArcFlags > > backwardAccessNodes(graph.nodes());
     vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
@@ -69,12 +67,14 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
     triedCombinations = 0;
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        if(i % 200 == 0) {
-            cout << "Computed forward access nodes for '" << i << "' transit nodes." << endl;
+        if(i % 100 == 0) {
+            cout << "\rComputed forward access nodes for '" << i << "' nodes.";
         }
 
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph, originalGraph, regions, useDistanceMatrix);
     }
+
+    cout << "\rComputed forward access nodes for all nodes in the graph.";
 
     //printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
     printf("Tried %u combinations when determining access nodes.\n", triedCombinations);
@@ -90,13 +90,14 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        if(i % 200 == 0) {
-            cout << "Computed backward access nodes for '" << i << "' transit nodes." << endl;
+        if(i % 100 == 0) {
+            cout << "\rComputed backward access nodes for '" << i << "' nodes.";
         }
 
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph, originalGraph, regions, useDistanceMatrix);
     }
-    cout << "True arc flags: " << trueArcFlags << ", total arc flags: " << totalArcFlags << ", that is: " << ((double) trueArcFlags / totalArcFlags) * 100 << "%." << endl;
+
+    cout << "\rComputed backward access nodes for all nodes in the graph.";
 
     if(useDistanceMatrix) {
         delete distanceMatrix;
@@ -113,7 +114,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
 void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & transitNodes, vector<vector<unsigned int>> & distanceTable, unsigned int transitNodesCnt, Graph & originalGraph) {
     for(unsigned int i = 0; i < transitNodesCnt; i++) {
         if(i % 100 == 0) {
-            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
+            cout << "\rComputed '" << i << "' transit nodes distance table rows.";
         }
 
         vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
@@ -122,6 +123,8 @@ void TNRAFPreprocessor::computeTransitNodeDistanceTable(vector<unsigned int> & t
             distanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
         }
     }
+
+    cout << "\rComputed the transit nodes distance table." << endl;
 }
 
 //______________________________________________________________________________________________________________________
@@ -135,7 +138,7 @@ void TNRAFPreprocessor::fillTransitNodeDistanceTable(vector<unsigned int> & tran
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, vector < pair < unsigned int, QueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes, vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount, RegionsStructure & regions, unsigned int regionsCnt) {
-    cout << "Outputting TNR" << endl;
+    cout << "Outputting TNRAF" << endl;
     ofstream output;
     output.open ( outputPath + ".tgaf", ios::binary );
     if( ! output.is_open() ) {
@@ -243,9 +246,6 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
             output.write((char *) &regionsOutput, sizeof(regionsOutput));
         }
     }
-
-    printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
-    printf("Tried %u combinations when determining access nodes.\n", triedCombinations);
 
     // Output search spaces (those are needed for the locality filter).
     printf("Will now output search spaces.\n");
@@ -373,7 +373,6 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
                         distanceMatrix->findDistance(accessNode, nodesInRegion[k]) + distanceToAccessNode) {
                         accessNodes[i].regionFlags[j] = true;
                         trueArcFlags++;
-                        //printf("The flag was set to true.\n");
                         break;
                     }
                 }
@@ -564,17 +563,16 @@ void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructu
             }
 
             if(unassignedNodes % 2000 == 0) {
-                printf("There are %u nodes left to be assigned to clusters.\n", unassignedNodes);
+                printf("\rThere are %u nodes left to be assigned to clusters.", unassignedNodes);
             }
         }
     }
 
+    printf("\rClustering for the Arc Flags computed.\n");
+
     for(unsigned int i = 0; i < nodesCnt; ++i) {
         regions.addNode(i, assignedClusters[i]);
     }
-
-    printf("%u skips occured during the clustering process. That is %lf %% of nodes.\n", clusteringSkips, ((double) clusteringSkips / nodesCnt) * 100);
-
 }
 
 //______________________________________________________________________________________________________________________

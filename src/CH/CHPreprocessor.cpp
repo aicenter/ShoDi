@@ -57,8 +57,7 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, UpdateableGraph & graph) {
-    Timer priorityQTimer("Priority queue initialization");
-    priorityQTimer.begin();
+    printf("Initializing priority queue.\n");
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         getPossibleShortcuts(i, graph, true);
@@ -69,9 +68,9 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
         priorityQueue.pushOnly(i, edgeDifference);
     }
     priorityQueue.buildProperHeap();
+    printf("\rPriority queue initialized.\n");
 
-    priorityQTimer.finish();
-    priorityQTimer.printMeasuredTime();
+
 }
 
 //______________________________________________________________________________________________________________________
@@ -100,14 +99,16 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
 
             if(graph.nodes() - CHrank < 2000) {
                 if(CHrank % 10 == 0) {
-                    printf("Contracted %u nodes!\n", CHrank);
+                    printf("\rContracted %u nodes!", CHrank);
                 }
             } else if(CHrank % 1000 == 0) {
-                printf("Contracted %u nodes!\n", CHrank);
+                printf("\rContracted %u nodes!", CHrank);
             }
         }
 
     }
+
+    printf("\rAll nodes contracted!\n");
 }
 
 //______________________________________________________________________________________________________________________

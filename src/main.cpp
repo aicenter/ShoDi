@@ -946,6 +946,8 @@ void benchmarkTNRAFwithMapping(
  * <br> _Author: Michal Cvach_
  */
 int main(int argc, char * argv[]) {
+    setbuf(stdout, NULL);
+
     if(argc < 5 || argc > 8) {
         printUsageInfo(argv[0]);
         return 0;

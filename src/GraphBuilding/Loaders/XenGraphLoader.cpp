@@ -112,7 +112,6 @@ void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     parseEdges(input, graph, edges);
 
     graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 

@@ -15,11 +15,13 @@ void DistanceMatrixComputor::computeDistanceMatrix(const Graph & graph) {
     distanceTable.resize(nodesCnt, vector<unsigned int>(nodesCnt));
 
     for(unsigned int i = 0; i < nodesCnt; i++) {
-        if (i % 1000 == 0) {
-            printf("Computed %u rows of the distance matrix.\n", i);
+        if (i % 100 == 0) {
+            printf("\rComputed %u rows of the distance matrix.", i);
         }
         fillDistanceMatrixRow(i, graph);
     }
+
+    printf("\rComputed %u rows of the distance matrix.\n", nodesCnt);
 }
 
 //______________________________________________________________________________________________________________________
@@ -28,11 +30,13 @@ void DistanceMatrixComputor::computeDistanceMatrixInReversedGraph(const Graph & 
     distanceTable.resize(nodesCnt, vector<unsigned int>(nodesCnt));
 
     for(unsigned int i = 0; i < nodesCnt; i++) {
-        if (i % 1000 == 0) {
-            printf("Computed %u rows of the distance matrix.\n", i);
+        if (i % 100 == 0) {
+            printf("\rComputed %u rows of the distance matrix.", i);
         }
         fillDistanceMatrixRow(i, graph, true);
     }
+
+    printf("\rComputed %u rows of the distance matrix.\n", nodesCnt);
 }
 
 //______________________________________________________________________________________________________________________

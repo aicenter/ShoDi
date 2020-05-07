@@ -28,7 +28,7 @@ public:
      * can then be used to verify that the returned distances were correct.
      * @return Returns the cumulative time required to answer all the queries in seconds.
      */
-    static double runAndMeasureOutputAndRetval(
+    static double benchmark(
             const vector < pair < unsigned int, unsigned int> > & trips,
             DistanceMatrix & matrix,
             vector < unsigned int > & distances);

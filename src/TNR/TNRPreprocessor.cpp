@@ -32,7 +32,7 @@ void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPa
     vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         if(i % 100 == 0) {
-            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
+            cout << "\rComputed '" << i << "' transit nodes distance table rows.";
         }
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
             if (i == j) {
@@ -42,6 +42,8 @@ void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPa
             }
         }
     }
+
+    cout << "\rComputed the transit nodes distance table." << endl;
 
     cout << "Computing access nodes" << endl;
     vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
@@ -54,9 +56,15 @@ void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPa
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
+        if (i % 100 == 0) {
+            cout << "\rComputed access nodes for '" << i << "' nodes.";
+        }
+
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping,chGraph);
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph);
     }
+
+    cout << "\rComputed acess nodes for all the nodes in the graph." << endl;
 
     vector < pair < unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
@@ -76,7 +84,7 @@ void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & o
     vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         if(i % 100 == 0) {
-            cout << "Computed transit nodes distances for '" << i << "' transit nodes." << endl;
+            cout << "\rComputed '" << i << "' transit nodes distance table rows.";
         }
 
         vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
@@ -85,6 +93,8 @@ void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & o
             transitNodesDistanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
         }
     }
+
+    cout << "\rComputed the transit nodes distance table." << endl;
 
     cout << "Computing access nodes" << endl;
     vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
@@ -97,8 +107,8 @@ void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & o
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        if (i % 1000 == 0) {
-            cout << "Computed access nodes for '" << i << "' nodes." << endl;
+        if (i % 100 == 0) {
+            cout << "\rComputed access nodes for '" << i << "' nodes.";
         }
 
         vector<unsigned int> forwardDistsFromNode(graph.nodes());
@@ -108,6 +118,8 @@ void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & o
         BasicDijkstra::computeOneToAllDistancesInReversedGraph(i, originalGraph, backwardDistsFromNode);
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, backwardDistsFromNode, chGraph);
     }
+
+    cout << "\rComputed acess nodes for all the nodes in the graph." << endl;
 
     vector < pair < unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
@@ -153,8 +165,15 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
     accessNodesBw = 0;
     removedAccessNodesBw = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
+        if (i % 100 == 0) {
+            cout << "\rComputed forward access nodes for '" << i << "' nodes.";
+        }
+
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph, *distanceMatrix);
     }
+
+    cout << "\rComputed forward acess nodes for all the nodes in the graph." << endl;
+
     {
         delete distanceMatrix;
         DistanceMatrixComputor dmComputor;
@@ -162,18 +181,16 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
     }
     for(unsigned int i = 0; i < graph.nodes(); i++) {
+        if (i % 100 == 0) {
+            cout << "\rComputed backward access nodes for '" << i << "' nodes.";
+        }
+
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph, *distanceMatrix);
     }
 
+    cout << "\rComputed backward acess nodes for all the nodes in the graph." << endl;
+
     delete distanceMatrix;
-
-    printf("Fw access nodes: %u useless, %u in total, %lf %% useless.\n", removedAccessNodesFw, accessNodesFw, ((double) removedAccessNodesFw / accessNodesFw) * 100);
-    printf("Bw access nodes: %u useless, %u in total, %lf %% useless.\n", removedAccessNodesBw, accessNodesBw, ((double) removedAccessNodesBw / accessNodesBw) * 100);
-    printf("Total access nodes: %u useless, %u in total, %lf %% useless.\n", removedAccessNodesFw + removedAccessNodesBw, accessNodesFw + accessNodesBw, ((double) (removedAccessNodesFw + removedAccessNodesBw) / (accessNodesFw + accessNodesBw)) * 100);
-
-    /*cout << "Computing locality filter" << endl;
-    vector < vector < bool > > isLocal(graph.nodes(), vector < bool> (graph.nodes(), false));
-    prepareLocalityFilter(isLocal, forwardSearchSpaces, backwardSearchSpaces);*/
 
     vector < pair < unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
@@ -214,15 +231,12 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
         output.write((char *) &allEdges[i].second.backward, sizeof(allEdges[i].second.backward));
         bool t = true;
         bool f = false;
-        //printf("Check forward shortcut.\n");
-        //printf("Check forward shortcut. (%u -> %u, fwflag: %u)\n", allEdges[i].first, allEdges[i].second.targetNode, allEdges[i].second.forward);
         if (allEdges[i].second.forward && graph.isShortcut(allEdges[i].first, allEdges[i].second.targetNode)) {
             output.write((char *) &t, sizeof(t));
         } else {
             output.write((char *) &f, sizeof(f));
         }
 
-        //printf("Check backward shortcut. (%u -> %u, bwflag: %u)\n", allEdges[i].second.targetNode, allEdges[i].first, allEdges[i].second.backward);
         if (allEdges[i].second.backward && graph.isShortcut(allEdges[i].second.targetNode, allEdges[i].first)) {
             output.write((char *) &t, sizeof(t));
         } else {
@@ -260,8 +274,6 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
         }
     }
 
-    printf("Will now output search spaces.\n");
-
     unsigned int fwSearchSpaceSum = 0;
     unsigned int bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
@@ -280,9 +292,6 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
         bwSearchSpaceSum += bwSearchSpaceSize;
 
     }
-
-    printf("Average forward search space size: %lf\n", (double)fwSearchSpaceSum/nodes);
-    printf("Average backward search space size: %lf\n", (double)bwSearchSpaceSum/nodes);
 
     output.close();
 }
