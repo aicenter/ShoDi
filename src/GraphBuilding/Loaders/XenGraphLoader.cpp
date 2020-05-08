@@ -21,11 +21,6 @@ Graph * XenGraphLoader::loadGraph() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("Graph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges;
     parseFirstLine(input, nodes, edges);
 
@@ -35,9 +30,6 @@ Graph * XenGraphLoader::loadGraph() {
     Graph * retvalGraph = new Graph(*graph);
 
     delete graph;
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 
@@ -53,19 +45,11 @@ UpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("UpdateableGraph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges;
     parseFirstLine(input, nodes, edges);
 
     UpdateableGraph * graph = new UpdateableGraph(nodes);
     parseEdges(input, *graph, edges);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 
@@ -80,15 +64,7 @@ void XenGraphLoader::loadNodesMapping(unordered_map <long long unsigned int, uns
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started nodes mapping!\n");
-
-    Timer graphLoadTimer("Mapping loading");
-    graphLoadTimer.begin();
-
     parseNodesMapping(input, mapping);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 }
@@ -101,17 +77,10 @@ void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Putting all original edges back into updateable graph!\n");
-
-    Timer graphLoadTimer("Putting back original edges");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges;
     parseFirstLine(input, nodes, edges);
 
     parseEdges(input, graph, edges);
-
-    graphLoadTimer.finish();
 
     input.close();
 

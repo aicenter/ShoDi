@@ -20,20 +20,12 @@ DistanceMatrix * DistanceMatrixLoader::loadDistanceMatrix() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading distance matrix!\n");
-
-    Timer graphLoadTimer("DistanceMatrix loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes;
     parseHeader(input, nodes);
 
     DistanceMatrix * distanceMatrix = new DistanceMatrix(nodes);
 
     parseDistances(input, nodes, *distanceMatrix);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 

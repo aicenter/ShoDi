@@ -23,32 +23,17 @@ TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("TNR AF Graph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges, tnodesAmount, regionsCnt;
     parseFirstLine(input, nodes, edges, tnodesAmount, regionsCnt);
 
     TransitNodeRoutingArcFlagsGraph * graph = new TransitNodeRoutingArcFlagsGraph(nodes, tnodesAmount);
     parseEdgesForDistanceQueries(input, *graph, edges);
-    printf("Parsed edges.\n");
     parseRanks(input, graph, nodes);
-    printf("Parsed ranks.\n");
     parseRegions(input, *graph, nodes);
-    printf("Parsed regions.\n");
     parseTransitNodesMapping(input, *graph, tnodesAmount);
-    printf("Parsed transit nodes mapping.\n");
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
-    printf("Parsed distance table.\n");
     parseAccessNodes(input, *graph, nodes, regionsCnt);
-    printf("Parsed access nodes.\n");
     parseSearchSpaces(input, *graph, nodes);
-    printf("Parsed search spaces.\n");
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 
@@ -135,7 +120,4 @@ void TGAFLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGr
             graph.addBackwardAccessNode(i, nodeID, nodeDistance, regionsCnt, regionFlags, powersOf2);
         }
     }
-    printf("Average forward access nodes: %lf, average backward access nodes: %lf, average total access nodes: %lf.\n", (double) forwardAccessNodesCnt / nodes, (double) backwardAccessNodesCnt / nodes, (double) (forwardAccessNodesCnt + backwardAccessNodesCnt) / nodes);
-    printf("%u flags out of %u were True. That is %lf %%.\n", validFlags, processedFlags, ((double) validFlags / processedFlags) * 100);
-    printf("%u acess nodes out of %u had no True region flags. That is %lf %%.\n", noTrueFlags, processedAcessNodes, ((double) noTrueFlags / processedAcessNodes) * 100);
 }

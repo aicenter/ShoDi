@@ -20,11 +20,6 @@ Graph * DIMACSLoader::loadGraph() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("Graph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
 
@@ -34,9 +29,6 @@ Graph * DIMACSLoader::loadGraph() {
     Graph * retvalGraph = new Graph(*graph);
 
     delete graph;
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 
@@ -52,19 +44,11 @@ UpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("Graph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
 
     UpdateableGraph * graph = new UpdateableGraph(nodes);
     parseEdges(input, *graph, edges);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 
@@ -79,18 +63,10 @@ void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Putting all original edges back into updateable graph!\n");
-
-    Timer graphLoadTimer("Putting back original edges");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges;
     parseGraphProblemLine(input, nodes, edges);
 
     parseEdges(input, graph, edges);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 

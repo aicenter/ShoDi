@@ -22,11 +22,6 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("TNR Graph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges, tnodesAmount;
     parseFirstLine(input, nodes, edges, tnodesAmount);
 
@@ -37,9 +32,6 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
     parseAccessNodes(input, *graph, nodes);
     parseSearchSpaces(input, *graph, nodes);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 
@@ -54,11 +46,6 @@ TransitNodeRoutingGraphForPathQueries * TNRGLoader::loadTNRforPathQueries() {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
 
-    printf("Started loading graph!\n");
-
-    Timer graphLoadTimer("TNR Graph loading");
-    graphLoadTimer.begin();
-
     unsigned int nodes, edges, tnodesAmount;
     parseFirstLine(input, nodes, edges, tnodesAmount);
 
@@ -69,9 +56,6 @@ TransitNodeRoutingGraphForPathQueries * TNRGLoader::loadTNRforPathQueries() {
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
     parseAccessNodes(input, *graph, nodes);
     parseSearchSpaces(input, *graph, nodes);
-
-    graphLoadTimer.finish();
-    graphLoadTimer.printMeasuredTime();
 
     input.close();
 

@@ -22,16 +22,11 @@ FlagsGraph * DDSGLoader::loadFlagsGraph() {
         exit(1);
     }
 
-    Timer loadTimer("DDSG Graph loading timer");
-    loadTimer.begin();
-
     if ( verifyHeader(input) == false ) {
         printf("Something was wrong with the header.\nFile should start with 'CH\\r\\n' followed by the");
         printf(" version '1', but it didn't.\n");
         exit(1);
     }
-
-    printf("Header was verified and suggests the file is a correct DDSG CH file.\n");
 
     unsigned int nodes, edges, shortcutEdges;
     loadCnts(input, nodes, edges, shortcutEdges);
@@ -47,11 +42,6 @@ FlagsGraph * DDSGLoader::loadFlagsGraph() {
         printf(" might provide unexpected and incorrect results.\n");
     }
 
-    loadTimer.finish();
-    loadTimer.printMeasuredTime();
-
-    printf("Graph seems to be loaded correctly!\n");
-
     return graph;
 }
 
@@ -65,23 +55,16 @@ FlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
         exit(1);
     }
 
-    Timer loadTimer("DDSG Graph loading timer");
-    loadTimer.begin();
-
     if ( verifyHeader(input) == false ) {
         printf("Something was wrong with the header.\nFile should start with 'CH\\r\\n' followed by the");
         printf(" version '1', but it didn't.\n");
         exit(1);
     }
 
-    printf("Header was verified and suggests the file is a correct DDSG CH file.\n");
-
     unsigned int nodes, edges, shortcutEdges;
     loadCnts(input, nodes, edges, shortcutEdges);
     printf("Graph should have %u unpacking pairs\n", shortcutEdges);
     FlagsGraphWithUnpackingData * graph = new FlagsGraphWithUnpackingData(nodes);
-
-    printf("Will be loading %u edges and %u shortcut edges.\n", edges, shortcutEdges);
 
     loadRanks(input, nodes, *graph);
     loadOriginalEdges(input, edges, *graph);
@@ -92,11 +75,6 @@ FlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
         printf(" with value '0x12345678', but it didn't.\nThe file could be corrupted, so using it");
         printf(" might provide unexpected and incorrect results.\n");
     }
-
-    loadTimer.finish();
-    loadTimer.printMeasuredTime();
-
-    printf("Graph seems to be loaded correctly!\n");
 
     return graph;
 }
