@@ -15,16 +15,16 @@ Both of those tasks should be fairly easy thanks to the provided `CMakeLists.txt
   * `cd cmakedata`
   * `cmake ..`
 2. Now invoke the `shortestPathsPreprocessor` target of the created `Makefile`:
-  * `make shortestPathsPreprocessor`
+  * `cmake --build . --target shortestPathsPreprocessor`
 3. Then invoke the `shortestPaths` target of the created `Makefile`:
-  * `make shortestPaths`
+  * `cmake --build . --target shortestPaths`
 
-After this, you should acquire a runnable application `shortestPathsPreprocessor` and a shared library `libshortestPaths.so` in Linux or their equivalents in other operating systems. This result can also be achieved by simply loading this project into your favourite IDE and then using the tools provided by it.
+After this, you should acquire a runnable application `shortestPathsPreprocessor` and a shared library `libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows. This result can also be achieved by simply loading this project into your favourite IDE and then using the tools provided by it.
 
 Creating the data structure required for the query algorithm
 ------------------------------------------------------------
 
-Let us now assume that we want to use Transit Node Routing with Arc Flags in Amod, that is the `TNRAFTravelTimeProvider`. If we wanted to use Contraction Hierarchies or Transit Node Routing, the process would be fairly similar.
+Let us now assume that we want to use Transit Node Routing with Arc Flags in Amodsim, that is the `TNRAFTravelTimeProvider`. If we wanted to use Contraction Hierarchies or Transit Node Routing, the process would be fairly similar.
 
 To precompute the data structure, we first need an input graph. Assume we have our desired road network in the form of two `GeoJSON` files `nodes.geojson` and `edges.geojson`. We can use the provided Python script to transform those two files into an input graph for the `preprocessor`.
 
@@ -58,8 +58,42 @@ First we will need to set the correct paths in the config. Amod contains a `conf
 
 You do not have to set the other variables if you only want to use the Transit Node Routing with Arc Flags method.
 
-Now we need to make sure that the Java VM will be able to load the library. The easiest way to accomplish this is to include the path to the `libshortestPaths.so` shared library acquired at the beginning of this tutorial to the `java.library.path`. This can be done by runnning the Java VM with the option `-Djava.library.path=/something/` where `something` is the directory containing `libshortestPaths.so`.
+Now we need to make sure that the Java VM will be able to load the library. The JVM loads libraries from the locations contained in the `java.library.path` system property. This property is initialized from `LD_LIBRARY_PATH` in Linux and from `PATH` in Windows. The easiest way to make sure the JVM will be able to load the library is therefore to edit those system variables so that they contain the path to the library.
 
-After this is done, we are basically ready. Additionally, check that the `TravelTimeProvider` is bound to `TNRAFTravelTimeProvider` in the `MainModule`. If it is, run the `OnDemandVehiclesSimulation` and it should now be using Transit Node Routing With Arc Flags to compute the travel times.
+### In Linux
+
+Assume the library (the `libshortestPaths.so` file) is located in the `/home/user/splib` directory. Then all we have to do is add this directory to the `LD_LIBRARY_PATH` system variable:
+
+- `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/splib`
+
+This command will add the path to the library to your existing library path. After this command, only the current session is affected, so we would need to rerun this command for example every time when we reboot the computer. To make the change permanent, we need to add this command into the `.bashrc` file:
+
+- `echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/splib' >> ~/.bashrc`
+
+This appends the export command to your `.bashrc` so that it will be executed each time when a new session is initialized. You can also edit your `.bashrc` manually using your text editor of choice (such as Vim or Gedit).
+
+### In Windows
+
+Assume the library (the `shortestPaths.dll` file) is located in the `C:\Users\user\splib` directory. We need to add this directory to the `PATH` environment variable:
+
+1. Right-click on the Start Button.
+2. Select `System` from the context menu.
+3. Click `Advanced system settings`.
+4. Go to the `Advanced` tab and click `Environment Variables...`
+5. Select the variable called `Path` and click `Edit...` (There might be two `Path` variables one in the `User variables` section and one in the `System variables` section. We recommend changing the one in the `System variables` section if possible.)
+6. In the pop-up window click `New` and add the paste the path to the directory containing the library, in our case `C:\Users\user\splib`.
+7. Save everything.
+
+It might also happen that there is no existing variable called `Path` in your list of environment variables. In that case you can create a new variable called `Path` containing only the path to the library.
+
+### Other options
+
+If you do not want to change the system variables, you can supply the path to library to the JVM by using the `-Djava.library.path=/path/to/directory` option. Note that in this case the `java.library.path` from the system variable is replaced by the path in the argument, so you might also need to add paths to other libraries such as `Gurobi`, so you might need to for example use `-Djava.library.path=/path/to/directory;/path/to/Gurobi`. 
+
+Using `-Djava.library.path` proved to be kinda tricky when using `mvn exec` though, since you need to get this `-Djava.library.path` argument to the JVM that will be actually executing the code. For this you might need something like `-Dexec.args=" -Djava.library.path=/path/to/directory"` so we recommend setting the system variables instead if possible, as it looks like the easier solution to us.
+
+### What remains?
+
+After we have ensured that the JVM will be able to find the library by ensuring the `java.library.path` property will contain the path to it (using any of the given options), we are basically ready. Additionally, we should check that the `TravelTimeProvider` is bound to `TNRAFTravelTimeProvider` in the `MainModule`. If it is, we can run the `OnDemandVehiclesSimulation` and it should now be using Transit Node Routing With Arc Flags to compute the travel times.
 
 
