@@ -2,8 +2,33 @@ cmake_minimum_required(VERSION 3.14)
 project(shortest_paths)
 
 set(CMAKE_CXX_STANDARD 11)
+option(BUILD_DOC "Build documentation" ON)
 
 find_package(JNI REQUIRED)
+
+# check if Doxygen is installed
+find_package(Doxygen
+        REQUIRED dot
+        OPTIONAL_COMPONENTS mscgen dia)
+if (DOXYGEN_FOUND)
+    # set input and output files
+    message(${CMAKE_CURRENT_SOURCE_DIR})
+    message(${CMAKE_CURRENT_BINARY_DIR})
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    # request to configure the file
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    message("Doxygen build started")
+
+    add_custom_target( doc ALL
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating documentation with Doxygen."
+            VERBATIM )
+else (DOXYGEN_FOUND)
+    message("Doxygen needs to be installed to generate documentation.")
+endif (DOXYGEN_FOUND)
 
 include_directories(${JNI_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
