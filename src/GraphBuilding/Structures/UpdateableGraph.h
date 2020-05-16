@@ -138,6 +138,17 @@ public:
             string filePath);
 
     /**
+     * Outputs the graph in the XenGraph format. The output file can then be used for example as input for Dijkstra's
+     * Algorithm. This is useful if you want to somehow adjust the graph. You can for example load a XenGraph, add some
+     * edges knowing that parallel edges are automatically removed and only the best edge for each pair of nodes
+     * is kept, and then output it as XenGraph again.
+     *
+     * @param filePath[in] The desired path where the graph should be output.
+     */
+    void outputAsXenGraph(
+            string filePath);
+
+    /**
      * Tries to insert an edge from one node to another with the given weight into the graph. The edge is not inserted
      * if there already exists an edge connecting the two nodes with a lower weight.
      *

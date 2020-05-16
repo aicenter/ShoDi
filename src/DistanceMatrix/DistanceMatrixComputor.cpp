@@ -117,12 +117,6 @@ void DistanceMatrixComputor::outputDistanceMatrixToFile(string path) {
 
 //______________________________________________________________________________________________________________________
 DistanceMatrix * DistanceMatrixComputor::getDistanceMatrixInstance() {
-    unsigned int n = distanceTable.size();
-    DistanceMatrix * retval = new DistanceMatrix(n);
-    for(unsigned int i = 0; i < n; ++i) {
-        for(unsigned int j = 0; j < n; ++j) {
-            retval->setDistance(i, j, distanceTable[i][j]);
-        }
-    }
+    DistanceMatrix * retval = new DistanceMatrix(move(distanceTable));
     return retval;
 }

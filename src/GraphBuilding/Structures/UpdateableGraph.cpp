@@ -114,7 +114,6 @@ void UpdateableGraph::getNodesWithHighestRank(vector< unsigned int > & highestNo
     }
 }
 
-//
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushInDdsgFormat(string filePath) {
     vector < OutputEdge > edges;
@@ -138,6 +137,30 @@ void UpdateableGraph::flushInDdsgFormat(string filePath) {
 
     output.close();
 
+}
+
+//______________________________________________________________________________________________________________________
+void UpdateableGraph::outputAsXenGraph(string filePath) {
+    ofstream output;
+    output.open ( filePath + ".xeng" );
+    if( ! output.is_open() ) {
+        printf("Couldn't open file '%s'!", (filePath + ".xeng").c_str());
+    }
+
+    unsigned int edges = 0;
+    for(unsigned int i = 0; i < nodes(); ++i) {
+        edges += followingNodes[i].size();
+    }
+
+    output << "XGI " << nodes() << " " << edges << endl;
+
+    for(unsigned int i = 0; i < nodes(); ++i) {
+        for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
+            output << i << " " << (*iter).first << " " << (*iter).second.weight << " 1" << endl;
+        }
+    }
+
+    output.close();
 }
 
 //______________________________________________________________________________________________________________________

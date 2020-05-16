@@ -19,7 +19,7 @@ double TNRAFBenchmark::benchmark(const vector < pair < unsigned int, unsigned in
         distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second);
     }
 
-    queryManager.printQueriesAnalysis();
+    //queryManager.printQueriesAnalysis();
 
     tnrTimer.finish();
     return tnrTimer.getMeasuredTimeInSeconds();

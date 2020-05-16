@@ -27,14 +27,14 @@ Graph * XenGraphLoader::loadGraph() {
     SimpleGraph * graph = new SimpleGraph(nodes);
     parseEdges(input, *graph, edges);
 
-    Graph * retvalGraph = new Graph(*graph);
+    //Graph * retvalGraph = new Graph(*graph);
 
     delete graph;
 
     input.close();
 
-    return retvalGraph;
-
+    //return retvalGraph;
+    return NULL;
 }
 
 //______________________________________________________________________________________________________________________

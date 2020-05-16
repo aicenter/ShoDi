@@ -97,7 +97,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph, originalGraph, regions, useDistanceMatrix);
     }
 
-    cout << "\rComputed backward access nodes for all nodes in the graph.";
+    cout << "\rComputed backward access nodes for all nodes in the graph." << endl;
 
     if(useDistanceMatrix) {
         delete distanceMatrix;

@@ -28,6 +28,13 @@ public:
     explicit DistanceMatrix(const unsigned int nodes);
 
     /**
+     * A move constructor.
+     *
+     * @param distMatrix[in] A 2D vector that will be used as the distance matrix.
+     */
+    explicit DistanceMatrix(vector<vector<unsigned int>> && distMatrix);
+
+    /**
      * This is basically a query algorithm. Each query is answered using a single table lookup,
      * as we already have all the shortest distances precomputed in the matrix.
      *

@@ -13,6 +13,11 @@ DistanceMatrix::DistanceMatrix(const unsigned int nodes) : distances(nodes, vect
 }
 
 //______________________________________________________________________________________________________________________
+DistanceMatrix::DistanceMatrix(vector<vector<unsigned int>> && distMatrix) : distances(move(distMatrix)) {
+
+}
+
+//______________________________________________________________________________________________________________________
 unsigned int DistanceMatrix::findDistance(const unsigned int start, const unsigned int goal) {
     return distances[start][goal];
 }
