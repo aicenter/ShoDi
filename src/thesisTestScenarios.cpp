@@ -1,5 +1,6 @@
 //
-// Created by xenty on 5/6/20.
+// Author: Xenty (Michal Cvach)
+// Created on: 6.5.20
 //
 
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
@@ -99,48 +100,62 @@ void createDM(
     delete graph;
 }
 
-void computeStructuresForAllMethods(char const * inputFilePath = "../thesisTestsData/Prague.xeng") {
-    createCH(inputFilePath, "../thesisTestsData/Prague");
-    createTNR(inputFilePath, 2000, "../thesisTestsData/Prague2000tnodes");
-    createTNRAF(inputFilePath, 2000, "../thesisTestsData/Prague2000tnodes");
-    createDM(inputFilePath, "../thesisTestsData/Prague");
+void computeStructuresForAllMethodsBerlin(char const * inputFilePath = "../thesisTestsData/Berlin/Berlin.xeng") {
+    createCH(inputFilePath, "../thesisTestsData/Berlin/Berlin");
+    createTNR(inputFilePath, 5000, "../thesisTestsData/Berlin/Berlin5000tnodes");
+    createTNRAF(inputFilePath, 5000, "../thesisTestsData/Berlin/Berlin5000tnodes");
+    createDM(inputFilePath, "../thesisTestsData/Berlin/Berlin");
 }
 
-void computeTNRvariousTransitNodeSetSizes(char const * inputFilePath = "../thesisTestsData/Prague.xeng") {
-    createTNR(inputFilePath, 200, "../thesisTestsData/Prague200tnodes");
-    createTNR(inputFilePath, 500, "../thesisTestsData/Prague500tnodes");
-    createTNR(inputFilePath, 1000, "../thesisTestsData/Prague1000tnodes");
-    createTNR(inputFilePath, 2000, "../thesisTestsData/Prague2000tnodes");
-    createTNR(inputFilePath, 5000, "../thesisTestsData/Prague5000tnodes");
-    createTNR(inputFilePath, 10000, "../thesisTestsData/Prague10000tnodes");
+void computeStructuresForAllMethodsPrague(char const * inputFilePath = "../thesisTestsData/Prague/Prague.xeng") {
+    createCH(inputFilePath, "../thesisTestsData/Prague/Prague");
+    createTNR(inputFilePath, 2000, "../thesisTestsData/Prague/Prague2000tnodes");
+    createTNRAF(inputFilePath, 2000, "../thesisTestsData/Prague/Prague2000tnodes");
+    createDM(inputFilePath, "../thesisTestsData/Prague/Prague");
 }
 
-void computeTNRAFvariousTransitNodeSetSizes(char const * inputFilePath = "../thesisTestsData/Prague.xeng") {
-    createTNRAF(inputFilePath, 200, "../thesisTestsData/Prague200tnodes");
-    createTNRAF(inputFilePath, 500, "../thesisTestsData/Prague500tnodes");
-    createTNRAF(inputFilePath, 1000, "../thesisTestsData/Prague1000tnodes");
-    createTNRAF(inputFilePath, 2000, "../thesisTestsData/Prague2000tnodes");
-    createTNRAF(inputFilePath, 5000, "../thesisTestsData/Prague5000tnodes");
-    createTNRAF(inputFilePath, 10000, "../thesisTestsData/Prague10000tnodes");
+void computeStructuresForAllMethodsPragueToPilsen(char const * inputFilePath = "../thesisTestsData/PragueToPilsen/PragueToPilsen.xeng") {
+    createCH(inputFilePath, "../thesisTestsData/PragueToPilsen/PragueToPilsen");
+    createTNR(inputFilePath, 7000, "../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes");
+    createTNRAF(inputFilePath, 7000, "../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes");
+    createDM(inputFilePath, "../thesisTestsData/PragueToPilsen/PragueToPilsen");
 }
 
-void compareFiveMethods(unsigned int runs = 20) {
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Prague.xeng");
+void computeTNRvariousTransitNodeSetSizes(char const * inputFilePath = "../thesisTestsData/Prague/Prague.xeng") {
+    createTNR(inputFilePath, 200, "../thesisTestsData/Prague/Prague200tnodes");
+    createTNR(inputFilePath, 500, "../thesisTestsData/Prague/Prague500tnodes");
+    createTNR(inputFilePath, 1000, "../thesisTestsData/Prague/Prague1000tnodes");
+    createTNR(inputFilePath, 2000, "../thesisTestsData/Prague/Prague2000tnodes");
+    createTNR(inputFilePath, 5000, "../thesisTestsData/Prague/Prague5000tnodes");
+    createTNR(inputFilePath, 10000, "../thesisTestsData/Prague/Prague10000tnodes");
+}
+
+void computeTNRAFvariousTransitNodeSetSizes(char const * inputFilePath = "../thesisTestsData/Prague/Prague.xeng") {
+    createTNRAF(inputFilePath, 200, "../thesisTestsData/Prague/Prague200tnodes");
+    createTNRAF(inputFilePath, 500, "../thesisTestsData/Prague/Prague500tnodes");
+    createTNRAF(inputFilePath, 1000, "../thesisTestsData/Prague/Prague1000tnodes");
+    createTNRAF(inputFilePath, 2000, "../thesisTestsData/Prague/Prague2000tnodes");
+    createTNRAF(inputFilePath, 5000, "../thesisTestsData/Prague/Prague5000tnodes");
+    createTNRAF(inputFilePath, 10000, "../thesisTestsData/Prague/Prague10000tnodes");
+}
+
+void compareAllMethodsOnPrague(unsigned int runs = 20) {
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Prague/Prague.xeng");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
-    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Prague.ch");
+    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Prague/Prague.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
 
-    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/Prague2000tnodes.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/Prague/Prague2000tnodes.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
-    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/Prague2000tnodes.tgaf");
+    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/Prague/Prague2000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
-    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Prague.xdm");
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Prague/Prague.xdm");
     DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
 
-    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague100000randomQueries.txt");
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = querySet.size();
@@ -154,6 +169,8 @@ void compareFiveMethods(unsigned int runs = 20) {
     bool validResults = true;
 
     for(unsigned int i = 0; i < runs; ++i) {
+        printf("\r%u runs completed.", i);
+
         vector<unsigned int> dijkstraDistances(queriesCnt);
         vector<unsigned int> chDistances(queriesCnt);
         vector<unsigned int> tnrDistances(queriesCnt);
@@ -178,6 +195,8 @@ void compareFiveMethods(unsigned int runs = 20) {
         }
     }
 
+    printf("\r%u runs completed.\n", runs);
+
     if(validResults) {
         printf("Reporting benchmark results using %u queries with %u runs.\n", queriesCnt, runs);
 
@@ -187,11 +206,209 @@ void compareFiveMethods(unsigned int runs = 20) {
         printf("Transit Node Routing with Arc Flags: average time to process the whole query set in seconds: %f\n", cummulativeTNRAFTime / runs);
         printf("Distance Matrix: average time to process the whole query set in seconds: %f\n", cummulativeDMTime / runs);
 
-        printf("Dijkstra's Algorithm: average time to process one query in milliseconds: %f\n", cummulativeDijkstraTime / (runs * queriesCnt * 1000) );
-        printf("Contraction Hierarchies: average time to process one query in milliseconds: %f\n", cummulativeCHTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing: average time to process one query in milliseconds: %f\n", cummulativeTNRTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing with Arc Flags: average time to process one query in milliseconds: %f\n", cummulativeTNRAFTime / (runs * queriesCnt * 1000));
-        printf("Distance Matrix: average time to process one query in milliseconds: %f\n", cummulativeDMTime / (runs * queriesCnt * 1000));
+        printf("Dijkstra's Algorithm: average time to process one query in milliseconds: %f\n", cummulativeDijkstraTime / (runs * queriesCnt * 0.001) );
+        printf("Contraction Hierarchies: average time to process one query in milliseconds: %f\n", cummulativeCHTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing: average time to process one query in milliseconds: %f\n", cummulativeTNRTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags: average time to process one query in milliseconds: %f\n", cummulativeTNRAFTime / (runs * queriesCnt * 0.001));
+        printf("Distance Matrix: average time to process one query in milliseconds: %f\n", cummulativeDMTime / (runs * queriesCnt * 0.001));
+
+        printf("\nContraction Hierarchies were:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeCHTime);
+
+        printf("\nTransit Node Routing was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeTNRTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeTNRTime);
+
+        printf("\nTransit Node Routing with Arc Flags was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeTNRAFTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeTNRAFTime);
+        printf("  %f times faster than Transit Node Routing.\n", cummulativeTNRTime/cummulativeTNRAFTime);
+
+        printf("\nDistance Matrix was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeDMTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeDMTime);
+        printf("  %f times faster than Transit Node Routing.\n", cummulativeTNRTime/cummulativeDMTime);
+        printf("  %f times faster than Transit Node Routing with Arc Flags.\n", cummulativeTNRAFTime/cummulativeDMTime);
+    }
+
+    delete dijkstraGraph;
+    delete chGraph;
+    delete tnrGraph;
+    delete tnrafGraph;
+    delete dm;
+}
+
+void compareAllMethodsOnBerlin(unsigned int runs = 20) {
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Berlin/Berlin.xeng");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Berlin/Berlin.ch");
+    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+
+    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/Berlin/Berlin5000tnodes.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/Berlin/Berlin5000tnodes.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Berlin/Berlin.xdm");
+    DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
+
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Berlin/Berlin100000randomQueries.txt");
+    vector<pair<unsigned int, unsigned int>> querySet;
+    querySetLoader.loadTrips(querySet);
+    unsigned int queriesCnt = querySet.size();
+
+    double cummulativeDijkstraTime = 0;
+    double cummulativeCHTime = 0;
+    double cummulativeTNRTime = 0;
+    double cummulativeTNRAFTime = 0;
+    double cummulativeDMTime = 0;
+
+    bool validResults = true;
+
+    for(unsigned int i = 0; i < runs; ++i) {
+        printf("\r%u runs completed.", i);
+
+        vector<unsigned int> dijkstraDistances(queriesCnt);
+        vector<unsigned int> chDistances(queriesCnt);
+        vector<unsigned int> tnrDistances(queriesCnt);
+        vector<unsigned int> tnrafDistances(queriesCnt);
+        vector<unsigned int> dmDistances(queriesCnt);
+
+        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, *dijkstraGraph, dijkstraDistances);
+        cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
+        cummulativeTNRTime += TNRBenchmark::benchmark(querySet, *tnrGraph, tnrDistances);
+        cummulativeTNRAFTime += TNRAFBenchmark::benchmark(querySet, *tnrafGraph, tnrafDistances);
+        cummulativeDMTime += DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
+
+        if(CorrectnessValidator::validate(dijkstraDistances, chDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, tnrDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, tnrafDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, dmDistances) == false) {
+            printf("Oops! Something went wrong!\n"
+                   "Some values were incorrect during the benchmark runs.\n"
+                   "Stopping the benchmark, no times will be reported.\n");
+            validResults = false;
+            break;
+        }
+    }
+
+    printf("\r%u runs completed.\n", runs);
+
+    if(validResults) {
+        printf("Reporting benchmark results using %u queries with %u runs.\n", queriesCnt, runs);
+
+        printf("Dijkstra's Algorithm: average time to process the whole query set in seconds: %f\n", cummulativeDijkstraTime / runs);
+        printf("Contraction Hierarchies: average time to process the whole query set in seconds: %f\n", cummulativeCHTime / runs);
+        printf("Transit Node Routing: average time to process the whole query set in seconds: %f\n", cummulativeTNRTime / runs);
+        printf("Transit Node Routing with Arc Flags: average time to process the whole query set in seconds: %f\n", cummulativeTNRAFTime / runs);
+        printf("Distance Matrix: average time to process the whole query set in seconds: %f\n", cummulativeDMTime / runs);
+
+        printf("Dijkstra's Algorithm: average time to process one query in milliseconds: %f\n", cummulativeDijkstraTime / (runs * queriesCnt * 0.001) );
+        printf("Contraction Hierarchies: average time to process one query in milliseconds: %f\n", cummulativeCHTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing: average time to process one query in milliseconds: %f\n", cummulativeTNRTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags: average time to process one query in milliseconds: %f\n", cummulativeTNRAFTime / (runs * queriesCnt * 0.001));
+        printf("Distance Matrix: average time to process one query in milliseconds: %f\n", cummulativeDMTime / (runs * queriesCnt * 0.001));
+
+        printf("\nContraction Hierarchies were:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeCHTime);
+
+        printf("\nTransit Node Routing was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeTNRTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeTNRTime);
+
+        printf("\nTransit Node Routing with Arc Flags was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeTNRAFTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeTNRAFTime);
+        printf("  %f times faster than Transit Node Routing.\n", cummulativeTNRTime/cummulativeTNRAFTime);
+
+        printf("\nDistance Matrix was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeDMTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeDMTime);
+        printf("  %f times faster than Transit Node Routing.\n", cummulativeTNRTime/cummulativeDMTime);
+        printf("  %f times faster than Transit Node Routing with Arc Flags.\n", cummulativeTNRAFTime/cummulativeDMTime);
+    }
+
+    delete dijkstraGraph;
+    delete chGraph;
+    delete tnrGraph;
+    delete tnrafGraph;
+    delete dm;
+}
+
+void compareAllMethodsOnPragueToPilsen(unsigned int runs = 20) {
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen.xeng");
+    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+
+    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen.ch");
+    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+
+    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen.xdm");
+    DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
+
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen100000randomQueries.txt");
+    vector<pair<unsigned int, unsigned int>> querySet;
+    querySetLoader.loadTrips(querySet);
+    unsigned int queriesCnt = querySet.size();
+
+    double cummulativeDijkstraTime = 0;
+    double cummulativeCHTime = 0;
+    double cummulativeTNRTime = 0;
+    double cummulativeTNRAFTime = 0;
+    double cummulativeDMTime = 0;
+
+    bool validResults = true;
+
+    for(unsigned int i = 0; i < runs; ++i) {
+        printf("\r%u runs completed.", i);
+
+        vector<unsigned int> dijkstraDistances(queriesCnt);
+        vector<unsigned int> chDistances(queriesCnt);
+        vector<unsigned int> tnrDistances(queriesCnt);
+        vector<unsigned int> tnrafDistances(queriesCnt);
+        vector<unsigned int> dmDistances(queriesCnt);
+
+        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, *dijkstraGraph, dijkstraDistances);
+        cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
+        cummulativeTNRTime += TNRBenchmark::benchmark(querySet, *tnrGraph, tnrDistances);
+        cummulativeTNRAFTime += TNRAFBenchmark::benchmark(querySet, *tnrafGraph, tnrafDistances);
+        cummulativeDMTime += DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
+
+        if(CorrectnessValidator::validate(dijkstraDistances, chDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, tnrDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, tnrafDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, dmDistances) == false) {
+            printf("Oops! Something went wrong!\n"
+                   "Some values were incorrect during the benchmark runs.\n"
+                   "Stopping the benchmark, no times will be reported.\n");
+            validResults = false;
+            break;
+        }
+    }
+
+    printf("\r%u runs completed.\n", runs);
+
+    if(validResults) {
+        printf("Reporting benchmark results using %u queries with %u runs.\n", queriesCnt, runs);
+
+        printf("Dijkstra's Algorithm: average time to process the whole query set in seconds: %f\n", cummulativeDijkstraTime / runs);
+        printf("Contraction Hierarchies: average time to process the whole query set in seconds: %f\n", cummulativeCHTime / runs);
+        printf("Transit Node Routing: average time to process the whole query set in seconds: %f\n", cummulativeTNRTime / runs);
+        printf("Transit Node Routing with Arc Flags: average time to process the whole query set in seconds: %f\n", cummulativeTNRAFTime / runs);
+        printf("Distance Matrix: average time to process the whole query set in seconds: %f\n", cummulativeDMTime / runs);
+
+        printf("Dijkstra's Algorithm: average time to process one query in milliseconds: %f\n", cummulativeDijkstraTime / (runs * queriesCnt * 0.001) );
+        printf("Contraction Hierarchies: average time to process one query in milliseconds: %f\n", cummulativeCHTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing: average time to process one query in milliseconds: %f\n", cummulativeTNRTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags: average time to process one query in milliseconds: %f\n", cummulativeTNRAFTime / (runs * queriesCnt * 0.001));
+        printf("Distance Matrix: average time to process one query in milliseconds: %f\n", cummulativeDMTime / (runs * queriesCnt * 0.001));
 
         printf("\nContraction Hierarchies were:\n");
         printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeCHTime);
@@ -220,25 +437,25 @@ void compareFiveMethods(unsigned int runs = 20) {
 }
 
 void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
-    TNRGLoader tnr200Loader = TNRGLoader("../thesisTestsData/Prague200tnodes.tnrg");
+    TNRGLoader tnr200Loader = TNRGLoader("../thesisTestsData/Prague/Prague200tnodes.tnrg");
     TransitNodeRoutingGraph * tnr200Graph = tnr200Loader.loadTNRforDistanceQueries();
 
-    TNRGLoader tnr500Loader = TNRGLoader("../thesisTestsData/Prague500tnodes.tnrg");
+    TNRGLoader tnr500Loader = TNRGLoader("../thesisTestsData/Prague/Prague500tnodes.tnrg");
     TransitNodeRoutingGraph * tnr500Graph = tnr500Loader.loadTNRforDistanceQueries();
 
-    TNRGLoader tnr1000Loader = TNRGLoader("../thesisTestsData/Prague1000tnodes.tnrg");
+    TNRGLoader tnr1000Loader = TNRGLoader("../thesisTestsData/Prague/Prague1000tnodes.tnrg");
     TransitNodeRoutingGraph * tnr1000Graph = tnr1000Loader.loadTNRforDistanceQueries();
 
-    TNRGLoader tnr2000Loader = TNRGLoader("../thesisTestsData/Prague2000tnodes.tnrg");
+    TNRGLoader tnr2000Loader = TNRGLoader("../thesisTestsData/Prague/Prague2000tnodes.tnrg");
     TransitNodeRoutingGraph * tnr2000Graph = tnr2000Loader.loadTNRforDistanceQueries();
 
-    TNRGLoader tnr5000Loader = TNRGLoader("../thesisTestsData/Prague5000tnodes.tnrg");
+    TNRGLoader tnr5000Loader = TNRGLoader("../thesisTestsData/Prague/Prague5000tnodes.tnrg");
     TransitNodeRoutingGraph * tnr5000Graph = tnr5000Loader.loadTNRforDistanceQueries();
 
-    TNRGLoader tnr10000Loader = TNRGLoader("../thesisTestsData/Prague10000tnodes.tnrg");
+    TNRGLoader tnr10000Loader = TNRGLoader("../thesisTestsData/Prague/Prague10000tnodes.tnrg");
     TransitNodeRoutingGraph * tnr10000Graph = tnr10000Loader.loadTNRforDistanceQueries();
 
-    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague100000randomQueries.txt");
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = querySet.size();
@@ -253,6 +470,8 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     bool validResults = true;
 
     for(unsigned int i = 0; i < runs; ++i) {
+        printf("\r%u runs completed.", i);
+
         vector<unsigned int> distances200tNodes(queriesCnt);
         vector<unsigned int> distances500tNodes(queriesCnt);
         vector<unsigned int> distances1000tNodes(queriesCnt);
@@ -280,6 +499,8 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
         }
     }
 
+    printf("\r%u runs completed.\n", runs);
+
     if(validResults) {
         printf("Reporting benchmark results using %u queries with %u runs.\n", queriesCnt, runs);
 
@@ -290,12 +511,12 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
         printf("Transit Node Routing (5000 transit nodes): average time to process the whole query set in seconds: %f\n", cummulative5000tNodesTime / runs);
         printf("Transit Node Routing (10000 transit nodes): average time to process the whole query set in seconds: %f\n", cummulative10000tNodesTime / runs);
 
-        printf("Transit Node Routing (200 transit nodes): average time to process one query in milliseconds: %f\n", cummulative200tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing (500 transit nodes): average time to process one query in milliseconds: %f\n", cummulative500tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing (1000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative1000tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing (2000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative2000tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing (5000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative5000tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing (10000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative10000tNodesTime / (runs * queriesCnt * 1000));
+        printf("Transit Node Routing (200 transit nodes): average time to process one query in milliseconds: %f\n", cummulative200tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing (500 transit nodes): average time to process one query in milliseconds: %f\n", cummulative500tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing (1000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative1000tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing (2000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative2000tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing (5000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative5000tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing (10000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative10000tNodesTime / (runs * queriesCnt * 0.001));
     }
 
     delete tnr200Graph;
@@ -307,25 +528,25 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
 }
 
 void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
-    TGAFLoader tnraf200Loader = TGAFLoader("../thesisTestsData/Prague200tnodes.tgaf");
+    TGAFLoader tnraf200Loader = TGAFLoader("../thesisTestsData/Prague/Prague200tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf200Graph = tnraf200Loader.loadTNRAFforDistanceQueries();
 
-    TGAFLoader tnraf500Loader = TGAFLoader("../thesisTestsData/Prague500tnodes.tgaf");
+    TGAFLoader tnraf500Loader = TGAFLoader("../thesisTestsData/Prague/Prague500tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf500Graph = tnraf500Loader.loadTNRAFforDistanceQueries();
 
-    TGAFLoader tnraf1000Loader = TGAFLoader("../thesisTestsData/Prague1000tnodes.tgaf");
+    TGAFLoader tnraf1000Loader = TGAFLoader("../thesisTestsData/Prague/Prague1000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf1000Graph = tnraf1000Loader.loadTNRAFforDistanceQueries();
 
-    TGAFLoader tnraf2000Loader = TGAFLoader("../thesisTestsData/Prague2000tnodes.tgaf");
+    TGAFLoader tnraf2000Loader = TGAFLoader("../thesisTestsData/Prague/Prague2000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf2000Graph = tnraf2000Loader.loadTNRAFforDistanceQueries();
 
-    TGAFLoader tnraf5000Loader = TGAFLoader("../thesisTestsData/Prague5000tnodes.tgaf");
+    TGAFLoader tnraf5000Loader = TGAFLoader("../thesisTestsData/Prague/Prague5000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf5000Graph = tnraf5000Loader.loadTNRAFforDistanceQueries();
 
-    TGAFLoader tnraf10000Loader = TGAFLoader("../thesisTestsData/Prague10000tnodes.tgaf");
+    TGAFLoader tnraf10000Loader = TGAFLoader("../thesisTestsData/Prague/Prague10000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf10000Graph = tnraf10000Loader.loadTNRAFforDistanceQueries();
 
-    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague100000randomQueries.txt");
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = querySet.size();
@@ -340,6 +561,8 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     bool validResults = true;
 
     for(unsigned int i = 0; i < runs; ++i) {
+        printf("\r%u runs completed.", i);
+
         vector<unsigned int> distances200tNodes(queriesCnt);
         vector<unsigned int> distances500tNodes(queriesCnt);
         vector<unsigned int> distances1000tNodes(queriesCnt);
@@ -367,6 +590,8 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
         }
     }
 
+    printf("\r%u runs completed.\n", runs);
+
     if(validResults) {
         printf("Reporting benchmark results using %u queries with %u runs.\n", queriesCnt, runs);
 
@@ -377,12 +602,12 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
         printf("Transit Node Routing with Arc Flags (5000 transit nodes): average time to process the whole query set in seconds: %f\n", cummulative5000tNodesTime / runs);
         printf("Transit Node Routing with Arc Flags (10000 transit nodes): average time to process the whole query set in seconds: %f\n", cummulative10000tNodesTime / runs);
 
-        printf("Transit Node Routing with Arc Flags (200 transit nodes): average time to process one query in milliseconds: %f\n", cummulative200tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing with Arc Flags (500 transit nodes): average time to process one query in milliseconds: %f\n", cummulative500tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing with Arc Flags (1000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative1000tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing with Arc Flags (2000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative2000tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing with Arc Flags (5000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative5000tNodesTime / (runs * queriesCnt * 1000));
-        printf("Transit Node Routing with Arc Flags (10000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative10000tNodesTime / (runs * queriesCnt * 1000));
+        printf("Transit Node Routing with Arc Flags (200 transit nodes): average time to process one query in milliseconds: %f\n", cummulative200tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags (500 transit nodes): average time to process one query in milliseconds: %f\n", cummulative500tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags (1000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative1000tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags (2000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative2000tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags (5000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative5000tNodesTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags (10000 transit nodes): average time to process one query in milliseconds: %f\n", cummulative10000tNodesTime / (runs * queriesCnt * 0.001));
     }
 
     delete tnraf200Graph;
@@ -396,14 +621,19 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
 int main(int argc, char * argv[]) {
     setbuf(stdout, NULL);
 
-    //createTNRAF("../thesisTestsData/Prague.xeng", 2000, "../thesisTestsData/PragueTest");
+    computeStructuresForAllMethodsPrague("../thesisTestsData/Prague.xeng");
+    computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
+    computeStructuresForAllMethodsPragueToPilsen("../thesisTestsData/PragueToPilsen/PragueToPilsen.xeng");
 
-    //computeStructuresForAllMethods("../thesisTestsData/Prague.xeng");
     computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague.xeng");
     computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague.xeng");
-    //compareFiveMethods(1);
-    //compareTNRwithVariousTransitNodeSetSizes(20);
-    //compareTNRAFwithVariousTransitNodeSetSizes(20);
+
+    compareAllMethodsOnPrague(20);
+    compareAllMethodsOnBerlin(20);
+    compareAllMethodsOnPragueToPilsen(20);
+
+    compareTNRwithVariousTransitNodeSetSizes(20);
+    compareTNRAFwithVariousTransitNodeSetSizes(20);
 
     return 0;
 }
