@@ -41,16 +41,9 @@ public:
             unsigned int start,
             unsigned int goal);
 
-    /**
-     * Auxiliary function only printing some info about the queries done since this manager was created. This is used
-     * currently for debugging purposes and should be removed later. FIXME
-     */
-    void printQueriesAnalysis();
 protected:
     TransitNodeRoutingGraph & graph;
     CHDistanceQueryManager fallbackCHmanager;
-    unsigned int globalQueries;
-    unsigned int localQueries;
 };
 
 

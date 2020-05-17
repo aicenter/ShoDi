@@ -251,11 +251,6 @@ protected:
             FlagsGraph & graph,
             DistanceMatrix & dm);
 
-//# FIXME debug stuff
-    static unsigned int accessNodesFw;
-    static unsigned int removedAccessNodesFw;
-    static unsigned int accessNodesBw;
-    static unsigned int removedAccessNodesBw;
 };
 
 

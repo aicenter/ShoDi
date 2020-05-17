@@ -271,16 +271,6 @@ protected:
     static void initPowersOf2(vector<uint32_t> & powersOf2);
 
     static DistanceMatrix * distanceMatrix;
-
-    // FIXME this is only debug stuff
-    static unsigned int totalArcFlags;
-    static unsigned int trueArcFlags;
-    static unsigned int totalAccessNodes;
-    static unsigned int uselessAccessNodes;
-    static unsigned int triedCombinations;
-    static unsigned int incorrectANdistances;
-    static unsigned int ANdistances;
-    static unsigned int clusteringSkips;
 };
 
 

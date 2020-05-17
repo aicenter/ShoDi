@@ -18,9 +18,6 @@ FlagsGraphWithUnpackingData::FlagsGraphWithUnpackingData(unsigned int n) {
 //______________________________________________________________________________________________________________________
 void FlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw, unsigned int mNode) {
     neighbours.at(from).push_back(QueryEdgeWithUnpackingData(to, weight, fw, bw, mNode));
-    if(to == 4294967295) {
-        printf("Adding edge from %u to %u. (Weight %u, fw: %s, bw: %s, middle node: %u)\n", from, to, weight, fw ? "true" : "false", bw ? "true" : "false", mNode);
-    }
 }
 
 //______________________________________________________________________________________________________________________
@@ -100,12 +97,9 @@ void FlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
 unsigned int FlagsGraphWithUnpackingData::getMiddleNode(unsigned int source, unsigned int target, bool direction) {
     for(unsigned int i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
-            //printf("Possible middle node: %u between %u and %u, direction: %s (neigbour forward: %s, backward: %s)\n", neighbours[source][i].middleNode, source, target, direction ? "forward" : "backward", neighbours[source][i].forward ? "true" : "false" , neighbours[source][i].backward ? "true" : "false");
             if (direction == FORWARD && neighbours[source][i].forward) {
-                //printf("Returning: %u as middle node between %u and %u\n", neighbours[source][i].middleNode, source, target);
                 return neighbours[source][i].middleNode;
             } else if (direction == BACKWARD && neighbours[source][i].backward) {
-                //printf("Returning: %u as middle node between %u and %u\n", neighbours[source][i].middleNode, source, target);
                 return neighbours[source][i].middleNode;
             }
         }

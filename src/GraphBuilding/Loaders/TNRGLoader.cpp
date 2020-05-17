@@ -111,7 +111,7 @@ void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGr
         input.read ((char *) &backward, sizeof(backward));
         input.read ((char *) &fwShortcutFlag, sizeof(fwShortcutFlag));
         input.read ((char *) &bwShortcutFlag, sizeof(bwShortcutFlag));
-        graph.addEdge(from, to, weight, forward, backward); // FIXME - here middle node would have to be added in order to have faster path queries.
+        graph.addEdge(from, to, weight, forward, backward);
         if(forward && !fwShortcutFlag) {
             graph.addUnpackingEdge(from, to, weight);
         }

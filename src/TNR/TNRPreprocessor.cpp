@@ -15,11 +15,6 @@
 #include "../DistanceMatrix/DistanceMatrixComputor.h"
 #include "../Dijkstra/BasicDijkstra.h"
 
-unsigned int TNRPreprocessor::accessNodesFw;
-unsigned int TNRPreprocessor::removedAccessNodesFw;
-unsigned int TNRPreprocessor::accessNodesBw;
-unsigned int TNRPreprocessor::removedAccessNodesBw;
-
 //______________________________________________________________________________________________________________________
 void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPath, unsigned int transitNodesAmount) {
     cout << "Getting transit nodes" << endl;
@@ -160,10 +155,6 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
         transitNodesMapping.insert(make_pair(transitNodes[i], i));
     }
 
-    accessNodesFw = 0;
-    removedAccessNodesFw = 0;
-    accessNodesBw = 0;
-    removedAccessNodesBw = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if (i % 100 == 0) {
             cout << "\rComputed forward access nodes for '" << i << "' nodes.";
@@ -465,16 +456,12 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
     }
 
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        accessNodesFw++;
         unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
         unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
         unsigned int realDistance = dm.findDistance(source, accessNode);
         if (realDistance == accessNodeDistance) {
             accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
-        } else {
-            removedAccessNodesFw++;
         }
-
     }
 
 }
@@ -650,16 +637,12 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 
 
     for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
-        accessNodesBw++;
         unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
         unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
         unsigned int realDistance = dm.findDistance(source, accessNode);
         if (realDistance == accessNodeDistance) {
             accessNodes.push_back(AccessNodeData(accessNodesSuperset[i].accessNodeID, accessNodesSuperset[i].distanceToNode));
-        } else {
-            removedAccessNodesBw++;
         }
-
     }
 
 }

@@ -13,15 +13,6 @@
 #include "../Dijkstra/BasicDijkstra.h"
 #include "../DistanceMatrix/DistanceMatrixComputor.h"
 
-// FIXME debug stuff
-unsigned int TNRAFPreprocessor::totalArcFlags;
-unsigned int TNRAFPreprocessor::trueArcFlags;
-unsigned int TNRAFPreprocessor::totalAccessNodes;
-unsigned int TNRAFPreprocessor::uselessAccessNodes;
-unsigned int TNRAFPreprocessor::triedCombinations;
-unsigned int TNRAFPreprocessor::incorrectANdistances;
-unsigned int TNRAFPreprocessor::ANdistances;
-unsigned int TNRAFPreprocessor::clusteringSkips;
 DistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 
 //______________________________________________________________________________________________________________________
@@ -59,13 +50,6 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
         transitNodesMapping.insert(make_pair(transitNodes[i], i));
     }
 
-    // FIXME debug stuff
-    totalArcFlags = 0;
-    trueArcFlags = 0;
-    totalAccessNodes = 0;
-    uselessAccessNodes = 0;
-    triedCombinations = 0;
-
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if(i % 100 == 0) {
             cout << "\rComputed forward access nodes for '" << i << "' nodes.";
@@ -75,10 +59,6 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
     }
 
     cout << "\rComputed forward access nodes for all nodes in the graph.";
-
-    //printf("Useless access nodes: %u, total access nodes: %u, that means %lf %% were useless.\n", uselessAccessNodes, totalAccessNodes, ((double) uselessAccessNodes / totalAccessNodes) * 100);
-    printf("Tried %u combinations when determining access nodes.\n", triedCombinations);
-    printf("Additionally, %u out of %u access nodes have incorrect distances. That is %lf %%.\n", incorrectANdistances, ANdistances, ((double) incorrectANdistances / ANdistances) * 100);
 
     if(useDistanceMatrix) {
         cout << "Computing the auxiliary distance matrix for backward direction." << endl;
@@ -238,11 +218,6 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
                 }
             }
 
-            // FIXME debug stuff
-            totalAccessNodes++;
-            if(regionsOutput == 0) {
-                uselessAccessNodes++;
-            }
             output.write((char *) &regionsOutput, sizeof(regionsOutput));
         }
     }
@@ -362,17 +337,10 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
             unsigned int distanceToAccessNode = accessNodes[i].distanceToNode;
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> & nodesInRegion = regions.nodesInRegion(j);
-                totalArcFlags++;
-                if(distanceToAccessNode != distanceMatrix->findDistance(node, accessNode)) {
-                    incorrectANdistances++;
-                }
-                ANdistances++;
                 for (unsigned int k = 0; k < nodesInRegion.size(); k++) {
-                    triedCombinations++;
                     if (distanceMatrix->findDistance(node, nodesInRegion[k]) ==
                         distanceMatrix->findDistance(accessNode, nodesInRegion[k]) + distanceToAccessNode) {
                         accessNodes[i].regionFlags[j] = true;
-                        trueArcFlags++;
                         break;
                     }
                 }
@@ -386,12 +354,10 @@ void TNRAFPreprocessor::computeForwardArcFlags(unsigned int node, vector<AccessN
             unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
             for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
                 vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
-                totalArcFlags++;
                 for (unsigned int k = 0; k < nodesInRegion.size(); k++) {
                     if (optionalDistancesFromNode[nodesInRegion[k]] ==
                         distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
                         accessNodes[i].regionFlags[j] = true;
-                        trueArcFlags++;
                         break;
                     }
                 }
@@ -526,8 +492,6 @@ void TNRAFPreprocessor::generateClustering(Graph & originalGraph, RegionsStructu
     vector < unsigned int > assignedClusters(nodesCnt, UINT_MAX);
     vector < queue < unsigned int > > q(clustersCnt, queue<unsigned int>());
 
-    clusteringSkips = 0;
-
     for(unsigned int i = 0; i < clustersCnt; ++i) {
         const unsigned int nodeID = approxNodesPerCluster * i;
         assignedClusters[nodeID] = i;
@@ -587,7 +551,6 @@ unsigned int TNRAFPreprocessor::getNewNodeForCluster( vector < unsigned int > & 
 
     for(unsigned int i = 0; i < assignedClusters.size(); ++i) {
         if(assignedClusters[i] == UINT_MAX) {
-            clusteringSkips++;
             return i;
         }
     }
