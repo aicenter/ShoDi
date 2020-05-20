@@ -1,5 +1,5 @@
-Shortest Paths computation library in C++
-=========================================
+Shortest Distances computation library in C++
+=============================================
 
 This project implements multiple complex preprocessing methods for shortest distance computation in directed weighted graphs. The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies) and Transit Node Routing with Arc Flags (extension of Transit Node Routing).
 
