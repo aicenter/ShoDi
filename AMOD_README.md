@@ -19,7 +19,7 @@ Both of those tasks should be fairly easy thanks to the provided `CMakeLists.txt
 3. Then invoke the `shortestPaths` target of the created `Makefile`:
   * `cmake --build . --target shortestPaths`
 
-After this, you should acquire a runnable application `shortestPathsPreprocessor` and a shared library `libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows. This result can also be achieved by simply loading this project into your favourite IDE and then using the tools provided by it.
+After this, you should acquire a runnable application `shortestPathsPreprocessor` and a shared library `libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows. This result can also be achieved by simply loading this project into your favourite IDE and then using the tools provided by it. Note that your library must have the exact same architecture as the JVM you will be using. In some older JDKs, the JVM is 32-bit only. In such cases, it is necessary to compile a 32-bit version of the library (64-bit version will not work with the JVM).
 
 Creating the data structure required for the query algorithm
 ------------------------------------------------------------
@@ -96,4 +96,9 @@ Using `-Djava.library.path` proved to be kinda tricky when using `mvn exec` thou
 
 After we have ensured that the JVM will be able to find the library by ensuring the `java.library.path` property will contain the path to it (using any of the given options), we are basically ready. Additionally, we should check that the `TravelTimeProvider` is bound to `TNRAFTravelTimeProvider` in the `MainModule`. If it is, we can run the `OnDemandVehiclesSimulation` and it should now be using Transit Node Routing With Arc Flags to compute the travel times.
 
+The simulation can be started by the following comand:
+
+- `mvn exec:exec '-Dexec.executable="java"' '-Dexec.args="-classpath %classpath cz.cvut.fel.aic.amodsim.OnDemandVehiclesSimulation path/to/local/config.cfg"' '-Dfile.encoding=UTF-8'`
+
+For larger graphs or some of the more demanding providers, the default maximum memory allocation pool for the JVM might not be enough. In such cases, you might need to add `-Xmx20g` to your `-Dexec.args` to allow the JVM to use more memory (substitute `20g` by your desired amount).
 
