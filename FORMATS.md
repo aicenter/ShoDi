@@ -61,24 +61,24 @@ All the data needed for the Contraction Hierarchies shortest distance query algo
 *    unsigned int: number of original edges (= m1)
 *    unsigned int: number of shortcut edges (= m2)
 *    n times, for each node 0..(n-1):
-   *        unsigned int: rank
+    *        unsigned int: rank
 *    m1 times, original edges:
-   *        unsigned int: source node
-   *        unsigned int: target node
-   *        unsigned int: weight
-   *        unsigned int: flags
+    * unsigned int: source node
+    *        unsigned int: target node
+    *        unsigned int: weight
+    *        unsigned int: flags
 *    m2 times, shortcut edges:
-   *        unsigned int: source node
-   *        unsigned int: target node
-   *        unsigned int: weight
-   *        unsigned int: flags
-   *        unsigned int: shortcut middle node
+    *        unsigned int: source node
+    *        unsigned int: target node
+    *        unsigned int: weight
+    *        unsigned int: flags
+    *        unsigned int: shortcut middle node
 *    unsigned int: 0x12345678 as terminator
 * possible (bit) flags are:
-   *    1 = forward edge
-   *    2 = backward edge
-   *    4 = shortcut edge
-   *    the actual flag is obtained as sum of those, so for example a forward shortcut edge will have the flag set to 5 (1+4)
+    *    1 = forward edge
+    *    2 = backward edge
+    *    4 = shortcut edge
+    *    the actual flag is obtained as sum of those, so for example a forward shortcut edge will have the flag set to 5 (1+4)
 
 Contraction Hierarchies data structure files are automatically generated with the `.ch` suffix. This suffix is not enforced when loading the data structure.
 
@@ -91,33 +91,33 @@ All the data needed for the Transit Node Routing shortest distance query algorit
 *    unsigned int: number of edges (= e, both original edges and shortcut edges are contained)
 *    unsigned int: number of transit nodes (= t)
 *    e times, for each edge 0..(e-1):
-   *        unsigned int: source node
-   *        unsigned int: target node
-   *        unsigned int: weight
-   *        bool: forward flag (determines whether the edge can be used in the forward direction)
-   *        bool: backward flag (determines whether the edge can be used in the backward direction)
+    *        unsigned int: source node
+    *        unsigned int: target node
+    *        unsigned int: weight
+    *        bool: forward flag (determines whether the edge can be used in the forward direction)
+    *        bool: backward flag (determines whether the edge can be used in the backward direction)
 *    n times, for each node 0..(n-1):
-   *        unsigned int: rank
+    *        unsigned int: rank
 *    t times:
-   *        unsigned int: a transit node ID (indices of all the nodes in the transit node set)
+    *        unsigned int: a transit node ID (indices of all the nodes in the transit node set)
 *    t*t times, transit node-set distance table values:
-   *        unsigned int: weight (shortest distance from the i-th transit node to the j-th transit node)
+    *        unsigned int: weight (shortest distance from the i-th transit node to the j-th transit node)
 *    n times: access nodes
-   *   unsigned int: the number of forward access nodes for node i (k)
-   * k times: forward access nodes for node i
-         * unsigned int: forward access node ID
-         * unsigned int: forward access node weight
-   *   unsigned int: the number of backward access nodes for node i (l)
-   * l times: backward access nodes for node i
-         * unsigned int: backward access node ID
-         * unsigned int: backward access node weight
+    *   unsigned int: the number of forward access nodes for node i (k)
+    * k times: forward access nodes for node i
+        * unsigned int: forward access node ID
+        * unsigned int: forward access node weight
+    *   unsigned int: the number of backward access nodes for node i (l)
+    * l times: backward access nodes for node i
+        * unsigned int: backward access node ID
+        * unsigned int: backward access node weight
 *   n times: search spaces
-   *     unsigned int: forward search space size (k)
-   *     k times: forward search space for node i
-         * unsigned int: a node ID of a node in the forward search space of node i
-   *     unsigned int: backward search space size (l)
-   *     l times: backward search space for node i
-         * unsigned int: a node ID of a node in the backward search space of node i
+    *     unsigned int: forward search space size (k)
+    *     k times: forward search space for node i
+        * unsigned int: a node ID of a node in the forward search space of node i
+    *     unsigned int: backward search space size (l)
+    *     l times: backward search space for node i
+        * unsigned int: a node ID of a node in the backward search space of node i
 
 Transit Node Routing data structure files are automatically generated with the `.tnrg` suffix. This suffix is not enforced when loading the data structure.
 
@@ -132,37 +132,37 @@ All the data needed for the Transit Node Routing with Arc Flags shortest distanc
 *    unsigned int: number of transit nodes (= t)
 *    unsigned int: number of regions for Arc Flags (= k)
 *    e times, for each edge 0..(e-1):
-   *        unsigned int: source node
-   *        unsigned int: target node
-   *        unsigned int: weight
-   *        bool: forward flag (determines whether the edge can be used in the forward direction)
-   *        bool: backward flag (determines whether the edge can be used in the backward direction)
+    *        unsigned int: source node
+    *        unsigned int: target node
+    *        unsigned int: weight
+    *        bool: forward flag (determines whether the edge can be used in the forward direction)
+    *        bool: backward flag (determines whether the edge can be used in the backward direction)
 *    n times, for each node 0..(n-1):
-   *        unsigned int: rank
+    *        unsigned int: rank
 *    n times, for each node 0..(n-1):
-   *        unsigned int: region (for Arc Flags)
+    *        unsigned int: region (for Arc Flags)
 *    t times:
-   *        unsigned int: a transit node ID (indices of all the nodes in the transit node set)
+    *        unsigned int: a transit node ID (indices of all the nodes in the transit node set)
 *    t*t times, transit node-set distance table values:
-   *        unsigned int: weight (shortest distance from the i-th transit node to the j-th transit node)
+    *        unsigned int: weight (shortest distance from the i-th transit node to the j-th transit node)
 *    n times: access nodes
-   *   unsigned int: the number of forward access nodes for node i (x)
-   * x times: forward access nodes for node i
-         * unsigned int: forward access node ID
-         * unsigned int: forward access node weight
-         * uint32_t: arc flags for the forward access node encoded into a 32 bit unsigned integer
-   *   unsigned int: the number of backward access nodes for node i (y)
-   * y times: backward access nodes for node i
-         * unsigned int: backward access node ID
-         * unsigned int: backward access node weight
-         * uint32_t: arc flags for the backward access node encoded into a 32 bit unsigned integer
+    *   unsigned int: the number of forward access nodes for node i (x)
+    * x times: forward access nodes for node i
+        * unsigned int: forward access node ID
+        * unsigned int: forward access node weight
+        * uint32_t: arc flags for the forward access node encoded into a 32 bit unsigned integer
+    *   unsigned int: the number of backward access nodes for node i (y)
+    * y times: backward access nodes for node i
+        * unsigned int: backward access node ID
+        * unsigned int: backward access node weight
+        * uint32_t: arc flags for the backward access node encoded into a 32 bit unsigned integer
 *   n times: search spaces
-   *     unsigned int: forward search space size (x)
-   *     x times: forward search space for node i
-         * unsigned int: a node ID of a node in the forward search space of node i
-   *     unsigned int: backward search space size (y)
-   *     y times: backward search space for node i
-         * unsigned int: a node ID of a node in the backward search space of node i
+    *     unsigned int: forward search space size (x)
+    *     x times: forward search space for node i
+        * unsigned int: a node ID of a node in the forward search space of node i
+    *     unsigned int: backward search space size (y)
+    *     y times: backward search space for node i
+        * unsigned int: a node ID of a node in the backward search space of node i
 
 Transit Node Routing with Arc Flags data structure files are automatically generated with the `.tgaf` suffix. This suffix is not enforced when loading the data structure.
 
@@ -174,7 +174,7 @@ The implementation can compute Distance Matrices and answer queries using those 
 * "XDM" (0x58 0x44 0x4d)
 *    unsigned int: number of nodes (= n)
 * n*n times, the values for the matrix:
-   * unsigned int: value for the field[i][j] in the distance matrix
+    * unsigned int: value for the field[i][j] in the distance matrix
 
 The Distance Matrices obtained from our implementation automatically have the `.xdm` suffix. This suffix is not enforced when loading the Distance Matrix.
 
