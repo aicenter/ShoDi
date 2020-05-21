@@ -112,11 +112,11 @@ All the data needed for the Transit Node Routing shortest distance query algorit
         * unsigned int: backward access node ID
         * unsigned int: backward access node weight
 *   n times: search spaces
-    *     unsigned int: forward search space size (k)
-    *     k times: forward search space for node i
+    * unsigned int: forward search space size (k)
+    * k times: forward search space for node i
         * unsigned int: a node ID of a node in the forward search space of node i
-    *     unsigned int: backward search space size (l)
-    *     l times: backward search space for node i
+    * unsigned int: backward search space size (l)
+    * l times: backward search space for node i
         * unsigned int: a node ID of a node in the backward search space of node i
 
 Transit Node Routing data structure files are automatically generated with the `.tnrg` suffix. This suffix is not enforced when loading the data structure.
@@ -157,11 +157,11 @@ All the data needed for the Transit Node Routing with Arc Flags shortest distanc
         * unsigned int: backward access node weight
         * uint32_t: arc flags for the backward access node encoded into a 32 bit unsigned integer
 *   n times: search spaces
-    *     unsigned int: forward search space size (x)
-    *     x times: forward search space for node i
+    * unsigned int: forward search space size (x)
+    * x times: forward search space for node i
         * unsigned int: a node ID of a node in the forward search space of node i
-    *     unsigned int: backward search space size (y)
-    *     y times: backward search space for node i
+    * unsigned int: backward search space size (y)
+    * y times: backward search space for node i
         * unsigned int: a node ID of a node in the backward search space of node i
 
 Transit Node Routing with Arc Flags data structure files are automatically generated with the `.tgaf` suffix. This suffix is not enforced when loading the data structure.
