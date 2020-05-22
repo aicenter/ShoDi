@@ -29,10 +29,11 @@ Let us now assume that we want to use Transit Node Routing with Arc Flags in Amo
 To precompute the data structure, we first need an input graph. Assume we have our desired road network in the form of two `GeoJSON` files `nodes.geojson` and `edges.geojson`. We can use the provided Python script to transform those two files into an input graph for the `preprocessor`.
 
 1. Go into the Python subdirectory of this project
-2. Copy your `nodes.geojson` and `edges.geojson` into that subdirectory.
-3. Run the `transformGeoJSONtoXenGraph.py` Python script present in that subdirectory.
-
-Alternatively if you do not want to copy `nodes.geojson` and `edges.geojson`, you can edit the script and insert the desired paths. After running the script, you should be left with two files `graph.xeng` and `graph.xeni` in the Python subdirectory.
+2. Run the `transformGeoJSONtoXenGraph.py` Python script present in that subdirectory.
+   * The script provides a very simple command line interface. It expects 4 arguments: `N E P O`. `N` is the path to the `nodes.geojson` file, `E` is the path to the `edges.geojson` file, `P` is your desired precision and `O` is the desired output path.
+   * The precision (the `P` argument) must be a positive number. Precision `1` means that the edge weighs in the obtained graph will correspond to seconds. Precision `1000` means they will correspond to milliseconds. For large graphs you can also use precisions smaller than `1`. For example using `0.1` the weights of the edges of the obtained graph will be in tens of milliseconds.
+   * The script will output two files. The first file both stored in a location specified by the `O` argument. The first file will have a `.xeng` suffix and represents the actual graph. The second file will have a `.xeni` suffix and represents the mapping.
+   * An example of a correct call of the script: `python transformGeoJSONtoXenGraph.py nodes.geojson edges.geojson 1000 output_graph`. This will create two files `output_graph.xeng` and `output_graph.xeni` in the current working directory.
 
 We will now continue with the file `graph.xeng` but save the other one, we will need it later. Now we can use the `preprocessor` with the `graph.xeng` file to precompute the data structures needed for the query algorithm.
 

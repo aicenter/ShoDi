@@ -1,4 +1,5 @@
 from roadmaptools import inout
+import argparse
 
 # Author: Michal Cvach
 # This script allows you to transform a map represented by a pair of .geojson files into the XenGraph format which is
@@ -33,16 +34,17 @@ def create_xengraph_file(nodes_feature_collection, edges_feature_collection, out
         print("XGI", str(len(nodes_feature_collection['features'])), str(len(edges_feature_collection['features'])),
               file=graph_file)
         for edge in edges_feature_collection['features']:
-            if 'oneway' in edge['properties']:
-                if edge['properties']['oneway'] == "yes":
-                    flag = 1
+            if edge['properties']['maxspeed'] != 0:
+                if 'oneway' in edge['properties']:
+                    if edge['properties']['oneway'] == "yes":
+                        flag = 1
+                    else:
+                        flag = 0
                 else:
                     flag = 0
-            else:
-                flag = 0
-            print(mapping[edge['properties']['from_id']], mapping[edge['properties']['to_id']],
-                  str(int(round((edge['properties']['length'] / (edge['properties']['maxspeed'] / 3.60)) * precision
-                          ))), str(flag), file=graph_file)
+                print(mapping[edge['properties']['from_id']], mapping[edge['properties']['to_id']],
+                      str(int(round((edge['properties']['length'] / (edge['properties']['maxspeed'] / 3.60)) * precision
+                              ))), str(flag), file=graph_file)
 
 
 def create_xenindices_file(nodes_feature_collection, output_filepath: str):
@@ -57,11 +59,30 @@ def create_xenindices_file(nodes_feature_collection, output_filepath: str):
 
 
 if __name__ == '__main__':
-    nodes_file = "nodes.geojson"
-    edges_file = "edges.geojson"
-    graph_output_file = "graph.xeng"
-    indices_output_file = "graph.xeni"
-    precision = 10
+    parser = argparse.ArgumentParser(description='Allows to obtain a XenGraph representation from a graph represented'
+                                                 ' by two GeoJSON files, one containing the nodes and the other '
+                                                 'containing the edges.',
+                                     epilog='This script will generate two files, one with the .xeng suffix containing '
+                                            'the graph in the XenGraph format and a second one with the .xeni suffix '
+                                            'containing the mapping information.'
+                                     )
+    parser.add_argument('nodes_input_path', metavar='N', nargs=1, type=str,
+                        help='Path to the nodes GeoJSON file.')
+    parser.add_argument('edges_input_path', metavar='E', nargs=1, type=str,
+                        help='Path to the edges GeoJSON file.')
+    parser.add_argument('precision', metavar='P', nargs=1, type=float,
+                        help='Precision for the edge weights (1 means seconds, 1000 means milliseconds...).')
+    parser.add_argument('output_path', metavar='O', nargs=1, type=str,
+                        help='Path where you want to output the transformed '
+                             'files without suffixes (those are added automatically).')
+    args = parser.parse_args()
+    args = vars(args)
+
+    nodes_file = args['nodes_input_path'][0]
+    edges_file = args['edges_input_path'][0]
+    graph_output_file = args['output_path'][0]+'.xeng'
+    indices_output_file = args['output_path'][0]+'.xeni'
+    precision = args['precision'][0]
 
     print("Loading graph...")
     nodes, edges = load_graph(nodes_file, edges_file)
