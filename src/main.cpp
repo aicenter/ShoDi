@@ -4,6 +4,7 @@
 //
 
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <cstring>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
@@ -22,6 +23,10 @@
 #include "GraphBuilding/Loaders/DistanceMatrixLoader.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "Benchmarking/DijkstraBenchmark.h"
+#include "Error/Error.h"
+#include "GraphBuilding/Loaders/CsvGraphLoader.h"
+#include "DistanceMatrix/DistanceMatrixComputor.h"
+#include "DistanceMatrix/johnson.hpp"
 
 using namespace std;
 
@@ -31,7 +36,7 @@ using namespace std;
  * @param[in] appName
  */
 void printUsageInfo(
-        char * appName) {
+        char *appName) {
     printf("Hello! This application allows the user to preprocess graphs to create data structures\n"
            "for Contraction Hierarchies, Transit Node Routing and Transit Node Routing with Arc Flags.\n"
            "Additionally, the user can also benchmark the obtained data structures using a given set of queries.\n"
@@ -42,57 +47,29 @@ void printUsageInfo(
            "  '%s create ch xengraph input_graph.xeng output_file'\n", appName, appName);
 }
 
-/**
- * Prints a simple error message in case the user provides some invalid input.
- */
-void printInvalidUsageInfo() {
-    printf("It seems that the given arguments do not match any use case for this application.\n"
-           "Please, see 'README.md' for a complete overview of use cases for this application\n"
-           "with examples.\n");
-}
+constexpr auto INVALID_USAGE_INFO = "It seems that the given arguments do not match any use case for this application.\n"
+                                    "Please, see 'README.md' for a complete overview of use cases for this application\n"
+                                    "with examples.\n";
+
+constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the right format. If not sure,\n"
+                                     "refer to 'README.md' for a complete overview of use cases for this application\n"
+                                     "with examples.\n";
 
 /**
  * This function will create the Contraction Hierarchies data structure based on a given input file.
- * In this case, the input format is XenGraph.
  *
- * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed CH data structure.
  */
-void createCHfromXenGraph(
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Contraction Hierarchies from XenGraph preprocessing");
-    timer.begin();
-
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat(outputFilePath);
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
-
-/**
- * This function will create the Contraction Hierarchies data structure based on a given input file.
- * In this case, the input format is DIMACS.
- *
- * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed CH data structure.
- */
-void createCHfromDIMACS(
-        char * inputFilePath,
-        char * outputFilePath) {
+void createCH(
+        GraphLoader *graphLoader,
+        char *outputFilePath) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
     timer.begin();
 
-    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    UpdateableGraph *graph = graphLoader->loadUpdateableGraph();
     CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    graphLoader->putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat(outputFilePath);
 
     timer.finish();
@@ -101,49 +78,22 @@ void createCHfromDIMACS(
     delete graph;
 }
 
-
-/**
- * An input processing function used in the case when the user wants to precompute using the
- * Contraction Hierarchies method. This function checks if the input format argument is valid,
- * and if it is, then calls the corresponding function that will handle the preprocessing.
- *
- * @param inputType[in] Contains the argument determining which input format is used (either XenGraph or DIMACS)
- * @param inputFilePath[in] Contains the file path to the input graph in the chosen format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
- */
-void createCH(
-        char * inputType,
-        char * inputFilePath,
-        char * outputFilePath) {
-    if(strcmp(inputType, "xengraph") == 0) {
-        createCHfromXenGraph(inputFilePath, outputFilePath);
-    } else if(strcmp(inputType, "dimacs") == 0) {
-        createCHfromDIMACS(inputFilePath, outputFilePath);
-    } else {
-        printf("Unknown input format '%s' for Contraction Hierarchies preprocessing.\n"
-               "Please, make sure that your call has the right format. If not sure,\n"
-               "refer to 'README.md' for a complete overview of use cases for this application\n"
-               "with examples.\n", inputType);
-    }
-}
-
 /**
  * This function will create the Transit Node Routing data structure based on a given input file.
- * In this case, the input format is XenGraph and the preprocessing mode is the 'fast' mode.
+ * In this case, the preprocessing mode is the 'fast' mode.
  *
  * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromXenGraphFast(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing from XenGraph preprocessing (fast mode)");
+void createTNRFast(
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    Timer timer("Transit Node Routing preprocessing (fast mode)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
+    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
@@ -157,22 +107,21 @@ void createTNRfromXenGraphFast(
 
 /**
  * This function will create the Transit Node Routing data structure based on a given input file.
- * In this case, the input format is XenGraph and the preprocessing mode is the 'slow' mode.
+ * In this case, the preprocessing mode is the 'slow' mode.
  *
  * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromXenGraphSlow(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing from XenGraph preprocessing (slow mode)");
+void createTNRSlow(
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    Timer timer("Transit Node Routing preprocessing (slow mode)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
+    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
+    Graph *originalGraph = graph->createCopy();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
@@ -186,108 +135,21 @@ void createTNRfromXenGraphSlow(
 
 /**
  * This function will create the Transit Node Routing data structure based on a given input file.
- * In this case, the input format is XenGraph and the preprocessing mode is the 'dm' mode.
+ * In this case, the preprocessing mode is the 'dm' mode.
  *
  * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
-void createTNRfromXenGraphUsingDM(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing from XenGraph preprocessing (using distance matrix)");
+void createTNRUsingDM(
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    Timer timer("Transit Node Routing preprocessing (using distance matrix)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize));
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
-
-/**
- * This function will create the Transit Node Routing data structure based on a given input file.
- * In this case, the input format is DIMACS and the preprocessing mode is the 'fast' mode.
- *
- * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
- */
-void createTNRfromDIMACSFast(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing from DIMACS preprocessing (fast mode)");
-    timer.begin();
-
-    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-
-    TNRPreprocessor::preprocessUsingCH(*graph, outputFilePath, atol(transitNodeSetSize));
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
-
-/**
- * This function will create the Transit Node Routing data structure based on a given input file.
- * In this case, the input format is DIMACS and the preprocessing mode is the 'slow' mode.
- *
- * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
- */
-void createTNRfromDIMACSSlow(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing from DIMACS preprocessing (slow mode)");
-    timer.begin();
-
-    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-
-    TNRPreprocessor::preprocessUsingCHslower(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize));
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
-
-/**
- * This function will create the Transit Node Routing data structure based on a given input file.
- * In this case, the input format is DIMACS and the preprocessing mode is the 'dm' mode.
- *
- * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
- */
-void createTNRfromDIMACSUsingDM(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing from DIMACS preprocessing (using distance matrix)");
-    timer.begin();
-
-    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
+    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
+    Graph *originalGraph = graph->createCopy();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
@@ -304,49 +166,25 @@ void createTNRfromDIMACSUsingDM(
  * Transit Node Routing method. This function checks if the mode and the input format arguments
  * are valid, and if so, calls the corresponding function that will handle the preprocessing.
  *
- * @param inputType[in] Contains the argument determining which input format is used (either XenGraph or DIMACS)
  * @param preprocessingMode[in] Contains the argument determining which preprocessing mode is used (fast, slow or DM)
  * @param transitNodeSetSize[in] Contains the argument determining the desired size of the transit node set.
- * @param inputFilePath[in] Contains the file path to the input graph in the chosen format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
 void createTNR(
-        char * inputType,
-        char * preprocessingMode,
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    if(strcmp(inputType, "xengraph") == 0) {
-        if(strcmp(preprocessingMode, "fast") == 0) {
-            createTNRfromXenGraphFast(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else if(strcmp(preprocessingMode, "slow") == 0) {
-            createTNRfromXenGraphSlow(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else if(strcmp(preprocessingMode, "dm") == 0) {
-            createTNRfromXenGraphUsingDM(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else {
-            printf("Unknown preprocessing mode '%s' for Transit Node Routing preprocessing.\n"
-                   "Please, make sure that your call has the right format. If not sure,\n"
-                   "refer to 'README.md' for a complete overview of use cases for this application\n"
-                   "with examples.\n", preprocessingMode);
-        }
-    } else if(strcmp(inputType, "dimacs") == 0) {
-        if(strcmp(preprocessingMode, "fast") == 0) {
-            createTNRfromDIMACSFast(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else if(strcmp(preprocessingMode, "slow") == 0) {
-            createTNRfromDIMACSSlow(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else if(strcmp(preprocessingMode, "dm") == 0) {
-            createTNRfromDIMACSUsingDM(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else {
-            printf("Unknown preprocessing mode '%s' for Transit Node Routing preprocessing.\n"
-                   "Please, make sure that your call has the right format. If not sure,\n"
-                   "refer to 'README.md' for a complete overview of use cases for this application\n"
-                   "with examples.\n", preprocessingMode);
-        }
+        char *preprocessingMode,
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    if (strcmp(preprocessingMode, "fast") == 0) {
+        createTNRFast(transitNodeSetSize, graphLoader, outputFilePath);
+    } else if (strcmp(preprocessingMode, "slow") == 0) {
+        createTNRSlow(transitNodeSetSize, graphLoader, outputFilePath);
+    } else if (strcmp(preprocessingMode, "dm") == 0) {
+        createTNRUsingDM(transitNodeSetSize, graphLoader, outputFilePath);
     } else {
-        printf("Unknown input format '%s' for Transit Node Routing preprocessing.\n"
-               "Please, make sure that your call has the right format. If not sure,\n"
-               "refer to 'README.md' for a complete overview of use cases for this application\n"
-               "with examples.\n", inputType);
+        throw input_error(string("Unknown preprocessing mode '") + preprocessingMode +
+                          "' for Transit Node Routing preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 }
 
@@ -355,19 +193,18 @@ void createTNR(
  * In this case, the input format is XenGraph and the preprocessing mode is the 'slow' mode.
  *
  * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
  */
-void createTNRAFfromXenGraphSlow(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing with Arc Flags from XenGraph preprocessing (slow mode)");
+void createTNRAFSlow(
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    Timer timer("Transit Node Routing with Arc Flags preprocessing (slow mode)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
+    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
+    Graph *originalGraph = graph->createCopy();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
@@ -384,77 +221,20 @@ void createTNRAFfromXenGraphSlow(
  * In this case, the input format is XenGraph and the preprocessing mode is the 'dm' mode.
  *
  * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the XenGraph format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
  */
-void createTNRAFfromXenGraphUsingDM(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing with Arc Flags from XenGraph preprocessing (using distance matrix)");
+void createTNRAFUsingDM(
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    Timer timer("Transit Node Routing with Arc Flags preprocessing (using distance matrix)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    // TODO tahle funkce je buhviproc uplne stejna jako createTNRAFSlow. Uz to tak bylo, tak jenom davam vedet.
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize), 32, true);
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
-
-/**
- * This function will create the Transit Node Routing with Arc Flags data structure based on a given input file.
- * In this case, the input format is DIMACS and the preprocessing mode is the 'slow' mode.
- *
- * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
- */
-void createTNRAFfromDIMACSSlow(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing with Arc Flags from DIMACS preprocessing (slow mode)");
-    timer.begin();
-
-    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize), 32, false);
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    delete graph;
-}
-
-/**
- * This function will create the Transit Node Routing with Arc Flags data structure based on a given input file.
- * In this case, the input format is DIMACS and the preprocessing mode is the 'dm' mode.
- *
- * @param transitNodeSetSize[in] The desired size of the transit nodes set.
- * @param inputFilePath[in] Contains the file path to the input graph in the DIMACS format.
- * @param outputFilePath[in] Contains the desired output file path for the precomputed TNRAF data structure.
- */
-void createTNRAFfromDIMACSUsingDM(
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    Timer timer("Transit Node Routing with Arc Flags from DIMACS preprocessing (using distance matrix)");
-    timer.begin();
-
-    DIMACSLoader graphLoader = DIMACSLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
+    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
+    Graph *originalGraph = graph->createCopy();
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
@@ -471,46 +251,68 @@ void createTNRAFfromDIMACSUsingDM(
  * Transit Node Routing with Arc Flags method. This function checks if the mode and the input format arguments
  * are valid, and if so, calls the corresponding function that will handle the preprocessing.
  *
- * @param inputType[in] Contains the argument determining which input format is used (either XenGraph or DIMACS)
  * @param preprocessingMode[in] Contains the argument determining which preprocessing mode is used (slow or DM)
  * @param transitNodeSetSize[in] Contains the argument determining the desired size of the transit node set.
- * @param inputFilePath[in] Contains the file path to the input graph in the chosen format.
+ * @param graphLoader TODO
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
 void createTNRAF(
-        char * inputType,
-        char * preprocessingMode,
-        char * transitNodeSetSize,
-        char * inputFilePath,
-        char * outputFilePath) {
-    if(strcmp(inputType, "xengraph") == 0) {
-        if(strcmp(preprocessingMode, "slow") == 0) {
-            createTNRAFfromXenGraphSlow(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else if(strcmp(preprocessingMode, "dm") == 0) {
-            createTNRAFfromXenGraphUsingDM(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else {
-            printf("Unknown preprocessing mode '%s' for Transit Node Routing with Arc Flags preprocessing.\n"
-                   "Please, make sure that your call has the right format. If not sure,\n"
-                   "refer to 'README.md' for a complete overview of use cases for this application\n"
-                   "with examples.\n", preprocessingMode);
-        }
-    } else if(strcmp(inputType, "dimacs") == 0) {
-        if(strcmp(preprocessingMode, "slow") == 0) {
-            createTNRAFfromDIMACSSlow(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else if(strcmp(preprocessingMode, "dm") == 0) {
-            createTNRAFfromDIMACSUsingDM(transitNodeSetSize, inputFilePath, outputFilePath);
-        } else {
-            printf("Unknown preprocessing mode '%s' for Transit Node Routing with Arc Flags preprocessing.\n"
-                   "Please, make sure that your call has the right format. If not sure,\n"
-                   "refer to 'README.md' for a complete overview of use cases for this application\n"
-                   "with examples.\n", preprocessingMode);
-        }
+        char *preprocessingMode,
+        char *transitNodeSetSize,
+        GraphLoader &graphLoader,
+        char *outputFilePath) {
+    if (strcmp(preprocessingMode, "slow") == 0) {
+        createTNRAFSlow(transitNodeSetSize, graphLoader, outputFilePath);
+    } else if (strcmp(preprocessingMode, "dm") == 0) {
+        createTNRAFUsingDM(transitNodeSetSize, graphLoader, outputFilePath);
     } else {
-        printf("Unknown input format '%s' for Transit Node Routing with Arc Flags preprocessing.\n"
-               "Please, make sure that your call has the right format. If not sure,\n"
-               "refer to 'README.md' for a complete overview of use cases for this application\n"
-               "with examples.\n", inputType);
+        throw input_error(string("Unknown preprocessing mode '") + preprocessingMode +
+                          "' for Transit Node Routing with Arc Flags preprocessing.\n" + INVALID_FORMAT_INFO);
     }
+}
+
+void createDM(
+        char *outputType,
+        char *preprocessingMode,
+        GraphLoader &graphLoader,
+        char *outputFilePath
+) {
+    Timer timer("Distance Matrix preprocessing");
+    timer.begin();
+
+    DistanceMatrix *dm;
+
+    if (strcmp(preprocessingMode, "slow") == 0) {
+        Graph *graph = graphLoader.loadGraph();
+        DistanceMatrixComputor computor;
+        computor.computeDistanceMatrix(*graph);
+        dm = computor.getDistanceMatrixInstance();
+        delete graph;
+    } else if (strcmp(preprocessingMode, "fast") == 0) {
+        vector<int> adj = graphLoader.loadAdjacencyMatrix();
+        vector<int> output(adj.size());
+        johnson::graph_t * gr = johnson::johnson_init(adj);
+        johnson::johnson_parallel(gr, output.data());
+
+        dm = new DistanceMatrix(std::move(output));
+    } else {
+        throw input_error(string("Unknown preprocessing mode '") + preprocessingMode +
+                          "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
+    }
+
+    if (strcmp(outputType, "xdm") == 0) {
+        dm->outputToXdm(outputFilePath);
+    } else if (strcmp(outputType, "csv") == 0) {
+        dm->outputToCsv(outputFilePath);
+    } else {
+        throw input_error(string("Unknown output type '") + outputType +
+                          "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
+    }
+
+    timer.finish();
+    timer.printMeasuredTime();
+
+    delete dm;
 }
 
 /**
@@ -529,16 +331,16 @@ void createTNRAF(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkDijkstra(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < unsigned int, unsigned int > > trips;
+    vector<pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
-    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    Graph *dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     vector<unsigned int> dijkstraDistances(trips.size());
     double dijkstraTime = DijkstraBenchmark::benchmark(trips, *dijkstraGraph, dijkstraDistances);
@@ -548,14 +350,14 @@ void benchmarkDijkstra(
     printf("Run %lu queries using Dijkstra's algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), dijkstraTime, (dijkstraTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << dijkstraDistances[i] << endl;
         }
 
@@ -581,35 +383,37 @@ void benchmarkDijkstra(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkDijkstraWithMapping(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * mappingFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *mappingFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    vector<pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
-    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    Graph *dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
     vector<unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, *dijkstraGraph, dijkstraDistances, mappingFilePath);
+    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, *dijkstraGraph, dijkstraDistances,
+                                                                   mappingFilePath);
 
     delete dijkstraGraph;
 
     printf("Run %lu queries using Dijkstra's algorithm in %f seconds\n"
            "using '%s' as mapping."
-           "That means %f ms per query.\n", trips.size(), dijkstraTime, mappingFilePath, (dijkstraTime / trips.size()) * 1000);
+           "That means %f ms per query.\n", trips.size(), dijkstraTime, mappingFilePath,
+           (dijkstraTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << dijkstraDistances[i] << endl;
         }
 
@@ -632,16 +436,16 @@ void benchmarkDijkstraWithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkCH(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < unsigned int, unsigned int > > trips;
+    vector<pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader(inputFilePath);
-    FlagsGraph * ch = chLoader.loadFlagsGraph();
+    FlagsGraph *ch = chLoader.loadFlagsGraph();
 
     vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::benchmark(trips, *ch, chDistances);
@@ -651,14 +455,14 @@ void benchmarkCH(
     printf("Run %lu queries using Contraction Hierarchies query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), chTime, (chTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << chDistances[i] << endl;
         }
 
@@ -683,17 +487,17 @@ void benchmarkCH(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkCHwithMapping(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * mappingFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *mappingFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    vector<pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader(inputFilePath);
-    FlagsGraph * ch = chLoader.loadFlagsGraph();
+    FlagsGraph *ch = chLoader.loadFlagsGraph();
 
     vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::benchmarkUsingMapping(trips, *ch, chDistances, mappingFilePath);
@@ -704,14 +508,14 @@ void benchmarkCHwithMapping(
            "using '%s' as mapping."
            "That means %f ms per query.\n", trips.size(), chTime, mappingFilePath, (chTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << chDistances[i] << endl;
         }
 
@@ -734,16 +538,16 @@ void benchmarkCHwithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNR(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < unsigned int, unsigned int > > trips;
+    vector<pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     TNRGLoader tnrLoader = TNRGLoader(inputFilePath);
-    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph *tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::benchmark(trips, *tnrGraph, tnrDistances);
@@ -753,14 +557,14 @@ void benchmarkTNR(
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << tnrDistances[i] << endl;
         }
 
@@ -785,17 +589,17 @@ void benchmarkTNR(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRwithMapping(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * mappingFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *mappingFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    vector<pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     TNRGLoader tnrLoader = TNRGLoader(inputFilePath);
-    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph *tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::benchmarkWithMapping(trips, *tnrGraph, tnrDistances, mappingFilePath);
@@ -805,14 +609,14 @@ void benchmarkTNRwithMapping(
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << tnrDistances[i] << endl;
         }
 
@@ -836,16 +640,16 @@ void benchmarkTNRwithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRAF(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < unsigned int, unsigned int > > trips;
+    vector<pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     TGAFLoader tnrafLoader = TGAFLoader(inputFilePath);
-    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+    TransitNodeRoutingArcFlagsGraph *tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     vector<unsigned int> tnrafDistances(trips.size());
     double tnrafTime = TNRAFBenchmark::benchmark(trips, *tnrafGraph, tnrafDistances);
@@ -855,14 +659,14 @@ void benchmarkTNRAF(
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << tnrafDistances[i] << endl;
         }
 
@@ -888,17 +692,17 @@ void benchmarkTNRAF(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRAFwithMapping(
-        char * inputFilePath,
-        char * queriesFilePath,
-        char * mappingFilePath,
-        char * distancesOutputPath = nullptr,
+        char *inputFilePath,
+        char *queriesFilePath,
+        char *mappingFilePath,
+        char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    vector< pair < long long unsigned int, long long unsigned int > > trips;
+    vector<pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     TGAFLoader tnrafLoader = TGAFLoader(inputFilePath);
-    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+    TransitNodeRoutingArcFlagsGraph *tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     vector<unsigned int> tnrafDistances(trips.size());
     double tnrafTime = TNRAFBenchmark::benchmarkWithMapping(trips, *tnrafGraph, tnrafDistances, mappingFilePath);
@@ -908,18 +712,33 @@ void benchmarkTNRAFwithMapping(
     printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
            "That means %f ms per query.\n", trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
 
-    if(outputDistances) {
+    if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for(unsigned int i = 0; i < trips.size(); ++i) {
+        for (unsigned int i = 0; i < trips.size(); ++i) {
             output << tnrafDistances[i] << endl;
         }
 
         output.close();
+    }
+}
+
+/**
+ * TODO
+ */
+GraphLoader *newGraphLoader(char *inputType, char *inputFilePath) {
+    if (strcmp(inputType, "xengraph") == 0) {
+        return new XenGraphLoader(inputFilePath);
+    } else if (strcmp(inputType, "dimacs") == 0) {
+        return new DIMACSLoader(inputFilePath);
+    } else if (strcmp(inputType, "csv") == 0) {
+        return new CsvGraphLoader(inputFilePath);
+    } else {
+        throw input_error(string("Unknown input format '") + inputType + "'.\n" + INVALID_FORMAT_INFO);
     }
 }
 
@@ -945,192 +764,129 @@ void benchmarkTNRAFwithMapping(
  *
  * <br> _Author: Michal Cvach_
  */
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[]) {
     setbuf(stdout, NULL);
 
-    if(argc < 5 || argc > 8) {
+    if (argc < 5 || argc > 8) {
         printUsageInfo(argv[0]);
         return 0;
     }
 
-    // The user wants to create data structures using some method.
-    if(strcmp(argv[1], "create") == 0) {
-        // Contraction Hierarchies preprocessing.
-        if(strcmp(argv[2], "ch") == 0) {
-            if(argc != 6) {
-                printf("Invalid amount of arguments for Contraction Hierarchies preprocessing.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n");
-                return 0;
-            }
-            createCH(argv[3], argv[4], argv[5]);
+    try {
+        // The user wants to create data structures using some method.
+        if (strcmp(argv[1], "create") == 0) {
+            // Contraction Hierarchies preprocessing.
+            if (strcmp(argv[2], "ch") == 0) {
+                if (argc != 6) {
+                    throw input_error(
+                            string("Invalid amount of arguments for Contraction Hierarchies preprocessing.\n") +
+                            INVALID_FORMAT_INFO);
+                }
+                GraphLoader *graphLoader = newGraphLoader(argv[3], argv[4]);
+                createCH(graphLoader, argv[5]);
+                delete graphLoader;
 
-        // Transit Node Routing preprocessing.
-        } else if(strcmp(argv[2], "tnr") == 0) {
-            if(argc != 8) {
-                printf("Invalid amount of arguments for Transit Node Routing preprocessing.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n");
-                return 0;
-            }
-            createTNR(argv[3], argv[4], argv[5], argv[6], argv[7]);
+                // Transit Node Routing preprocessing.
+            } else if (strcmp(argv[2], "tnr") == 0) {
+                if (argc != 8) {
+                    throw input_error(
+                            string("Invalid amount of arguments for Transit Node Routing preprocessing.\n") +
+                            INVALID_FORMAT_INFO);
+                }
+                GraphLoader *graphLoader = newGraphLoader(argv[3], argv[6]);
+                createTNR(argv[4], argv[5], *graphLoader, argv[7]);
+                delete graphLoader;
 
-        // Transit Node Routing with Arc Flags preprocessing.
-        } else if(strcmp(argv[2], "tnraf") == 0) {
-            if(argc != 8) {
-                printf("Invalid amount of arguments for Transit Node Routing with Arc Flags preprocessing.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n");
-                return 0;
-            }
-            createTNRAF(argv[3], argv[4], argv[5], argv[6], argv[7]);
+                // Transit Node Routing with Arc Flags preprocessing.
+            } else if (strcmp(argv[2], "tnraf") == 0) {
+                if (argc != 8) {
+                    throw input_error(
+                            string("Invalid amount of arguments for Transit Node Routing with Arc Flags preprocessing.\n") +
+                            INVALID_FORMAT_INFO);
+                }
+                GraphLoader *graphLoader = newGraphLoader(argv[3], argv[6]);
+                createTNRAF(argv[4], argv[5], *graphLoader, argv[7]);
+                delete graphLoader;
+            } else if (strcmp(argv[2], "dm") == 0) {
+                if (argc != 8) {
+                    throw input_error(string("Invalid amount of arguments for Distance Matrix preprocessing.\n") +
+                                      INVALID_FORMAT_INFO);
+                }
 
+                GraphLoader *graphLoader = newGraphLoader(argv[3], argv[6]);
+                createDM(argv[4], argv[5], *graphLoader, argv[7]);
+                delete graphLoader;
+            } else {
+                throw input_error(INVALID_USAGE_INFO);
+            }
+
+
+            // The user has data structures computed using some method and wants to benchmark those using a set of queries.
+        } else if (strcmp(argv[1], "benchmark") == 0) {
+            const auto benchmarks = {
+                    make_tuple(string("dijkstra"), benchmarkDijkstra, benchmarkDijkstraWithMapping),
+                    make_tuple(string("ch"), benchmarkCH, benchmarkCHwithMapping),
+                    make_tuple(string("tnr"), benchmarkTNR, benchmarkTNRwithMapping),
+                    make_tuple(string("tnraf"), benchmarkTNRAF, benchmarkTNRAFwithMapping),
+            };
+
+            bool found = false;
+            for (auto &benchmark : benchmarks) {
+                auto &name = get<0>(benchmark);
+
+                if (name.compare(argv[2])) {
+                    if (strcmp(argv[3], "nomapping") == 0) {
+                        auto &func = get<1>(benchmark);
+                        if (argc == 7) {
+                            func(argv[4], argv[5], argv[6], true);
+                        } else if (argc == 6) {
+                            func(argv[4], argv[5], nullptr, false);
+                        } else {
+                            throw input_error(
+                                    string("Invalid amount of arguments for") + name + " benchmarking.\n" +
+                                    INVALID_FORMAT_INFO);
+                        }
+                    } else if (strcmp(argv[3], "mapping") == 0) {
+                        auto &func = get<2>(benchmark);
+                        if (argc == 8) {
+                            func(argv[4], argv[5], argv[6], argv[7], true);
+                        } else if (argc == 7) {
+                            func(argv[4], argv[5], argv[6], nullptr, false);
+                        } else {
+                            throw input_error(
+                                    string("Invalid amount of arguments for") + name + " benchmarking.\n" +
+                                    INVALID_FORMAT_INFO);
+                        }
+                    } else {
+                        throw input_error(string("Option '") + argv[3] + "' does not make sense for benchmarking.\n" +
+                                          "Either 'mapping' or 'nomapping' is expected.\n" + INVALID_FORMAT_INFO);
+                    }
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                throw input_error(INVALID_USAGE_INFO);
+            }
         } else {
-            printInvalidUsageInfo();
-            return 0;
+            throw input_error(INVALID_USAGE_INFO);
         }
-
-
-    // The user has data structures computed using some method and wants to benchmark those using a set of queries.
-    } else if (strcmp(argv[1], "benchmark") == 0) {
-        // Dijkstra benchmarking
-        if(strcmp(argv[2], "dijkstra") == 0) {
-            if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 7) {
-                    benchmarkDijkstra(argv[4], argv[5], argv[6], true);
-                } else if(argc == 6) {
-                    benchmarkDijkstra(argv[4], argv[5], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Dijkstra's Algorithm benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 8) {
-                    benchmarkDijkstraWithMapping(argv[4], argv[5], argv[6], argv[7], true);
-                } else if(argc == 7) {
-                    benchmarkDijkstraWithMapping(argv[4], argv[5], argv[6], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Dijkstra's Algorithm  benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else {
-                printf("Option '%s' does not make sense for benchmarking.\n"
-                       "Either 'mapping' or 'nomapping' is expected.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n", argv[3]);
-            }
-        }
-        // Contraction Hierarchies benchmarking.
-        else if(strcmp(argv[2], "ch") == 0) {
-            if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 7) {
-                    benchmarkCH(argv[4], argv[5], argv[6], true);
-                } else if(argc == 6) {
-                    benchmarkCH(argv[4], argv[5], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Contraction Hierarchies benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 8) {
-                    benchmarkCHwithMapping(argv[4], argv[5], argv[6], argv[7], true);
-                } else if(argc == 7) {
-                    benchmarkCHwithMapping(argv[4], argv[5], argv[6], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Contraction Hierarchies benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else {
-                printf("Option '%s' does not make sense for benchmarking.\n"
-                       "Either 'mapping' or 'nomapping' is expected.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n", argv[3]);
-            }
-
-        // Transit Node Routing benchmarking.
-        } else if(strcmp(argv[2], "tnr") == 0) {
-            if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 7) {
-                    benchmarkTNR(argv[4], argv[5], argv[6], true);
-                } else if(argc == 6) {
-                    benchmarkTNR(argv[4], argv[5], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Transit Node Routing benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 8) {
-                    benchmarkTNRwithMapping(argv[4], argv[5], argv[6], argv[7], true);
-                } else if(argc == 7) {
-                    benchmarkTNRwithMapping(argv[4], argv[5], argv[6], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Transit Node Routing benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else {
-                printf("Option '%s' does not make sense for benchmarking.\n"
-                       "Either 'mapping' or 'nomapping' is expected.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n", argv[3]);
-            }
-
-        // Transit Node Routing with Arc Flags benchmarking.
-        } else if(strcmp(argv[2], "tnraf") == 0) {
-            if(strcmp(argv[3], "nomapping") == 0) {
-                if(argc == 7) {
-                    benchmarkTNRAF(argv[4], argv[5], argv[6], true);
-                } else if(argc == 6) {
-                    benchmarkTNRAF(argv[4], argv[5], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Transit Node Routing with Arc Flags benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else if(strcmp(argv[3], "mapping") == 0) {
-                if(argc == 8) {
-                    benchmarkTNRAFwithMapping(argv[4], argv[5], argv[6], argv[7], true);
-                } else if(argc == 7) {
-                    benchmarkTNRAFwithMapping(argv[4], argv[5], argv[6], nullptr, false);
-                } else {
-                    printf("Invalid amount of arguments for Transit Node Routing with Arc Flags benchmarking.\n"
-                           "Please, make sure that your call has the right format. If not sure,\n"
-                           "refer to 'README.md' for a complete overview of use cases for this application\n"
-                           "with examples.\n");
-                }
-            } else {
-                printf("Option '%s' does not make sense for benchmarking.\n"
-                       "Either 'mapping' or 'nomapping' is expected.\n"
-                       "Please, make sure that your call has the right format. If not sure,\n"
-                       "refer to 'README.md' for a complete overview of use cases for this application\n"
-                       "with examples.\n", argv[3]);
-            }
-
-        } else {
-            printInvalidUsageInfo();
-            return 0;
-        }
-    } else {
-        printInvalidUsageInfo();
-        return 0;
+    }
+    catch (input_error &e) {
+        cout << "Input Error for";
+        for (int i = 0; i < argc; ++i)
+            cout << " " << argv[i];
+        cout << ": " << e.what();
+        return 1;
+    }
+    catch (not_implemented_error &e) {
+        cout << "Not Implemented Error for";
+        for (int i = 0; i < argc; ++i)
+            cout << " " << argv[i];
+        cout << ": " << e.what();
+        return 1;
     }
 
     return 0;

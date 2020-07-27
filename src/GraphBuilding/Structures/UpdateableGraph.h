@@ -6,8 +6,10 @@
 #ifndef TRANSIT_NODE_ROUTING_UPDATEABLEGRAPH_H
 #define TRANSIT_NODE_ROUTING_UPDATEABLEGRAPH_H
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
+#include <string>
+#include <iostream>
 #include "PreprocessingEdgeData.h"
 #include "OutputEdge.h"
 #include "OutputShortcutEdge.h"

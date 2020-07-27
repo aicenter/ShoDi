@@ -92,11 +92,14 @@ void createDM(
 
     DistanceMatrixComputor dmComputor;
     dmComputor.computeDistanceMatrix(*graph);
-    dmComputor.outputDistanceMatrixToFile(outputFilePath);
+
+    DistanceMatrix * dm = dmComputor.getDistanceMatrixInstance();
+    dm->outputToXdm(outputFilePath);
 
     timer.finish();
     timer.printMeasuredTime();
 
+    delete dm;
     delete graph;
 }
 

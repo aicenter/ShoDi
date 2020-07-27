@@ -10,6 +10,7 @@
 #include <map>
 #include "../Structures/Graph.h"
 #include "../Structures/UpdateableGraph.h"
+#include "GraphLoader.h"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ using namespace std;
  * sample graphs that can be directly used with this program can be found here:
  * http://www.dis.uniroma1.it/challenge9/download.shtml
  */
-class DIMACSLoader{
+class DIMACSLoader : public GraphLoader {
 private:
     string inputFile;
 
@@ -80,31 +81,15 @@ public:
      */
     explicit DIMACSLoader(string inputFile);
 
-    /**
-     * Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
-     * into an 'SimpleGraph' instance, which automatically removes multiple (parallel) edges and then
-     * construct a 'Graph' from that.
-     *
-     * @return An instance of the Graph class containing the graph obtained from the input file.
-     */
-    Graph * loadGraph();
+    vector<int> loadAdjacencyMatrix() override;
 
-    /**
-     * This function is used to load the graph data into an 'UpdateableGraph' instance, which can be used for the
-     * preprocessing to create a Contraction Hierarchy from the input graph.
-     *
-     * @return An instance of the UpdateableGraph class containing the graph obtained from the input file.
-     */
-    UpdateableGraph * loadUpdateableGraph();
+    Graph *loadGraph() override;
 
-    /**
-     * This function is used to reinsert all the original edges into the graph after the preprocessing has been
-     * finished. Since during preprocessing edges are deleted during the contraction process, this puts the original
-     * edges back into the graph.
-     *
-     * @param graph[in, out] An existing graph we will insert the edges into.
-     */
-    void putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph);
+    UpdateableGraph *loadUpdateableGraph() override;
+
+    void putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) override;
+
+    ~DIMACSLoader() override = default;
 };
 
 #endif //TRANSIT_NODE_ROUTING_LOADER_H

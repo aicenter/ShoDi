@@ -5,6 +5,7 @@
 
 #include "../../Timer/Timer.h"
 #include "XenGraphLoader.h"
+#include "../../Error/Error.h"
 #include <fstream>
 #include <iostream>
 
@@ -150,4 +151,8 @@ void XenGraphLoader::parseNodesMapping(ifstream & input, unordered_map <long lon
         mapping.insert(make_pair(cur, i));
     }
 
+}
+
+vector<int> XenGraphLoader::loadAdjacencyMatrix() {
+    throw not_implemented_error("loadAdjacencyMatrix() is not implemented for XenGraphLoader class");
 }

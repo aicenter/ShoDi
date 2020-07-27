@@ -7,6 +7,7 @@
 #define CONTRACTION_HIERARCHIES_DISTANCEMATRIX_H
 
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -25,14 +26,14 @@ public:
      *
      * @param nodes[in] The number of nodes in the graph (also the number of rows and columns in the matrix).
      */
-    explicit DistanceMatrix(const unsigned int nodes);
+    explicit DistanceMatrix(unsigned int nodes);
 
     /**
      * A move constructor.
      *
      * @param distMatrix[in] A 2D vector that will be used as the distance matrix.
      */
-    explicit DistanceMatrix(vector<vector<unsigned int>> && distMatrix);
+    explicit DistanceMatrix(vector<int> && distMatrix);
 
     /**
      * This is basically a query algorithm. Each query is answered using a single table lookup,
@@ -42,7 +43,7 @@ public:
      * @param goal[in] The goal node for the query.
      * @return Returns the shortest distance from start to goal or 'UINT_MAX' if goal is not reachable from start.
      */
-    unsigned int findDistance(const unsigned int start, const unsigned int goal);
+    unsigned int findDistance(unsigned int start, unsigned int goal);
 
     /**
      * Auxiliary function used during the initialization to set the distances.
@@ -54,6 +55,26 @@ public:
     void setDistance(unsigned int source, unsigned int target, unsigned int distance);
 
     /**
+     * Allows to output the distance matrix in a simple binary format. The distance matrix will be saved into a file
+     * specified by the path argument, suffix '.xdm' is added automatically.
+     *
+     * The format is as follows: First three bytes should contain the characters 'X', 'D' and 'M' respectively,
+     * following is one unsigned int denoting the number of nodes 'n', and following are n*n unsigned int values
+     * representing the actual distances for the matrix.
+     *
+     * @param path[in] The desired output file path where the distance matrix should be output.
+     */
+    void outputToXdm(const string &path);
+
+    /**
+     * Allows to output the distance matrix in a CSV format. The distance matrix will be saved into a file
+     * specified by the path argument, suffix '.csv' is added automatically.
+     *
+     * @param path[in] The desired output file path where the distance matrix should be output.
+     */
+    void outputToCsv(const string &path);
+
+    /**
      * Prints some statistics about the distance matrix. Useful mainly during debugging, might be removed later.
      * Checks how many values in the distance matrix are set to infinity (represented as 'UINT_MAX' in our case).
      * Too many of such values are suspicious and might mean that for example the precision of the graph is too
@@ -62,7 +83,8 @@ public:
     void printInfo();
 
 private:
-    vector<vector<unsigned int>> distances;
+    const unsigned int nodesCnt;
+    vector<int> distances;
 };
 
 

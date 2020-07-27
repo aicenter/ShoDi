@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.14)
 project(shortest_paths)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CSV_CXX_STANDARD 11)
 option(BUILD_DOC "Build documentation" ON)
 
 find_package(JNI REQUIRED)
+find_package(Boost REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # check if Doxygen is installed
 find_package(Doxygen
@@ -21,16 +24,26 @@ if (DOXYGEN_FOUND)
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
     message("Doxygen build started")
 
-    add_custom_target( doc ALL
+    add_custom_target(doc ALL
             COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Generating documentation with Doxygen."
-            VERBATIM )
+            VERBATIM)
 else (DOXYGEN_FOUND)
     message("Doxygen needs to be installed to generate documentation.")
 endif (DOXYGEN_FOUND)
 
-include_directories(${JNI_INCLUDE_DIRS})
+add_subdirectory(csv-parser)
+
+include_directories(${JNI_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} csv-parser/single_include)
+link_libraries(csv ${Boost_LIBRARIES})
+
+if (OpenMP_CXX_FOUND)
+    link_libraries(OpenMP::OpenMP_CXX)
+endif ()
+
+add_compile_definitions(_OPENMP)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
 
 add_library(shortestPaths SHARED
@@ -139,7 +152,12 @@ add_library(shortestPaths SHARED
         src/TNRAF/Structures/NodeDataRegions.h
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
-        )
+        src/GraphBuilding/Loaders/GraphLoader.h
+        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+        src/GraphBuilding/Loaders/CsvGraphLoader.h
+        src/Error/Error.h
+        src/DistanceMatrix/johnson.cpp
+        src/DistanceMatrix/johnson.hpp)
 
 add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRBenchmark.cpp
@@ -257,7 +275,12 @@ add_executable(shortestPathsPreprocessor
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         src/main.cpp
-        )
+        src/GraphBuilding/Loaders/GraphLoader.h
+        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+        src/GraphBuilding/Loaders/CsvGraphLoader.h
+        src/Error/Error.h
+        src/DistanceMatrix/johnson.cpp
+        src/DistanceMatrix/johnson.hpp)
 
 add_executable(thesisTests
         src/Benchmarking/TNRBenchmark.cpp
@@ -375,4 +398,9 @@ add_executable(thesisTests
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         src/thesisTestScenarios.cpp
-        )
+        src/GraphBuilding/Loaders/GraphLoader.h
+        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+        src/GraphBuilding/Loaders/CsvGraphLoader.h
+        src/Error/Error.h
+        src/DistanceMatrix/johnson.cpp
+        src/DistanceMatrix/johnson.hpp)

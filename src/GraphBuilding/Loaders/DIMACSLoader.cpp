@@ -6,6 +6,7 @@
 #include <fstream>
 #include "DIMACSLoader.h"
 #include "../../Timer/Timer.h"
+#include "../../Error/Error.h"
 
 //______________________________________________________________________________________________________________________
 DIMACSLoader::DIMACSLoader(string inputFile) {
@@ -171,4 +172,8 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
     from = tmpfrom - 1;
     to = tmpto - 1;
     weight = tmpweight;
+}
+
+vector<int> DIMACSLoader::loadAdjacencyMatrix() {
+    throw not_implemented_error("loadAdjacencyMatrix() is not implemented for DIMACSLoader class");
 }
