@@ -21,6 +21,17 @@
 #include "TNRAF/TNRAFPreprocessor.h"
 #include "DistanceMatrix/DistanceMatrixComputor.h"
 
+/*
+ * The exact code in this file was used to obtain the benchmark data presented in the thesis.
+ * Using this file, anyone can redo the tests to validate our results.
+ */
+
+/**
+ * Auxiliary function that creates a Contraction Hierarchy.
+ *
+ * @param inputFilePath[in] Path to the input graph.
+ * @param outputFilePath[in] The desired output file path for the precomputed data structure.
+ */
 void createCH(
         char const * inputFilePath,
         char const * outputFilePath) {
@@ -39,6 +50,12 @@ void createCH(
     delete graph;
 }
 
+/**
+ * Auxiliary function that precomputes the data structures for Transit Node Routing.
+ *
+ * @param inputFilePath[in] Path to the input graph.
+ * @param outputFilePath[in] The desired output file path for the precomputed data structure.
+ */
 void createTNR(
         char const * inputFilePath,
         unsigned int transitNodeSetSize,
@@ -60,6 +77,12 @@ void createTNR(
     delete graph;
 }
 
+/**
+ * Auxiliary function that precomputes the data structures for Transit Node Routing with Arc Flags.
+ *
+ * @param inputFilePath[in] Path to the input graph.
+ * @param outputFilePath[in] The desired output file path for the precomputed data structure.
+ */
 void createTNRAF(
         char const * inputFilePath,
         unsigned int transitNodeSetSize,
@@ -81,6 +104,12 @@ void createTNRAF(
     delete graph;
 }
 
+/**
+ * Auxiliary function that precomputes the full Distance Matrix for the graph.
+ *
+ * @param inputFilePath[in] Path to the input graph.
+ * @param outputFilePath[in] The desired output file path for the precomputed data structure.
+ */
 void createDM(
         char const * inputFilePath,
         char const * outputFilePath) {
@@ -103,13 +132,11 @@ void createDM(
     delete graph;
 }
 
-void computeStructuresForAllMethodsBerlin(char const * inputFilePath = "../thesisTestsData/Berlin/Berlin.xeng") {
-    createCH(inputFilePath, "../thesisTestsData/Berlin/Berlin");
-    createTNR(inputFilePath, 5000, "../thesisTestsData/Berlin/Berlin5000tnodes");
-    createTNRAF(inputFilePath, 5000, "../thesisTestsData/Berlin/Berlin5000tnodes");
-    createDM(inputFilePath, "../thesisTestsData/Berlin/Berlin");
-}
-
+/**
+ * Auxiliary function that precomputes all the data structures used for the first benchmark (graph of Prague).
+ *
+ * @param inputFilePath[in] The path to the graph of Prague in the XenGraph format.
+ */
 void computeStructuresForAllMethodsPrague(char const * inputFilePath = "../thesisTestsData/Prague/Prague.xeng") {
     createCH(inputFilePath, "../thesisTestsData/Prague/Prague");
     createTNR(inputFilePath, 2000, "../thesisTestsData/Prague/Prague2000tnodes");
@@ -117,13 +144,36 @@ void computeStructuresForAllMethodsPrague(char const * inputFilePath = "../thesi
     createDM(inputFilePath, "../thesisTestsData/Prague/Prague");
 }
 
-void computeStructuresForAllMethodsPragueToPilsen(char const * inputFilePath = "../thesisTestsData/PragueToPilsen/PragueToPilsen.xeng") {
-    createCH(inputFilePath, "../thesisTestsData/PragueToPilsen/PragueToPilsen");
-    createTNR(inputFilePath, 7000, "../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes");
-    createTNRAF(inputFilePath, 7000, "../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes");
-    createDM(inputFilePath, "../thesisTestsData/PragueToPilsen/PragueToPilsen");
+/**
+ * Auxiliary function that precomputes all the data structures used for the second benchmark (graph of Berlin).
+ *
+ * @param inputFilePath[in] The path to the graph of Berlin in the XenGraph format.
+ */
+void computeStructuresForAllMethodsBerlin(char const * inputFilePath = "../thesisTestsData/Berlin/Berlin.xeng") {
+    createCH(inputFilePath, "../thesisTestsData/Berlin/Berlin");
+    createTNR(inputFilePath, 5000, "../thesisTestsData/Berlin/Berlin5000tnodes");
+    createTNRAF(inputFilePath, 5000, "../thesisTestsData/Berlin/Berlin5000tnodes");
+    createDM(inputFilePath, "../thesisTestsData/Berlin/Berlin");
 }
 
+/**
+ * Auxiliary function that precomputes all the data structures used for the third benchmark (graph of SouthwestBohemia).
+ *
+ * @param inputFilePath[in] The path to the graph of SouthwestBohemia in the XenGraph format.
+ */
+void computeStructuresForAllMethodsSouthwestBohemia(char const * inputFilePath = "../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng") {
+    createCH(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
+    createTNR(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
+    createTNRAF(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
+    createDM(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
+}
+
+/**
+ * Auxiliary function that precomputes Transit Node Routing data structures for the graph of Prague with 6 different
+ * transit node-set sizes.
+ *
+ * @param inputFilePath[in] The path to the graph of Prague in the XenGraph format.
+ */
 void computeTNRvariousTransitNodeSetSizes(char const * inputFilePath = "../thesisTestsData/Prague/Prague.xeng") {
     createTNR(inputFilePath, 200, "../thesisTestsData/Prague/Prague200tnodes");
     createTNR(inputFilePath, 500, "../thesisTestsData/Prague/Prague500tnodes");
@@ -133,6 +183,12 @@ void computeTNRvariousTransitNodeSetSizes(char const * inputFilePath = "../thesi
     createTNR(inputFilePath, 10000, "../thesisTestsData/Prague/Prague10000tnodes");
 }
 
+/**
+ * Auxiliary function that precomputes Transit Node Routing with Arc Flags data structures for the graph of Prague
+ * with 6 different transit node-set sizes.
+ *
+ * @param inputFilePath[in] The path to the graph of Prague in the XenGraph format.
+ */
 void computeTNRAFvariousTransitNodeSetSizes(char const * inputFilePath = "../thesisTestsData/Prague/Prague.xeng") {
     createTNRAF(inputFilePath, 200, "../thesisTestsData/Prague/Prague200tnodes");
     createTNRAF(inputFilePath, 500, "../thesisTestsData/Prague/Prague500tnodes");
@@ -142,6 +198,13 @@ void computeTNRAFvariousTransitNodeSetSizes(char const * inputFilePath = "../the
     createTNRAF(inputFilePath, 10000, "../thesisTestsData/Prague/Prague10000tnodes");
 }
 
+/**
+ * Compares the five methods on the graph of Prague using a query set containing 100 000 random queries.
+ * The results of this benchmark are reported in section 7.2.1 of the thesis.
+ *
+ * @param runs[in] The number of times the benchmark should be repeated. The average values are returned at the end.
+ * More runs should provide more accurate values.
+ */
 void compareAllMethodsOnPrague(unsigned int runs = 20) {
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Prague/Prague.xeng");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
@@ -241,6 +304,13 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     delete dm;
 }
 
+/**
+ * Compares the five methods on the graph of Berlin using a query set containing 100 000 random queries.
+ * The results of this benchmark are reported in section 7.2.2 of the thesis.
+ *
+ * @param runs[in] The number of times the benchmark should be repeated. The average values are returned at the end.
+ * More runs should provide more accurate values.
+ */
 void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Berlin/Berlin.xeng");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
@@ -340,23 +410,30 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     delete dm;
 }
 
-void compareAllMethodsOnPragueToPilsen(unsigned int runs = 20) {
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen.xeng");
+/**
+ * Compares the five methods on the graph of SouthwestBohemia using a query set containing 100 000 random queries.
+ * The results of this benchmark are reported in section 7.2.3 of the thesis.
+ *
+ * @param runs[in] The number of times the benchmark should be repeated. The average values are returned at the end.
+ * More runs should provide more accurate values.
+ */
+void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
+    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
     Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
 
-    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen.ch");
+    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
 
-    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes.tnrg");
+    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes.tnrg");
     TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
-    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen7000tnodes.tgaf");
+    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
-    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen.xdm");
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xdm");
     DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
 
-    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/PragueToPilsen/PragueToPilsen100000randomQueries.txt");
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = querySet.size();
@@ -439,6 +516,14 @@ void compareAllMethodsOnPragueToPilsen(unsigned int runs = 20) {
     delete dm;
 }
 
+/**
+ * Compares Transit Node Routing with 6 different transit node-set sizes on the graph of Prague using a query
+ * set containing 100 000 random queries.
+ * The results of this benchmark are reported in section 7.2.4 of the thesis.
+ *
+ * @param runs[in] The number of times the benchmark should be repeated. The average values are returned at the end.
+ * More runs should provide more accurate values.
+ */
 void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TNRGLoader tnr200Loader = TNRGLoader("../thesisTestsData/Prague/Prague200tnodes.tnrg");
     TransitNodeRoutingGraph * tnr200Graph = tnr200Loader.loadTNRforDistanceQueries();
@@ -530,6 +615,14 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     delete tnr10000Graph;
 }
 
+/**
+ * Compares Transit Node Routing with Arc Flags with 6 different transit node-set sizes
+ * on the graph of Prague using a query set containing 100 000 random queries.
+ * The results of this benchmark are reported in section 7.2.5 of the thesis.
+ *
+ * @param runs[in] The number of times the benchmark should be repeated. The average values are returned at the end.
+ * More runs should provide more accurate values.
+ */
 void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TGAFLoader tnraf200Loader = TGAFLoader("../thesisTestsData/Prague/Prague200tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnraf200Graph = tnraf200Loader.loadTNRAFforDistanceQueries();
@@ -621,19 +714,22 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     delete tnraf10000Graph;
 }
 
+/**
+ * A main function that by default runs all the tests. You can comment out the tests you do not want to perform.
+ */
 int main(int argc, char * argv[]) {
     setbuf(stdout, NULL);
 
     computeStructuresForAllMethodsPrague("../thesisTestsData/Prague.xeng");
     computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
-    computeStructuresForAllMethodsPragueToPilsen("../thesisTestsData/PragueToPilsen/PragueToPilsen.xeng");
+    computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
 
     computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague.xeng");
     computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague.xeng");
 
     compareAllMethodsOnPrague(20);
     compareAllMethodsOnBerlin(20);
-    compareAllMethodsOnPragueToPilsen(20);
+    compareAllMethodsOnSouthwestBohemia(20);
 
     compareTNRwithVariousTransitNodeSetSizes(20);
     compareTNRAFwithVariousTransitNodeSetSizes(20);

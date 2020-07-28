@@ -58,7 +58,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph, originalGraph, regions, useDistanceMatrix);
     }
 
-    cout << "\rComputed forward access nodes for all nodes in the graph.";
+    cout << "\rComputed forward access nodes for all nodes in the graph." << endl;
 
     if(useDistanceMatrix) {
         cout << "Computing the auxiliary distance matrix for backward direction." << endl;
