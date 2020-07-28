@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(shortest_paths)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CSV_CXX_STANDARD 11)
 option(BUILD_DOC "Build documentation" ON)
@@ -78,8 +80,8 @@ add_library(shortestPaths SHARED
         src/Dijkstra/DijkstraNode.h
         src/DistanceMatrix/DistanceMatrix.cpp
         src/DistanceMatrix/DistanceMatrix.h
-        src/DistanceMatrix/DistanceMatrixComputor.cpp
-        src/DistanceMatrix/DistanceMatrixComputor.h
+        src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+        src/DistanceMatrix/DistanceMatrixComputorSlow.h
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.h
         src/GraphBuilding/Loaders/DIMACSLoader.cpp
@@ -157,7 +159,17 @@ add_library(shortestPaths SHARED
         src/GraphBuilding/Loaders/CsvGraphLoader.h
         src/Error/Error.h
         src/DistanceMatrix/johnson.cpp
-        src/DistanceMatrix/johnson.hpp)
+        src/DistanceMatrix/johnson.hpp
+        src/DistanceMatrix/DistanceMatrixComputorFast.cpp
+        src/DistanceMatrix/DistanceMatrixComputorFast.h
+        src/DistanceMatrix/DistanceMatrixComputor.h
+        src/DistanceMatrix/DistanceMatrixOutputter.h
+        src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
+        src/DistanceMatrix/DistanceMatrixCsvOutputter.h
+        src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
+        src/DistanceMatrix/DistanceMatrixXdmOutputter.h
+        src/DistanceMatrix/ProgressBar.cpp
+        src/DistanceMatrix/ProgressBar.hpp)
 
 add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRBenchmark.cpp
@@ -176,111 +188,8 @@ add_executable(shortestPathsPreprocessor
         src/Benchmarking/PathCorrectnessValidator.h
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
-        src/CH/Structures/CHNode.cpp
-        src/CH/Structures/CHNode.h
-        src/CH/Structures/CHpriorityQueue.cpp
-        src/CH/Structures/CHpriorityQueue.h
-        src/CH/EdgeDifferenceManager.cpp
-        src/CH/EdgeDifferenceManager.h
-        src/CH/Structures/HopsDijkstraNode.cpp
-        src/CH/Structures/HopsDijkstraNode.h
-        src/CH/Structures/NodeData.cpp
-        src/CH/Structures/NodeData.h
-        src/CH/CHDistanceQueryManager.cpp
-        src/CH/CHDistanceQueryManager.h
-        src/CH/CHDistanceQueryManagerWithMapping.cpp
-        src/CH/CHDistanceQueryManagerWithMapping.h
-        src/CH/CHPathQueryManager.cpp
-        src/CH/CHPathQueryManager.h
-        src/CH/CHPreprocessor.cpp
-        src/CH/CHPreprocessor.h
-        src/Dijkstra/BasicDijkstra.cpp
-        src/Dijkstra/BasicDijkstra.h
-        src/Dijkstra/DijkstraNode.cpp
-        src/Dijkstra/DijkstraNode.h
-        src/DistanceMatrix/DistanceMatrix.cpp
-        src/DistanceMatrix/DistanceMatrix.h
-        src/DistanceMatrix/DistanceMatrixComputor.cpp
-        src/DistanceMatrix/DistanceMatrixComputor.h
-        src/GraphBuilding/Loaders/DDSGLoader.cpp
-        src/GraphBuilding/Loaders/DDSGLoader.h
-        src/GraphBuilding/Loaders/DIMACSLoader.cpp
-        src/GraphBuilding/Loaders/DIMACSLoader.h
-        src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
-        src/GraphBuilding/Loaders/DistanceMatrixLoader.h
-        src/GraphBuilding/Loaders/XenGraphLoader.cpp
-        src/GraphBuilding/Loaders/XenGraphLoader.h
-        src/GraphBuilding/Loaders/TripsLoader.cpp
-        src/GraphBuilding/Loaders/TripsLoader.h
-        src/GraphBuilding/Loaders/TNRGLoader.cpp
-        src/GraphBuilding/Loaders/TNRGLoader.h
-        src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Loaders/TGAFLoader.h
-        src/GraphBuilding/Structures/FlagsGraph.cpp
-        src/GraphBuilding/Structures/FlagsGraph.h
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
-        src/GraphBuilding/Structures/Graph.cpp
-        src/GraphBuilding/Structures/Graph.h
-        src/GraphBuilding/Structures/OutputEdge.cpp
-        src/GraphBuilding/Structures/OutputEdge.h
-        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
-        src/GraphBuilding/Structures/OutputShortcutEdge.h
-        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
-        src/GraphBuilding/Structures/PreprocessingEdgeData.h
-        src/GraphBuilding/Structures/QueryEdge.cpp
-        src/GraphBuilding/Structures/QueryEdge.h
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.h
-        src/GraphBuilding/Structures/ShortcutEdge.cpp
-        src/GraphBuilding/Structures/ShortcutEdge.h
-        src/GraphBuilding/Structures/SimpleGraph.cpp
-        src/GraphBuilding/Structures/SimpleGraph.h
-        src/GraphBuilding/Structures/UpdateableGraph.cpp
-        src/GraphBuilding/Structures/UpdateableGraph.h
-        src/GraphBuilding/Structures/SimpleEdge.cpp
-        src/GraphBuilding/Structures/SimpleEdge.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.h
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h
-        src/TNR/TNRPreprocessor.cpp
-        src/TNR/TNRPreprocessor.h
-        src/TNR/Structures/AccessNodeData.cpp
-        src/TNR/Structures/AccessNodeData.h
-        src/TNR/TNRDistanceQueryManager.cpp
-        src/TNR/TNRDistanceQueryManager.h
-        src/TNR/TNRDistanceQueryManagerWithMapping.cpp
-        src/TNR/TNRDistanceQueryManagerWithMapping.h
-        src/Timer/Timer.cpp
-        src/Timer/Timer.h
-        src/TNR/TNRPathQueryManager.cpp
-        src/TNR/TNRPathQueryManager.h
-        src/TNRAF/TNRAFPreprocessor.cpp
-        src/TNRAF/TNRAFPreprocessor.h
-        src/TNRAF/TNRAFPathQueryManager.cpp
-        src/TNRAF/TNRAFPathQueryManager.h
-        src/TNRAF/TNRAFDistanceQueryManager.cpp
-        src/TNRAF/TNRAFDistanceQueryManager.h
-        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
-        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.h
-        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
-        src/TNRAF/Structures/AccessNodeDataArcFlags.h
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/Structures/RegionsStructure.h
-        src/TNRAF/Structures/NodeDataRegions.cpp
-        src/TNRAF/Structures/NodeDataRegions.h
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/Structures/RegionsStructure.h
-        src/GraphBuilding/Loaders/GraphLoader.h
-        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
-        src/GraphBuilding/Loaders/CsvGraphLoader.h
-        src/Error/Error.h
-        src/DistanceMatrix/johnson.cpp
-        src/DistanceMatrix/johnson.hpp
         src/main.cpp)
+target_link_libraries(shortestPathsPreprocessor shortestPaths)
 
 add_executable(thesisTests
         src/Benchmarking/TNRBenchmark.cpp
@@ -299,111 +208,8 @@ add_executable(thesisTests
         src/Benchmarking/PathCorrectnessValidator.h
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
-        src/CH/Structures/CHNode.cpp
-        src/CH/Structures/CHNode.h
-        src/CH/Structures/CHpriorityQueue.cpp
-        src/CH/Structures/CHpriorityQueue.h
-        src/CH/EdgeDifferenceManager.cpp
-        src/CH/EdgeDifferenceManager.h
-        src/CH/Structures/HopsDijkstraNode.cpp
-        src/CH/Structures/HopsDijkstraNode.h
-        src/CH/Structures/NodeData.cpp
-        src/CH/Structures/NodeData.h
-        src/CH/CHDistanceQueryManager.cpp
-        src/CH/CHDistanceQueryManager.h
-        src/CH/CHDistanceQueryManagerWithMapping.cpp
-        src/CH/CHDistanceQueryManagerWithMapping.h
-        src/CH/CHPathQueryManager.cpp
-        src/CH/CHPathQueryManager.h
-        src/CH/CHPreprocessor.cpp
-        src/CH/CHPreprocessor.h
-        src/Dijkstra/BasicDijkstra.cpp
-        src/Dijkstra/BasicDijkstra.h
-        src/Dijkstra/DijkstraNode.cpp
-        src/Dijkstra/DijkstraNode.h
-        src/DistanceMatrix/DistanceMatrix.cpp
-        src/DistanceMatrix/DistanceMatrix.h
-        src/DistanceMatrix/DistanceMatrixComputor.cpp
-        src/DistanceMatrix/DistanceMatrixComputor.h
-        src/GraphBuilding/Loaders/DDSGLoader.cpp
-        src/GraphBuilding/Loaders/DDSGLoader.h
-        src/GraphBuilding/Loaders/DIMACSLoader.cpp
-        src/GraphBuilding/Loaders/DIMACSLoader.h
-        src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
-        src/GraphBuilding/Loaders/DistanceMatrixLoader.h
-        src/GraphBuilding/Loaders/XenGraphLoader.cpp
-        src/GraphBuilding/Loaders/XenGraphLoader.h
-        src/GraphBuilding/Loaders/TripsLoader.cpp
-        src/GraphBuilding/Loaders/TripsLoader.h
-        src/GraphBuilding/Loaders/TNRGLoader.cpp
-        src/GraphBuilding/Loaders/TNRGLoader.h
-        src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Loaders/TGAFLoader.h
-        src/GraphBuilding/Structures/FlagsGraph.cpp
-        src/GraphBuilding/Structures/FlagsGraph.h
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
-        src/GraphBuilding/Structures/Graph.cpp
-        src/GraphBuilding/Structures/Graph.h
-        src/GraphBuilding/Structures/OutputEdge.cpp
-        src/GraphBuilding/Structures/OutputEdge.h
-        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
-        src/GraphBuilding/Structures/OutputShortcutEdge.h
-        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
-        src/GraphBuilding/Structures/PreprocessingEdgeData.h
-        src/GraphBuilding/Structures/QueryEdge.cpp
-        src/GraphBuilding/Structures/QueryEdge.h
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.h
-        src/GraphBuilding/Structures/ShortcutEdge.cpp
-        src/GraphBuilding/Structures/ShortcutEdge.h
-        src/GraphBuilding/Structures/SimpleGraph.cpp
-        src/GraphBuilding/Structures/SimpleGraph.h
-        src/GraphBuilding/Structures/UpdateableGraph.cpp
-        src/GraphBuilding/Structures/UpdateableGraph.h
-        src/GraphBuilding/Structures/SimpleEdge.cpp
-        src/GraphBuilding/Structures/SimpleEdge.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.h
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h
-        src/TNR/TNRPreprocessor.cpp
-        src/TNR/TNRPreprocessor.h
-        src/TNR/Structures/AccessNodeData.cpp
-        src/TNR/Structures/AccessNodeData.h
-        src/TNR/TNRDistanceQueryManager.cpp
-        src/TNR/TNRDistanceQueryManager.h
-        src/TNR/TNRDistanceQueryManagerWithMapping.cpp
-        src/TNR/TNRDistanceQueryManagerWithMapping.h
-        src/Timer/Timer.cpp
-        src/Timer/Timer.h
-        src/TNR/TNRPathQueryManager.cpp
-        src/TNR/TNRPathQueryManager.h
-        src/TNRAF/TNRAFPreprocessor.cpp
-        src/TNRAF/TNRAFPreprocessor.h
-        src/TNRAF/TNRAFPathQueryManager.cpp
-        src/TNRAF/TNRAFPathQueryManager.h
-        src/TNRAF/TNRAFDistanceQueryManager.cpp
-        src/TNRAF/TNRAFDistanceQueryManager.h
-        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
-        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.h
-        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
-        src/TNRAF/Structures/AccessNodeDataArcFlags.h
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/Structures/RegionsStructure.h
-        src/TNRAF/Structures/NodeDataRegions.cpp
-        src/TNRAF/Structures/NodeDataRegions.h
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/Structures/RegionsStructure.h
-        src/GraphBuilding/Loaders/GraphLoader.h
-        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
-        src/GraphBuilding/Loaders/CsvGraphLoader.h
-        src/Error/Error.h
-        src/DistanceMatrix/johnson.cpp
-        src/DistanceMatrix/johnson.hpp
         src/thesisTestScenarios.cpp)
+target_link_libraries(thesisTests shortestPaths)
 
 
 add_executable(tests
@@ -423,109 +229,5 @@ add_executable(tests
         src/Benchmarking/PathCorrectnessValidator.h
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
-        src/CH/Structures/CHNode.cpp
-        src/CH/Structures/CHNode.h
-        src/CH/Structures/CHpriorityQueue.cpp
-        src/CH/Structures/CHpriorityQueue.h
-        src/CH/EdgeDifferenceManager.cpp
-        src/CH/EdgeDifferenceManager.h
-        src/CH/Structures/HopsDijkstraNode.cpp
-        src/CH/Structures/HopsDijkstraNode.h
-        src/CH/Structures/NodeData.cpp
-        src/CH/Structures/NodeData.h
-        src/CH/CHDistanceQueryManager.cpp
-        src/CH/CHDistanceQueryManager.h
-        src/CH/CHDistanceQueryManagerWithMapping.cpp
-        src/CH/CHDistanceQueryManagerWithMapping.h
-        src/CH/CHPathQueryManager.cpp
-        src/CH/CHPathQueryManager.h
-        src/CH/CHPreprocessor.cpp
-        src/CH/CHPreprocessor.h
-        src/Dijkstra/BasicDijkstra.cpp
-        src/Dijkstra/BasicDijkstra.h
-        src/Dijkstra/DijkstraNode.cpp
-        src/Dijkstra/DijkstraNode.h
-        src/DistanceMatrix/DistanceMatrix.cpp
-        src/DistanceMatrix/DistanceMatrix.h
-        src/DistanceMatrix/DistanceMatrixComputor.cpp
-        src/DistanceMatrix/DistanceMatrixComputor.h
-        src/GraphBuilding/Loaders/DDSGLoader.cpp
-        src/GraphBuilding/Loaders/DDSGLoader.h
-        src/GraphBuilding/Loaders/DIMACSLoader.cpp
-        src/GraphBuilding/Loaders/DIMACSLoader.h
-        src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
-        src/GraphBuilding/Loaders/DistanceMatrixLoader.h
-        src/GraphBuilding/Loaders/XenGraphLoader.cpp
-        src/GraphBuilding/Loaders/XenGraphLoader.h
-        src/GraphBuilding/Loaders/TripsLoader.cpp
-        src/GraphBuilding/Loaders/TripsLoader.h
-        src/GraphBuilding/Loaders/TNRGLoader.cpp
-        src/GraphBuilding/Loaders/TNRGLoader.h
-        src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Loaders/TGAFLoader.h
-        src/GraphBuilding/Structures/FlagsGraph.cpp
-        src/GraphBuilding/Structures/FlagsGraph.h
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
-        src/GraphBuilding/Structures/Graph.cpp
-        src/GraphBuilding/Structures/Graph.h
-        src/GraphBuilding/Structures/OutputEdge.cpp
-        src/GraphBuilding/Structures/OutputEdge.h
-        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
-        src/GraphBuilding/Structures/OutputShortcutEdge.h
-        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
-        src/GraphBuilding/Structures/PreprocessingEdgeData.h
-        src/GraphBuilding/Structures/QueryEdge.cpp
-        src/GraphBuilding/Structures/QueryEdge.h
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.h
-        src/GraphBuilding/Structures/ShortcutEdge.cpp
-        src/GraphBuilding/Structures/ShortcutEdge.h
-        src/GraphBuilding/Structures/SimpleGraph.cpp
-        src/GraphBuilding/Structures/SimpleGraph.h
-        src/GraphBuilding/Structures/UpdateableGraph.cpp
-        src/GraphBuilding/Structures/UpdateableGraph.h
-        src/GraphBuilding/Structures/SimpleEdge.cpp
-        src/GraphBuilding/Structures/SimpleEdge.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.h
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h
-        src/TNR/TNRPreprocessor.cpp
-        src/TNR/TNRPreprocessor.h
-        src/TNR/Structures/AccessNodeData.cpp
-        src/TNR/Structures/AccessNodeData.h
-        src/TNR/TNRDistanceQueryManager.cpp
-        src/TNR/TNRDistanceQueryManager.h
-        src/TNR/TNRDistanceQueryManagerWithMapping.cpp
-        src/TNR/TNRDistanceQueryManagerWithMapping.h
-        src/Timer/Timer.cpp
-        src/Timer/Timer.h
-        src/TNR/TNRPathQueryManager.cpp
-        src/TNR/TNRPathQueryManager.h
-        src/TNRAF/TNRAFPreprocessor.cpp
-        src/TNRAF/TNRAFPreprocessor.h
-        src/TNRAF/TNRAFPathQueryManager.cpp
-        src/TNRAF/TNRAFPathQueryManager.h
-        src/TNRAF/TNRAFDistanceQueryManager.cpp
-        src/TNRAF/TNRAFDistanceQueryManager.h
-        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
-        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.h
-        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
-        src/TNRAF/Structures/AccessNodeDataArcFlags.h
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/Structures/RegionsStructure.h
-        src/TNRAF/Structures/NodeDataRegions.cpp
-        src/TNRAF/Structures/NodeDataRegions.h
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/Structures/RegionsStructure.h
-        src/GraphBuilding/Loaders/GraphLoader.h
-        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
-        src/GraphBuilding/Loaders/CsvGraphLoader.h
-        src/Error/Error.h
-        src/DistanceMatrix/johnson.cpp
-        src/DistanceMatrix/johnson.hpp
-        src/tests.cpp
-        )
+        src/tests.cpp)
+target_link_libraries(tests shortestPaths)

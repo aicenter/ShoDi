@@ -13,7 +13,7 @@ using namespace std;
 
 /**
  * Class used for loading a Distance Matrix. The Distance Matrix is saved in a simple binary format which is described
- * in the 'DistanceMatrixComputor.cpp' file. This loader allows to load such Distance Matrices.
+ * in the 'DistanceMatrix.h' file. This loader allows to load such Distance Matrices.
  */
 class DistanceMatrixLoader {
 public:

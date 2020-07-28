@@ -1,12 +1,10 @@
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-using namespace boost;
-
 namespace johnson {
-    typedef adjacency_list<listS, vecS, directedS,
-            no_property, property<edge_weight_t, int> > Graph;
-    typedef graph_traits<Graph>::vertex_descriptor Vertex;
+    typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
+            boost::no_property, boost::property<boost::edge_weight_t, int> > Graph;
+    typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
     typedef std::pair<int,int> Edge;
 
     typedef struct graph {

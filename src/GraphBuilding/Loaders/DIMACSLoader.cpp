@@ -3,7 +3,9 @@
 // Created on: 25.7.18
 //
 
+#include <climits>
 #include <fstream>
+#include <memory>
 #include "DIMACSLoader.h"
 #include "../../Timer/Timer.h"
 #include "../../Error/Error.h"
@@ -18,7 +20,7 @@ Graph * DIMACSLoader::loadGraph() {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     unsigned int nodes, edges;
@@ -42,7 +44,7 @@ UpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     unsigned int nodes, edges;
@@ -61,7 +63,7 @@ void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     unsigned int nodes, edges;
@@ -174,6 +176,20 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
     weight = tmpweight;
 }
 
+
 vector<int> DIMACSLoader::loadAdjacencyMatrix() {
-    throw not_implemented_error("loadAdjacencyMatrix() is not implemented for DIMACSLoader class");
+    // TODO can be done faster - without first making it into a graph and then copying to adjacency matrix
+
+    std::unique_ptr<Graph> graph {loadGraph()};
+
+    const auto nodes = graph->nodes();
+    vector<int> adj(nodes * nodes, INT_MAX);
+
+    for(size_t i = 0; i < nodes; ++i) {
+        for(auto &pair : graph->outgoingEdges(i)) {
+            adj[i * nodes + pair.first] = pair.second;
+        }
+    }
+
+    return adj;
 }

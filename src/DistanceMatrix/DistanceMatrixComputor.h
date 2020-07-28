@@ -1,15 +1,13 @@
 //
-// Author: Xenty (Michal Cvach)
-// Created on: 05.10.19
+// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 28.07.20.
 //
 
-#ifndef CONTRACTION_HIERARCHIES_DISTANCEMATRIXCOMPUTOR_H
-#define CONTRACTION_HIERARCHIES_DISTANCEMATRIXCOMPUTOR_H
+#ifndef SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H
+#define SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H
 
-#include "../GraphBuilding/Structures/Graph.h"
+
+#include "../GraphBuilding/Loaders/GraphLoader.h"
 #include "DistanceMatrix.h"
-
-using namespace std;
 
 /**
  * This class can compute a full distance matrix for a given Graph. Meaning all possible pairs
@@ -21,23 +19,16 @@ using namespace std;
  */
 class DistanceMatrixComputor {
 public:
-    /**
-     * This function will compute the full distance matrix for the given graph.
-     * The matrix will be stored in the instance of the DistanceMatrixComputor class,
-     * so that it can be output or used further.
-     *
-     * @param graph[in] The graph for which we want to compute the distance matrix.
-     */
-    void computeDistanceMatrix(const Graph & graph);
 
     /**
-     * This function will compute the full distance matrix for the given graph as if the directions for all the edges
-     * were switched. This is useful during the preprocessing phase of some of the methods.
+     * this function will compute the full distance matrix for the graph provided by the given GraphLoader.
+     * the matrix will be stored in the instance of the DistanceMatrixcomputor class,
+     * so that it can be output or used further.
      *
-     * @param graph[in] The graph for which we want to compute the distance matrix. (The graph should be as normal,
-     * not reversed, the 'reversion' is done inside this function.)
+     * @param graphLoader[in] instance of GraphLoader that will provide the graph
+     * for which we want to compute the distance matrix.
      */
-    void computeDistanceMatrixInReversedGraph(const Graph & graph);
+    virtual void computeDistanceMatrix(GraphLoader &graphLoader) = 0;
 
     /**
      * Allows us to get a DistanceMatrix instance immediately from the DistanceMatrixComputor without the need to first
@@ -46,23 +37,10 @@ public:
      *
      * @return An instance of the DistanceMatrix class that can be used to answer queries.
      */
-    DistanceMatrix * getDistanceMatrixInstance();
+    virtual DistanceMatrix * getDistanceMatrixInstance() = 0;
 
-private:
-    /**
-     * // This function will compute one row of the full distance matrix. This is done by running a simple Dijkstra from the
-// node corresponding to the row, which is not stopped until all reachable nodes have been visited. The distances
-// to all the other nodes found by this Dijkstra run are then used as values for the row.
-     *
-     * @param rowID
-     * @param nodesCnt
-     * @param graph
-     * @param useReversedGraph
-     */
-    void fillDistanceMatrixRow(unsigned int rowID, unsigned int nodesCnt, const Graph & graph, bool useReversedGraph = false);
-
-    vector<int> distanceTable;
+    virtual ~DistanceMatrixComputor() = default;
 };
 
 
-#endif //CONTRACTION_HIERARCHIES_DISTANCEMATRIXCOMPUTOR_H
+#endif //SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H

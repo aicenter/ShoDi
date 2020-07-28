@@ -31,51 +31,6 @@ void DistanceMatrix::setDistance(unsigned int source, unsigned int target, unsig
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrix::outputToXdm(const string &path) {
-    printf("Outputting the distance matrix.\n");
-    ofstream output;
-    output.open(path + ".xdm", ios::binary);
-    if (!output.is_open()) {
-        printf("Couldn't open file '%s'!", (path + ".xdm").c_str());
-    }
-
-    char c1, c2, c3;
-    c1 = 'X';
-    c2 = 'D';
-    c3 = 'M';
-    output.write(&c1, sizeof(c1));
-    output.write(&c2, sizeof(c2));
-    output.write(&c3, sizeof(c3));
-    output.write((char *) &nodesCnt, sizeof(nodesCnt));
-
-    for (unsigned int i = 0; i < nodesCnt; ++i)
-        for (unsigned int j = 0; j < nodesCnt; ++j)
-            output.write((char *) &distances[i * nodesCnt + j], sizeof(distances[i * nodesCnt + j]));
-
-    output.close();
-}
-
-//______________________________________________________________________________________________________________________
-void DistanceMatrix::outputToCsv(const string &path) {
-    printf("Outputting the distance matrix.\n");
-    ofstream output;
-    output.open(path + ".csv");
-    if (!output.is_open()) {
-        printf("Couldn't open file '%s'!", (path + ".xdm").c_str());
-    }
-
-    for (size_t i = 0; i < distances.size(); i++) {
-        output << distances[i];
-
-        if ((i + 1) % nodesCnt == 0) {
-            output << endl;
-        } else {
-            output << ",";
-        }
-    }
-}
-
-//______________________________________________________________________________________________________________________
 void DistanceMatrix::printInfo() {
     int half = INT_MAX / 2;
     unsigned int halfCnt = 0;
@@ -96,4 +51,12 @@ void DistanceMatrix::printInfo() {
     printf("Distance matrix contains %u INF values. That is %f %%.\n", maxCnt, (double) maxCnt / optCount);
     printf("Distance matrix contains %u values that are at least half of INT_MAX. That is %f %%.\n", halfCnt,
            (double) halfCnt / optCount);
+}
+
+const vector<int> &DistanceMatrix::getRawData() {
+    return distances;
+}
+
+unsigned int DistanceMatrix::nodes() {
+    return nodesCnt;
 }

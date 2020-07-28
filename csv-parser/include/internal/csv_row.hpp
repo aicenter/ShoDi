@@ -22,11 +22,14 @@ namespace csv {
         static const std::string ERROR_OVERFLOW = "Overflow error.";
         static const std::string ERROR_FLOAT_TO_INT =
             "Attempted to convert a floating point value to an integral type.";
+        static const std::string ERROR_NEG_TO_UNSIGNED = "Negative numbers cannot be converted to unsigned types.";
+    
+        std::string json_escape_string(csv::string_view s) noexcept;
     }
 
     /**
     * @class CSVField
-    * @brief Data type representing individual CSV values. 
+    * @brief Data type representing individual CSV values.
     *        CSVFields can be obtained by using CSVRow::operator[]
     */
     class CSVField {
@@ -66,31 +69,43 @@ namespace csv {
         *           numeric value.
         *
         */
-        template<typename T=std::string> T get() {
-            static_assert(!std::is_unsigned<T>::value, "Conversions to unsigned types are not supported.");
-
-            IF_CONSTEXPR (std::is_arithmetic<T>::value) {
+        template<typename T = std::string> T get() {
+            IF_CONSTEXPR(std::is_arithmetic<T>::value) {
+                // Note: this->type() also converts the CSV value to float
                 if (this->type() <= CSV_STRING) {
                     throw std::runtime_error(internals::ERROR_NAN);
                 }
             }
 
             IF_CONSTEXPR(std::is_integral<T>::value) {
+                // Note: this->is_float() also converts the CSV value to float
                 if (this->is_float()) {
                     throw std::runtime_error(internals::ERROR_FLOAT_TO_INT);
+                }
+
+                IF_CONSTEXPR(std::is_unsigned<T>::value) {
+                    if (this->value < 0) {
+                        throw std::runtime_error(internals::ERROR_NEG_TO_UNSIGNED);
+                    }
                 }
             }
 
             // Allow fallthrough from previous if branch
             IF_CONSTEXPR(!std::is_floating_point<T>::value) {
-                if (internals::type_num<T>() < this->_type) {
+                IF_CONSTEXPR(std::is_unsigned<T>::value) {
+                    // Quick hack to perform correct unsigned integer boundary checks
+                    if (this->value > internals::get_uint_max<sizeof(T)>()) {
+                        throw std::runtime_error(internals::ERROR_OVERFLOW);
+                    }
+                }
+                else if (internals::type_num<T>() < this->_type) {
                     throw std::runtime_error(internals::ERROR_OVERFLOW);
                 }
             }
 
             return static_cast<T>(this->value);
         }
-   
+
         /** Compares the contents of this field to a numeric value. If this
          *  field does not contain a numeric value, then all comparisons return
          *  false.
@@ -125,7 +140,10 @@ namespace csv {
 
             return internals::is_equal(out, static_cast<long double>(other), 0.000001L);
         }
-        
+
+        /** Return a string view over the field's contents */
+        CONSTEXPR csv::string_view get_sv() const { return this->sv; }
+
         /** Returns true if field is an empty string or string of whitespace characters */
         CONSTEXPR bool is_null() { return type() == CSV_NULL; }
 
@@ -167,33 +185,33 @@ namespace csv {
     class CSVRow {
     public:
         CSVRow() = default;
-
-        /** Construct a CSVRow from a RawRowBuffer. Should be called by CSVReader::write_record. */
-        CSVRow(const internals::BufferPtr& _str) : buffer(_str)
-        {
-            this->row_str = _str->get_row();
-
-            auto splits = _str->get_splits();
-            this->start = splits.start;
-            this->n_cols = splits.n_cols;
-        };
+        
+        /** Construct a CSVRow from a RawRowBuffer */
+        CSVRow(const internals::BufferPtr& _buffer) : buffer(_buffer), data(_buffer->get_row()) {};
 
         /** Constructor for testing */
-        CSVRow(const std::string& str, const std::vector<uint32_t>& splits,
+        CSVRow(const std::string& str, const std::vector<internals::StrBufferPos>& splits,
             const std::shared_ptr<internals::ColNames>& col_names)
             : CSVRow(internals::BufferPtr(new internals::RawRowBuffer(str, splits, col_names))) {};
 
+        /** Retrieve a string view over this row's data */
+        CSV_INLINE csv::string_view row_str() const {
+            return csv::string_view(this->buffer->buffer.c_str() + this->data.row_str.first, this->data.row_str.second);
+        }
+
         /** Indicates whether row is empty or not */
-        CONSTEXPR bool empty() const { return this->row_str.empty(); }
+        CSV_INLINE bool empty() const { return this->row_str().empty(); }
 
         /** Return the number of fields in this row */
-        CONSTEXPR size_t size() const { return this->n_cols; }
+        CONSTEXPR size_t size() const { return this->data.col_pos.n_cols; }
 
         /** @name Value Retrieval */
         ///@{
         CSVField operator[](size_t n) const;
         CSVField operator[](const std::string&) const;
         csv::string_view get_string_view(size_t n) const;
+        std::string to_json(const std::vector<std::string>& subset = {}) const;
+        std::string to_json_array(const std::vector<std::string>& subset = {}) const;
 
         /** Convert this CSVRow into a vector of strings.
          *  **Note**: This is a less efficient method of
@@ -207,22 +225,21 @@ namespace csv {
          */
         class iterator {
         public:
-            #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
             using value_type = CSVField;
             using difference_type = int;
 
             // Using CSVField * as pointer type causes segfaults in MSVC debug builds
             // but using shared_ptr as pointer type won't compile in g++
-            #ifdef _MSC_BUILD
-            using pointer = std::shared_ptr<CSVField> ;
-            #else
+#ifdef _MSC_BUILD
+            using pointer = std::shared_ptr<CSVField>;
+#else
             using pointer = CSVField * ;
-            #endif
+#endif
 
             using reference = CSVField & ;
             using iterator_category = std::random_access_iterator_tag;
-            #endif
-
+#endif
             iterator(const CSVRow*, int i);
 
             reference operator*() const;
@@ -235,12 +252,16 @@ namespace csv {
             iterator operator+(difference_type n) const;
             iterator operator-(difference_type n) const;
 
-            bool operator==(const iterator&) const;
-            bool operator!=(const iterator& other) const { return !operator==(other); }
+            /** Two iterators are equal if they point to the same field */
+            constexpr bool operator==(const iterator& other) const {
+                return this->i == other.i;
+            };
 
-            #ifndef NDEBUG
+            constexpr bool operator!=(const iterator& other) const { return !operator==(other); }
+
+#ifndef NDEBUG
             friend CSVRow;
-            #endif
+#endif
 
         private:
             const CSVRow * daddy = nullptr;            // Pointer to parent
@@ -248,13 +269,13 @@ namespace csv {
             int i = 0;                                 // Index of current field
         };
 
-        /** @brief A reverse iterator over the contents of a CSVRow. */
+        /** A reverse iterator over the contents of a CSVRow. */
         using reverse_iterator = std::reverse_iterator<iterator>;
 
         /** @name Iterators
          *  @brief Each iterator points to a CSVField object.
          */
-        ///@{
+         ///@{
         iterator begin() const;
         iterator end() const;
         reverse_iterator rbegin() const;
@@ -263,12 +284,10 @@ namespace csv {
 
     private:
         /** Get the index in CSVRow's text buffer where the n-th field begins */
-		uint32_t split_at(size_t n) const;
+        size_t split_at(size_t n) const;
 
-		internals::BufferPtr buffer = nullptr; /**< Memory buffer containing data for this row. */
-		csv::string_view row_str = "";         /**< Text data for this row */
-        size_t start;                          /**< Where in split buffer this row begins */
-		uint32_t n_cols;                 /**< Numbers of columns this row has */
+        internals::BufferPtr buffer = nullptr; /**< Memory buffer containing data for this row. */
+        internals::RowData data;               /**< Contains row string and column positions. */
     };
 
 #pragma region CSVField::get Specializations
@@ -280,7 +299,7 @@ namespace csv {
 
     /** Retrieve a view over this field's string
      *
-     *  @warning This string_view is only guaranteed to be valid as long as this 
+     *  @warning This string_view is only guaranteed to be valid as long as this
      *           CSVRow is still alive.
      */
     template<>

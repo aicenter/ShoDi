@@ -10,25 +10,24 @@ endif(CSV_CXX_STANDARD)
 message("Building CSV library using C++${CMAKE_CXX_STANDARD}")
 
 # Defines CSV_HAS_CXX17 in compatibility.hpp
-add_compile_definitions(CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+if (CMAKE_VERSION VERSION_LESS "3.12.0")
+	add_definitions(-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+else()
+	add_compile_definitions(CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+endif()
+
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads QUIET REQUIRED)
 
 if(MSVC)
 	# Make Visual Studio report accurate C++ version
 	# See: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
-	set(CMAKE_CXX_FLAGS "/EHsc /Zc:__cplusplus")
-
-	if(CMAKE_BUILD_TYPE MATCHES Debug)
-		# /Wall emits warnings about the C++ standard library
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-	endif()
+  # /Wall emits warnings about the C++ standard library
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /Zc:__cplusplus /W4")
 else()
 	# Ignore Visual Studio pragma regions
-	set(CMAKE_CXX_FLAGS "-pthread -Wno-unknown-pragmas")
-	if(CMAKE_BUILD_TYPE MATCHES Debug)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -g")
-	endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -Og")
 endif(MSVC)
 
 set(CSV_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
@@ -52,20 +51,51 @@ add_subdirectory("programs")
 
 ## Developer settings
 if (CSV_DEVELOPER)
+    # Allow for performance profiling
+    if (MSVC)
+	    target_link_options(csv PUBLIC /PROFILE)
+    endif()
+
     # Generate a single header library
-    add_custom_target(generate_single_header
-        COMMAND python single_header.py > single_include/csv.hpp
-        WORKING_DIRECTORY ${CSV_ROOT_DIR}
-    )
+    find_package(Python3 QUIET)
+    if(Python3_Interpreter_FOUND)
+      add_custom_target(generate_single_header
+          COMMAND ${Python3_EXECUTABLE} single_header.py > single_include/csv.hpp
+          COMMAND ${Python3_EXECUTABLE} single_header.py > single_include_test/csv.hpp
+          WORKING_DIRECTORY ${CSV_ROOT_DIR}
+      )
+      # Single header compilation test
+      add_subdirectory(single_include_test)
+    else()
+      message(WARNING "Python3 not found, skipping target 'generate_single_header'.")
+    endif()
 
     # Documentation
     find_package(Doxygen QUIET)
-    add_custom_target(doxygen
-        COMMAND Doxygen ${CSV_ROOT_DIR}/Doxyfile
-        WORKING_DIRECTORY ${CSV_ROOT_DIR}
-    )
+    if(DOXYGEN_FOUND)
+      add_custom_target(doxygen
+          COMMAND ${DOXYGEN_EXECUTABLE} ${CSV_ROOT_DIR}/Doxyfile
+          WORKING_DIRECTORY ${CSV_ROOT_DIR}
+      )
+    else()
+      message(WARNING "Doxygen not found, skipping target 'doxygen'.")
+    endif()
 
     ## Tests
     enable_testing()
     add_subdirectory("tests")
+
+    # Code coverage
+    find_program( GCOV_PATH gcov )
+    if(GCOV_PATH)
+        set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
+        include(CodeCoverage)
+        append_coverage_compiler_flags()
+        set(ENV{CSV_TEST_ROOT} ${CSV_TEST_DIR})
+        setup_target_for_coverage_gcovr_html(
+          NAME csv_coverage
+          EXECUTABLE csv_test
+          EXCLUDE "tests/*"
+        )
+    endif()
 endif()

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstring>
+#include <memory>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
@@ -25,8 +26,12 @@
 #include "Benchmarking/DijkstraBenchmark.h"
 #include "Error/Error.h"
 #include "GraphBuilding/Loaders/CsvGraphLoader.h"
-#include "DistanceMatrix/DistanceMatrixComputor.h"
+#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "DistanceMatrix/johnson.hpp"
+#include "DistanceMatrix/DistanceMatrixComputorFast.h"
+#include "DistanceMatrix/DistanceMatrixOutputter.h"
+#include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
+#include "DistanceMatrix/DistanceMatrixCsvOutputter.h"
 
 using namespace std;
 
@@ -277,42 +282,38 @@ void createDM(
         GraphLoader &graphLoader,
         char *outputFilePath
 ) {
-    Timer timer("Distance Matrix preprocessing");
-    timer.begin();
-
-    DistanceMatrix *dm;
+    std::unique_ptr<DistanceMatrixComputor> computor{nullptr};
+    std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
+    std::unique_ptr<DistanceMatrix> dm{nullptr};
 
     if (strcmp(preprocessingMode, "slow") == 0) {
-        Graph *graph = graphLoader.loadGraph();
-        DistanceMatrixComputor computor;
-        computor.computeDistanceMatrix(*graph);
-        dm = computor.getDistanceMatrixInstance();
-        delete graph;
+        computor = std::unique_ptr<DistanceMatrixComputorSlow> {new DistanceMatrixComputorSlow()};
     } else if (strcmp(preprocessingMode, "fast") == 0) {
-        vector<int> adj = graphLoader.loadAdjacencyMatrix();
-        vector<int> output(adj.size());
-        johnson::graph_t * gr = johnson::johnson_init(adj);
-        johnson::johnson_parallel(gr, output.data());
-
-        dm = new DistanceMatrix(std::move(output));
+        computor = std::unique_ptr<DistanceMatrixComputorFast> { new DistanceMatrixComputorFast()};
     } else {
         throw input_error(string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    if (strcmp(outputType, "xdm") == 0) {
-        dm->outputToXdm(outputFilePath);
+    if (strcmp(outputType, "xengraph") == 0) {
+        outputter = std::unique_ptr<DistanceMatrixXdmOutputter> { new DistanceMatrixXdmOutputter()};
     } else if (strcmp(outputType, "csv") == 0) {
-        dm->outputToCsv(outputFilePath);
+        outputter = std::unique_ptr<DistanceMatrixCsvOutputter> { new DistanceMatrixCsvOutputter()};
     } else {
         throw input_error(string("Unknown output type '") + outputType +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
+    Timer timer("Distance Matrix preprocessing");
+    timer.begin();
+
+    computor->computeDistanceMatrix(graphLoader);
+
     timer.finish();
     timer.printMeasuredTime();
 
-    delete dm;
+    dm = std::unique_ptr<DistanceMatrix> {computor->getDistanceMatrixInstance()};
+    outputter->store(*dm, outputFilePath);
 }
 
 /**

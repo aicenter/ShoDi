@@ -1,6 +1,5 @@
 # Vince's CSV Parser
 [![Build Status](https://travis-ci.org/vincentlaucsb/csv-parser.svg?branch=master)](https://travis-ci.org/vincentlaucsb/csv-parser)
-[![codecov](https://codecov.io/gh/vincentlaucsb/csv-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/vincentlaucsb/csv-parser)
 
  * [Motivation](#motivation)
  * [Documentation](#documentation)
@@ -14,7 +13,9 @@
    * [Numeric Conversions](#numeric-conversions)
    * [Specifying the CSV Format](#specifying-the-csv-format)
       * [Trimming Whitespace](#trimming-whitespace)
+      * [Handling Variable Numbers of Columns](#handling-variable-numbers-of-columns)
       * [Setting Column Names](#setting-column-names)
+   * [Converting to JSON](#converting-to-json)
    * [Parsing an In-Memory String](#parsing-an-in-memory-string)
    * [Writing CSV Files](#writing-csv-files)
  * [Contributing](#contributing)
@@ -30,18 +31,20 @@ This CSV parser uses multiple threads to simulatenously pull data from disk and 
 
 On my computer (Intel Core i7-8550U @ 1.80GHz/Toshiba XG5 SSD), it is capable of parsing the [69.9 MB 2015_StateDepartment.csv](https://github.com/vincentlaucsb/csv-data/tree/master/real_data) in 0.33 seconds.
 
-### Robust
-#### RFC 4180 Compliance
-This CSV parser is much more than a fancy string splitter, and follows every guideline from [RFC 4180](https://www.rfc-editor.org/rfc/rfc4180.txt). An optional strict parsing mode can be enabled to sniff out errors in files.
+### Robust Yet Flexible
+#### RFC 4180 and Beyond
+This CSV parser is much more than a fancy string splitter, and parses all files following [RFC 4180](https://www.rfc-editor.org/rfc/rfc4180.txt).
 
-#### Non-RFC 4180 Deviations
-We know that actual CSV files come with many different quirks. In addition, there are many CSV-inspired formats like tab-separated values. Thus, this CSV library has many features for dealing with this reality:
+However, in reality we know that RFC 4180 is just a suggestion, and there's many "flavors" of CSV such as tab-delimited files. Thus, this library has:
  * Automatic delimiter guessing
  * Ability to ignore comments in leading rows and elsewhere
  * Ability to handle rows of different lengths
 
+By default, rows of variable length are silently ignored, although you may elect to keep them or throw an error.
+
 #### Encoding
-This CSV parser will handle ANSI and UTF-8 encoded files. It does not try to decode UTF-8, except for detecting and stripping byte order marks.
+This CSV parser is encoding-agnostic and will handle ANSI and UTF-8 encoded files.
+It does not try to decode UTF-8, except for detecting and stripping UTF-8 byte order marks.
 
 ### Well Tested
 This CSV parser has an extensive test suite and is checked for memory safety with Valgrind. If you still manage to find a bug,
@@ -49,7 +52,7 @@ do not hesitate to report it.
 
 ## Documentation
 
-In addition to the [Features & Examples](#features--examples) below, a [fully-fledged online documentation](http://vincela.com/csv) contains more examples, details, interesting features, and instructions for less common use cases.
+In addition to the [Features & Examples](#features--examples) below, a [fully-fledged online documentation](https://vincentlaucsb.github.io/csv-parser/html/) contains more examples, details, interesting features, and instructions for less common use cases.
 
 ## Integration
 
@@ -144,7 +147,8 @@ for (auto& row: reader) {
 If your CSV has lots of numeric values, you can also have this parser (lazily)
 convert them to the proper data type.
 
- * Type checking is performed on conversions to prevent undefined behavior and integer overflow.
+ * Type checking is performed on conversions to prevent undefined behavior and integer overflow
+   * Negative numbers cannot be blindly converted to unsigned integer types
  * `get<float>()`, `get<double>()`, and `get<long double>()` are capable of parsing numbers written in scientific notation.
  * **Note:** Conversions to floating point types are not currently checked for loss of precision.
 
@@ -159,11 +163,41 @@ CSVReader reader("very_big_file.csv");
 
 for (auto& row: reader) {
     if (row["timestamp"].is_int()) {
-		// Can use get<>() with any signed integer type
+        // Can use get<>() with any integer type, but negative
+        // numbers cannot be converted to unsigned types
         row["timestamp"].get<int>();
         
         // ..
     }
+}
+
+```
+
+### Converting to JSON
+You can serialize individual rows as JSON objects, where the keys are column names, or as 
+JSON arrays (which don't contain column names). The outputted JSON contains properly escaped
+strings with minimal whitespace and no quoting for numeric values. How these JSON fragments are 
+assembled into a larger JSON document is an exercise left for the user.
+
+```cpp
+# include <sstream>
+# include "csv.hpp"
+
+using namespace csv;
+
+...
+
+CSVReader reader("very_big_file.csv");
+std::stringstream my_json;
+
+for (auto& row: reader) {
+    my_json << row.to_json() << std::endl;
+    my_json << row.to_json_array() << std::endl;
+
+    // You can pass in a vector of column names to
+    // slice or rearrange the outputted JSON
+    my_json << row.to_json({ "A", "B", "C" }) << std::endl;
+    my_json << row.to_json_array({ "C", "B", "A" }) << std::endl;
 }
 
 ```
@@ -181,6 +215,7 @@ CSVFormat format;
 format.delimiter('\t')
       .quote('~')
       .header_row(2);  // Header is on 3rd row (zero-indexed)
+      // .quote(false)  Turn off quoting 
 
 // Alternatively, we can use format.delimiter({ '\t', ',', ... })
 // to tell the CSV guesser which delimiters to try out
@@ -203,15 +238,33 @@ CSVFormat format;
 format.trim({ ' ', '\t'  });
 ```
 
+#### Handling Variable Numbers of Columns
+Sometimes, the rows in a CSV are not all of the same length. Whether this was intentional or not,
+this library is built to handle all use cases.
+
+```cpp
+CSVFormat format;
+
+// Default: Silently ignoring rows with missing or extraneous columns
+format.variable_columns(false); // Short-hand
+format.variable_columns(VariableColumnPolicy::IGNORE);
+
+// Case 2: Keeping variable-length rows
+format.variable_columns(true); // Short-hand
+format.variable_columns(VariableColumnPolicy::KEEP);
+
+// Case 3: Throwing an error if variable-length rows are encountered
+format.variable_columns(VariableColumnPolicy::THROW);
+```
+
 #### Setting Column Names
 If a CSV file does not have column names, you can specify your own:
 
 ```cpp
 std::vector<std::string> col_names = { ... };
 CSVFormat format;
-format.set_column_names(col_names);
+format.column_names(col_names);
 ```
-
 
 ### Parsing an In-Memory String
 

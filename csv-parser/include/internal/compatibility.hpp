@@ -2,6 +2,11 @@
  *  Defines various compatibility macros
  */
 
+/** Helper macro which should be #defined as "inline" 
+ *  in the single header version
+ */
+#define CSV_INLINE
+
 #pragma once
 #include "../external/string_view.hpp"
 
@@ -9,9 +14,6 @@
 // takes precedence.
 // See: https://github.com/nemequ/hedley
 #include "../external/hedley.h"
-
-/** Used to supress unused variable warning in g++ */
-#define SUPPRESS_UNUSED_WARNING(x) (void)x
 
 namespace csv {
     /**
@@ -53,7 +55,7 @@ namespace csv {
     #endif
 
     // Resolves g++ bug with regard to constexpr methods
-    #ifdef __GNUC__
+    #if defined __GNUC__ && !defined __clang__
         #if __GNUC__ >= 7
             #if defined(CSV_HAS_CXX17) && (__GNUC_MINOR__ >= 2 || __GNUC__ >= 8)
                 #define CONSTEXPR constexpr

@@ -25,11 +25,10 @@ std::vector<int> CsvGraphLoader::loadAdjacencyMatrix() {
     vector<string> first_row = reader.get_col_names();
     const int size = first_row.size();
     std::vector<int> adj(size * size);
+    //cout << size << " nodes" << endl;
+    //cout << size * size << " values expected" << endl;
     //ProgressBar progress(size);
 
-    //for (CSVField& field : first_row) {
-    //	adj.push_back(parse_distance(field.get<string>()));
-    //}
     int index = 0;
     for (; index < size; index++) {
         string str_value = first_row[index];
@@ -40,10 +39,12 @@ std::vector<int> CsvGraphLoader::loadAdjacencyMatrix() {
 
     for (csv::CSVRow &row : reader) {
         for (csv::CSVField &field : row) {
-            adj[index++] = (parse_distance(field.get<string>()));
+            adj[index++] = parse_distance(field.get<string>());
         }
         //++progress;
     }
+
+    //cout << index << " values found" << endl;
     return adj;
 }
 
@@ -54,13 +55,23 @@ Graph *CsvGraphLoader::loadGraph() {
     const int size = first_row.size();
     auto *const graph = new Graph(size);
 
-    for (int i = 0; i < size; ++i)
-        graph->addEdge(0, i, parse_distance(first_row[i]));
+    for (int i = 0; i < size; ++i) {
+        const int dist = parse_distance(first_row[i]);
+        if (dist != INT_MAX)
+            graph->addEdge(0, i, dist);
+    }
 
-    int i = 1, j = 0;
-    for(auto row_it = reader.begin(); row_it != reader.end(); ++row_it, ++i)
-        for(auto field_it = row_it->begin(); field_it != row_it->end(); ++field_it, ++j)
-            graph->addEdge(i, j, parse_distance(field_it->get<string>()));
+    int i = 1;
+    for (csv::CSVRow &row : reader) {
+        int j = 0;
+        for (csv::CSVField &field : row) {
+            const int dist = parse_distance(field.get<string>());
+            if (dist != INT_MAX)
+                graph->addEdge(i, j, dist);
+            ++j;
+        }
+        ++i;
+    }
 
     return graph;
 }
@@ -72,13 +83,23 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
     const int size = first_row.size();
     auto *const graph = new UpdateableGraph(size);
 
-    for (int i = 0; i < size; ++i)
-        graph->addEdge(0, i, parse_distance(first_row[i]));
+    for (int i = 0; i < size; ++i) {
+        const int dist = parse_distance(first_row[i]);
+        if (dist != INT_MAX)
+            graph->addEdge(0, i, dist);
+    }
 
-    int i = 1, j = 0;
-    for(auto row_it = reader.begin(); row_it != reader.end(); ++row_it, ++i)
-        for(auto field_it = row_it->begin(); field_it != row_it->end(); ++field_it, ++j)
-            graph->addEdge(i, j, parse_distance(field_it->get<string>()));
+    int i = 1;
+    for (csv::CSVRow &row : reader) {
+        int j = 0;
+        for (csv::CSVField &field : row) {
+            const int dist = parse_distance(field.get<string>());
+            if (dist != INT_MAX)
+                graph->addEdge(i, j, dist);
+            ++j;
+        }
+        ++i;
+    }
 
     return graph;
 }
@@ -89,11 +110,22 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
     vector<string> first_row = reader.get_col_names();
     const int size = first_row.size();
 
-    for (int i = 0; i < size; ++i)
-        graph.addEdge(0, i, parse_distance(first_row[i]));
+    for (int i = 0; i < size; ++i) {
+        const int dist = parse_distance(first_row[i]);
+        if (dist != INT_MAX)
+            graph.addEdge(0, i, dist);
+    }
 
-    int i = 1, j = 0;
-    for(auto row_it = reader.begin(); row_it != reader.end(); ++row_it, ++i)
-        for(auto field_it = row_it->begin(); field_it != row_it->end(); ++field_it, ++j)
-            graph.addEdge(i, j, parse_distance(field_it->get<string>()));
+    int i = 1;
+    for (csv::CSVRow &row : reader) {
+        int j = 0;
+        for (csv::CSVField &field : row) {
+            const int dist = parse_distance(field.get<string>());
+            if (dist != INT_MAX)
+                graph.addEdge(i, j, dist);
+            ++j;
+        }
+        ++i;
+    }
+
 }

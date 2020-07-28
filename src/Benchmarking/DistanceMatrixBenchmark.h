@@ -31,7 +31,7 @@ public:
     static double benchmark(
             const vector < pair < unsigned int, unsigned int> > & trips,
             DistanceMatrix & matrix,
-            vector < unsigned int > & distances);
+            vector < int > & distances);
 };
 
 

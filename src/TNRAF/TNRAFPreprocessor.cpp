@@ -11,7 +11,7 @@
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "../Dijkstra/BasicDijkstra.h"
-#include "../DistanceMatrix/DistanceMatrixComputor.h"
+#include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 
 DistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 
@@ -28,7 +28,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
                                                             vector<unsigned int>(transitNodesAmount));
     if (useDistanceMatrix) {
         cout << "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction." << endl;
-        DistanceMatrixComputor dmComputor;
+        DistanceMatrixComputorSlow dmComputor;
         dmComputor.computeDistanceMatrix(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
         cout << "Distance matrix computed." << endl;
@@ -63,7 +63,7 @@ void TNRAFPreprocessor::preprocessUsingCH(UpdateableGraph & graph, Graph & origi
     if(useDistanceMatrix) {
         cout << "Computing the auxiliary distance matrix for backward direction." << endl;
         delete distanceMatrix;
-        DistanceMatrixComputor dmComputor;
+        DistanceMatrixComputorSlow dmComputor;
         dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
         cout << "Distance matrix computed." << endl;

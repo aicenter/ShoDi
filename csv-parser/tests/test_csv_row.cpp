@@ -16,9 +16,9 @@ TEST_CASE("CSVRow Test", "[test_csv_row]") {
         "Col3"
         "Col4";
 
-    std::vector<unsigned short> splits = { 4, 8, 12 };
+    std::vector<internals::StrBufferPos> splits = { 4, 8, 12 };
 
-    CSVRow row(str, splits, col_names);
+    const CSVRow row(str, splits, col_names);
 
     bool error_caught = false;
 
@@ -60,6 +60,22 @@ TEST_CASE("CSVRow Test", "[test_csv_row]") {
         REQUIRE(std::vector<std::string>(row) ==
             std::vector<std::string>({ "Col1", "Col2", "Col3", "Col4" }));
     }
+
+    /** Allow get_sv() to be used with a const CSVField
+     *  
+     *  See: https://github.com/vincentlaucsb/csv-parser/issues/86
+     *
+     */
+    SECTION("get_sv() Check") {
+        std::vector<std::string> content;
+
+        for (const auto& field : row) {
+            content.push_back(std::string(field.get_sv()));
+        }
+
+        REQUIRE(std::vector<std::string>(row) ==
+            std::vector<std::string>({ "Col1", "Col2", "Col3", "Col4" }));
+    }
 }
 
 // Integration test for CSVRow/CSVField
@@ -74,7 +90,7 @@ TEST_CASE("CSVField operator==", "[test_csv_field_equal]") {
         "3"
         "3.14";
 
-    std::vector<unsigned short> splits = { 1, 2, 3 };
+    std::vector<internals::StrBufferPos> splits = { 1, 2, 3 };
     CSVRow row(str, splits, col_names);
 
     REQUIRE(row["A"] == 1);

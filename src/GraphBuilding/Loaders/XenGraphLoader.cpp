@@ -7,7 +7,9 @@
 #include "XenGraphLoader.h"
 #include "../../Error/Error.h"
 #include <fstream>
+#include <climits>
 #include <iostream>
+#include <memory>
 
 //______________________________________________________________________________________________________________________
 XenGraphLoader::XenGraphLoader(string inputFile) {
@@ -19,7 +21,7 @@ Graph * XenGraphLoader::loadGraph() {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     unsigned int nodes, edges;
@@ -42,7 +44,7 @@ UpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     unsigned int nodes, edges;
@@ -61,7 +63,7 @@ void XenGraphLoader::loadNodesMapping(unordered_map <long long unsigned int, uns
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     parseNodesMapping(input, mapping);
@@ -74,7 +76,7 @@ void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
     ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
+        throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
     unsigned int nodes, edges;
@@ -154,5 +156,19 @@ void XenGraphLoader::parseNodesMapping(ifstream & input, unordered_map <long lon
 }
 
 vector<int> XenGraphLoader::loadAdjacencyMatrix() {
-    throw not_implemented_error("loadAdjacencyMatrix() is not implemented for XenGraphLoader class");
+    // TODO can be done faster - without first making it into a graph and then copying to adjacency matrix
+
+    Graph * graph = loadGraph();
+
+    const auto nodes = graph->nodes();
+    vector<int> adj(nodes * nodes, INT_MAX);
+
+    for(size_t i = 0; i < nodes; ++i) {
+        for(auto pair : graph->outgoingEdges(i)) {
+            adj[i * nodes + pair.first] = pair.second;
+        }
+    }
+
+    delete graph;
+    return adj;
 }

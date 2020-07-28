@@ -53,8 +53,8 @@ To retrieve a distance matrix for a graph, the arguments are as follows:
 `./shortestPathsPreprocessor create dm [input_format] [output_format] [slow/fast] [input_file] [output_file]`,  
 where:
 
- * `input_format` must be one of `xengraph`, `dimacs`, `csv`. The `fast` mode currently only supports `csv`.
- * `output_format` must be one of `csv`, `xdm`.
+ * `input_format` is one of `xengraph`, `dimacs`, `csv`.
+ * `output_format` is one of `xengraph`, `csv`.
 
 ### Benchmarking
 

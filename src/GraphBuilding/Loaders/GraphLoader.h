@@ -23,6 +23,7 @@ public:
 
     /**
      * Function used to load a graph in the form of an adjacency matrix.
+     * Values for edges that are not present are expected to be INT_MAX.
      */
     virtual vector<int> loadAdjacencyMatrix() = 0;
 

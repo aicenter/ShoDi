@@ -6,6 +6,7 @@
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 
 #include "johnson.hpp"
+#include "ProgressBar.hpp"
 
 using namespace johnson;
 
@@ -184,19 +185,20 @@ void johnson::johnson_parallel(graph_t* gr, int* output) {
 
   Graph G(gr->edge_array, gr->edge_array + gr->E, gr->weights, V);
 
-  //ProgressBar progress(V);
+  ProgressBar progress(V);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
 #endif
   for (int s = 0; s < V; s++) {
     std::vector<int> d(num_vertices(G));
-    dijkstra_shortest_paths(G, s, distance_map(&d[0]));
+    dijkstra_shortest_paths(G, s, boost::distance_map(&d[0]));
     for (int v = 0; v < V; v++) {
       output[s*V + v] = d[v] + h[v] - h[s];
     }
-	//++progress;
+	++progress;
   }
 
   delete[] h;
   free_graph(bf_graph);
 }
+

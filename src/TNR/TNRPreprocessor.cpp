@@ -12,7 +12,7 @@
 #include "Structures/AccessNodeData.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "../DistanceMatrix/DistanceMatrix.h"
-#include "../DistanceMatrix/DistanceMatrixComputor.h"
+#include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "../Dijkstra/BasicDijkstra.h"
 
 //______________________________________________________________________________________________________________________
@@ -132,7 +132,7 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
 
     DistanceMatrix * distanceMatrix;
     {
-        DistanceMatrixComputor dmComputor;
+        DistanceMatrixComputorSlow dmComputor;
         dmComputor.computeDistanceMatrix(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
     }
@@ -167,7 +167,7 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
 
     {
         delete distanceMatrix;
-        DistanceMatrixComputor dmComputor;
+        DistanceMatrixComputorSlow dmComputor;
         dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
     }

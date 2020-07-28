@@ -9,11 +9,11 @@ namespace csv {
      *
      *  @snippet tests/test_read_csv.cpp Parse Example
      */
-    CSVCollection parse(csv::string_view in, CSVFormat format) {
+    CSV_INLINE CSVReader parse(csv::string_view in, CSVFormat format) {
         CSVReader parser(format);
         parser.feed(in);
         parser.end_feed();
-        return parser.records;
+        return parser;
     }
 
     /** Parse a RFC 4180 CSV string, returning a collection
@@ -23,30 +23,18 @@ namespace csv {
      *  @snippet tests/test_read_csv.cpp Escaped Comma
      *
      */
-    CSVCollection operator ""_csv(const char* in, size_t n) {
-        std::string temp(in, n);
-        return parse(temp);
-    }
-
-    /** Return a CSV's column names
-     *
-     *  @param[in] filename  Path to CSV file
-     *  @param[in] format    Format of the CSV file
-     *
-     */
-    std::vector<std::string> get_col_names(const std::string& filename, CSVFormat format) {
-        CSVReader reader(filename, format);
-        return reader.get_col_names();
+    CSV_INLINE CSVReader operator ""_csv(const char* in, size_t n) {
+        return parse(csv::string_view(in, n));
     }
 
     /**
-     *  @brief Find the position of a column in a CSV file or CSV_NOT_FOUND otherwise
+     *  Find the position of a column in a CSV file or CSV_NOT_FOUND otherwise
      *
      *  @param[in] filename  Path to CSV file
      *  @param[in] col_name  Column whose position we should resolve
      *  @param[in] format    Format of the CSV file
      */
-    int get_col_pos(
+    CSV_INLINE int get_col_pos(
         const std::string filename,
         const std::string col_name,
         const CSVFormat format) {
@@ -54,23 +42,19 @@ namespace csv {
         return reader.index_of(col_name);
     }
 
-    /** @brief Get basic information about a CSV file
+    /** Get basic information about a CSV file
      *  @include programs/csv_info.cpp
      */
-    CSVFileInfo get_file_info(const std::string& filename) {
+    CSV_INLINE CSVFileInfo get_file_info(const std::string& filename) {
         CSVReader reader(filename);
         CSVFormat format = reader.get_format();
-        for (auto& row : reader) {
-            #ifndef NDEBUG
-            SUPPRESS_UNUSED_WARNING(row);
-            #endif
-        }
+        for (auto it = reader.begin(); it != reader.end(); ++it);
 
         CSVFileInfo info = {
             filename,
             reader.get_col_names(),
             format.get_delim(),
-            reader.correct_rows,
+            reader.num_rows,
             (int)reader.get_col_names().size()
         };
 

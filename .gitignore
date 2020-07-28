@@ -1,2 +1,4 @@
 .idea/
+.clangd/
 build/
+compile_commands.json

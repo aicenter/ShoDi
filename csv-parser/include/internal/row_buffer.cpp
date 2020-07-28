@@ -10,25 +10,43 @@ namespace csv {
         //////////////
         // ColNames //
         //////////////
-
-        ColNames::ColNames(const std::vector<std::string>& _cnames)
-            : col_names(_cnames) {
-            for (size_t i = 0; i < _cnames.size(); i++) {
-                this->col_pos[_cnames[i]] = i;
-            }
-        }
-
-        std::vector<std::string> ColNames::get_col_names() const {
+        CSV_INLINE std::vector<std::string> ColNames::get_col_names() const {
             return this->col_names;
         }
 
-        size_t ColNames::size() const {
+        CSV_INLINE void ColNames::set_col_names(const std::vector<std::string>& cnames) {
+            this->col_names = cnames;
+
+            for (size_t i = 0; i < cnames.size(); i++) {
+                this->col_pos[cnames[i]] = i;
+            }
+        }
+
+        CSV_INLINE int ColNames::index_of(csv::string_view col_name) const {
+            auto pos = this->col_pos.find(col_name.data());
+            if (pos != this->col_pos.end())
+                return (int)pos->second;
+
+            return CSV_NOT_FOUND;
+        }
+
+        CSV_INLINE size_t ColNames::size() const {
             return this->col_names.size();
         }
 
-        csv::string_view RawRowBuffer::get_row() {
-            csv::string_view ret(
-                this->buffer.c_str() + this->current_end, // Beginning of string
+        CSV_INLINE RowData RawRowBuffer::get_row() {
+            return {
+                this->get_row_string(),
+                this->get_splits()
+            };
+        }
+
+        /** Get the current row in the buffer
+         *  @note Has the side effect of updating the current end pointer
+         */
+        CSV_INLINE std::pair<size_t, size_t> RawRowBuffer::get_row_string() {
+            auto ret = std::make_pair(
+                this->current_end, // Beginning of string
                 (this->buffer.size() - this->current_end) // Count
             );
 
@@ -36,24 +54,26 @@ namespace csv {
             return ret;
         }
 
-        ColumnPositions RawRowBuffer::get_splits()
+        CSV_INLINE ColumnPositions RawRowBuffer::get_splits()
         {
             const size_t head_idx = this->current_split_idx,
                 new_split_idx = this->split_buffer.size();
-         
+            StrBufferPos n_cols = (new_split_idx - head_idx > 0) ?
+                (StrBufferPos)(new_split_idx - head_idx + 1): 0;
+
             this->current_split_idx = new_split_idx;
-            return ColumnPositions(*this, head_idx, (uint32_t)(new_split_idx - head_idx + 1));
+            return ColumnPositions(head_idx, n_cols);
         }
 
-        size_t RawRowBuffer::size() const {
+        CSV_INLINE size_t RawRowBuffer::size() const {
             return this->buffer.size() - this->current_end;
         }
 
-        size_t RawRowBuffer::splits_size() const {
+        CSV_INLINE size_t RawRowBuffer::splits_size() const {
             return this->split_buffer.size() - this->current_split_idx;
         }
         
-        HEDLEY_WARN_UNUSED_RESULT
+        HEDLEY_WARN_UNUSED_RESULT CSV_INLINE
         BufferPtr RawRowBuffer::reset() const {
             // Save current row in progress
             auto new_buff = BufferPtr(new RawRowBuffer());
@@ -74,10 +94,6 @@ namespace csv {
             // No need to remove unnecessary bits from this buffer
             // (memory savings would be marginal anyways)
             return new_buff;
-        }
-
-		uint32_t ColumnPositions::split_at(int n) const {
-            return this->parent->split_buffer[this->start + n];
         }
     }
 }

@@ -49,22 +49,40 @@ TEST_CASE( "Recognize Floats Properly", "[dtype_float]" ) {
     REQUIRE(is_equal(out, 2.71828L));
 }
 
-TEST_CASE("Integer Overflow", "[int_overflow]") {
+TEST_CASE("Integer Size Recognition", "[int_sizes]") {
     std::string s;
     long double out;
 
-    s = std::to_string((long long)csv::internals::CSV_INT16_MAX + 1);
-    REQUIRE(data_type(s, &out) == CSV_INT32);
-    REQUIRE(out == (long long)CSV_INT16_MAX + 1);
+    SECTION("Boundary Values") {
+        s = std::to_string((long long)csv::internals::CSV_INT8_MAX);
+        REQUIRE(data_type(s, &out) == CSV_INT8);
+        REQUIRE(out == (long long)CSV_INT8_MAX);
 
-    s = std::to_string((long long)csv::internals::CSV_INT32_MAX + 1);
-    REQUIRE(data_type(s, &out) == CSV_INT64);
-    REQUIRE(out == (long long)CSV_INT32_MAX + 1);
+        s = std::to_string((long long)csv::internals::CSV_INT16_MAX);
+        REQUIRE(data_type(s, &out) == CSV_INT16);
+        REQUIRE(out == (long long)CSV_INT16_MAX);
 
-    // Case: Integer too large to fit in int64 --> store in long double
-    s = std::to_string((long long)csv::internals::CSV_INT64_MAX);
-    s.append("1");
-    REQUIRE(data_type(s, &out) == CSV_DOUBLE);
+        s = std::to_string((long long)csv::internals::CSV_INT32_MAX);
+        REQUIRE(data_type(s, &out) == CSV_INT32);
+        REQUIRE(out == (long long)CSV_INT32_MAX);
+
+        // Note: data_type() doesn't have enough precision for CSV_INT64
+    }
+
+    SECTION("Integer Overflow") {
+        s = std::to_string((long long)csv::internals::CSV_INT16_MAX + 1);
+        REQUIRE(data_type(s, &out) == CSV_INT32);
+        REQUIRE(out == (long long)CSV_INT16_MAX + 1);
+
+        s = std::to_string((long long)csv::internals::CSV_INT32_MAX + 1);
+        REQUIRE(data_type(s, &out) == CSV_INT64);
+        REQUIRE(out == (long long)CSV_INT32_MAX + 1);
+
+        // Case: Integer too large to fit in int64 --> store in long double
+        s = std::to_string((long long)csv::internals::CSV_INT64_MAX);
+        s.append("1");
+        REQUIRE(data_type(s, &out) == CSV_DOUBLE);
+    }
 }
 
 TEST_CASE( "Recognize Sub-Unit Double Values", "[regression_double]" ) {
@@ -76,7 +94,7 @@ TEST_CASE( "Recognize Sub-Unit Double Values", "[regression_double]" ) {
 
 TEST_CASE( "Recognize Double Values", "[regression_double2]" ) {
     // Test converting double values back and forth
-    long double out;
+    long double out = -1.0;
     std::string s;
 
     for (long double i = 0; i <= 2.0; i += 0.01) {
@@ -90,6 +108,12 @@ TEST_CASE( "Recognize Double Values", "[regression_double2]" ) {
 TEST_CASE("Parse Scientific Notation", "[e_notation]") {
     // Test parsing e notation
     long double out;
+
+    REQUIRE(data_type("1E-06", &out) == CSV_DOUBLE);
+    REQUIRE(is_equal(out, 0.000001L));
+
+    REQUIRE(data_type("1e-06", &out) == CSV_DOUBLE);
+    REQUIRE(is_equal(out, 0.000001L));
 
     REQUIRE(data_type("2.17222E+02", &out) == CSV_DOUBLE);
     REQUIRE(is_equal(out, 217.222L));

@@ -7,7 +7,7 @@
 #include "CorrectnessValidator.h"
 
 //______________________________________________________________________________________________________________________
-bool CorrectnessValidator::validate(vector < unsigned int > & a, vector < unsigned int > & b) {
+bool CorrectnessValidator::validate(vector<int> &a, vector<int> &b) {
     for (unsigned int i = 0; i < a.size(); i++) {
         if (a.at(i) != b.at(i)) {
             return false;
@@ -17,7 +17,7 @@ bool CorrectnessValidator::validate(vector < unsigned int > & a, vector < unsign
 }
 
 //______________________________________________________________________________________________________________________
-bool CorrectnessValidator::validateVerbose(vector < unsigned int > & a, vector < unsigned int > & b) {
+bool CorrectnessValidator::validateVerbose(vector<int> &a, vector<int> &b) {
     unsigned int mmcnt = 0;
     for (unsigned int i = 0; i < a.size(); i++) {
         if (a.at(i) != b.at(i)) {

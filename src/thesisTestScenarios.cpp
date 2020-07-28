@@ -19,7 +19,8 @@
 #include "Timer/Timer.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
-#include "DistanceMatrix/DistanceMatrixComputor.h"
+#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
+#include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
 
 /*
  * The exact code in this file was used to obtain the benchmark data presented in the thesis.
@@ -119,11 +120,12 @@ void createDM(
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
     Graph * graph = dijkstraGraphLoader.loadGraph();
 
-    DistanceMatrixComputor dmComputor;
+    DistanceMatrixComputorSlow dmComputor;
     dmComputor.computeDistanceMatrix(*graph);
 
     DistanceMatrix * dm = dmComputor.getDistanceMatrixInstance();
-    dm->outputToXdm(outputFilePath);
+    DistanceMatrixXdmOutputter outputter;
+    outputter.store(*dm, outputFilePath);
 
     timer.finish();
     timer.printMeasuredTime();

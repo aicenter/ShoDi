@@ -55,24 +55,16 @@ public:
     void setDistance(unsigned int source, unsigned int target, unsigned int distance);
 
     /**
-     * Allows to output the distance matrix in a simple binary format. The distance matrix will be saved into a file
-     * specified by the path argument, suffix '.xdm' is added automatically.
-     *
-     * The format is as follows: First three bytes should contain the characters 'X', 'D' and 'M' respectively,
-     * following is one unsigned int denoting the number of nodes 'n', and following are n*n unsigned int values
-     * representing the actual distances for the matrix.
-     *
-     * @param path[in] The desired output file path where the distance matrix should be output.
+     * Get the underlying data structure (a 1D array)
+     * @return The underlying 1D array
      */
-    void outputToXdm(const string &path);
+    const vector<int> &getRawData();
 
     /**
-     * Allows to output the distance matrix in a CSV format. The distance matrix will be saved into a file
-     * specified by the path argument, suffix '.csv' is added automatically.
-     *
-     * @param path[in] The desired output file path where the distance matrix should be output.
+     * Get nodes count
+     * @return nodes count
      */
-    void outputToCsv(const string &path);
+    unsigned int nodes();
 
     /**
      * Prints some statistics about the distance matrix. Useful mainly during debugging, might be removed later.

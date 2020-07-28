@@ -90,30 +90,14 @@ namespace csv {
         template<> inline DataType type_num<std::nullptr_t>() { return CSV_NULL; }
         template<> inline DataType type_num<std::string>() { return CSV_STRING; }
 
-        inline std::string type_name(const DataType& dtype) {
-            switch (dtype) {
-            case CSV_STRING:
-                return "string";
-            case CSV_INT8:
-                return "int8";
-            case CSV_INT16:
-                return "int16";
-            case CSV_INT32:
-                return "int32";
-            case CSV_INT64:
-                return "int64";
-            case CSV_DOUBLE:
-                return "double";
-            default:
-                return "null";
-            }
-        };
-
         CONSTEXPR DataType data_type(csv::string_view in, long double* const out = nullptr);
 #endif
 
         /** Given a byte size, return the largest number than can be stored in
          *  an integer of that size
+         *
+         *  Note: Provides a platform-agnostic way of mapping names like "long int" to
+         *  byte sizes
          */
         template<size_t Bytes>
         CONSTEXPR long double get_int_max() {
@@ -143,7 +127,38 @@ namespace csv {
             HEDLEY_UNREACHABLE();
         }
 
-        /** Largest number that can be stored in a 1-bit integer */
+        /** Given a byte size, return the largest number than can be stored in
+         *  an unsigned integer of that size
+         */
+        template<size_t Bytes>
+        CONSTEXPR long double get_uint_max() {
+            static_assert(Bytes == 1 || Bytes == 2 || Bytes == 4 || Bytes == 8,
+                "Bytes must be a power of 2 below 8.");
+
+            IF_CONSTEXPR(sizeof(unsigned char) == Bytes) {
+                return (long double)std::numeric_limits<unsigned char>::max();
+            }
+
+            IF_CONSTEXPR(sizeof(unsigned short) == Bytes) {
+                return (long double)std::numeric_limits<unsigned short>::max();
+            }
+
+            IF_CONSTEXPR(sizeof(unsigned int) == Bytes) {
+                return (long double)std::numeric_limits<unsigned int>::max();
+            }
+
+            IF_CONSTEXPR(sizeof(unsigned long int) == Bytes) {
+                return (long double)std::numeric_limits<unsigned long int>::max();
+            }
+
+            IF_CONSTEXPR(sizeof(unsigned long long int) == Bytes) {
+                return (long double)std::numeric_limits<unsigned long long int>::max();
+            }
+
+            HEDLEY_UNREACHABLE();
+        }
+
+        /** Largest number that can be stored in a 8-bit integer */
         CONSTEXPR_VALUE long double CSV_INT8_MAX = get_int_max<1>();
 
         /** Largest number that can be stored in a 16-bit integer */
@@ -154,6 +169,18 @@ namespace csv {
 
         /** Largest number that can be stored in a 64-bit integer */
         CONSTEXPR_VALUE long double CSV_INT64_MAX = get_int_max<8>();
+
+        /** Largest number that can be stored in a 8-bit ungisned integer */
+        CONSTEXPR_VALUE long double CSV_UINT8_MAX = get_uint_max<1>();
+
+        /** Largest number that can be stored in a 16-bit unsigned integer */
+        CONSTEXPR_VALUE long double CSV_UINT16_MAX = get_uint_max<2>();
+
+        /** Largest number that can be stored in a 32-bit unsigned integer */
+        CONSTEXPR_VALUE long double CSV_UINT32_MAX = get_uint_max<4>();
+
+        /** Largest number that can be stored in a 64-bit unsigned integer */
+        CONSTEXPR_VALUE long double CSV_UINT64_MAX = get_uint_max<8>();
 
         /** Given a pointer to the start of what is start of
          *  the exponential part of a number written (possibly) in scientific notation
@@ -167,7 +194,8 @@ namespace csv {
             long double exponent = 0;
             auto result = data_type(exponential_part, &exponent);
 
-            if (result >= CSV_INT8 && result <= CSV_DOUBLE) {
+            // Exponents in scientific notation should not be decimal numbers
+            if (result >= CSV_INT8 && result < CSV_DOUBLE) {
                 if (out) *out = coeff * pow10(exponent);
                 return CSV_DOUBLE;
             }
@@ -183,13 +211,13 @@ namespace csv {
             // We can assume number is always non-negative
             assert(number >= 0);
 
-            if (number < internals::CSV_INT8_MAX)
+            if (number <= internals::CSV_INT8_MAX)
                 return CSV_INT8;
-            else if (number < internals::CSV_INT16_MAX)
+            else if (number <= internals::CSV_INT16_MAX)
                 return CSV_INT16;
-            else if (number < internals::CSV_INT32_MAX)
+            else if (number <= internals::CSV_INT32_MAX)
                 return CSV_INT32;
-            else if (number < internals::CSV_INT64_MAX)
+            else if (number <= internals::CSV_INT64_MAX)
                 return CSV_INT64;
             else // Conversion to long long will cause an overflow
                 return CSV_DOUBLE;
@@ -258,8 +286,9 @@ namespace csv {
                 case 'e':
                 case 'E':
                     // Process scientific notation
-                    if (prob_float) {
+                    if (prob_float || (i && i + 1 < ilen && isdigit(in[i - 1]))) {
                         size_t exponent_start_idx = i + 1;
+                        prob_float = true;
 
                         // Strip out plus sign
                         if (in[i + 1] == '+') {
