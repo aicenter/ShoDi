@@ -1,6 +1,10 @@
-//
-// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 28.07.20.
-//
+/******************************************************************************
+* File:             DistanceMatrixComputor.h
+*
+* Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
+* Created:          07/28/20 
+* Description:      DistanceMatrixComputor abstract class
+*****************************************************************************/
 
 #ifndef SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H
 #define SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H

@@ -1,6 +1,9 @@
-//
-// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 28.07.20.
-//
+/******************************************************************************
+* File:             DistanceMatrixComputorFast.h
+*
+* Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
+* Created:          07/28/20 
+*****************************************************************************/
 
 #ifndef SHORTEST_PATHS_DISTANCEMATRIXCOMPUTORFAST_H
 #define SHORTEST_PATHS_DISTANCEMATRIXCOMPUTORFAST_H
@@ -24,10 +27,10 @@ public:
      *
      * @param graphAdjMatrix[in] The adjacency matrix of a graph for which we want to compute the distance matrix.
      */
-    void computeDistanceMatrix(const vector<int> &graphAdjMatrix);
+    void computeDistanceMatrix(const vector<dist_t> &graphAdjMatrix);
 
 private:
-    vector<int> distanceTable;
+    vector<dist_t> distanceTable;
 };
 
 

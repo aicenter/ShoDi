@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include "constants.h"
 #include "Timer/Timer.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
 #include "DistanceMatrix/DistanceMatrixComputorSlow.h"
@@ -42,7 +43,7 @@ DistanceMatrix *obtainDM(GraphLoader &loader, DistanceMatrixComputor &computor) 
  * @param trueValues[out] The vector that the true values will be loaded into.
  * @param inputFilePath[in] The file path to the text file containing the true (expected) values.
  */
-void obtainTrueValues(vector<int> &trueValues, const string &inputFilePath) {
+void obtainTrueValues(vector<unsigned int> &trueValues, const string &inputFilePath) {
     ifstream input;
     input.open(inputFilePath);
     unsigned int queriesCnt;
@@ -61,10 +62,10 @@ bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor &computor, stri
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
 
-    vector<int> trueValues;
+    vector<dist_t> trueValues;
     obtainTrueValues(trueValues, trueDistancesFilePath);
 
-    vector<int> dmDistances(querySet.size());
+    vector<dist_t> dmDistances(querySet.size());
     double time = DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
 
     delete dm;
@@ -146,7 +147,7 @@ int main(int argc, char *argv[]) {
     runTests({
         smallSlowTest,
         smallFastTest,
-        mediumSlowTest,
+        //mediumSlowTest,
         mediumFastTest
     });
 

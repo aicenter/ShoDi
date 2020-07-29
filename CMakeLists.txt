@@ -37,7 +37,7 @@ endif (DOXYGEN_FOUND)
 
 add_subdirectory(csv-parser)
 
-include_directories(${JNI_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} csv-parser/single_include)
+include_directories(src/ ${JNI_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} csv-parser/single_include)
 link_libraries(csv ${Boost_LIBRARIES})
 
 if (OpenMP_CXX_FOUND)
@@ -169,7 +169,8 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
         src/DistanceMatrix/ProgressBar.cpp
-        src/DistanceMatrix/ProgressBar.hpp)
+        src/DistanceMatrix/ProgressBar.hpp
+        src/constants.h)
 
 add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRBenchmark.cpp

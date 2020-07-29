@@ -11,7 +11,7 @@ SimpleGraph::SimpleGraph(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
-void SimpleGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
+void SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to) > weight) {
             followingNodes.at(from).at(to) = weight;
@@ -27,7 +27,7 @@ unsigned int SimpleGraph::nodes()const {
 }
 
 //______________________________________________________________________________________________________________________
-const map<unsigned int, unsigned int> & SimpleGraph::edges(const unsigned int x)const {
+const map<unsigned int, dist_t> & SimpleGraph::edges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }
 

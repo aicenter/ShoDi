@@ -1,6 +1,9 @@
-//
-// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 28.07.20.
-//
+/******************************************************************************
+* File:             DistanceMatrixCsvOutputter.h
+*
+* Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
+* Created:          07/28/20 
+*****************************************************************************/
 
 #ifndef SHORTEST_PATHS_DISTANCEMATRIXCSVOUTPUTTER_H
 #define SHORTEST_PATHS_DISTANCEMATRIXCSVOUTPUTTER_H

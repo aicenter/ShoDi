@@ -1,6 +1,9 @@
-//
-// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 27.07.20.
-//
+/******************************************************************************
+* File:             CsvGraphLoader.h
+*
+* Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
+* Created:          07/27/20 
+*****************************************************************************/
 
 #ifndef SHORTEST_PATHS_CSVGRAPHLOADER_H
 #define SHORTEST_PATHS_CSVGRAPHLOADER_H
@@ -14,7 +17,7 @@ private:
 public:
     CsvGraphLoader(string inputFile);
 
-    vector<int> loadAdjacencyMatrix() override;
+    vector<dist_t> loadAdjacencyMatrix() override;
 
     Graph *loadGraph() override;
 

@@ -1,132 +1,144 @@
-//
-// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 27.07.20.
-//
+/******************************************************************************
+ * File:             CsvGraphLoader.cpp
+ *
+ * Author:           Jan Neumann (neumaja5@fel.cvut.cz)
+ * Created:          07/27/20
+ *****************************************************************************/
 
-#include <climits>
-#include <boost/algorithm/string.hpp>
 #include "CsvGraphLoader.h"
 #include "csv.hpp"
+#include <algorithm>
+#include <cctype>
+#include <climits>
+#include <limits>
 
-CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {
+CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {}
 
+bool charicmp(const char &c1, const char &c2) {
+  return std::tolower(c1) == std::tolower(c2);
 }
 
-int parse_distance(std::string str) {
-    if (boost::iequals(str, "nan")) {
-        return INT_MAX;
-    } else {
-        return (int) round(stof(str));
-    }
+dist_t parse_distance(std::string str) {
+  if (std::equal(str.begin(), str.end(), string("nan").begin(), charicmp)) {
+    return std::numeric_limits<dist_t>::max();
+  } else {
+    return (dist_t)round(stof(str));
+  }
 }
 
-std::vector<int> CsvGraphLoader::loadAdjacencyMatrix() {
-    csv::CSVReader reader(this->inputFile);
+std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
+  csv::CSVReader reader(this->inputFile);
 
-    //init from the first row
-    vector<string> first_row = reader.get_col_names();
-    const int size = first_row.size();
-    std::vector<int> adj(size * size);
-    //cout << size << " nodes" << endl;
-    //cout << size * size << " values expected" << endl;
-    //ProgressBar progress(size);
+  // init from the first row
+  vector<string> first_row = reader.get_col_names();
+  const unsigned int size = first_row.size();
+  std::vector<dist_t> adj(size * size);
+  cout << size << " nodes" << endl;
+  cout << size * size << " values expected" << endl;
+  // ProgressBar progress(size);
 
-    int index = 0;
-    for (; index < size; index++) {
-        string str_value = first_row[index];
-        adj[index] = parse_distance(str_value);
-        //cout << index << " " << str_value << "\n";
+  unsigned int index = 0;
+  for (; index < size; index++) {
+    string str_value = first_row[index];
+    adj[index] = parse_distance(str_value);
+    // cout << index << " " << str_value << "\n";
+  }
+  //++progress;
+
+  for (csv::CSVRow &row : reader) {
+    for (csv::CSVField &field : row) {
+      adj[index++] = parse_distance(field.get<string>());
     }
     //++progress;
+  }
 
-    for (csv::CSVRow &row : reader) {
-        for (csv::CSVField &field : row) {
-            adj[index++] = parse_distance(field.get<string>());
-        }
-        //++progress;
-    }
-
-    //cout << index << " values found" << endl;
-    return adj;
+  cout << index << " values found" << endl;
+  return adj;
 }
 
 Graph *CsvGraphLoader::loadGraph() {
-    csv::CSVReader reader(this->inputFile);
+  csv::CSVReader reader(this->inputFile);
 
-    vector<string> first_row = reader.get_col_names();
-    const int size = first_row.size();
-    auto *const graph = new Graph(size);
+  vector<string> first_row = reader.get_col_names();
+  const unsigned int size = first_row.size();
+  auto *const graph = new Graph(size);
 
-    for (int i = 0; i < size; ++i) {
-        const int dist = parse_distance(first_row[i]);
-        if (dist != INT_MAX)
-            graph->addEdge(0, i, dist);
+  const dist_t max = std::numeric_limits<dist_t>::max();
+
+  for (unsigned int i = 0; i < size; ++i) {
+    const dist_t dist = parse_distance(first_row[i]);
+    if (dist != max)
+      graph->addEdge(0, i, dist);
+  }
+
+  unsigned int i = 1;
+  for (csv::CSVRow &row : reader) {
+    unsigned int j = 0;
+    for (csv::CSVField &field : row) {
+      const dist_t dist = parse_distance(field.get<string>());
+      if (dist != max)
+        graph->addEdge(i, j, dist);
+      ++j;
     }
+    ++i;
+  }
 
-    int i = 1;
-    for (csv::CSVRow &row : reader) {
-        int j = 0;
-        for (csv::CSVField &field : row) {
-            const int dist = parse_distance(field.get<string>());
-            if (dist != INT_MAX)
-                graph->addEdge(i, j, dist);
-            ++j;
-        }
-        ++i;
-    }
-
-    return graph;
+  return graph;
 }
 
 UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
-    csv::CSVReader reader(this->inputFile);
+  csv::CSVReader reader(this->inputFile);
 
-    vector<string> first_row = reader.get_col_names();
-    const int size = first_row.size();
-    auto *const graph = new UpdateableGraph(size);
+  vector<string> first_row = reader.get_col_names();
+  const int size = first_row.size();
+  auto *const graph = new UpdateableGraph(size);
 
-    for (int i = 0; i < size; ++i) {
-        const int dist = parse_distance(first_row[i]);
-        if (dist != INT_MAX)
-            graph->addEdge(0, i, dist);
+  const dist_t max = std::numeric_limits<dist_t>::max();
+
+  for (unsigned int i = 0; i < size; ++i) {
+    const dist_t dist = parse_distance(first_row[i]);
+    if (dist != max)
+      graph->addEdge(0, i, dist);
+  }
+
+  unsigned int i = 1;
+  for (csv::CSVRow &row : reader) {
+    unsigned int j = 0;
+    for (csv::CSVField &field : row) {
+      const dist_t dist = parse_distance(field.get<string>());
+      if (dist != max)
+        graph->addEdge(i, j, dist);
+      ++j;
     }
+    ++i;
+  }
 
-    int i = 1;
-    for (csv::CSVRow &row : reader) {
-        int j = 0;
-        for (csv::CSVField &field : row) {
-            const int dist = parse_distance(field.get<string>());
-            if (dist != INT_MAX)
-                graph->addEdge(i, j, dist);
-            ++j;
-        }
-        ++i;
-    }
-
-    return graph;
+  return graph;
 }
 
 void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
-    csv::CSVReader reader(this->inputFile);
+  csv::CSVReader reader(this->inputFile);
 
-    vector<string> first_row = reader.get_col_names();
-    const int size = first_row.size();
+  vector<string> first_row = reader.get_col_names();
+  const unsigned int size = first_row.size();
 
-    for (int i = 0; i < size; ++i) {
-        const int dist = parse_distance(first_row[i]);
-        if (dist != INT_MAX)
-            graph.addEdge(0, i, dist);
+  const dist_t max = std::numeric_limits<dist_t>::max();
+
+  for (unsigned int i = 0; i < size; ++i) {
+    const dist_t dist = parse_distance(first_row[i]);
+    if (dist != max)
+      graph.addEdge(0, i, dist);
+  }
+
+  unsigned int i = 1;
+  for (csv::CSVRow &row : reader) {
+    unsigned int j = 0;
+    for (csv::CSVField &field : row) {
+      const dist_t dist = parse_distance(field.get<string>());
+      if (dist != max)
+        graph.addEdge(i, j, dist);
+      ++j;
     }
-
-    int i = 1;
-    for (csv::CSVRow &row : reader) {
-        int j = 0;
-        for (csv::CSVField &field : row) {
-            const int dist = parse_distance(field.get<string>());
-            if (dist != INT_MAX)
-                graph.addEdge(i, j, dist);
-            ++j;
-        }
-        ++i;
-    }
-
+    ++i;
+  }
 }

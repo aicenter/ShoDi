@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include "SimpleGraph.h"
+#include "constants.h"
 
 using namespace std;
 
@@ -20,8 +21,8 @@ using namespace std;
  */
 class Graph{
 private:
-    vector< vector < pair< unsigned int, unsigned int > > > followingNodes;
-    vector< vector < pair< unsigned int, unsigned int > > > previousNodes;
+    vector< vector < pair< unsigned int, dist_t > > > followingNodes;
+    vector< vector < pair< unsigned int, dist_t > > > previousNodes;
 public:
     /**
      * A simple constructor.
@@ -48,7 +49,7 @@ public:
      * @param to[in] Target node of the edge.
      * @param weight[in] The weight of the edge.
      */
-    void addEdge(unsigned int from, unsigned int to, unsigned int weight);
+    void addEdge(unsigned int from, unsigned int to, dist_t weight);
 
     /**
      * Returns the number of nodes in the graph.
@@ -63,7 +64,7 @@ public:
      * @param x[in] The target node we are interested in.
      * @return All the edges in the graph that have 'x' as their target node.
      */
-    const vector<pair<unsigned int, unsigned int>> & incomingEdges(const unsigned int x)const;
+    const vector<pair<unsigned int, dist_t>> & incomingEdges(const unsigned int x)const;
 
     /**
      * Returns all the edges with the node 'x' as their source node.
@@ -71,7 +72,7 @@ public:
      * @param x[in] The source node we are interested in.
      * @return All the edges in the graph that have 'x' as their source node.
      */
-    const vector<pair<unsigned int, unsigned int>> & outgoingEdges(const unsigned int x)const;
+    const vector<pair<unsigned int, dist_t>> & outgoingEdges(const unsigned int x)const;
 };
 
 #endif //TRANSIT_NODE_ROUTING_GRAPH_H

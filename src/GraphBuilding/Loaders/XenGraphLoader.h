@@ -76,7 +76,7 @@ public:
      */
     void loadNodesMapping(unordered_map <long long unsigned int, unsigned int> & mapping);
 
-    vector<int> loadAdjacencyMatrix() override;
+    vector<dist_t> loadAdjacencyMatrix() override;
 
     Graph *loadGraph() override;
 

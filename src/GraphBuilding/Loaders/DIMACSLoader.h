@@ -71,7 +71,7 @@ private:
      * @param to[out] The target node of the edge.
      * @param weight[out] The weight of the edge.
      */
-    void getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight);
+    void getEdge(string & buffer, unsigned int & from, unsigned int & to, dist_t & weight);
 
 public:
     /**
@@ -81,7 +81,7 @@ public:
      */
     explicit DIMACSLoader(string inputFile);
 
-    vector<int> loadAdjacencyMatrix() override;
+    vector<dist_t> loadAdjacencyMatrix() override;
 
     Graph *loadGraph() override;
 

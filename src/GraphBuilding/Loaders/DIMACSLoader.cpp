@@ -177,13 +177,13 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
 }
 
 
-vector<int> DIMACSLoader::loadAdjacencyMatrix() {
+vector<dist_t> DIMACSLoader::loadAdjacencyMatrix() {
     // TODO can be done faster - without first making it into a graph and then copying to adjacency matrix
 
     std::unique_ptr<Graph> graph {loadGraph()};
 
     const auto nodes = graph->nodes();
-    vector<int> adj(nodes * nodes, INT_MAX);
+    vector<dist_t> adj(nodes * nodes, std::numeric_limits<dist_t>::max());
 
     for(size_t i = 0; i < nodes; ++i) {
         for(auto &pair : graph->outgoingEdges(i)) {

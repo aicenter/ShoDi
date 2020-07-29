@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <map>
+#include "constants.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ using namespace std;
  */
 class SimpleGraph{
 private:
-    vector< map < unsigned int, unsigned int > > followingNodes;
+    vector< map < unsigned int, dist_t > > followingNodes;
 public:
     /**
      * A simple constructor.
@@ -36,7 +37,7 @@ public:
      * @param to[in] The target node of the edge.
      * @param weight[in] The weight of the edge.
      */
-    void addEdge(unsigned int from, unsigned int to, unsigned int weight);
+    void addEdge(unsigned int from, unsigned int to, dist_t weight);
 
     /**
      * Returns the amount of nodes in the graph.
@@ -51,7 +52,7 @@ public:
      * @param x[in] The node we are interested in.
      * @return A map containing all the edges in the graph that have 'x' as their source node along with their weights.
      */
-    const map<unsigned int, unsigned int> & edges(unsigned int x)const;
+    const map<unsigned int, dist_t> & edges(unsigned int x)const;
 };
 
 

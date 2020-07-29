@@ -6,6 +6,7 @@
 #define SHORTEST_PATHS_GRAPHLOADER_H
 
 
+#include "constants.h"
 #include "../Structures/Graph.h"
 #include "../Structures/UpdateableGraph.h"
 
@@ -23,9 +24,9 @@ public:
 
     /**
      * Function used to load a graph in the form of an adjacency matrix.
-     * Values for edges that are not present are expected to be INT_MAX.
+     * Values for edges that are not present are expected to be std::numeric_limits<dist_t>::max().
      */
-    virtual vector<int> loadAdjacencyMatrix() = 0;
+    virtual vector<dist_t> loadAdjacencyMatrix() = 0;
 
     /**
      * Function used to load a graph in a way that is practical for preprocessing using one of the methods.

@@ -5,9 +5,11 @@
 
 #include <climits>
 #include <fstream>
+#include <limits>
 #include <queue>
 #include "DistanceMatrixComputorSlow.h"
 #include "../Dijkstra/DijkstraNode.h"
+#include "constants.h"
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
@@ -42,10 +44,11 @@ void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Grap
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID, const unsigned int nodesCnt, const Graph & graph, bool useReversedGraph) {
     unsigned int n = graph.nodes();
-    auto * distance = new int[n];
+    auto * distance = new dist_t[n];
 
+    const dist_t max = std::numeric_limits<dist_t>::max();
     for(unsigned int i = 0; i < n; i++) {
-        distance[i] = INT_MAX;
+        distance[i] = max;
     }
 
     distance[rowID] = 0;

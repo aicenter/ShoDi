@@ -1,9 +1,13 @@
-//
-// Created by Jan Neumann (neumaja5@fel.cvut.cz) on 28.07.20.
-//
+/******************************************************************************
+* File:             DistanceMatrixCsvOutputter.cpp
+*
+* Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
+* Created:          07/28/20 
+*****************************************************************************/
 
 #include <fstream>
 #include "DistanceMatrixCsvOutputter.h"
+#include "constants.h"
 
 void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
     printf("Storing the distance matrix.\n");
@@ -13,9 +17,9 @@ void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
         printf("Couldn't open file '%s'!", (path + ".xdm").c_str());
     }
 
-    const vector<int> &distances = dm.getRawData();
-    const int nodesCnt = dm.nodes();
-    for (size_t i = 0; i < distances.size(); i++) {
+    const vector<dist_t> &distances = dm.getRawData();
+    const auto nodesCnt = dm.nodes();
+    for (unsigned int i = 0; i < distances.size(); i++) {
         output << distances[i];
 
         if ((i + 1) % nodesCnt == 0) {

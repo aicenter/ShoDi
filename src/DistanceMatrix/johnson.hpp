@@ -1,28 +1,33 @@
+#include "constants.h"
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
 namespace johnson {
-    typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
-            boost::no_property, boost::property<boost::edge_weight_t, int> > Graph;
-    typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-    typedef std::pair<int,int> Edge;
 
-    typedef struct graph {
-        int V;
-        int E;
-        Edge *edge_array;
-        int* weights;
-    } graph_t;
+typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
+                              boost::no_property,
+                              boost::property<boost::edge_weight_t, dist_t>>
+    Graph;
+typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+typedef std::pair<unsigned int, unsigned int> Edge;
 
-    graph_t* johnson_init(std::vector<int>);
+typedef struct graph {
+  unsigned int V;
+  unsigned int E;
+  Edge *edge_array;
+  dist_t *weights;
+} graph_t;
 
-    graph_t* johnson_init2(const int n, const double p, const unsigned long seed);
+graph_t *johnson_init(std::vector<dist_t>);
 
-    typedef struct edge {
-        int u;
-        int v;
-    } edge_t;
+graph_t *johnson_init2(const unsigned int n, const double p, const unsigned long seed);
 
-    void free_graph(graph_t* g);
-    void johnson_parallel(graph_t *gr, int* output);
-}
+typedef struct edge {
+  unsigned int u;
+  unsigned int v;
+} edge_t;
+
+void free_graph(graph_t *g);
+void johnson_parallel(graph_t *gr, dist_t *output);
+
+} // namespace johnson

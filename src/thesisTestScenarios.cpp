@@ -722,12 +722,12 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
 int main(int argc, char * argv[]) {
     setbuf(stdout, NULL);
 
-    computeStructuresForAllMethodsPrague("../thesisTestsData/Prague.xeng");
+    computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");
     computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
     computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
 
-    computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague.xeng");
-    computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague.xeng");
+    computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
+    computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
 
     compareAllMethodsOnPrague(20);
     compareAllMethodsOnBerlin(20);

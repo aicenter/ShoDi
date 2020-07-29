@@ -14,6 +14,7 @@
 #include "OutputEdge.h"
 #include "OutputShortcutEdge.h"
 #include "Graph.h"
+#include "constants.h"
 
 using namespace std;
 
@@ -83,7 +84,7 @@ protected:
             ostream & output);
 
     vector< unordered_map < unsigned int, PreprocessingEdgeData > > followingNodes;
-    vector< unordered_map < unsigned int, unsigned int > > previousNodes;
+    vector< unordered_map < unsigned int, dist_t > > previousNodes;
     vector< unsigned int > ranks;
 
 public:
@@ -164,7 +165,7 @@ public:
     bool addEdge(
             unsigned int from,
             unsigned int to,
-            unsigned int weight);
+            dist_t weight);
 
     /**
      * Tries to insert an shortcut edge from one node to another with the given weight into the graph. The edge is not
@@ -183,7 +184,7 @@ public:
     bool addShortcutEdge(
             unsigned int from,
             unsigned int to,
-            unsigned int weight,
+            dist_t weight,
             unsigned int middlenode);
 
     /**
@@ -253,7 +254,7 @@ public:
      * @param x[in] The target node we are interested in.
      * @return All the edges in the graph that have 'x' as their target node.
      */
-    const unordered_map<unsigned int, unsigned int> & incomingEdges(
+    const unordered_map<unsigned int, dist_t> & incomingEdges(
             const unsigned int x)const;
 
     /**

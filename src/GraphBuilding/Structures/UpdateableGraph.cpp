@@ -28,7 +28,7 @@ UpdateableGraph::UpdateableGraph(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
-bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
+bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to).weight > weight) {
             followingNodes.at(from).at(to).weight = weight;
@@ -44,7 +44,7 @@ bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, unsigned int w
 }
 
 //______________________________________________________________________________________________________________________
-bool UpdateableGraph::addShortcutEdge(unsigned int from, unsigned int to, unsigned int weight, unsigned int middlenode) {
+bool UpdateableGraph::addShortcutEdge(unsigned int from, unsigned int to, dist_t weight, unsigned int middlenode) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to).weight > weight) {
             followingNodes.at(from).at(to).weight = weight;

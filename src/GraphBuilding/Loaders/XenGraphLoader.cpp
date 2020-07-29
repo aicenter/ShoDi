@@ -9,6 +9,7 @@
 #include <fstream>
 #include <climits>
 #include <iostream>
+#include <limits>
 #include <memory>
 
 //______________________________________________________________________________________________________________________
@@ -155,20 +156,19 @@ void XenGraphLoader::parseNodesMapping(ifstream & input, unordered_map <long lon
 
 }
 
-vector<int> XenGraphLoader::loadAdjacencyMatrix() {
+vector<dist_t> XenGraphLoader::loadAdjacencyMatrix() {
     // TODO can be done faster - without first making it into a graph and then copying to adjacency matrix
 
-    Graph * graph = loadGraph();
+    std::unique_ptr<Graph> graph {loadGraph()};
 
     const auto nodes = graph->nodes();
-    vector<int> adj(nodes * nodes, INT_MAX);
+    vector<dist_t> adj(nodes * nodes, std::numeric_limits<dist_t>::max());
 
     for(size_t i = 0; i < nodes; ++i) {
-        for(auto pair : graph->outgoingEdges(i)) {
+        for(auto &pair : graph->outgoingEdges(i)) {
             adj[i * nodes + pair.first] = pair.second;
         }
     }
 
-    delete graph;
     return adj;
 }

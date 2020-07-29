@@ -6,7 +6,7 @@
 #include "PreprocessingEdgeData.h"
 
 //______________________________________________________________________________________________________________________
-PreprocessingEdgeData::PreprocessingEdgeData(const unsigned int b, const unsigned int c, const bool d) : weight(b), middleNode(c), isShortcut(d) {
+PreprocessingEdgeData::PreprocessingEdgeData(const dist_t b, const unsigned int c, const bool d) : weight(b), middleNode(c), isShortcut(d) {
 
 }
 

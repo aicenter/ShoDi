@@ -50,7 +50,7 @@ private:
      */
     void fillDistanceMatrixRow(unsigned int rowID, unsigned int nodesCnt, const Graph & graph, bool useReversedGraph = false);
 
-    vector<int> distanceTable;
+    vector<dist_t> distanceTable;
 };
 
 
