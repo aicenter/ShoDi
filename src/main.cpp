@@ -67,14 +67,14 @@ constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the r
  * @param outputFilePath[in] Contains the desired output file path for the precomputed CH data structure.
  */
 void createCH(
-        GraphLoader *graphLoader,
+        GraphLoader &graphLoader,
         char *outputFilePath) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
     timer.begin();
 
-    UpdateableGraph *graph = graphLoader->loadUpdateableGraph();
+    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
     CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader->putAllEdgesIntoUpdateableGraph(*graph);
+    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
     graph->flushInDdsgFormat(outputFilePath);
 
     timer.finish();
@@ -295,7 +295,7 @@ void createDM(
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    if (strcmp(outputType, "xengraph") == 0) {
+    if (strcmp(outputType, "xdm") == 0) {
         outputter = std::unique_ptr<DistanceMatrixXdmOutputter> { new DistanceMatrixXdmOutputter()};
     } else if (strcmp(outputType, "csv") == 0) {
         outputter = std::unique_ptr<DistanceMatrixCsvOutputter> { new DistanceMatrixCsvOutputter()};
@@ -784,7 +784,7 @@ int main(int argc, char *argv[]) {
                             INVALID_FORMAT_INFO);
                 }
                 GraphLoader *graphLoader = newGraphLoader(argv[3], argv[4]);
-                createCH(graphLoader, argv[5]);
+                createCH(*graphLoader, argv[5]);
                 delete graphLoader;
 
                 // Transit Node Routing preprocessing.

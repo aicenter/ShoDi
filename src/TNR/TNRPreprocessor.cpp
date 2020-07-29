@@ -195,7 +195,7 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     ofstream output;
     output.open ( outputPath + ".tnrg", ios::binary );
     if( ! output.is_open() ) {
-        printf("Couldn't open file '%s'!", (outputPath + ".ch").c_str());
+        printf("Couldn't open file '%s'!", (outputPath + ".tnrg").c_str());
     }
 
     char c1, c2, c3, c4;

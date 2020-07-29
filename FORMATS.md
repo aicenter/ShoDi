@@ -10,7 +10,7 @@ This part described all the file formats that can be used as input for the `prep
 
 ### XenGraph input format
 
-One of the two input formats that can be used to describe the input graph for the preprocessing. This format can also be used when benchmarking Dijkstra's Algorithm performance.
+One of the three input formats that can be used to describe the input graph for the preprocessing. This format can also be used when benchmarking Dijkstra's Algorithm performance.
 
 The format is a plain text file that looks as follows:
 
@@ -21,15 +21,27 @@ The expected suffix for XenGraph files is `.xeng` although it is not enforced.
 
 ### DIMACS input format
 
-One of the two input formats that can be used to describe the input graph for the preprocessing.
+One of the three input formats that can be used to describe the input graph for the preprocessing.
 
 This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. Example graphs in this format can therefore be downloaded from the website of the challenge: http://users.diag.uniroma1.it/challenge9/download.shtml . The graph file is a plain text file and it looks as follows:
 
 * Everywhere in the file lines beginning with the character `c` can occur. Those lines are comment lines and are skipped during loading.
 * First line of the file not starting with the character `c` must be in the format `p sp n e`. Here `p sp` is a fixed string which serves as a magic constant. `n` is a positive integer denoting the number of nodes, `e` is another positive integer denoting the number of edges.
-* Then there must be exactly `e` lines of the format `a s t w` each representing one edge. In this case, `a` is a fixed characted constant indicating that the line describes one edge (so it is not a comment line). `s` is the source node of the edge and `t` is the target node of the edge. In this format, nodes are indexed from 1, so both `s` and `t` must be in the range from 1 to `n` (Internally, nodes are indexed from 0, so during loading, each node ID is automatically decreased by one). In this format, each edge is considered to be a one way edge, so if we want a bidirectional edge between `s` to `t`, we must provide two lines, one for an edge from `s` to `t` and one for an edge from `t` to `s`, both with the same weight.
+* Then there must be exactly `e` lines of the format `a s t w` each representing one edge. In this case, `a` is a fixed character constant indicating that the line describes one edge (so it is not a comment line). `s` is the source node of the edge and `t` is the target node of the edge. In this format, nodes are indexed from 1, so both `s` and `t` must be in the range from 1 to `n` (Internally, nodes are indexed from 0, so during loading, each node ID is automatically decreased by one). In this format, each edge is considered to be a one way edge, so if we want a bidirectional edge between `s` to `t`, we must provide two lines, one for an edge from `s` to `t` and one for an edge from `t` to `s`, both with the same weight.
 
 The expected suffix for DIMACS graph files is `.gr` although it is not enforced.
+
+### CSV input format
+
+One of the three input formats that can be used to describe the input graph for the preprocessing.
+
+A CSV file represents an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix) of a graph.
+
+* The file is expected to not have a header.
+* The file must have its amount of rows equal to its amount of columns.
+* Each value on row `i` and column `j` represents the weight of a *directed* edge from node `i` to node `j`.
+* Weights are expected to be valid *positive* integers, or `nan` for where there is no directed edge joining the nodes.
+
 
 ### Query set input format
 
@@ -166,9 +178,17 @@ All the data needed for the Transit Node Routing with Arc Flags shortest distanc
 
 Transit Node Routing with Arc Flags data structure files are automatically generated with the `.tgaf` suffix. This suffix is not enforced when loading the data structure.
 
-### Distance Matrix format
+### Distance Matrix output formats
 
-The implementation can compute Distance Matrices and answer queries using those matrices. This can not be used directly from the `preprocessor` or the `library`, but the code is present in the implementation. This was used in the thesis during benchmarks (examples can be found in [src/thesisTestScenarios.cpp](./src/thesisTestScenarios.cpp)). The Distance Matrix is stored in a binary file that is organized as follows:
+The implementation can compute Distance Matrices and answer queries using those
+matrices. This can not be used from the `library`, but can be used from the
+`preprocessor`, as described above.
+
+#### XDM
+
+This was used in the thesis during benchmarks (examples can be found in
+[src/thesisTestScenarios.cpp](./src/thesisTestScenarios.cpp)). The Distance
+Matrix is stored in a binary file that is organized as follows:
 
 
 * "XDM" (0x58 0x44 0x4d)
@@ -178,6 +198,14 @@ The implementation can compute Distance Matrices and answer queries using those 
 
 The Distance Matrices obtained from our implementation automatically have the `.xdm` suffix. This suffix is not enforced when loading the Distance Matrix.
 
+#### CSV
+
+Very similar to the *CSV graph input format* described previously: This output is a CSV file containing the distance matrix of a graph.
+
+* The file does not have a header.
+* The file has its amount of rows equal to its amount of columns.
+* Each value on row `i` and column `j` represents the *distance* from node `i` to node `j`.
+* All values are positive integers.
 
 
 Output format when benchmarking

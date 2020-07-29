@@ -3,6 +3,7 @@
 //
 
 #include <climits>
+#include <boost/algorithm/string.hpp>
 #include "CsvGraphLoader.h"
 #include "csv.hpp"
 
@@ -11,7 +12,7 @@ CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {
 }
 
 int parse_distance(std::string str) {
-    if (str == "nan") {
+    if (boost::iequals(str, "nan")) {
         return INT_MAX;
     } else {
         return (int) round(stof(str));

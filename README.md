@@ -40,21 +40,29 @@ The command line interface requires you to use specific arguments in the correct
 
 ### Graph preprocessing
 
+#### Contraction Hierarchies
+
 To preprocess a graph using Contraction Hierarchies, simply call the preprocessor with the following arguments:
 `./shortestPathsPreprocessor create ch [xengraph/dimacs/csv] [input_file] [output_file]`.
 Here the third argument must be exactly `xengraph` or `dimacs` and it determines which input format is used. The fourth argument is your input file in the chosen format, and the last argument is the output file. A suffix `.ch` will be automatically added to the path. An example of a correct call is: `./shortestPathsPreprocessor create ch xengraph my_graph.xeng my_graph`.
 
+#### Transit Node Routing
+
 To preprocess a graph for Transit Node Routing, the arguments are as follows:
 `./shortestPathsPreprocessor create tnr [xengraph/dimacs/csv] [fast/slow/dm] [tnodes_cnt] [input_file] [output_file]`. The third argument again determines which input format is used. The fourth argument determines which preprocessing mode should be used. The `fast` mode will precompute the structures in the smallest time out of the three, but the performance of the resulting data structure will be significantly lower than for the other two modes. Modes `slow` and `dm` will produce exactly the same result, but the `dm` mode uses distance matrix to speed up the precomputation. This means that the `dm` mode requires a lot of memory, but the precomputation will be fairly quick. The `slow` mode needs significantly less memory, but takes more time. The fifth argument determines the size of the transit nodes set. Therefore it must be an integer between 1 and the number of nodes in the graph. Less transit nodes usually mean lower memory requirements, but also worse query times. By choosing the appropriate size of the transit node set, you can find a great balance between memory requirements and performance. The sixth argument is your input file in the chosen format, and the last argument is the output file. A suffix `.tnrg` will be automatically added to the output path. An example of a correct call: `./shortestPathsPreprocessor create tnr xengraph dm 1000 my_graph.xeng my_graph`.
 
+#### Transit Node Routing with Arc Flags
+
 To preprocess a graph for Transit Node Routing with Arc Flags, the arguments are as follows: `./shortestPathsPreprocessor create tnraf [xengraph/dimacs] [slow/dm] [tnodes_cnt] [input_file] [output_file]`. The third argument determines which input format is used. The fourth argument again switches between preprocessing modes. Both modes return the exact same result, but the `dm` mode is faster while requiring more memory. The fifth argument again determines the size of the transit node set (it must be an integer between 1 and the number of nodes in the graph). The sixth argument is your input file in the chosen format, the last argument is the output file. A suffix `.tgaf` will be automatically added to the output path. An example of a correct call: `./shortestPathsPreprocessor create tnraf xengraph dm 1000 my_graph.xeng my_graph`.
+
+#### Distance Matrix
 
 To retrieve a distance matrix for a graph, the arguments are as follows:
 `./shortestPathsPreprocessor create dm [input_format] [output_format] [slow/fast] [input_file] [output_file]`,  
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `csv`.
- * `output_format` is one of `xengraph`, `csv`.
+ * `output_format` is one of `xdm`, `csv`.
 
 ### Benchmarking
 
@@ -75,7 +83,7 @@ Example of a Dijkstra's Algorithm benchmark call with mapping and with output of
 Input formats
 -------------
 
-In this part, we will describe all the input formats that can be used with the preprocessor application. The first two formats are two input formats for directed weighted graphs that can be used as input for the creation of data structures for one of the methods. The other two formats are related to benchmarking.
+In this part, we will describe all the input formats that can be used with the preprocessor application. The first three formats are input formats for directed weighted graphs that can be used as input for the creation of data structures for one of the methods. The other two formats are related to benchmarking.
 
 ### XenGraph input format
 
@@ -95,6 +103,18 @@ This input format was used during the 9th DIMACS Implementation Challenge on sho
 * Then there must be exactly `e` lines of the format `a s t w` each representing one edge. In this case, `a` is a fixed characted constant indicating that the line describes one edge (so it is not a comment line). `s` is the source node of the edge and `t` is the target node of the edge. In this format, nodes are indexed from 1, so both `s` and `t` must be in the range from 1 to `n` (Internally, nodes are indexed from 0, so during loading, each node ID is automatically decreased by one). In this format, each edge is considered to be a one way edge, so if we want a bidirectional edge between `s` to `t`, we must provide two lines, one for an edge from `s` to `t` and one for an edge from `t` to `s`, both with the same weight.
 
 The expected suffix for DIMACS graph files is `.gr` although it is not enforced.
+
+### CSV input format
+
+One of the three input formats that can be used to describe the input graph for the preprocessing.
+
+A CSV file represents an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix) of a graph.
+
+* The file is expected to not have a header.
+* The file must have its amount of rows equal to its amount of columns.
+* Each value on row `i` and column `j` represents the weight of a directed edge from node `i` to node `j`.
+* Weights are expected to be valid *positive* integers, or `nan` for where there is no edge joining the nodes.
+
 
 ### The query set input format
 
