@@ -6,12 +6,12 @@
 #include <iostream>
 #include <climits>
 #include <fstream>
+#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "TNRAFPreprocessor.h"
 #include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "../Dijkstra/BasicDijkstra.h"
-#include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 
 DistanceMatrix * TNRAFPreprocessor::distanceMatrix = NULL;
 

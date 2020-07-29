@@ -37,7 +37,7 @@ std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
   cout << size * size << " values expected" << endl;
   // ProgressBar progress(size);
 
-  unsigned int index = 0;
+  size_t index = 0;
   for (; index < size; index++) {
     string str_value = first_row[index];
     adj[index] = parse_distance(str_value);
@@ -90,7 +90,7 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
   csv::CSVReader reader(this->inputFile);
 
   vector<string> first_row = reader.get_col_names();
-  const int size = first_row.size();
+  const unsigned int size = first_row.size();
   auto *const graph = new UpdateableGraph(size);
 
   const dist_t max = std::numeric_limits<dist_t>::max();

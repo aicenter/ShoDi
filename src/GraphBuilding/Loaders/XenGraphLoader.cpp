@@ -25,7 +25,8 @@ Graph * XenGraphLoader::loadGraph() {
         throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
-    unsigned int nodes, edges;
+    unsigned int nodes;
+    size_t edges;
     parseFirstLine(input, nodes, edges);
 
     SimpleGraph * graph = new SimpleGraph(nodes);
@@ -48,7 +49,8 @@ UpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
         throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
-    unsigned int nodes, edges;
+    unsigned int nodes;
+    size_t edges;
     parseFirstLine(input, nodes, edges);
 
     UpdateableGraph * graph = new UpdateableGraph(nodes);
@@ -80,7 +82,8 @@ void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
         throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
-    unsigned int nodes, edges;
+    unsigned int nodes;
+    size_t edges;
     parseFirstLine(input, nodes, edges);
 
     parseEdges(input, graph, edges);
@@ -90,7 +93,7 @@ void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
 }
 
 //______________________________________________________________________________________________________________________
-void XenGraphLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges) {
+void XenGraphLoader::parseFirstLine(ifstream & input, unsigned int & nodes, size_t & edges) {
     char c1, c2, c3;
     input >> c1 >> c2 >> c3;
     if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
@@ -103,9 +106,9 @@ void XenGraphLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsi
 }
 
 //______________________________________________________________________________________________________________________
-void XenGraphLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges) {
+void XenGraphLoader::parseEdges(ifstream & input, SimpleGraph & graph, size_t edges) {
     unsigned int from, to, oneWayFlag, weight;
-    for(unsigned int i = 0; i < edges; i++) {
+    for(size_t i = 0; i < edges; i++) {
         input >> from >> to >> weight >> oneWayFlag;
         if (from != to) {
             if (oneWayFlag == 1) {
@@ -119,9 +122,9 @@ void XenGraphLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned 
 }
 
 //______________________________________________________________________________________________________________________
-void XenGraphLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges) {
+void XenGraphLoader::parseEdges(ifstream & input, UpdateableGraph & graph, size_t edges) {
     unsigned int from, to, oneWayFlag, weight;
-    for(unsigned int i = 0; i < edges; i++) {
+    for(size_t i = 0; i < edges; i++) {
         input >> from >> to >> weight >> oneWayFlag;
         if (from != to) {
             if (oneWayFlag == 1) {
@@ -161,7 +164,7 @@ vector<dist_t> XenGraphLoader::loadAdjacencyMatrix() {
 
     std::unique_ptr<Graph> graph {loadGraph()};
 
-    const auto nodes = graph->nodes();
+    const size_t nodes = graph->nodes();
     vector<dist_t> adj(nodes * nodes, std::numeric_limits<dist_t>::max());
 
     for(size_t i = 0; i < nodes; ++i) {

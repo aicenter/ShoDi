@@ -34,7 +34,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void parseGraphProblemLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
+    void parseGraphProblemLine(ifstream & input, unsigned int & nodes, size_t & edges);
 
     /**
      Auxiliary function used to parse the edges when loading the graph.
@@ -43,7 +43,7 @@ private:
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
      */
-    void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, SimpleGraph & graph, size_t edges);
 
     /**
      * Auxiliary function used to parse the edges when loading the graph.
@@ -52,7 +52,7 @@ private:
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
      */
-    void parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, UpdateableGraph & graph, size_t edges);
 
     /**
      * Auxiliary function that extracts the number of nodes and the number of edges from the problem line.
@@ -61,7 +61,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
+    void processGraphProblemLine(string & buffer, unsigned int & nodes, size_t & edges);
 
     /**
      * Extracts an edge data from an input line representing an edge.

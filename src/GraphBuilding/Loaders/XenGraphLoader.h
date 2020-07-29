@@ -31,7 +31,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
+    void parseFirstLine(ifstream & input, unsigned int & nodes, size_t & edges);
 
     /**
      * Auxiliary function used to parse the edges when loading the graph.
@@ -40,7 +40,7 @@ private:
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
      */
-    void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, SimpleGraph & graph, size_t edges);
 
     /**
      * Auxiliary function used to parse the edges when loading the graph.
@@ -49,7 +49,7 @@ private:
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
      */
-    void parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, UpdateableGraph & graph, size_t edges);
 
     /**
      * Auxiliary function used to parse the mapping.

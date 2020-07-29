@@ -23,7 +23,8 @@ Graph * DIMACSLoader::loadGraph() {
         throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
-    unsigned int nodes, edges;
+    unsigned int nodes;
+    size_t edges;
     parseGraphProblemLine(input, nodes, edges);
 
     SimpleGraph * graph = new SimpleGraph(nodes);
@@ -47,7 +48,8 @@ UpdateableGraph * DIMACSLoader::loadUpdateableGraph() {
         throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
-    unsigned int nodes, edges;
+    unsigned int nodes;
+    size_t edges;
     parseGraphProblemLine(input, nodes, edges);
 
     UpdateableGraph * graph = new UpdateableGraph(nodes);
@@ -66,7 +68,8 @@ void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
         throw runtime_error(string("Couldn't open file '") + this->inputFile + "'!");
     }
 
-    unsigned int nodes, edges;
+    unsigned int nodes;
+    size_t edges;
     parseGraphProblemLine(input, nodes, edges);
 
     parseEdges(input, graph, edges);
@@ -76,7 +79,7 @@ void DIMACSLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, unsigned int &edges) {
+void DIMACSLoader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, size_t &edges) {
     while (true) {
         string buffer;
         getline(input, buffer);
@@ -88,9 +91,9 @@ void DIMACSLoader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, u
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes, unsigned int &edges) {
-    unsigned int position = 5;
-    unsigned int tmpnodes = 0;
+void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes, size_t &edges) {
+    size_t position = 5;
+    size_t tmpnodes = 0;
     while (buffer[position] != ' ') {
         tmpnodes *= 10;
         tmpnodes += (buffer[position] - 48);
@@ -98,7 +101,7 @@ void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes, 
     }
 
     position++;
-    unsigned int tmpedges = 0;
+    size_t tmpedges = 0;
     while(position < buffer.size()) {
         tmpedges *= 10;
         tmpedges += (buffer[position] - 48);
@@ -110,14 +113,14 @@ void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes, 
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges) {
-    unsigned int loadededgescnt = 0;
+void DIMACSLoader::parseEdges(ifstream & input, SimpleGraph & graph, size_t edges) {
+    size_t loadededgescnt = 0;
     while (loadededgescnt < edges) {
         string buffer;
         getline(input, buffer);
         if (buffer[0] == 'a') {
             unsigned int from, to;
-            unsigned int weight;
+            dist_t weight;
             getEdge(buffer, from, to, weight);
             if(from != to) {
                 graph.addEdge(from, to, weight);
@@ -128,14 +131,14 @@ void DIMACSLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned in
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges) {
-    unsigned int loadededgescnt = 0;
+void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, size_t edges) {
+    size_t loadededgescnt = 0;
     while (loadededgescnt < edges) {
         string buffer;
         getline(input, buffer);
         if (buffer[0] == 'a') {
             unsigned int from, to;
-            unsigned int weight;
+            dist_t weight;
             getEdge(buffer, from, to, weight);
             if(from != to) {
                 graph.addEdge(from, to, weight);
@@ -146,9 +149,9 @@ void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigne
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight) {
-    unsigned int position = 2;
-    unsigned int tmpfrom = 0;
+void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & to, dist_t & weight) {
+    size_t position = 2;
+    size_t tmpfrom = 0;
     while (buffer[position] != ' ') {
         tmpfrom *= 10;
         tmpfrom += (buffer[position] - 48);
@@ -156,7 +159,7 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
     }
 
     position++;
-    unsigned int tmpto = 0;
+    size_t tmpto = 0;
     while(buffer[position] != ' ') {
         tmpto *= 10;
         tmpto += (buffer[position] - 48);
@@ -164,7 +167,7 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
     }
 
     position++;
-    unsigned int tmpweight = 0;
+    dist_t tmpweight = 0;
     while(position < buffer.size()) {
         tmpweight *= 10;
         tmpweight += (buffer[position] - 48);

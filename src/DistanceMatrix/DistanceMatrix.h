@@ -27,7 +27,7 @@ public:
      *
      * @param nodes[in] The number of nodes in the graph (also the number of rows and columns in the matrix).
      */
-    explicit DistanceMatrix(unsigned int nodes);
+    explicit DistanceMatrix(size_t nodes);
 
     /**
      * A move constructor.
@@ -65,7 +65,7 @@ public:
      * Get nodes count
      * @return nodes count
      */
-    unsigned int nodes();
+    size_t nodes();
 
     /**
      * Prints some statistics about the distance matrix. Useful mainly during debugging, might be removed later.
@@ -76,7 +76,7 @@ public:
     void printInfo();
 
 private:
-    const unsigned int nodesCnt;
+    const size_t nodesCnt;
     vector<dist_t> distances;
 };
 

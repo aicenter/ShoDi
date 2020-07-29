@@ -4,50 +4,55 @@
 //
 
 #include <climits>
+#include <cstddef>
 #include <fstream>
 #include <limits>
 #include <queue>
+#include <stdexcept>
+#include <string>
 #include "DistanceMatrixComputorSlow.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "constants.h"
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
-    unsigned int nodesCnt = graph.nodes();
+    const size_t nodesCnt = graph.nodes();
+
     distanceTable.resize(nodesCnt * nodesCnt);
 
-    for(unsigned int i = 0; i < nodesCnt; i++) {
+    for(size_t i = 0; i < nodesCnt; i++) {
         if (i % 100 == 0) {
-            printf("\rComputed %u rows of the distance matrix.", i);
+            cout << "\rComputed " << i << '/' << nodesCnt << " rows of the distance matrix.";
         }
-        fillDistanceMatrixRow(i, nodesCnt, graph);
+        fillDistanceMatrixRow(i, graph);
     }
 
-    printf("\rComputed %u rows of the distance matrix.\n", nodesCnt);
+    cout << "\rComputed " << nodesCnt << '/' << nodesCnt << " rows of the distance matrix." << endl;
 }
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Graph & graph) {
-    unsigned int nodesCnt = graph.nodes();
+    const size_t nodesCnt = graph.nodes();
+
     distanceTable.resize(nodesCnt * nodesCnt);
 
-    for(unsigned int i = 0; i < nodesCnt; i++) {
+    for(size_t i = 0; i < nodesCnt; i++) {
         if (i % 100 == 0) {
-            printf("\rComputed %u rows of the distance matrix.", i);
+            cout << "\rComputed " << i << '/' << nodesCnt << " rows of the distance matrix.";
         }
-        fillDistanceMatrixRow(i, nodesCnt, graph, true);
+        fillDistanceMatrixRow(i, graph, true);
     }
 
-    printf("\rComputed %u rows of the distance matrix.\n", nodesCnt);
+    cout << "\rComputed " << nodesCnt << '/' << nodesCnt << " rows of the distance matrix." << endl;
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID, const unsigned int nodesCnt, const Graph & graph, bool useReversedGraph) {
-    unsigned int n = graph.nodes();
+void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const size_t rowID, const Graph & graph, bool useReversedGraph) {
+    size_t n = graph.nodes();
     auto * distance = new dist_t[n];
 
     const dist_t max = std::numeric_limits<dist_t>::max();
-    for(unsigned int i = 0; i < n; i++) {
+    for(size_t i = 0; i < n; i++) {
         distance[i] = max;
     }
 
@@ -84,8 +89,8 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
 
     }
 
-    for(unsigned int i = 0; i < n; i++) {
-        distanceTable[rowID * nodesCnt + i] = distance[i];
+    for(size_t i = 0; i < n; i++) {
+      distanceTable[rowID * n + i] = distance[i];
     }
     delete [] distance;
 }

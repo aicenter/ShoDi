@@ -3,6 +3,7 @@
 // Created on: 6.5.20
 //
 
+#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
 #include "GraphBuilding/Loaders/DDSGLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
@@ -19,7 +20,6 @@
 #include "Timer/Timer.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
-#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
 
 /*
@@ -118,10 +118,9 @@ void createDM(
     timer.begin();
 
     XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
-    Graph * graph = dijkstraGraphLoader.loadGraph();
 
     DistanceMatrixComputorSlow dmComputor;
-    dmComputor.computeDistanceMatrix(*graph);
+    dmComputor.computeDistanceMatrix(dijkstraGraphLoader);
 
     DistanceMatrix * dm = dmComputor.getDistanceMatrixInstance();
     DistanceMatrixXdmOutputter outputter;
@@ -131,7 +130,6 @@ void createDM(
     timer.printMeasuredTime();
 
     delete dm;
-    delete graph;
 }
 
 /**

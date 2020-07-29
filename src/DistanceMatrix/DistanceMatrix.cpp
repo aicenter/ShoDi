@@ -3,6 +3,7 @@
 // Created on: 05.10.19
 //
 
+#include <bits/c++config.h>
 #include <cstdio>
 #include <climits>
 #include <fstream>
@@ -11,7 +12,7 @@
 #include "DistanceMatrix.h"
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix::DistanceMatrix(const unsigned int nodes) : nodesCnt(nodes), distances(nodes) {
+DistanceMatrix::DistanceMatrix(const size_t nodes) : nodesCnt(nodes), distances(nodes * nodes) {
 
 }
 
@@ -59,6 +60,6 @@ const vector<dist_t> &DistanceMatrix::getRawData() {
     return distances;
 }
 
-unsigned int DistanceMatrix::nodes() {
+size_t DistanceMatrix::nodes() {
     return nodesCnt;
 }

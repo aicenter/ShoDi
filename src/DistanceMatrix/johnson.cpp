@@ -13,21 +13,21 @@ using namespace johnson;
 
 graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
   const dist_t max = std::numeric_limits<dist_t>::max();
-  unsigned int E = 0;
-  for (unsigned int i = 0; i < adj_matrix.size(); i++) {
+  size_t E = 0;
+  for (size_t i = 0; i < adj_matrix.size(); i++) {
     if (adj_matrix[i] < max) {
       E++;
     }
   }
 
-  unsigned int n = sqrt(adj_matrix.size());
+  size_t n = sqrt(adj_matrix.size());
 
   Edge *edge_array = new Edge[E];
   dist_t *weights = new dist_t[E];
-  unsigned int ei = 0;
+  size_t ei = 0;
 
-  for (unsigned int i = 0; i < n; i++) {
-    for (unsigned int j = 0; j < n; j++) {
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < n; j++) {
       if (adj_matrix[i * n + j] != 0 && adj_matrix[i * n + j] != max) {
         edge_array[ei] = Edge(i, j);
         weights[ei] = adj_matrix[i * n + j];
@@ -45,7 +45,7 @@ graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
   return gr;
 }
 
-graph_t *johnson::johnson_init2(const unsigned int n, const double p,
+graph_t *johnson::johnson_init2(const size_t n, const double p,
                                 const unsigned long seed) {
   static std::uniform_real_distribution<double> flip(0, 1);
   static std::uniform_int_distribution<unsigned int> choose_weight(1, 100);
@@ -56,9 +56,9 @@ graph_t *johnson::johnson_init2(const unsigned int n, const double p,
 
   dist_t *adj_matrix = new dist_t[n * n];
 
-  unsigned int E = 0;
-  for (unsigned int i = 0; i < n; i++) {
-    for (unsigned int j = 0; j < n; j++) {
+  size_t E = 0;
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < n; j++) {
       if (i == j) {
         adj_matrix[i * n + j] = 0;
       } else if (flip(rand_engine) < p) {
@@ -71,9 +71,9 @@ graph_t *johnson::johnson_init2(const unsigned int n, const double p,
   }
   Edge *edge_array = new Edge[E];
   dist_t *weights = new dist_t[E];
-  unsigned int ei = 0;
-  for (unsigned int i = 0; i < n; i++) {
-    for (unsigned int j = 0; j < n; j++) {
+  size_t ei = 0;
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < n; j++) {
       if (adj_matrix[i * n + j] != 0 && adj_matrix[i * n + j] != max) {
         edge_array[ei] = Edge(i, j);
         weights[ei] = adj_matrix[i * n + j];
@@ -101,7 +101,7 @@ void johnson::free_graph(graph_t *g) {
 
 inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
   unsigned int V = gr->V;
-  unsigned int E = gr->E;
+  size_t E = gr->E;
   Edge *edges = gr->edge_array;
   dist_t *weights = gr->weights;
 
@@ -110,16 +110,16 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (unsigned int i = 0; i < V; i++) {
+  for (size_t i = 0; i < V; i++) {
     dist[i] = max;
   }
   dist[src] = 0;
 
-  for (unsigned int i = 1; i <= V - 1; i++) {
+  for (size_t i = 1; i <= V - 1; i++) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-    for (unsigned int j = 0; j < E; j++) {
+    for (size_t j = 0; j < E; j++) {
       unsigned int u = std::get<0>(edges[j]);
       unsigned int v = std::get<1>(edges[j]);
       dist_t new_dist = weights[j] + dist[u];
@@ -132,7 +132,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (unsigned int i = 0; i < E; i++) {
+  for (size_t i = 0; i < E; i++) {
     unsigned int u = std::get<0>(edges[i]);
     unsigned int v = std::get<1>(edges[i]);
     dist_t weight = weights[i];
@@ -162,7 +162,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (unsigned int e = 0; e < V; e++) {
+  for (size_t e = 0; e < V; e++) {
     bf_graph->edge_array[e + gr->E] = Edge(V, e);
   }
 
@@ -182,7 +182,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (unsigned int e = 0; e < gr->E; e++) {
+  for (size_t e = 0; e < gr->E; e++) {
     unsigned int u = std::get<0>(gr->edge_array[e]);
     unsigned int v = std::get<1>(gr->edge_array[e]);
     gr->weights[e] = gr->weights[e] + h[u] - h[v];
@@ -194,10 +194,10 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
 #endif
-  for (unsigned int s = 0; s < V; s++) {
+  for (size_t s = 0; s < V; s++) {
     std::vector<dist_t> d(num_vertices(G));
     dijkstra_shortest_paths(G, s, boost::distance_map(&d[0]));
-    for (unsigned int v = 0; v < V; v++) {
+    for (size_t v = 0; v < V; v++) {
       output[s * V + v] = d[v] + h[v] - h[s];
     }
     ++progress;

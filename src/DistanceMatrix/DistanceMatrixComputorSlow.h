@@ -9,6 +9,7 @@
 #include "../GraphBuilding/Structures/Graph.h"
 #include "DistanceMatrix.h"
 #include "DistanceMatrixComputor.h"
+#include <cstddef>
 
 using namespace std;
 
@@ -44,11 +45,10 @@ private:
 // to all the other nodes found by this Dijkstra run are then used as values for the row.
      *
      * @param rowID
-     * @param nodesCnt
      * @param graph
      * @param useReversedGraph
      */
-    void fillDistanceMatrixRow(unsigned int rowID, unsigned int nodesCnt, const Graph & graph, bool useReversedGraph = false);
+    void fillDistanceMatrixRow(size_t rowID, const Graph & graph, bool useReversedGraph = false);
 
     vector<dist_t> distanceTable;
 };
