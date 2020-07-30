@@ -18,8 +18,10 @@ bool charicmp(const char &c1, const char &c2) {
   return std::tolower(c1) == std::tolower(c2);
 }
 
+const string NAN_STR = string("nan");
+
 dist_t parse_distance(std::string str) {
-  if (std::equal(str.begin(), str.end(), string("nan").begin(), charicmp)) {
+  if (std::equal(str.begin(), str.end(), NAN_STR.begin(), NAN_STR.end(), charicmp)) {
     return std::numeric_limits<dist_t>::max();
   } else {
     return (dist_t)round(stof(str));

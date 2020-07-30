@@ -27,7 +27,7 @@ The process can be done as follows:
 * `mkdir build`
 * `cd build`
 * `cmake ..`
-* `cmake --build . --target shortestPathsPreprocessor`
+* `cmake --build . --target shortestPathsPreprocessor --config Release`
 
 Usage
 -----

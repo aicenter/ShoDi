@@ -5,9 +5,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CSV_CXX_STANDARD 11)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 set(CMAKE_BUILD_TYPE Release)
 option(BUILD_DOC "Build documentation" ON)
 
+include(GenerateExportHeader)
 find_package(JNI REQUIRED)
 find_package(Boost REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -175,6 +177,12 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/ProgressBar.cpp
         src/DistanceMatrix/ProgressBar.hpp
         src/constants.h)
+
+GENERATE_EXPORT_HEADER(shortestPaths
+        BASE_NAME shortestPaths
+        EXPORT_MACRO_NAME shortestPaths_EXPORTS
+        EXPORT_FILE_NAME shortestPaths_EXPORTS.h
+        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
 
 add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRBenchmark.cpp

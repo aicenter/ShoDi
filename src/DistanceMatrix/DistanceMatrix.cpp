@@ -3,7 +3,6 @@
 // Created on: 05.10.19
 //
 
-#include <bits/c++config.h>
 #include <cstdio>
 #include <climits>
 #include <fstream>
