@@ -2,4 +2,5 @@
 .clangd/
 .vscode/
 build/
+vcpkg/
 compile_commands.json

@@ -1,23 +1,44 @@
 cmake_minimum_required(VERSION 3.14)
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+  CACHE STRING "Vcpkg toolchain file")
+
 project(shortest_paths)
+include(GenerateExportHeader)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-
 set(CMAKE_CXX_STANDARD 11)
-set(CSV_CXX_STANDARD 11)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-set(CMAKE_BUILD_TYPE Release)
 option(BUILD_DOC "Build documentation" ON)
 
-include(GenerateExportHeader)
-find_package(JNI REQUIRED)
-find_package(Boost REQUIRED)
-find_package(OpenMP REQUIRED)
+include_directories(src/)
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
+endif()
 
-# check if Doxygen is installed
+# Packages
+
+## Java
+find_package(JNI REQUIRED)
+include_directories(${JNI_INCLUDE_DIRS})
+
+## Boost
+find_path(BOOST_CONFIG_INCLUDE_DIRS "/boost/config.hpp")
+include_directories(${BOOST_CONFIG_INCLUDE_DIRS})
+
+## CSV
+find_package(csv2 CONFIG REQUIRED)
+link_libraries(csv2::csv2)
+
+## OpenMP
+find_package(OpenMP REQUIRED)
+add_compile_definitions(_OPENMP)
+if (OpenMP_CXX_FOUND)
+    link_libraries(OpenMP::OpenMP_CXX)
+endif ()
+
+## Doxygen
 find_package(Doxygen
-        REQUIRED dot
-        OPTIONAL_COMPONENTS mscgen dia)
+        OPTIONAL_COMPONENTS dot mscgen dia)
 if (DOXYGEN_FOUND)
     # set input and output files
     message(${CMAKE_CURRENT_SOURCE_DIR})
@@ -38,21 +59,7 @@ else (DOXYGEN_FOUND)
     message("Doxygen needs to be installed to generate documentation.")
 endif (DOXYGEN_FOUND)
 
-add_subdirectory(csv-parser)
-
-include_directories(src/ ${JNI_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} csv-parser/single_include)
-link_libraries(csv ${Boost_LIBRARIES})
-
-if (OpenMP_CXX_FOUND)
-    link_libraries(OpenMP::OpenMP_CXX)
-endif ()
-
-add_compile_definitions(_OPENMP)
-
-include_directories(${JNI_INCLUDE_DIRS})
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
-endif()
+# Targets
 
 add_library(shortestPaths SHARED
         src/API/CHDistanceQueryManagerAPI.cpp
@@ -174,8 +181,8 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/DistanceMatrixCsvOutputter.h
         src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
-        src/DistanceMatrix/ProgressBar.cpp
-        src/DistanceMatrix/ProgressBar.hpp
+        src/CLI/ProgressBar.cpp
+        src/CLI/ProgressBar.hpp
         src/constants.h)
 
 GENERATE_EXPORT_HEADER(shortestPaths

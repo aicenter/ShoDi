@@ -6,21 +6,32 @@
  *****************************************************************************/
 
 #include "CsvGraphLoader.h"
-#include "csv.hpp"
+#include "CLI/ProgressBar.hpp"
+#include "GraphBuilding/Structures/Graph.h"
+#include "GraphBuilding/Structures/UpdateableGraph.h"
 #include <algorithm>
 #include <cctype>
 #include <climits>
+#include <cmath>
+#include <csv2/reader.hpp>
 #include <limits>
+#include <stdexcept>
+#include <string>
 
 CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {}
+
+typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
+                     csv2::first_row_is_header<false>,
+                     csv2::trim_policy::trim_whitespace>
+    DefaultCSVReader;
 
 inline bool stricmp(const string s1, const string s2) {
   const auto size1 = s1.size();
 
-  if(size1 != s2.size())
+  if (size1 != s2.size())
     return false;
 
-  for (int i = 0; i < size1; ++i) {
+  for (auto i = 0; i < size1; ++i) {
     if (tolower(s1[i]) != tolower(s2[i]))
       return false;
   }
@@ -39,118 +50,145 @@ dist_t parse_distance(std::string str) {
 }
 
 std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
-  csv::CSVReader reader(this->inputFile);
+  DefaultCSVReader reader;
 
-  // init from the first row
-  vector<string> first_row = reader.get_col_names();
-  const unsigned int size = first_row.size();
-  std::vector<dist_t> adj(size * size);
-  cout << size << " nodes" << endl;
-  cout << size * size << " values expected" << endl;
-  // ProgressBar progress(size);
+  if (reader.mmap(this->inputFile)) {
+    const unsigned int size = reader.cols();
+    if (size != reader.rows())
+      throw runtime_error(this->inputFile +
+                          " does not contain a square matrix. Found " +
+                          to_string(reader.rows()) + " rows and " +
+                          to_string(size) + " cols.\n");
 
-  size_t index = 0;
-  for (; index < size; index++) {
-    string str_value = first_row[index];
-    adj[index] = parse_distance(str_value);
-    // cout << index << " " << str_value << "\n";
-  }
-  //++progress;
+    std::vector<dist_t> adj(size * size);
 
-  for (csv::CSVRow &row : reader) {
-    for (csv::CSVField &field : row) {
-      adj[index++] = parse_distance(field.get<string>());
+    ProgressBar progress(size, "Loading CSV file:");
+
+    size_t index = 0;
+    for (const auto row : reader) {
+      for (const auto cell : row) {
+        string val;
+        cell.read_value(val);
+        adj[index++] = parse_distance(val);
+      }
+      ++progress;
     }
-    //++progress;
-  }
 
-  cout << index << " values found" << endl;
-  return adj;
+    return adj;
+  } else {
+    throw runtime_error(string("Error reading file ") + this->inputFile +
+                        " using mmap.\n");
+  }
 }
 
 Graph *CsvGraphLoader::loadGraph() {
-  csv::CSVReader reader(this->inputFile);
+  DefaultCSVReader reader;
 
-  vector<string> first_row = reader.get_col_names();
-  const unsigned int size = first_row.size();
-  auto *const graph = new Graph(size);
+  if (reader.mmap(this->inputFile)) {
+    const unsigned int size = reader.cols();
+    if (size != reader.rows())
+      throw runtime_error(this->inputFile +
+                          " does not contain a square matrix. Found " +
+                          to_string(reader.rows()) + " rows and " +
+                          to_string(size) + " cols.\n");
 
-  const dist_t max = std::numeric_limits<dist_t>::max();
+    const dist_t max = std::numeric_limits<dist_t>::max();
+    auto *const graph = new Graph(size);
 
-  for (unsigned int i = 0; i < size; ++i) {
-    const dist_t dist = parse_distance(first_row[i]);
-    if (dist != max)
-      graph->addEdge(0, i, dist);
-  }
+    ProgressBar progress(size, "Loading CSV file:");
 
-  unsigned int i = 1;
-  for (csv::CSVRow &row : reader) {
-    unsigned int j = 0;
-    for (csv::CSVField &field : row) {
-      const dist_t dist = parse_distance(field.get<string>());
-      if (dist != max)
-        graph->addEdge(i, j, dist);
-      ++j;
+    unsigned int i = 0;
+    for (const auto row : reader) {
+      unsigned int j = 0;
+      for (const auto cell : row) {
+        string val;
+        cell.read_value(val);
+        const dist_t dist = parse_distance(val);
+        if (dist != max)
+          graph->addEdge(i, j, dist);
+        ++j;
+      }
+      ++progress;
+      ++i;
     }
-    ++i;
-  }
 
-  return graph;
+    return graph;
+  } else {
+    throw runtime_error(string("Error reading file ") + this->inputFile +
+                        " using mmap.\n");
+  }
 }
 
 UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
-  csv::CSVReader reader(this->inputFile);
+  DefaultCSVReader reader;
 
-  vector<string> first_row = reader.get_col_names();
-  const unsigned int size = first_row.size();
-  auto *const graph = new UpdateableGraph(size);
+  if (reader.mmap(this->inputFile)) {
+    const unsigned int size = reader.cols();
+    if (size != reader.rows())
+      throw runtime_error(this->inputFile +
+                          " does not contain a square matrix. Found " +
+                          to_string(reader.rows()) + " rows and " +
+                          to_string(size) + " cols.\n");
 
-  const dist_t max = std::numeric_limits<dist_t>::max();
+    const dist_t max = std::numeric_limits<dist_t>::max();
+    auto *const graph = new UpdateableGraph(size);
 
-  for (unsigned int i = 0; i < size; ++i) {
-    const dist_t dist = parse_distance(first_row[i]);
-    if (dist != max)
-      graph->addEdge(0, i, dist);
-  }
+    ProgressBar progress(size, "Loading CSV file:");
 
-  unsigned int i = 1;
-  for (csv::CSVRow &row : reader) {
-    unsigned int j = 0;
-    for (csv::CSVField &field : row) {
-      const dist_t dist = parse_distance(field.get<string>());
-      if (dist != max)
-        graph->addEdge(i, j, dist);
-      ++j;
+    unsigned int i = 0;
+    for (const auto row : reader) {
+      unsigned int j = 0;
+      for (const auto cell : row) {
+        string val;
+        cell.read_value(val);
+        const dist_t dist = parse_distance(val);
+        if (dist != max)
+          graph->addEdge(i, j, dist);
+        ++j;
+      }
+      ++progress;
+      ++i;
     }
-    ++i;
-  }
 
-  return graph;
+    return graph;
+  } else {
+    throw runtime_error(string("Error reading file ") + this->inputFile +
+                        " using mmap.\n");
+  }
 }
 
 void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
-  csv::CSVReader reader(this->inputFile);
+  DefaultCSVReader reader;
 
-  vector<string> first_row = reader.get_col_names();
-  const unsigned int size = first_row.size();
+  if (reader.mmap(this->inputFile)) {
+    const unsigned int size = reader.cols();
+    if (size != reader.rows())
+      throw runtime_error(this->inputFile +
+                          " does not contain a square matrix. Found " +
+                          to_string(reader.rows()) + " rows and " +
+                          to_string(size) + " cols.\n");
 
-  const dist_t max = std::numeric_limits<dist_t>::max();
+    const dist_t max = std::numeric_limits<dist_t>::max();
 
-  for (unsigned int i = 0; i < size; ++i) {
-    const dist_t dist = parse_distance(first_row[i]);
-    if (dist != max)
-      graph.addEdge(0, i, dist);
-  }
+    ProgressBar progress(size, "Loading CSV file:");
 
-  unsigned int i = 1;
-  for (csv::CSVRow &row : reader) {
-    unsigned int j = 0;
-    for (csv::CSVField &field : row) {
-      const dist_t dist = parse_distance(field.get<string>());
-      if (dist != max)
-        graph.addEdge(i, j, dist);
-      ++j;
+    unsigned int i = 0;
+    for (const auto row : reader) {
+      unsigned int j = 0;
+      for (const auto cell : row) {
+        string val;
+        cell.read_value(val);
+        const dist_t dist = parse_distance(val);
+        if (dist != max)
+          graph.addEdge(i, j, dist);
+        ++j;
+      }
+      ++progress;
+      ++i;
     }
-    ++i;
+
+  } else {
+    throw runtime_error(string("Error reading file ") + this->inputFile +
+                        " using mmap.\n");
   }
 }

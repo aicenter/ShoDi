@@ -6,7 +6,7 @@
 #include <random>   // mt19937_64, uniform_x_distribution
 #include <vector>
 
-#include "ProgressBar.hpp"
+#include "CLI/ProgressBar.hpp"
 #include "johnson.hpp"
 
 using namespace johnson;

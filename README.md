@@ -21,13 +21,23 @@ Preprocessor
 Compiling
 ---------
 
-To use the preprocessor, we first need to compile it. Compilation should be fairly easy. First, run `CMake` in the root of this project. This should create a `Makefile` with a target called `shortestPathsPreprocessor` that will build the preprocessor application.
+The project uses [vcpkg](https://github.com/microsoft/vcpkg) for package
+management. In addition, Java JNI is required for building the library due to Java bindings.
 
-The process can be done as follows:
-* `mkdir build`
-* `cd build`
-* `cmake ..`
-* `cmake --build . --target shortestPathsPreprocessor --config Release`
+To generate documentation, Doxygen is needed, but it is not a required dependency.
+
+The entire process can be done as follows:
+
+1. Install `vcpkg` (can be done in the root directory):
+  * `git clone https://github.com/microsoft/vcpkg`
+  * `./vcpkg/bootstrap-vcpkg.sh` (on Linux/macOS)
+  * `./vcpkg/bootstrap-vcpkg.bat` (on Windows)
+2. Install `vcpkg` packages:
+  * `./vcpkg/vcpkg install boost-config boost-graph p-ranav-csv2`
+3. `mkdir build`
+4. `cd build`
+5. `cmake -DCMAKE_BUILD_TYPE=Release ..`
+6. `cmake --build . --target shortestPathsPreprocessor --config Release -- -j 8`
 
 Usage
 -----
