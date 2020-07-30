@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(shortest_paths)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_BUILD_TYPE Release)
 option(BUILD_DOC "Build documentation" ON)
 
 find_package(JNI REQUIRED)
@@ -31,7 +32,9 @@ else (DOXYGEN_FOUND)
 endif (DOXYGEN_FOUND)
 
 include_directories(${JNI_INCLUDE_DIRS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
+endif()
 
 add_library(shortestPaths SHARED
         src/API/CHDistanceQueryManagerAPI.cpp
