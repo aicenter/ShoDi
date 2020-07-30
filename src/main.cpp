@@ -876,17 +876,15 @@ int main(int argc, char *argv[]) {
         }
     }
     catch (input_error &e) {
-        cout << "Input Error for";
-        for (int i = 0; i < argc; ++i)
-            cout << " " << argv[i];
-        cout << ": " << e.what();
+        cout << "Input Error: " << e.what();
         return 1;
     }
     catch (not_implemented_error &e) {
-        cout << "Not Implemented Error for";
-        for (int i = 0; i < argc; ++i)
-            cout << " " << argv[i];
-        cout << ": " << e.what();
+        cout << "Not Implemented Error: " << e.what();
+        return 1;
+    }
+    catch (const std::exception &e) {
+        cout << "Error: " << e.what();
         return 1;
     }
 
