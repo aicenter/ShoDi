@@ -14,14 +14,24 @@
 
 CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {}
 
-bool charicmp(const char &c1, const char &c2) {
-  return std::tolower(c1) == std::tolower(c2);
+inline bool stricmp(const string s1, const string s2) {
+  const auto size1 = s1.size();
+
+  if(size1 != s2.size())
+    return false;
+
+  for (int i = 0; i < size1; ++i) {
+    if (tolower(s1[i]) != tolower(s2[i]))
+      return false;
+  }
+
+  return true;
 }
 
 const string NAN_STR = string("nan");
 
 dist_t parse_distance(std::string str) {
-  if (std::equal(str.begin(), str.end(), NAN_STR.begin(), NAN_STR.end(), charicmp)) {
+  if (stricmp(str, NAN_STR)) {
     return std::numeric_limits<dist_t>::max();
   } else {
     return (dist_t)round(stof(str));
