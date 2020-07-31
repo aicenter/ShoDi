@@ -29,6 +29,9 @@ to generate new 'glue code' for the desired language using a tool called
 compile the library for such usage. The steps required for the integration with
 a different language are briefly described [here](./src/API/README.md).
 
+Table of Contents
+=================
+
 <!--ts-->
    * [Shortest Distances computation library in C  ](#shortest-distances-computation-library-in-c)
    * [Installation](#installation)
