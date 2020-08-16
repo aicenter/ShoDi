@@ -823,7 +823,8 @@ int main(int argc, char *argv[]) {
 
 
             // The user has data structures computed using some method and wants to benchmark those using a set of queries.
-        } else if (strcmp(argv[1], "benchmark") == 0) {
+        } 
+        else if (strcmp(argv[1], "benchmark") == 0) {
             const auto benchmarks = {
                     make_tuple(string("dijkstra"), benchmarkDijkstra, benchmarkDijkstraWithMapping),
                     make_tuple(string("ch"), benchmarkCH, benchmarkCHwithMapping),
