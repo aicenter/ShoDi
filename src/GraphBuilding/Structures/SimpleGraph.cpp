@@ -23,7 +23,7 @@ void SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
 
 //______________________________________________________________________________________________________________________
 unsigned int SimpleGraph::nodes()const {
-    return this->followingNodes.size();
+    return (unsigned int) this->followingNodes.size();
 }
 
 //______________________________________________________________________________________________________________________

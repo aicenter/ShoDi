@@ -93,7 +93,7 @@ void DIMACSLoader::parseGraphProblemLine(ifstream &input, unsigned int &nodes, s
 //______________________________________________________________________________________________________________________
 void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes, size_t &edges) {
     size_t position = 5;
-    size_t tmpnodes = 0;
+    unsigned int tmpnodes = 0;
     while (buffer[position] != ' ') {
         tmpnodes *= 10;
         tmpnodes += (buffer[position] - 48);
@@ -151,7 +151,7 @@ void DIMACSLoader::parseEdges(ifstream & input, UpdateableGraph & graph, size_t 
 //______________________________________________________________________________________________________________________
 void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & to, dist_t & weight) {
     size_t position = 2;
-    size_t tmpfrom = 0;
+    unsigned int tmpfrom = 0;
     while (buffer[position] != ' ') {
         tmpfrom *= 10;
         tmpfrom += (buffer[position] - 48);
@@ -159,7 +159,7 @@ void DIMACSLoader::getEdge(string & buffer, unsigned int & from, unsigned int & 
     }
 
     position++;
-    size_t tmpto = 0;
+    unsigned int tmpto = 0;
     while(buffer[position] != ' ') {
         tmpto *= 10;
         tmpto += (buffer[position] - 48);
@@ -188,7 +188,7 @@ vector<dist_t> DIMACSLoader::loadAdjacencyMatrix() {
     const auto nodes = graph->nodes();
     vector<dist_t> adj(nodes * nodes, std::numeric_limits<dist_t>::max());
 
-    for(size_t i = 0; i < nodes; ++i) {
+    for(unsigned int i = 0; i < nodes; ++i) {
         for(auto &pair : graph->outgoingEdges(i)) {
             adj[i * nodes + pair.first] = pair.second;
         }

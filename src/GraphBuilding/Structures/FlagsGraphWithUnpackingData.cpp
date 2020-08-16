@@ -22,7 +22,7 @@ void FlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, un
 
 //______________________________________________________________________________________________________________________
 unsigned int FlagsGraphWithUnpackingData::nodes() const {
-    return neighbours.size();
+    return (unsigned int) neighbours.size();
 }
 
 // Returns all neighbours of a given node 'x'. Keep in mind that this returns neighbour both in the forward and

@@ -20,14 +20,14 @@ CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::insert(const unsigned int x, const int y) {
     content.push_back(CHNode(x, y));
-    mapping[x] = content.size() - 1;
-    bubbleUp(content.size() - 1);
+    mapping[x] = (unsigned int) content.size() - 1;
+    bubbleUp((unsigned int) content.size() - 1);
 }
 
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::pushOnly(const unsigned int x, const int y) {
     content.push_back(CHNode(x, y));
-    mapping[x] = content.size() - 1;
+    mapping[x] = (unsigned int) content.size() - 1;
 }
 
 //______________________________________________________________________________________________________________________
@@ -52,7 +52,7 @@ CHNode CHpriorityQueue::front() {
 
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::pop() {
-    swap(0, content.size()-1);
+    swap(0, (unsigned int) content.size()-1);
     content.pop_back();
     bubbleDown(0);
 }

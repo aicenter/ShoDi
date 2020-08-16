@@ -11,12 +11,12 @@
 #include "DistanceMatrix.h"
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix::DistanceMatrix(const size_t nodes) : nodesCnt(nodes), distances(nodes * nodes) {
+DistanceMatrix::DistanceMatrix(const unsigned int nodes) : nodesCnt(nodes), distances(nodes * nodes) {
 
 }
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix::DistanceMatrix(vector<dist_t> &&distMatrix) : nodesCnt(sqrt(distMatrix.size())),
+DistanceMatrix::DistanceMatrix(vector<dist_t> &&distMatrix) : nodesCnt((unsigned int) sqrt(distMatrix.size())),
                                                            distances(move(distMatrix)) {
 
 }
@@ -48,7 +48,7 @@ void DistanceMatrix::printInfo() {
         }
     }
 
-    const unsigned int optCount = distances.size();
+    const unsigned int optCount = (unsigned int) distances.size();
     printf("Computed distance matrix info.\n");
     printf("Distance matrix contains %u UINF values. That is %f %%.\n", maxCnt, (double) maxCnt / optCount);
     printf("Distance matrix contains %u values that are at least half of std::numeric_limist<dist_t>::max(). That is %f %%.\n", halfCnt,
@@ -59,6 +59,6 @@ const vector<dist_t> &DistanceMatrix::getRawData() {
     return distances;
 }
 
-size_t DistanceMatrix::nodes() {
+unsigned int DistanceMatrix::nodes() {
     return nodesCnt;
 }

@@ -115,7 +115,7 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
     }
 
     printf("~~~ Outputting path from %u to %u (distance %u) ~~~\n", path[path.size()-1].first.first, x, dist[x]);
-    for(int i = path.size()-1; i >= 0; i--) {
+    for(int i = (int) path.size()-1; i >= 0; i--) {
         printf("%u -> %u (%u)\n", path[i].first.first, path[i].first.second, path[i].second);
     }
     printf("~~~ End of path ~~~\n");

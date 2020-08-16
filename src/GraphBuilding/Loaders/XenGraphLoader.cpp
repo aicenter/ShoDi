@@ -164,10 +164,10 @@ vector<dist_t> XenGraphLoader::loadAdjacencyMatrix() {
 
     std::unique_ptr<Graph> graph {loadGraph()};
 
-    const size_t nodes = graph->nodes();
+    const unsigned int nodes = graph->nodes();
     vector<dist_t> adj(nodes * nodes, std::numeric_limits<dist_t>::max());
 
-    for(size_t i = 0; i < nodes; ++i) {
+    for(unsigned int i = 0; i < nodes; ++i) {
         for(auto &pair : graph->outgoingEdges(i)) {
             adj[i * nodes + pair.first] = pair.second;
         }

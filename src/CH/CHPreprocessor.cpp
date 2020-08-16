@@ -47,7 +47,7 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
     preprocessTimer.finish();
     preprocessTimer.printMeasuredTime();
 
-    printf("During the preprocessing process, %lu shortcuts were added into the graph.\n", allShortcuts.size());
+    printf("During the preprocessing process, %lu shortcuts were added into the graph.\n", (unsigned long) allShortcuts.size());
 
     allShortcuts.clear();
     preprocessingDegrees.clear();
@@ -311,7 +311,7 @@ void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
     vector<unsigned int> nodesWithChangedDistances;
-    unsigned int targetsAmount = targets.size();
+    unsigned int targetsAmount = (unsigned int) targets.size();
     unsigned int targetsFound = 0;
     unsigned int expanded = 0;
 

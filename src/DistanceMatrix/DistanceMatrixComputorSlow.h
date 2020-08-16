@@ -48,7 +48,7 @@ private:
      * @param graph
      * @param useReversedGraph
      */
-    void fillDistanceMatrixRow(size_t rowID, const Graph & graph, bool useReversedGraph = false);
+    void fillDistanceMatrixRow(unsigned int rowID, const Graph & graph, bool useReversedGraph = false);
 
     vector<dist_t> distanceTable;
 };

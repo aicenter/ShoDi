@@ -74,7 +74,7 @@ unsigned int UpdateableGraph::getRank(unsigned int nodeID) const {
 
 //______________________________________________________________________________________________________________________
 unsigned int UpdateableGraph::nodes() const {
-    return followingNodes.size();
+    return (unsigned int) followingNodes.size();
 }
 
 //______________________________________________________________________________________________________________________
@@ -94,7 +94,7 @@ const unordered_map<unsigned int, PreprocessingEdgeData> & UpdateableGraph::outg
 
 //______________________________________________________________________________________________________________________
 unsigned int UpdateableGraph::degree(unsigned int node)const {
-    return followingNodes.at(node).size() + previousNodes.at(node).size();
+    return (unsigned int) (followingNodes.at(node).size() + previousNodes.at(node).size());
 }
 
 //______________________________________________________________________________________________________________________
@@ -129,7 +129,7 @@ void UpdateableGraph::flushInDdsgFormat(string filePath) {
 
     printf("Actually flushing the CH graph into the file\n");
     flushHeader(output);
-    flushCnts(output, followingNodes.size(), edges.size(), shortcuts.size());
+    flushCnts(output, (unsigned int) followingNodes.size(), (unsigned int) edges.size(), (unsigned int) shortcuts.size());
     flushRanks(output);
     flushOriginalEdges(output, edges);
     flushShortcutEdges(output, shortcuts);
@@ -149,7 +149,7 @@ void UpdateableGraph::outputAsXenGraph(string filePath) {
 
     unsigned int edges = 0;
     for(unsigned int i = 0; i < nodes(); ++i) {
-        edges += followingNodes[i].size();
+        edges += (unsigned int) followingNodes[i].size();
     }
 
     output << "XGI " << nodes() << " " << edges << endl;

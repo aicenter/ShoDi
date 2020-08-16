@@ -16,11 +16,11 @@
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
-    const size_t nodesCnt = graph.nodes();
+    const unsigned int nodesCnt = graph.nodes();
 
     distanceTable.resize(nodesCnt * nodesCnt);
 
-    for(size_t i = 0; i < nodesCnt; i++) {
+    for(unsigned int i = 0; i < nodesCnt; i++) {
         if (i % 100 == 0) {
             cout << "\rComputed " << i << '/' << nodesCnt << " rows of the distance matrix.";
         }
@@ -32,11 +32,11 @@ void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Graph & graph) {
-    const size_t nodesCnt = graph.nodes();
+    const unsigned int nodesCnt = graph.nodes();
 
     distanceTable.resize(nodesCnt * nodesCnt);
 
-    for(size_t i = 0; i < nodesCnt; i++) {
+    for(unsigned int i = 0; i < nodesCnt; i++) {
         if (i % 100 == 0) {
             cout << "\rComputed " << i << '/' << nodesCnt << " rows of the distance matrix.";
         }
@@ -47,7 +47,7 @@ void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Grap
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const size_t rowID, const Graph & graph, bool useReversedGraph) {
+void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID, const Graph & graph, bool useReversedGraph) {
     size_t n = graph.nodes();
     auto * distance = new dist_t[n];
 
@@ -68,7 +68,7 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const size_t rowID, const
         if (useReversedGraph) {
             const vector < pair < unsigned int, unsigned int > > & neighbours = graph.incomingEdges(current.ID);
             for (auto neighbour : neighbours) {
-                long long int newDistance = current.weight + neighbour.second;
+                unsigned int newDistance = current.weight + neighbour.second;
                 if (newDistance < distance[neighbour.first]) {
                     distance[neighbour.first] = newDistance;
                     q.push(DijkstraNode(neighbour.first, newDistance));
@@ -77,7 +77,7 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const size_t rowID, const
         } else {
             const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
             for (auto neighbour : neighbours) {
-                long long int newDistance = current.weight + neighbour.second;
+                unsigned int newDistance = current.weight + neighbour.second;
                 if (newDistance < distance[neighbour.first]) {
                     distance[neighbour.first] = newDistance;
                     q.push(DijkstraNode(neighbour.first, newDistance));

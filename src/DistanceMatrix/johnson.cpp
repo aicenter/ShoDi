@@ -13,7 +13,7 @@ using namespace johnson;
 
 graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
   const dist_t max = std::numeric_limits<dist_t>::max();
-  size_t E = 0;
+  unsigned int E = 0;
   for (size_t i = 0; i < adj_matrix.size(); i++) {
     if (adj_matrix[i] < max) {
       E++;
@@ -26,8 +26,8 @@ graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
   dist_t *weights = new dist_t[E];
   size_t ei = 0;
 
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < n; j++) {
+  for (unsigned int i = 0; i < n; i++) {
+    for (unsigned int j = 0; j < n; j++) {
       if (adj_matrix[i * n + j] != 0 && adj_matrix[i * n + j] != max) {
         edge_array[ei] = Edge(i, j);
         weights[ei] = adj_matrix[i * n + j];
@@ -56,7 +56,7 @@ graph_t *johnson::johnson_init2(const unsigned int n, const double p,
 
   dist_t *adj_matrix = new dist_t[n * n];
 
-  size_t E = 0;
+  unsigned int E = 0;
   for (size_t i = 0; i < n; i++) {
     for (size_t j = 0; j < n; j++) {
       if (i == j) {
@@ -72,8 +72,8 @@ graph_t *johnson::johnson_init2(const unsigned int n, const double p,
   Edge *edge_array = new Edge[E];
   dist_t *weights = new dist_t[E];
   size_t ei = 0;
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < n; j++) {
+  for (unsigned int i = 0; i < n; i++) {
+    for (unsigned int j = 0; j < n; j++) {
       if (adj_matrix[i * n + j] != 0 && adj_matrix[i * n + j] != max) {
         edge_array[ei] = Edge(i, j);
         weights[ei] = adj_matrix[i * n + j];

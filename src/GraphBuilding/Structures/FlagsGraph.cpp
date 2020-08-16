@@ -99,7 +99,7 @@ void FlagsGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight
 
 //______________________________________________________________________________________________________________________
 unsigned int FlagsGraph::nodes() const {
-    return neighbours.size();
+    return (unsigned int) neighbours.size();
 }
 
 //______________________________________________________________________________________________________________________

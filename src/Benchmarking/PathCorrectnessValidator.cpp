@@ -19,7 +19,7 @@ void PathCorrectnessValidator::validateTNRPaths(Graph * originalGraph, TNRPathQu
         }
     }
 
-    printf("Validated %lu trips. All paths computed by TNR were valid in the original graph.\n", trips.size());
+    printf("Validated %u trips. All paths computed by TNR were valid in the original graph.\n", (unsigned int) trips.size());
 
     Timer pathQueriesTimer = Timer("TNR path queries");
     pathQueriesTimer.begin();
@@ -31,7 +31,7 @@ void PathCorrectnessValidator::validateTNRPaths(Graph * originalGraph, TNRPathQu
 
     pathQueriesTimer.finish();
     double time = pathQueriesTimer.getMeasuredTimeInSeconds();
-    printf("Performed %lu path queries using TNR in time %f (sec).\n", trips.size(), time);
+    printf("Performed %u path queries using TNR in time %f (sec).\n", (unsigned int) trips.size(), time);
     printf("This means one query took %f (sec).\n", time / trips.size());
 }
 
@@ -47,7 +47,7 @@ void PathCorrectnessValidator::validateCHPaths(Graph * originalGraph, CHPathQuer
         }
     }
 
-    printf("Validated %lu trips. All paths computed by CH were valid in the original graph.\n", trips.size());
+    printf("Validated %u trips. All paths computed by CH were valid in the original graph.\n", (unsigned int) trips.size());
 
     Timer pathQueriesTimer = Timer("CH path queries");
     pathQueriesTimer.begin();
@@ -59,7 +59,7 @@ void PathCorrectnessValidator::validateCHPaths(Graph * originalGraph, CHPathQuer
 
     pathQueriesTimer.finish();
     double time = pathQueriesTimer.getMeasuredTimeInSeconds();
-    printf("Performed %lu path queries using CH in time %f (sec).\n", trips.size(), time);
+    printf("Performed %u path queries using CH in time %f (sec).\n", (unsigned int) trips.size(), time);
     printf("This means one query took %f (sec).\n", time / trips.size());
 }
 

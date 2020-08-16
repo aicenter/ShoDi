@@ -208,7 +208,7 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     output.write(&c3, sizeof (c3));
     output.write(&c4, sizeof (c4));
     unsigned int nodes = graph.nodes();
-    unsigned int edges = allEdges.size();
+    unsigned int edges = (unsigned int) allEdges.size();
     output.write((char *) &nodes, sizeof(nodes));
     output.write((char *) &edges, sizeof(edges));
     output.write((char *) &transitNodesAmount, sizeof(transitNodesAmount));
@@ -251,13 +251,13 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        unsigned int fwSize = forwardAccessNodes[i].size();
+        unsigned int fwSize = (unsigned int) forwardAccessNodes[i].size();
         output.write((char *) &fwSize, sizeof(fwSize));
         for(unsigned int j = 0; j < forwardAccessNodes[i].size(); j++) {
             output.write((char *) &forwardAccessNodes[i][j].accessNodeID, sizeof(forwardAccessNodes[i][j].accessNodeID));
             output.write((char *) &forwardAccessNodes[i][j].distanceToNode, sizeof(forwardAccessNodes[i][j].distanceToNode));
         }
-        unsigned int bwSize = backwardAccessNodes[i].size();
+        unsigned int bwSize = (unsigned int) backwardAccessNodes[i].size();
         output.write((char *) &bwSize, sizeof(bwSize));
         for(unsigned int j = 0; j < backwardAccessNodes[i].size(); j++) {
             output.write((char *) &backwardAccessNodes[i][j].accessNodeID, sizeof(backwardAccessNodes[i][j].accessNodeID));
@@ -268,14 +268,14 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     unsigned int fwSearchSpaceSum = 0;
     unsigned int bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        unsigned int fwSearchSpaceSize = forwardSearchSpaces[i].size();
+        unsigned int fwSearchSpaceSize = (unsigned int) forwardSearchSpaces[i].size();
         output.write((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
         for(unsigned int j = 0; j < fwSearchSpaceSize; j++) {
             output.write((char *) &forwardSearchSpaces[i][j], sizeof(forwardSearchSpaces[i][j]));
         }
         fwSearchSpaceSum += fwSearchSpaceSize;
 
-        unsigned int bwSearchSpaceSize = backwardSearchSpaces[i].size();
+        unsigned int bwSearchSpaceSize = (unsigned int) backwardSearchSpaces[i].size();
         output.write((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
         for(unsigned int j = 0; j < bwSearchSpaceSize; j++) {
             output.write((char *) &backwardSearchSpaces[i][j], sizeof(backwardSearchSpaces[i][j]));
