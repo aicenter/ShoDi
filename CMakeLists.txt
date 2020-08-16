@@ -31,7 +31,6 @@ link_libraries(csv2::csv2)
 
 ## OpenMP
 find_package(OpenMP REQUIRED)
-add_compile_definitions(_OPENMP)
 if (OpenMP_CXX_FOUND)
     link_libraries(OpenMP::OpenMP_CXX)
 endif ()

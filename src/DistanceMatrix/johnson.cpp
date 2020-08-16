@@ -20,7 +20,7 @@ graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
     }
   }
 
-  size_t n = sqrt(adj_matrix.size());
+  unsigned int n = (unsigned int) sqrt((double) adj_matrix.size());
 
   Edge *edge_array = new Edge[E];
   dist_t *weights = new dist_t[E];
@@ -45,7 +45,7 @@ graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
   return gr;
 }
 
-graph_t *johnson::johnson_init2(const size_t n, const double p,
+graph_t *johnson::johnson_init2(const unsigned int n, const double p,
                                 const unsigned long seed) {
   static std::uniform_real_distribution<double> flip(0, 1);
   static std::uniform_int_distribution<unsigned int> choose_weight(1, 100);
@@ -100,8 +100,8 @@ void johnson::free_graph(graph_t *g) {
 }
 
 inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
-  unsigned int V = gr->V;
-  size_t E = gr->E;
+  int V = gr->V;
+  int E = gr->E;
   Edge *edges = gr->edge_array;
   dist_t *weights = gr->weights;
 
@@ -110,16 +110,16 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (size_t i = 0; i < V; i++) {
+  for (int i = 0; i < V; i++) {
     dist[i] = max;
   }
   dist[src] = 0;
 
-  for (size_t i = 1; i <= V - 1; i++) {
+  for (int i = 1; i <= V - 1; i++) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-    for (size_t j = 0; j < E; j++) {
+    for (int j = 0; j < E; j++) {
       unsigned int u = std::get<0>(edges[j]);
       unsigned int v = std::get<1>(edges[j]);
       dist_t new_dist = weights[j] + dist[u];
@@ -132,7 +132,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (size_t i = 0; i < E; i++) {
+  for (int i = 0; i < E; i++) {
     unsigned int u = std::get<0>(edges[i]);
     unsigned int v = std::get<1>(edges[i]);
     dist_t weight = weights[i];
@@ -144,7 +144,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
 
 void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 
-  unsigned int V = gr->V;
+  int V = gr->V;
 
   // Make new graph for Bellman-Ford
   // First, a new node q is added to the graph, connected by zero-weight edges
@@ -155,14 +155,15 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   bf_graph->edge_array = new Edge[bf_graph->E];
   bf_graph->weights = new dist_t[bf_graph->E];
 
-  std::memcpy(bf_graph->edge_array, gr->edge_array, gr->E * sizeof(Edge));
+//  std::memcpy(bf_graph->edge_array, gr->edge_array, gr->E * sizeof(Edge));
+    bf_graph->edge_array = gr->edge_array;
   std::memcpy(bf_graph->weights, gr->weights, gr->E * sizeof(dist_t));
   std::memset(&bf_graph->weights[gr->E], 0, V * sizeof(dist_t));
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (size_t e = 0; e < V; e++) {
+  for (int e = 0; e < V; e++) {
     bf_graph->edge_array[e + gr->E] = Edge(V, e);
   }
 
@@ -179,10 +180,12 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   // Next the edges of the original graph are reweighted using the values
   // computed by the Bellman–Ford algorithm: an edge from u to v, having length
   // w(u,v), is given the new length w(u,v) + h(u) − h(v).
+  int ec = (int) gr->E;
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-  for (size_t e = 0; e < gr->E; e++) {
+    
+  for (int e = 0; e < ec; e++) {
     unsigned int u = std::get<0>(gr->edge_array[e]);
     unsigned int v = std::get<1>(gr->edge_array[e]);
     gr->weights[e] = gr->weights[e] + h[u] - h[v];
@@ -194,10 +197,10 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
 #endif
-  for (size_t s = 0; s < V; s++) {
+  for (int s = 0; s < V; s++) {
     std::vector<dist_t> d(num_vertices(G));
     dijkstra_shortest_paths(G, s, boost::distance_map(&d[0]));
-    for (size_t v = 0; v < V; v++) {
+    for (int v = 0; v < V; v++) {
       output[s * V + v] = d[v] + h[v] - h[s];
     }
     ++progress;

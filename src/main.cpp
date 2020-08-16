@@ -348,8 +348,8 @@ void benchmarkDijkstra(
 
     delete dijkstraGraph;
 
-    printf("Run %lu queries using Dijkstra's algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", trips.size(), dijkstraTime, (dijkstraTime / trips.size()) * 1000);
+    printf("Run %u queries using Dijkstra's algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", (unsigned int) trips.size(), dijkstraTime, (dijkstraTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -402,9 +402,9 @@ void benchmarkDijkstraWithMapping(
 
     delete dijkstraGraph;
 
-    printf("Run %lu queries using Dijkstra's algorithm in %f seconds\n"
+    printf("Run %u queries using Dijkstra's algorithm in %f seconds\n"
            "using '%s' as mapping."
-           "That means %f ms per query.\n", trips.size(), dijkstraTime, mappingFilePath,
+           "That means %f ms per query.\n", (unsigned int) trips.size(), dijkstraTime, mappingFilePath,
            (dijkstraTime / trips.size()) * 1000);
 
     if (outputDistances) {
@@ -453,8 +453,8 @@ void benchmarkCH(
 
     delete ch;
 
-    printf("Run %lu queries using Contraction Hierarchies query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", trips.size(), chTime, (chTime / trips.size()) * 1000);
+    printf("Run %u queries using Contraction Hierarchies query algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", (unsigned int) trips.size(), chTime, (chTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -505,9 +505,9 @@ void benchmarkCHwithMapping(
 
     delete ch;
 
-    printf("Run %lu queries using Contraction Hierarchies query algorithm in %f seconds\n"
+    printf("Run %u queries using Contraction Hierarchies query algorithm in %f seconds\n"
            "using '%s' as mapping."
-           "That means %f ms per query.\n", trips.size(), chTime, mappingFilePath, (chTime / trips.size()) * 1000);
+           "That means %f ms per query.\n", (unsigned int) trips.size(), chTime, mappingFilePath, (chTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -555,8 +555,8 @@ void benchmarkTNR(
 
     delete tnrGraph;
 
-    printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
+    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -607,8 +607,8 @@ void benchmarkTNRwithMapping(
 
     delete tnrGraph;
 
-    printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
+    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -657,8 +657,8 @@ void benchmarkTNRAF(
 
     delete tnrafGraph;
 
-    printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
+    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -710,8 +710,8 @@ void benchmarkTNRAFwithMapping(
 
     delete tnrafGraph;
 
-    printf("Run %lu queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
+    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
+           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
 
     if (outputDistances) {
         printf("Now outputting distances to '%s'.\n", distancesOutputPath);
@@ -766,7 +766,7 @@ GraphLoader *newGraphLoader(char *inputType, char *inputFilePath) {
  * <br> _Author: Michal Cvach_
  */
 int main(int argc, char *argv[]) {
-    setbuf(stdout, NULL);
+    setvbuf(stdout, NULL, _IONBF, 0);
 
     if (argc < 5 || argc > 8) {
         printUsageInfo(argv[0]);

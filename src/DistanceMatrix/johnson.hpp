@@ -14,14 +14,14 @@ typedef std::pair<unsigned int, unsigned int> Edge;
 
 typedef struct graph {
   unsigned int V;
-  size_t E;
+  unsigned int E;
   Edge *edge_array;
   dist_t *weights;
 } graph_t;
 
 graph_t *johnson_init(std::vector<dist_t>);
 
-graph_t *johnson_init2(const size_t n, const double p, const unsigned long seed);
+graph_t *johnson_init2(const unsigned int n, const double p, const unsigned long seed);
 
 typedef struct edge {
   unsigned int u;

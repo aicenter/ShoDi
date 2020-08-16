@@ -1,39 +1,34 @@
 Shortest Distances computation library in C++
 =============================================
 
-This project implements multiple complex preprocessing methods for shortest
-distance computation in directed weighted graphs. The implemented methods are
-Contraction Hierarchies, Transit Node Routing (based on Contraction
-Hierarchies), Transit Node Routing with Arc Flags (extension of Transit Node
-Routing) and Distance Matrix computation.
+This project implements multiple methods for shortest distance computation in directed weighted graphs that leverage 
+preprocessing of the graph to provide fast shortest distance queries.
+The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies),
+Transit Node Routing with Arc Flags (extension of Transit Node Routing) and Distance Matrix computation.
 
-The project is split into two major components. One component is the
-**preprocessor** (an executable called `shortestPathsPreprocessor`) which takes
-an arbitrary graph in a supported format (described later) and prepares the
-structures required for the query algorithms of one of the three methods.
-Additionally, the preprocessor allows running a set of queries using some
-method and benchmark the time required to answer them. This way, the user can
-easily evaluate whether the performance is sufficient for their use case. The
-second component is the **library** (a shared library called
-`libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows), which can
-load the structures prepared by the preprocessor to answer arbitrary queries
-using the query algorithms of the aforementioned methods. The library can
-be used in a `C++` application, but it can also be integrated into a `Java`
-application. A simple example application written in `Java` which uses the
-library can be found in the `javatests` subdirectory. This application also
-serves as a testing tool to check whether the project is working correctly on
-a given machine. Integration of this library into an application written in
-languages other than `C++` and `Java` is also possible, but it will require you
-to generate new 'glue code' for the desired language using a tool called
-`SWIG`. You will also need to change the `CMakeLists.txt` file in order to
-compile the library for such usage. The steps required for the integration with
-a different language are briefly described [here](./src/API/README.md).
+The project is split into two major components. 
+One component is the **preprocessor** (an executable called `shortestPathsPreprocessor`) which takes an arbitrary 
+graph in a supported format (described later) and prepares the graph, creating structures for fast distance computation.
+Additionally, the preprocessor allows running a set of queries and benchmark the time required to answer them. 
+This way, the user can easily evaluate whether the performance is sufficient for their use case. 
+
+The second component is the **library** (a shared library called `libshortestPaths.so` in Linux 
+or `shortestPaths.dll` in Windows), which can load the structures prepared by the preprocessor to answer shortest 
+distance queries. 
+The library can be used in a `C++` application, but it can also be integrated into a `Java` application. 
+A simple example application written in `Java` which uses the library can be found in the `javatests` subdirectory. 
+This application also serves as a testing tool to check whether the project is working correctly on a given machine. 
+
+Integration of this library into an application written in languages other than `C++` and `Java` is also possible,
+but it will require you to generate new 'glue code' for the desired language using a tool called `SWIG`. 
+You will also need to change the `CMakeLists.txt` file in order to compile the library for such usage. 
+The steps required for the integration with a different language are briefly described [here](./src/API/README.md).
 
 Table of Contents
 =================
 
 <!--ts-->
-   * [Shortest Distances computation library in C  ](#shortest-distances-computation-library-in-c)
+   * [Shortest Distances computation library in C++  ](#shortest-distances-computation-library-in-c)
    * [Installation](#installation)
       * [Prebuilt Packages](#prebuilt-packages)
       * [From Source](#from-source)
@@ -69,7 +64,7 @@ Table of Contents
          * [The query set input format](#the-query-set-input-format)
          * [The mapping file format](#the-mapping-file-format)
 
-<!-- Added by: nojmy, at: Pá 31. července 2020, 11:34:25 CEST -->
+<!-- Added by: nojmy, at: Pá 31. �?ervence 2020, 11:34:25 CEST -->
 
 <!--te-->
 
@@ -86,22 +81,17 @@ architecture.
 From Source
 -----------
 
-The project uses [vcpkg](https://github.com/microsoft/vcpkg) for package
-management. In addition, Java JNI is required for building the library due to Java bindings.
 
-To generate documentation, Doxygen is needed, but it is not a required dependency.
+### Requirements
+ - [vcpkg](https://github.com/microsoft/vcpkg) for dependency management.
+ - [Java](https://java.com/en/download/): JNI is required for Java bindings.
+ - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
-The entire process can be done as follows:
-
-1. Install `vcpkg` (can be done in the root directory):
-    * `git clone https://github.com/microsoft/vcpkg`
-    * `./vcpkg/bootstrap-vcpkg.sh` (on Linux/macOS)
-    * `./vcpkg/bootstrap-vcpkg.bat` (on Windows)
-2. Install `vcpkg` packages:
-    * `./vcpkg/vcpkg install boost-config boost-graph p-ranav-csv2`
-3. `mkdir build && cd build`
-4. `cmake -DCMAKE_BUILD_TYPE=Release ..`
-5. `cmake --build . --target shortestPathsPreprocessor --config Release -- -j 8`
+### Building the project
+1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph p-ranav-csv2`
+2. `mkdir build && cd build`
+3. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
+4. `cmake --build . --target shortestPathsPreprocessor --config Release`
 
 Usage
 =====
@@ -109,18 +99,17 @@ Usage
 The Preprocessor
 ----------------
 
-The preprocessor has a simple **command line interface** (CLI) that should make
-the process of preprocessing graphs quite simple.
+The preprocessor has a simple **command line interface** that should make the process of preprocessing graphs quite 
+simple.
 
-Let us now assume that you have a directed weighted graph in one of the given
-formats. The formats are described in the Readme in the section below. In
-addition, a `Python` script is available for conversion of `GeoJSON` data to
-one of the supported formats.
+Let us now assume that you have a directed weighted graph in one of the supported formats 
+(see [Input/Output File Formats](#inputoutput-file-formats)).
+In addition, a `Python` script is available for conversion of `GeoJSON` data to one of the supported formats.
 
-The command line interface requires you to use specific arguments in the
-correct order. The first argument determines whether you want to preprocess
-a graph file or benchmark a preprocessed graph using some method. The arguments following
-the first one are specific to each of the usages.
+The command line interface requires you to use specific arguments in the correct order. 
+The first argument determines whether you want to preprocess a graph file or benchmark a preprocessed graph using 
+some method.
+The arguments following the first one are specific to each of the usages.
 
 ### Graph Preprocessing
 

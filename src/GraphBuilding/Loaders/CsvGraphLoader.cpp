@@ -13,7 +13,10 @@
 #include <cctype>
 #include <climits>
 #include <cmath>
+
+#define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
 #include <csv2/reader.hpp>
+
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -26,12 +29,12 @@ typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
     DefaultCSVReader;
 
 inline bool stricmp(const string s1, const string s2) {
-  const auto size1 = s1.size();
+  auto size1 = (unsigned int) s1.size();
 
   if (size1 != s2.size())
     return false;
 
-  for (auto i = 0; i < size1; ++i) {
+  for (unsigned int i = 0; i < size1; ++i) {
     if (tolower(s1[i]) != tolower(s2[i]))
       return false;
   }
@@ -53,7 +56,7 @@ std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = reader.cols();
+    const unsigned int size = (unsigned int) reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -85,7 +88,7 @@ Graph *CsvGraphLoader::loadGraph() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = reader.cols();
+    const unsigned int size = (unsigned int) reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -123,7 +126,7 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = reader.cols();
+    const unsigned int size = (unsigned int) reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -161,7 +164,7 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = reader.cols();
+    const unsigned int size = (unsigned int) reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
