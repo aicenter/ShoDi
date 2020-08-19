@@ -19,11 +19,6 @@ The library can be used in a `C++` application, but it can also be integrated in
 A simple example application written in `Java` which uses the library can be found in the `javatests` subdirectory. 
 This application also serves as a testing tool to check whether the project is working correctly on a given machine. 
 
-Integration of this library into an application written in languages other than `C++` and `Java` is also possible,
-but it will require you to generate new 'glue code' for the desired language using a tool called `SWIG`. 
-You will also need to change the `CMakeLists.txt` file in order to compile the library for such usage. 
-The steps required for the integration with a different language are briefly described [here](./src/API/README.md).
-
 Table of Contents
 =================
 
@@ -149,9 +144,11 @@ where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `csv`
  * `preprocessing_mode` is one of `fast`, `slow`, `dm`
- * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the number of nodes in the graph)
+ * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the 
+	number of nodes in the graph)
  * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added automatically)
+ * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added 
+	automatically)
 
 ##### Preprocessing Mode
 
@@ -186,9 +183,11 @@ where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `csv`
  * `preprocessing_mode` is one of `slow`, `dm` (for more info, see [Preprocessing Mode](#preprocessing-mode))
- * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the numbr of nodes in the graph)
+ * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the numbr 
+	of nodes in the graph)
  * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added automatically)
+ * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added 
+	automatically)
 
 
 ##### Example Usage
@@ -211,7 +210,8 @@ where:
  * `output_format` is one of `xdm`, `csv`
  * `preprocessing_mode` is one of `slow`, `fast`
  * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on `output_format` will be added automatically)
+ * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on 
+	`output_format` will be added automatically)
 
 ##### Preprocessing Mode
 
@@ -249,8 +249,10 @@ benchmark <method> nomapping <input_data_structure> <query_set> [output_file]
 where:
 
 * `method` is one of `dijkstra`, `ch`, `tnr`, `tnraf` - the method being benchmarked
-* `input_data_structure` is path to the data structure preprocessed using the preprocessor for the selected `method` (generated using the preprocessor as described in the previous section)
-* `query_set` is path to the query set (file format described in the [File Formats](#inputoutput-file-formats) section below)
+* `input_data_structure` is path to the data structure preprocessed using the preprocessor for the selected `method` 
+	(generated using the preprocessor as described in the previous section)
+* `query_set` is path to the query set (file format described in the [File Formats](#inputoutput-file-formats) 
+	section below)
 * `output_file` (optional) is path to the output file for the computed distances
 
 #### Benchmark With ID Mapping
@@ -268,7 +270,8 @@ where:
 `method`. For dijkstra, use a XenGraph file.
 `input_data_structure` argument. 
 * `query_set` is path to the query set (file format described in the File Formats section below)
-* `mapping_file` is path to the mapping file (file format described in the File Formats section below), which will be used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
+* `mapping_file` is path to the mapping file (file format described in the File Formats section below), which will be 
+	used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
 * `output_file` (optional) is path to the output file for the computed distances
 
 #### Computed Distances
@@ -325,11 +328,6 @@ You can consult the readme for this simple application [here](./javatests/README
 For more information about how to integrate this project with other programming languages, please consult 
 the [readme](./src/API/README.md) in the `src/API` subdirectory.
 
-Amod-to-agentpolis
-------------------
-
-If you want to use the library with Amod-to-agentpolis, you can consult the [Amod readme](./AMOD_README.md) 
-for step-by-step instructions on how to accomplish this.
 
 Input/Output File Formats
 -------------------------
@@ -425,3 +423,14 @@ The third line contains the original ID of the node with the ID 1, and so on up 
 original ID for the node with the ID `n-1` in our application.
 
 
+# Integraion to Other Languages
+Integration of this library into an application written in languages other than `C++` and `Java` is also possible,
+but it will require you to generate new 'glue code' for the desired language using a tool called `SWIG`. 
+You will also need to change the `CMakeLists.txt` file in order to compile the library for such usage. 
+The steps required for the integration with a different language are briefly described [here](./src/API/README.md).
+
+
+# Amod-to-agentpolis
+
+If you want to use the library with Amod-to-agentpolis, you can consult the [Amod readme](./AMOD_README.md) 
+for step-by-step instructions on how to accomplish this.
