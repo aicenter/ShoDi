@@ -836,7 +836,7 @@ int main(int argc, char *argv[]) {
             for (auto &benchmark : benchmarks) {
                 auto &name = get<0>(benchmark);
 
-                if (name.compare(argv[2])) {
+                if (name.compare(argv[2]) == 0) {
                     if (strcmp(argv[3], "nomapping") == 0) {
                         auto &func = get<1>(benchmark);
                         if (argc == 7) {
