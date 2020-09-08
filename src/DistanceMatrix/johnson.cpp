@@ -107,18 +107,15 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
 
   const dist_t max = std::numeric_limits<dist_t>::max();
 
-#ifdef _OPENMP
 #pragma omp parallel for
-#endif
   for (int i = 0; i < V; i++) {
     dist[i] = max;
   }
   dist[src] = 0;
 
   for (int i = 1; i <= V - 1; i++) {
-#ifdef _OPENMP
+
 #pragma omp parallel for
-#endif
     for (int j = 0; j < E; j++) {
       unsigned int u = std::get<0>(edges[j]);
       unsigned int v = std::get<1>(edges[j]);
@@ -129,9 +126,8 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, unsigned int src) {
   }
 
   bool no_neg_cycle = true;
-#ifdef _OPENMP
+
 #pragma omp parallel for
-#endif
   for (int i = 0; i < E; i++) {
     unsigned int u = std::get<0>(edges[i]);
     unsigned int v = std::get<1>(edges[i]);
@@ -160,9 +156,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   std::memcpy(bf_graph->weights, gr->weights, gr->E * sizeof(dist_t));
   std::memset(&bf_graph->weights[gr->E], 0, V * sizeof(dist_t));
 
-#ifdef _OPENMP
 #pragma omp parallel for
-#endif
   for (int e = 0; e < V; e++) {
     bf_graph->edge_array[e + gr->E] = Edge(V, e);
   }
@@ -181,10 +175,8 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   // computed by the Bellman–Ford algorithm: an edge from u to v, having length
   // w(u,v), is given the new length w(u,v) + h(u) − h(v).
   int ec = (int) gr->E;
-#ifdef _OPENMP
+
 #pragma omp parallel for
-#endif
-    
   for (int e = 0; e < ec; e++) {
     unsigned int u = std::get<0>(gr->edge_array[e]);
     unsigned int v = std::get<1>(gr->edge_array[e]);
@@ -194,9 +186,8 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   Graph G(gr->edge_array, gr->edge_array + gr->E, gr->weights, V);
 
   ProgressBar progress(V);
-#ifdef _OPENMP
+
 #pragma omp parallel for schedule(dynamic)
-#endif
   for (int s = 0; s < V; s++) {
     std::vector<dist_t> d(num_vertices(G));
     dijkstra_shortest_paths(G, s, boost::distance_map(&d[0]));
