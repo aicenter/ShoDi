@@ -31,7 +31,7 @@ unsigned int TNRPathQueryManager::findDistance(const unsigned int start, const u
     }
 
     vector < pair < unsigned int, unsigned int > > additionalNextNodes = graph.unpackingNeighbours(start);
-    for(auto i = 0; i < additionalNextNodes.size(); i++) {
+    for(size_t i = 0; i < additionalNextNodes.size(); i++) {
         //printf("Trying %u (rank %u) as middle node. Distances: %u and %u, that is: %u\n", additionalNextNodes[i].first, graph.data(additionalNextNodes[i].first).rank, additionalNextNodes[i].second, quickFindDistance(additionalNextNodes[i].first, goal), quickFindDistance(additionalNextNodes[i].first, goal) + unpackingNeighbours[i].second);
         if(distance - additionalNextNodes[i].second == quickFindDistance(additionalNextNodes[i].first, goal)) {
             //fallbackCHmanager.printEdgesForwardShortcut(start, additionalNextNodes[i].first);
@@ -68,7 +68,7 @@ unsigned int TNRPathQueryManager::findPath(const unsigned int start, const unsig
     }
 
     vector < pair < unsigned int, unsigned int > > additionalNextNodes = graph.unpackingNeighbours(start);
-    for(auto i = 0; i < additionalNextNodes.size(); i++) {
+    for(size_t i = 0; i < additionalNextNodes.size(); i++) {
         //printf("Trying %u (rank %u) as middle node. Distances: %u and %u, that is: %u\n", additionalNextNodes[i].first, graph.data(additionalNextNodes[i].first).rank, additionalNextNodes[i].second, quickFindDistance(additionalNextNodes[i].first, goal), quickFindDistance(additionalNextNodes[i].first, goal) + unpackingNeighbours[i].second);
         if(distance - additionalNextNodes[i].second == quickFindDistance(additionalNextNodes[i].first, goal)) {
             //fallbackCHmanager.printEdgesForwardShortcut(start, additionalNextNodes[i].first);

@@ -96,7 +96,7 @@ void FlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
 
 //______________________________________________________________________________________________________________________
 unsigned int FlagsGraphWithUnpackingData::getMiddleNode(unsigned int source, unsigned int target, bool direction) {
-    for(auto i = 0; i < neighbours[source].size(); i++) {
+    for(size_t i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
             if (direction == FORWARD && neighbours[source][i].forward) {
                 return neighbours[source][i].middleNode;
@@ -118,7 +118,7 @@ unsigned int FlagsGraphWithUnpackingData::getDistance(unsigned int node1, unsign
         target = node1;
     }
 
-    for(auto i = 0; i < neighbours[source].size(); i++) {
+    for(size_t i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
             if (direction == FORWARD && neighbours[source][i].forward) {
                 return neighbours[source][i].weight;

@@ -188,14 +188,14 @@ void UpdateableGraph::flushCnts(ostream & output, const unsigned int nodes, cons
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushRanks(ostream & output) {
-    for(auto i = 0; i < ranks.size(); i++) {
+    for(size_t i = 0; i < ranks.size(); i++) {
         output.write((char *) &ranks[i], sizeof (unsigned int));
     }
 }
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushOriginalEdges(ostream & output, vector < OutputEdge > & edges) {
-    for(auto i = 0; i < edges.size(); i++) {
+    for(size_t i = 0; i < edges.size(); i++) {
         output.write((char *) &edges[i].sourceNode, sizeof (unsigned int));
         output.write((char *) &edges[i].targetNode, sizeof (unsigned int));
         output.write((char *) &edges[i].weight, sizeof (unsigned int));
@@ -205,7 +205,7 @@ void UpdateableGraph::flushOriginalEdges(ostream & output, vector < OutputEdge >
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushShortcutEdges(ostream & output, vector < OutputShortcutEdge > & edges) {
-    for(auto i = 0; i < edges.size(); i++) {
+    for(size_t i = 0; i < edges.size(); i++) {
         output.write((char *) &edges[i].sourceNode, sizeof (unsigned int));
         output.write((char *) &edges[i].targetNode, sizeof (unsigned int));
         output.write((char *) &edges[i].weight, sizeof (unsigned int));
@@ -222,7 +222,7 @@ void UpdateableGraph::flushTerminator(ostream & output) {
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
-   for(auto i = 0; i < followingNodes.size(); i++) {
+   for(size_t i = 0; i < followingNodes.size(); i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
@@ -257,7 +257,7 @@ void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vec
 void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
     vector<pair<pair<unsigned int, unsigned int>, PreprocessingEdgeData>> removedEdges;
 
-    for(auto i = 0; i < followingNodes.size(); i++) {
+    for(size_t i = 0; i < followingNodes.size(); i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
@@ -289,7 +289,7 @@ void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > 
         }
     }
 
-    for(auto i = 0; i < removedEdges.size(); i++) {
+    for(size_t i = 0; i < removedEdges.size(); i++) {
         followingNodes[removedEdges[i].first.first].insert(make_pair(removedEdges[i].first.second, PreprocessingEdgeData(removedEdges[i].second)));
     }
 }

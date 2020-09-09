@@ -23,8 +23,8 @@ void TransitNodeRoutingGraphForPathQueries::addUnpackingEdge(unsigned int from, 
 // FROM TNRGraph
 //______________________________________________________________________________________________________________________
 bool TransitNodeRoutingGraphForPathQueries::isLocalQuery(unsigned int source, unsigned int target) {
-    for(auto k = 0; k < forwardSearchSpaces[source].size(); k++) {
-        for(auto m = 0; m < backwardSearchSpaces[target].size(); m++) {
+    for(size_t k = 0; k < forwardSearchSpaces[source].size(); k++) {
+        for(size_t m = 0; m < backwardSearchSpaces[target].size(); m++) {
             if(forwardSearchSpaces[source][k] == backwardSearchSpaces[target][m]) {
                 return true;
             }
@@ -44,8 +44,8 @@ unsigned int TransitNodeRoutingGraphForPathQueries::findTNRDistance(unsigned int
     unsigned int shortestDistance = UINT_MAX;
 
     //printf("Finding shortest distance between '%u' (rank: %u, %lu access nodes) and '%u' (rank: %u, %lu access nodes) via TNR.\n", source, data(source).rank, forwardAccessNodes[source].size(), target, data(target).rank, backwardAccessNodes[target].size());
-    for(auto i = 0; i < forwardAccessNodes[source].size(); i++) {
-        for(auto j = 0; j < backwardAccessNodes[target].size(); j++) {
+    for(size_t i = 0; i < forwardAccessNodes[source].size(); i++) {
+        for(size_t j = 0; j < backwardAccessNodes[target].size(); j++) {
             unsigned int id1 = transitNodeMapping[forwardAccessNodes[source][i].accessNodeID];
             unsigned int id2 = transitNodeMapping[backwardAccessNodes[target][j].accessNodeID];
             unsigned int newDistance = forwardAccessNodes[source][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[target][j].distanceToNode;

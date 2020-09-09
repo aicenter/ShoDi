@@ -117,7 +117,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
   for (size_t i = 1; i <= V - 1; i++) {
 
 #pragma omp parallel for
-    for (auto j = 0; j < E; j++) {
+    for (size_t j = 0; j < E; j++) {
       unsigned int u = std::get<0>(edges[j]);
       unsigned int v = std::get<1>(edges[j]);
       dist_t new_dist = weights[j] + dist[u];
@@ -129,7 +129,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
   bool no_neg_cycle = true;
 
 #pragma omp parallel for
-  for (auto i = 0; i < E; i++) {
+  for (size_t i = 0; i < E; i++) {
     unsigned int u = std::get<0>(edges[i]);
     unsigned int v = std::get<1>(edges[i]);
     dist_t weight = weights[i];

@@ -270,14 +270,14 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     size_t fwSearchSpaceSum = 0;
     size_t bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        auto fwSearchSpaceSize = forwardSearchSpaces[i].size();
+        size_t fwSearchSpaceSize = forwardSearchSpaces[i].size();
         output.write((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
         for(size_t j = 0; j < fwSearchSpaceSize; j++) {
             output.write((char *) &forwardSearchSpaces[i][j], sizeof(forwardSearchSpaces[i][j]));
         }
         fwSearchSpaceSum += fwSearchSpaceSize;
 
-        auto bwSearchSpaceSize = backwardSearchSpaces[i].size();
+        size_t bwSearchSpaceSize = backwardSearchSpaces[i].size();
         output.write((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
         for(size_t j = 0; j < bwSearchSpaceSize; j++) {
             output.write((char *) &backwardSearchSpaces[i][j], sizeof(backwardSearchSpaces[i][j]));

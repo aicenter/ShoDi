@@ -30,12 +30,12 @@ typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
     DefaultCSVReader;
 
 inline bool stricmp(const string s1, const string s2) {
-  auto size1 = s1.size();
+  size_t size1 = s1.size();
 
   if (size1 != s2.size())
     return false;
 
-  for(auto i = 0; i < size1; ++i) {
+  for(size_t i = 0; i < size1; ++i) {
     if (tolower(s1[i]) != tolower(s2[i]))
       return false;
   }
@@ -57,7 +57,7 @@ std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const auto size = reader.cols();
+    const size_t size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -89,7 +89,7 @@ Graph *CsvGraphLoader::loadGraph() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const auto size = reader.cols();
+    const size_t size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -127,7 +127,7 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const auto size = reader.cols();
+    const size_t size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -165,7 +165,7 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const auto size = reader.cols();
+    const size_t size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +

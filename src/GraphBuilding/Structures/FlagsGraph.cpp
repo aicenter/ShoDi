@@ -36,8 +36,8 @@ FlagsGraph::~FlagsGraph() = default;
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges) {
-    for(auto i = 0; i < neighbours.size(); i++) {
-        for(auto j = 0; j < neighbours[i].size(); j++) {
+    for(size_t i = 0; i < neighbours.size(); i++) {
+        for(size_t j = 0; j < neighbours[i].size(); j++) {
             allEdges.push_back(make_pair(i, QueryEdge(neighbours[i][j])));
         }
     }
@@ -45,7 +45,7 @@ void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > >
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::processOriginalEdges(vector < OutputEdge > & edges) {
-    for(auto i = 0; i < edges.size(); i++) {
+    for(size_t i = 0; i < edges.size(); i++) {
         unsigned int from, to, weight, flags;
         from = edges[i].sourceNode;
         to = edges[i].targetNode;
@@ -70,7 +70,7 @@ void FlagsGraph::processOriginalEdges(vector < OutputEdge > & edges) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::processShortcuts( vector < OutputShortcutEdge > & shortcuts) {
-    for(auto i = 0; i < shortcuts.size(); i++) {
+    for(size_t i = 0; i < shortcuts.size(); i++) {
         unsigned int from, to, weight, flags;
         from = shortcuts[i].sourceNode;
         to = shortcuts[i].targetNode;

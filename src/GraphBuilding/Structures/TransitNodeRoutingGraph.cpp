@@ -16,8 +16,8 @@ TransitNodeRoutingGraph::~TransitNodeRoutingGraph() = default;
 
 //______________________________________________________________________________________________________________________
 bool TransitNodeRoutingGraph::isLocalQuery(unsigned int start, unsigned int goal) {
-    for(auto k = 0; k < forwardSearchSpaces[start].size(); k++) {
-        for(auto m = 0; m < backwardSearchSpaces[goal].size(); m++) {
+    for(size_t k = 0; k < forwardSearchSpaces[start].size(); k++) {
+        for(size_t m = 0; m < backwardSearchSpaces[goal].size(); m++) {
             if(forwardSearchSpaces[start][k] == backwardSearchSpaces[goal][m]) {
                 return true;
             }
@@ -30,8 +30,8 @@ bool TransitNodeRoutingGraph::isLocalQuery(unsigned int start, unsigned int goal
 unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int start, unsigned int goal) {
     unsigned int shortestDistance = UINT_MAX;
 
-    for(auto i = 0; i < forwardAccessNodes[start].size(); i++) {
-        for(auto j = 0; j < backwardAccessNodes[goal].size(); j++) {
+    for(size_t i = 0; i < forwardAccessNodes[start].size(); i++) {
+        for(size_t j = 0; j < backwardAccessNodes[goal].size(); j++) {
             unsigned int id1 = transitNodeMapping[forwardAccessNodes[start][i].accessNodeID];
             unsigned int id2 = transitNodeMapping[backwardAccessNodes[goal][j].accessNodeID];
             unsigned int newDistance = forwardAccessNodes[start][i].distanceToNode + transitNodesDistanceTable[id1][id2] + backwardAccessNodes[goal][j].distanceToNode;
@@ -79,8 +79,8 @@ void TransitNodeRoutingGraph::accessNodesTest(DistanceMatrix & dm) {
     unsigned int allAccessNodes = 0;
     unsigned int invalidDistanceNodes = 0;
 
-    for(auto i = 0; i < forwardAccessNodes.size(); ++i) {
-        for(auto j = 0; j < forwardAccessNodes[i].size(); ++j) {
+    for(size_t i = 0; i < forwardAccessNodes.size(); ++i) {
+        for(size_t j = 0; j < forwardAccessNodes[i].size(); ++j) {
             allAccessNodes++;
             if(forwardAccessNodes[i][j].distanceToNode != dm.findDistance(i, forwardAccessNodes[i][j].accessNodeID)) {
                 invalidDistanceNodes++;
