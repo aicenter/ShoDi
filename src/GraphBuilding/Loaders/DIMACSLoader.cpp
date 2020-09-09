@@ -3,6 +3,7 @@
 // Created on: 25.7.18
 //
 
+#include <boost/numeric/conversion/cast.hpp>
 #include <climits>
 #include <fstream>
 #include <memory>
@@ -186,11 +187,11 @@ vector<dist_t> DIMACSLoader::loadAdjacencyMatrix() {
     std::unique_ptr<Graph> graph {loadGraph()};
 
     const auto nodes = graph->nodes();
-    vector<dist_t> adj(nodes * nodes, std::numeric_limits<dist_t>::max());
+    vector<dist_t> adj(((size_t) nodes) * ((size_t) nodes), std::numeric_limits<dist_t>::max());
 
     for(unsigned int i = 0; i < nodes; ++i) {
         for(auto &pair : graph->outgoingEdges(i)) {
-            adj[i * nodes + pair.first] = pair.second;
+            adj[((size_t) i) * ((size_t) nodes) + ((size_t) pair.first)] = pair.second;
         }
     }
 

@@ -173,22 +173,22 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, cons
 
 //______________________________________________________________________________________________________________________
 void CHDistanceQueryManager::prepareStructuresForNextQuery() {
-    for (unsigned int i = 0; i < forwardChanged.size(); i++) {
+    for(size_t i = 0; i < forwardChanged.size(); i++) {
         graph.resetForwardInfo(forwardChanged[i]);
     }
     forwardChanged.clear();
 
-    for (unsigned int i = 0; i < backwardChanged.size(); i++) {
+    for(size_t i = 0; i < backwardChanged.size(); i++) {
        graph.resetBackwardInfo(backwardChanged[i]);
     }
     backwardChanged.clear();
 
-    for (unsigned int i = 0; i < forwardStallChanged.size(); i++) {
+    for(size_t i = 0; i < forwardStallChanged.size(); i++) {
         graph.resetForwardStall(forwardStallChanged[i]);
     }
     forwardStallChanged.clear();
 
-    for (unsigned int i = 0; i < backwardStallChanged.size(); i++) {
+    for(size_t i = 0; i < backwardStallChanged.size(); i++) {
         graph.resetBackwardStall(backwardStallChanged[i]);
     }
     backwardStallChanged.clear();

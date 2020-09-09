@@ -49,7 +49,7 @@ void obtainTrueValues(vector<unsigned int> &trueValues, const string &inputFileP
     unsigned int queriesCnt;
     input >> queriesCnt;
     trueValues.resize(queriesCnt);
-    for (unsigned int i = 0; i < queriesCnt; ++i) {
+    for(size_t i = 0; i < queriesCnt; ++i) {
         input >> trueValues[i];
     }
 }

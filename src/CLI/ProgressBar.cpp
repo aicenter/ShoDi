@@ -28,7 +28,7 @@ namespace
 	}
 }
 
-ProgressBar::ProgressBar(uint32_t expectedIterations, const std::string& initialMessage)
+ProgressBar::ProgressBar(size_t expectedIterations, const std::string& initialMessage)
 	: mTotalIterations(expectedIterations),
 	mNumberOfTicks(0),
 	mEnded(false)

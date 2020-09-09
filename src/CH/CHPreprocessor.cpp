@@ -3,6 +3,7 @@
 // Created on: 1.8.18
 //
 
+#include <boost/numeric/conversion/cast.hpp>
 #include <queue>
 #include <climits>
 #include <fstream>
@@ -65,7 +66,7 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
         clearStructures();
         preprocessingDegrees[i] = graph.degree(i);
         int edgeDifference = EdgeDifferenceManager::difference(UINT_MAX, i, shortcuts, preprocessingDegrees[i]);
-        priorityQueue.pushOnly(i, edgeDifference);
+        priorityQueue.pushOnly(i, (unsigned int) edgeDifference);
     }
     priorityQueue.buildProperHeap();
     printf("\rPriority queue initialized.\n");
@@ -113,7 +114,7 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::reinsertShortcuts(UpdateableGraph & graph) {
-    for(unsigned int i = 0; i < allShortcuts.size(); i++) {
+    for(size_t i = 0; i < allShortcuts.size(); i++) {
         graph.addShortcutEdge(allShortcuts[i].sourceNode, allShortcuts[i].targetNode, allShortcuts[i].weight, allShortcuts[i].middleNode);
     }
 }
@@ -274,7 +275,7 @@ unsigned int CHPreprocessor::longestPossibleShortcut(const unsigned int source) 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
     unsigned int lowestBucketVal = UINT_MAX;
-    for(unsigned int i = 0; i < targets.size(); i++) {
+    for(size_t i = 0; i < targets.size(); i++) {
         initBuckets(targets[i], graph, lowestBucketVal);
     }
 
@@ -285,7 +286,7 @@ void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
         hops = 2;
     }
 
-    for(unsigned int i = 0; i < sources.size(); i++) {
+    for(size_t i = 0; i < sources.size(); i++) {
         unsigned int longestShortcut = longestPossibleShortcut(sources[i]);
         oneToManyWithBuckets(sources[i], longestShortcut - lowestBucketVal, graph, hops, searchspace);
     }
@@ -311,7 +312,7 @@ void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
     vector<unsigned int> nodesWithChangedDistances;
-    unsigned int targetsAmount = (unsigned int) targets.size();
+    unsigned int targetsAmount = boost::numeric_cast<unsigned int>(targets.size());
     unsigned int targetsFound = 0;
     unsigned int expanded = 0;
 
@@ -372,7 +373,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsig
         distancesWithoutX.insert(make_pair(make_pair(source, *iter), dijkstraDistance[*iter]));
     }
 
-    for(unsigned int i = 0; i < nodesWithChangedDistances.size(); i++) {
+    for(size_t i = 0; i < nodesWithChangedDistances.size(); i++) {
         dijkstraDistance[nodesWithChangedDistances[i]] = UINT_MAX;
     }
 

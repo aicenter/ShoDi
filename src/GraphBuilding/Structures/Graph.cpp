@@ -4,6 +4,7 @@
 //
 
 #include <cstdio>
+#include <boost/numeric/conversion/cast.hpp>
 #include "Graph.h"
 
 //______________________________________________________________________________________________________________________
@@ -14,7 +15,7 @@ Graph::Graph(unsigned int n) {
 
 //______________________________________________________________________________________________________________________
 Graph::Graph(SimpleGraph & x) {
-    const unsigned int nodes = x.nodes();
+    const auto nodes = x.nodes();
     this->followingNodes.resize(nodes);
     this->previousNodes.resize(nodes);
 
@@ -34,7 +35,7 @@ void Graph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
 
 //______________________________________________________________________________________________________________________
 unsigned int Graph::nodes()const {
-    return (unsigned int) this->followingNodes.size();
+    return boost::numeric_cast<unsigned int>(this->followingNodes.size());
 }
 
 //______________________________________________________________________________________________________________________

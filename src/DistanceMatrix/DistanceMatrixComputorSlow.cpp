@@ -3,6 +3,7 @@
 // Created on: 05.10.19
 //
 
+#include <boost/numeric/conversion/cast.hpp>
 #include <climits>
 #include <cstddef>
 #include <fstream>
@@ -18,9 +19,9 @@
 void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
     const unsigned int nodesCnt = graph.nodes();
 
-    distanceTable.resize(nodesCnt * nodesCnt);
+    distanceTable.resize(((dist_t) nodesCnt) * ((dist_t) nodesCnt));
 
-    for(unsigned int i = 0; i < nodesCnt; i++) {
+    for (unsigned int i = 0; i < nodesCnt; ++i) {
         if (i % 100 == 0) {
             cout << "\rComputed " << i << '/' << nodesCnt << " rows of the distance matrix.";
         }
@@ -34,9 +35,9 @@ void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
 void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Graph & graph) {
     const unsigned int nodesCnt = graph.nodes();
 
-    distanceTable.resize(nodesCnt * nodesCnt);
+    distanceTable.resize(((dist_t) nodesCnt) * ((dist_t) nodesCnt));
 
-    for(unsigned int i = 0; i < nodesCnt; i++) {
+    for (unsigned int i = 0; i < nodesCnt; ++i) {
         if (i % 100 == 0) {
             cout << "\rComputed " << i << '/' << nodesCnt << " rows of the distance matrix.";
         }
@@ -48,7 +49,7 @@ void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Grap
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID, const Graph & graph, bool useReversedGraph) {
-    size_t n = graph.nodes();
+    size_t n = (size_t) graph.nodes();
     auto * distance = new dist_t[n];
 
     const dist_t max = std::numeric_limits<dist_t>::max();
@@ -89,8 +90,8 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
 
     }
 
-    for(size_t i = 0; i < n; i++) {
-      distanceTable[rowID * n + i] = distance[i];
+    for (size_t i = 0; i < (size_t) n; ++i) {
+      distanceTable[((size_t) rowID) * ((size_t) n) + ((size_t) i)] = distance[i];
     }
     delete [] distance;
 }

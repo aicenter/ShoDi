@@ -6,6 +6,7 @@
 #include <climits>
 #include <cstdio>
 #include "CHpriorityQueue.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 // All methods are pretty standard binary heap methods, so google 'binary heap' and you will probably find articles
 // about how it works and why it works this way. Also mapping is added here - we store heap positions for all the
@@ -20,14 +21,14 @@ CHpriorityQueue::CHpriorityQueue(const unsigned int nodes) {
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::insert(const unsigned int x, const int y) {
     content.push_back(CHNode(x, y));
-    mapping[x] = (unsigned int) content.size() - 1;
-    bubbleUp((unsigned int) content.size() - 1);
+    mapping[x] = boost::numeric_cast<unsigned int>(content.size() - 1);
+    bubbleUp(boost::numeric_cast<unsigned int>(content.size() - 1));
 }
 
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::pushOnly(const unsigned int x, const int y) {
     content.push_back(CHNode(x, y));
-    mapping[x] = (unsigned int) content.size() - 1;
+    mapping[x] = boost::numeric_cast<unsigned int>(content.size() - 1);
 }
 
 //______________________________________________________________________________________________________________________
@@ -52,7 +53,7 @@ CHNode CHpriorityQueue::front() {
 
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::pop() {
-    swap(0, (unsigned int) content.size()-1);
+    swap(0, boost::numeric_cast<unsigned int>(content.size() - 1));
     content.pop_back();
     bubbleDown(0);
 }
@@ -64,7 +65,7 @@ bool CHpriorityQueue::empty() {
 
 //______________________________________________________________________________________________________________________
 void CHpriorityQueue::buildProperHeap() {
-    for (int i = (int) ((content.size()/2) - 1); i >= 0; i-- ) {
+    for (int i = boost::numeric_cast<int>((content.size()/2) - 1); i >= 0; i--) {
         bubbleDown((unsigned int) i);
     }
 }

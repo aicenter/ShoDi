@@ -9,6 +9,7 @@
 #include "CLI/ProgressBar.hpp"
 #include "GraphBuilding/Structures/Graph.h"
 #include "GraphBuilding/Structures/UpdateableGraph.h"
+#include <boost/numeric/conversion/cast.hpp>
 #include <algorithm>
 #include <cctype>
 #include <climits>
@@ -29,12 +30,12 @@ typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
     DefaultCSVReader;
 
 inline bool stricmp(const string s1, const string s2) {
-  auto size1 = (unsigned int) s1.size();
+  auto size1 = s1.size();
 
   if (size1 != s2.size())
     return false;
 
-  for (unsigned int i = 0; i < size1; ++i) {
+  for(auto i = 0; i < size1; ++i) {
     if (tolower(s1[i]) != tolower(s2[i]))
       return false;
   }
@@ -56,7 +57,7 @@ std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = (unsigned int) reader.cols();
+    const auto size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -88,7 +89,7 @@ Graph *CsvGraphLoader::loadGraph() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = (unsigned int) reader.cols();
+    const auto size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -96,19 +97,19 @@ Graph *CsvGraphLoader::loadGraph() {
                           to_string(size) + " cols.\n");
 
     const dist_t max = std::numeric_limits<dist_t>::max();
-    auto *const graph = new Graph(size);
+    auto *const graph = new Graph(boost::numeric_cast<unsigned int>(size)); // TODO graph could possibly have more than UINT nodes ?
 
     ProgressBar progress(size, "Loading CSV file:");
 
-    unsigned int i = 0;
+    size_t i = 0;
     for (const auto row : reader) {
-      unsigned int j = 0;
+      size_t j = 0;
       for (const auto cell : row) {
         string val;
         cell.read_value(val);
         const dist_t dist = parse_distance(val);
         if (dist != max)
-          graph->addEdge(i, j, dist);
+          graph->addEdge(boost::numeric_cast<unsigned int>(i), boost::numeric_cast<unsigned int>(j), dist);
         ++j;
       }
       ++progress;
@@ -126,7 +127,7 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = (unsigned int) reader.cols();
+    const auto size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -134,19 +135,19 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
                           to_string(size) + " cols.\n");
 
     const dist_t max = std::numeric_limits<dist_t>::max();
-    auto *const graph = new UpdateableGraph(size);
+    auto *const graph = new UpdateableGraph(boost::numeric_cast<unsigned int>(size)); // TODO graph could possibly have more than UINT nodes ?
 
     ProgressBar progress(size, "Loading CSV file:");
 
-    unsigned int i = 0;
+    size_t i = 0;
     for (const auto row : reader) {
-      unsigned int j = 0;
+      size_t j = 0;
       for (const auto cell : row) {
         string val;
         cell.read_value(val);
         const dist_t dist = parse_distance(val);
         if (dist != max)
-          graph->addEdge(i, j, dist);
+          graph->addEdge(boost::numeric_cast<unsigned int>(i), boost::numeric_cast<unsigned int>(j), dist);
         ++j;
       }
       ++progress;
@@ -164,7 +165,7 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
   DefaultCSVReader reader;
 
   if (reader.mmap(this->inputFile)) {
-    const unsigned int size = (unsigned int) reader.cols();
+    const auto size = reader.cols();
     if (size != reader.rows())
       throw runtime_error(this->inputFile +
                           " does not contain a square matrix. Found " +
@@ -175,15 +176,15 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
 
     ProgressBar progress(size, "Loading CSV file:");
 
-    unsigned int i = 0;
+    size_t i = 0;
     for (const auto row : reader) {
-      unsigned int j = 0;
+      size_t j = 0;
       for (const auto cell : row) {
         string val;
         cell.read_value(val);
         const dist_t dist = parse_distance(val);
         if (dist != max)
-          graph.addEdge(i, j, dist);
+          graph.addEdge(boost::numeric_cast<unsigned int>(i), boost::numeric_cast<unsigned int>(j), dist);
         ++j;
       }
       ++progress;

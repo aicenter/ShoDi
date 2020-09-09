@@ -14,7 +14,7 @@ unsigned int BasicDijkstra::run(const unsigned int start, const unsigned int goa
     unsigned int n = graph.nodes();
     unsigned int * distance = new unsigned int[n];
 
-    for(unsigned int i = 0; i < n; i++) {
+    for(size_t i = 0; i < n; i++) {
         distance[i] = UINT_MAX;
     }
 
@@ -56,7 +56,7 @@ unsigned int BasicDijkstra::runWithPathOutput(const unsigned int start, const un
     unsigned int * distance = new unsigned int[n];
     vector < vector < unsigned int > > previous(n);
 
-    for(unsigned int i = 0; i < n; i++) {
+    for(size_t i = 0; i < n; i++) {
         distance[i] = UINT_MAX;
     }
 
@@ -103,8 +103,8 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
     unsigned int current = x;
     while (prev[current].size() > 0) {
         unsigned int distance = dist[prev[current].at(0)];
-        unsigned int pos = 0;
-        for (unsigned int i = 1; i < prev[current].size(); i++) {
+        size_t pos = 0;
+        for(size_t i = 1; i < prev[current].size(); i++) {
             if (dist[prev[current].at(i)] < distance) {
                 distance = dist[prev[current].at(i)];
                 pos = i;
@@ -115,7 +115,7 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
     }
 
     printf("~~~ Outputting path from %u to %u (distance %u) ~~~\n", path[path.size()-1].first.first, x, dist[x]);
-    for(int i = (int) path.size()-1; i >= 0; i--) {
+    for(auto i = path.size()-1; i >= 0; i--) {
         printf("%u -> %u (%u)\n", path[i].first.first, path[i].first.second, path[i].second);
     }
     printf("~~~ End of path ~~~\n");
@@ -124,9 +124,9 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
 
 //______________________________________________________________________________________________________________________
 void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Graph & graph, vector<unsigned int> & distances) {
-    unsigned int n = graph.nodes();
+    size_t n = (size_t) graph.nodes();
 
-    for(unsigned int i = 0; i < n; i++) {
+    for(size_t i = 0; i < (size_t) n; i++) {
         distances[i] = UINT_MAX;
     }
 
@@ -155,9 +155,9 @@ void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Gr
 
 //______________________________________________________________________________________________________________________
 void BasicDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int source, const Graph & graph, vector<unsigned int> & distances) {
-    unsigned int n = graph.nodes();
+    size_t n = (size_t) graph.nodes();
 
-    for(unsigned int i = 0; i < n; i++) {
+    for(size_t i = 0; i < (size_t) n; i++) {
         distances[i] = UINT_MAX;
     }
 

@@ -31,7 +31,7 @@ void DistanceMatrixXdmOutputter::store(DistanceMatrix &dm, const string &path) {
 
     for (unsigned int i = 0; i < nodesCnt; ++i)
         for (unsigned int j = 0; j < nodesCnt; ++j)
-            output.write((char *) &distances[i * nodesCnt + j], sizeof(distances[i * nodesCnt + j]));
+            output.write((char *) &distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)], sizeof(distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)]));
 
     output.close();
 }

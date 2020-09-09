@@ -14,7 +14,7 @@ double DijkstraBenchmark::benchmark(const vector < pair < unsigned int, unsigned
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 
-    for(unsigned int i = 0; i < trips.size(); i++) {
+    for(size_t i = 0; i < trips.size(); i++) {
         distances[i] = BasicDijkstra::run(trips.at(i).first, trips.at(i).second, graph);
     }
 
@@ -31,7 +31,7 @@ double DijkstraBenchmark::benchmarkUsingMapping(const vector < pair < long long 
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 
-    for(unsigned int i = 0; i < trips.size(); i++) {
+    for(size_t i = 0; i < trips.size(); i++) {
         distances[i] = BasicDijkstra::run(mapping.at(trips.at(i).first), mapping.at(trips.at(i).second), graph);
     }
 

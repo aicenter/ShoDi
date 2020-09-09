@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <cstring>
 #include <memory>
+#include <iostream>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
@@ -348,17 +349,17 @@ void benchmarkDijkstra(
 
     delete dijkstraGraph;
 
-    printf("Run %u queries using Dijkstra's algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", (unsigned int) trips.size(), dijkstraTime, (dijkstraTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds." << endl;
+    cout << "That means " << (dijkstraTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for (size_t i = 0; i < trips.size(); ++i) {
             output << dijkstraDistances[i] << endl;
         }
 
@@ -402,19 +403,19 @@ void benchmarkDijkstraWithMapping(
 
     delete dijkstraGraph;
 
-    printf("Run %u queries using Dijkstra's algorithm in %f seconds\n"
-           "using '%s' as mapping."
-           "That means %f ms per query.\n", (unsigned int) trips.size(), dijkstraTime, mappingFilePath,
-           (dijkstraTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds" << endl;
+    cout << "using '" << mappingFilePath << "' as mapping." << endl;
+    cout << "That means " << (dijkstraTime / trips.size()) * 1000 << " ms per query." << endl;
+
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for (size_t i = 0; i < trips.size(); ++i) {
             output << dijkstraDistances[i] << endl;
         }
 
@@ -453,17 +454,17 @@ void benchmarkCH(
 
     delete ch;
 
-    printf("Run %u queries using Contraction Hierarchies query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", (unsigned int) trips.size(), chTime, (chTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Contraction Hierarchies query algorithm in " << chTime << " seconds." << endl;
+    cout << "That means " << (chTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for(size_t i = 0; i < trips.size(); ++i) {
             output << chDistances[i] << endl;
         }
 
@@ -505,18 +506,18 @@ void benchmarkCHwithMapping(
 
     delete ch;
 
-    printf("Run %u queries using Contraction Hierarchies query algorithm in %f seconds\n"
-           "using '%s' as mapping."
-           "That means %f ms per query.\n", (unsigned int) trips.size(), chTime, mappingFilePath, (chTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Contraction Hierarchies query algorithm in " << chTime << " seconds" << endl;
+    cout << "using '" << mappingFilePath << "' as mapping." << endl;
+    cout << "That means " << (chTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for(size_t i = 0; i < trips.size(); ++i) {
             output << chDistances[i] << endl;
         }
 
@@ -555,17 +556,17 @@ void benchmarkTNR(
 
     delete tnrGraph;
 
-    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrTime << " seconds." << endl;
+    cout << "That means " << (tnrTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for(size_t i = 0; i < trips.size(); ++i) {
             output << tnrDistances[i] << endl;
         }
 
@@ -607,17 +608,17 @@ void benchmarkTNRwithMapping(
 
     delete tnrGraph;
 
-    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrTime, (tnrTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrTime << " seconds." << endl;
+    cout << "That means " << (tnrTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for(size_t i = 0; i < trips.size(); ++i) {
             output << tnrDistances[i] << endl;
         }
 
@@ -657,17 +658,17 @@ void benchmarkTNRAF(
 
     delete tnrafGraph;
 
-    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrafTime << " seconds." << endl;
+    cout << "That means " << (tnrafTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for(size_t i = 0; i < trips.size(); ++i) {
             output << tnrafDistances[i] << endl;
         }
 
@@ -710,17 +711,17 @@ void benchmarkTNRAFwithMapping(
 
     delete tnrafGraph;
 
-    printf("Run %u queries using Transit Node Routing query algorithm in %f seconds.\n"
-           "That means %f ms per query.\n", (unsigned int) trips.size(), tnrafTime, (tnrafTime / trips.size()) * 1000);
+    cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrafTime << " seconds." << endl;
+    cout << "That means " << (tnrafTime / trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
-        printf("Now outputting distances to '%s'.\n", distancesOutputPath);
+        cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
 
         ofstream output;
         output.open(distancesOutputPath);
 
         output << queriesFilePath << endl;
-        for (unsigned int i = 0; i < trips.size(); ++i) {
+        for(size_t i = 0; i < trips.size(); ++i) {
             output << tnrafDistances[i] << endl;
         }
 

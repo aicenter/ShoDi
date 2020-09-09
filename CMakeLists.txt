@@ -24,6 +24,8 @@ include_directories(${JNI_INCLUDE_DIRS})
 ## Boost
 find_path(BOOST_CONFIG_INCLUDE_DIRS "/boost/config.hpp")
 include_directories(${BOOST_CONFIG_INCLUDE_DIRS})
+find_path(BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS "boost/cast.hpp")
+include_directories(${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
 
 ## CSV
 find_package(csv2 CONFIG REQUIRED)
@@ -61,6 +63,7 @@ endif (DOXYGEN_FOUND)
 # Targets
 
 add_library(shortestPaths SHARED
+        src/constants.h
         src/API/CHDistanceQueryManagerAPI.cpp
         src/API/CHDistanceQueryManagerAPI.h
         src/API/TNRDistanceQueryManagerAPI.cpp
@@ -181,8 +184,7 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
         src/CLI/ProgressBar.cpp
-        src/CLI/ProgressBar.hpp
-        src/constants.h)
+        src/CLI/ProgressBar.hpp)
 
 GENERATE_EXPORT_HEADER(shortestPaths
         BASE_NAME shortestPaths
@@ -208,7 +210,7 @@ add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/main.cpp)
-target_link_libraries(shortestPathsPreprocessor shortestPaths)
+target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
 
 add_executable(thesisTests
         src/Benchmarking/TNRBenchmark.cpp

@@ -60,7 +60,7 @@ private:
      */
     static bool validatePath(
             Graph * originalGraph,
-            const unsigned int distance,
+            const dist_t distance,
             vector<SimpleEdge> & path);
 
     /**

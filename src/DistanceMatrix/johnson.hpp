@@ -13,8 +13,8 @@ typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
 typedef std::pair<unsigned int, unsigned int> Edge;
 
 typedef struct graph {
-  unsigned int V;
-  unsigned int E;
+  size_t V;
+  size_t E;
   Edge *edge_array;
   dist_t *weights;
 } graph_t;

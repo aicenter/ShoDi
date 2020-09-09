@@ -4,6 +4,7 @@
 //
 
 #include <climits>
+#include <boost/numeric/conversion/cast.hpp>
 #include "FlagsGraphWithUnpackingData.h"
 #include "constants_defines.h"
 
@@ -22,7 +23,7 @@ void FlagsGraphWithUnpackingData::addEdge(unsigned int from, unsigned int to, un
 
 //______________________________________________________________________________________________________________________
 unsigned int FlagsGraphWithUnpackingData::nodes() const {
-    return (unsigned int) neighbours.size();
+    return boost::numeric_cast<unsigned int>(neighbours.size());
 }
 
 // Returns all neighbours of a given node 'x'. Keep in mind that this returns neighbour both in the forward and
@@ -95,7 +96,7 @@ void FlagsGraphWithUnpackingData::resetBackwardPrev(unsigned int x) {
 
 //______________________________________________________________________________________________________________________
 unsigned int FlagsGraphWithUnpackingData::getMiddleNode(unsigned int source, unsigned int target, bool direction) {
-    for(unsigned int i = 0; i < neighbours[source].size(); i++) {
+    for(auto i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
             if (direction == FORWARD && neighbours[source][i].forward) {
                 return neighbours[source][i].middleNode;
@@ -117,7 +118,7 @@ unsigned int FlagsGraphWithUnpackingData::getDistance(unsigned int node1, unsign
         target = node1;
     }
 
-    for(unsigned int i = 0; i < neighbours[source].size(); i++) {
+    for(auto i = 0; i < neighbours[source].size(); i++) {
         if (neighbours[source][i].targetNode == target) {
             if (direction == FORWARD && neighbours[source][i].forward) {
                 return neighbours[source][i].weight;

@@ -15,7 +15,7 @@ double CHBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> 
     Timer chTimer("Contraction hierarchies trips benchmark");
     chTimer.begin();
 
-    for(unsigned int i = 0; i < trips.size(); i++) {
+    for(size_t i = 0; i < trips.size(); i++) {
         distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second);
     }
 
@@ -30,7 +30,7 @@ double CHBenchmark::benchmarkUsingMapping(const vector < pair < long long unsign
     Timer chTimer("Contraction hierarchies trips benchmark with mapping");
     chTimer.begin();
 
-    for(unsigned int i = 0; i < trips.size(); i++) {
+    for(size_t i = 0; i < trips.size(); i++) {
         distances[i] = queryManager.findDistance(trips.at(i).first, trips.at(i).second);
     }
 

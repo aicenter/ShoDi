@@ -4,13 +4,14 @@
 //
 
 #include <fstream>
+#include <boost/numeric/conversion/cast.hpp>
 #include "UpdateableGraph.h"
 
 //______________________________________________________________________________________________________________________
 Graph * UpdateableGraph::createCopy() {
-    unsigned int n = nodes();
+    auto n = nodes();
     Graph * newInst = new Graph(n);
-    for (unsigned int i = 0; i < n; i++) {
+    for(unsigned int i = 0; i < n; i++) {
         for (auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             unsigned int target = (*iter).first;
             unsigned int weight = (*iter).second.weight;
@@ -74,7 +75,7 @@ unsigned int UpdateableGraph::getRank(unsigned int nodeID) const {
 
 //______________________________________________________________________________________________________________________
 unsigned int UpdateableGraph::nodes() const {
-    return (unsigned int) followingNodes.size();
+    return boost::numeric_cast<unsigned int>(followingNodes.size());
 }
 
 //______________________________________________________________________________________________________________________
@@ -94,7 +95,7 @@ const unordered_map<unsigned int, PreprocessingEdgeData> & UpdateableGraph::outg
 
 //______________________________________________________________________________________________________________________
 unsigned int UpdateableGraph::degree(unsigned int node)const {
-    return (unsigned int) (followingNodes.at(node).size() + previousNodes.at(node).size());
+    return boost::numeric_cast<unsigned int>(followingNodes.at(node).size() + previousNodes.at(node).size());
 }
 
 //______________________________________________________________________________________________________________________
@@ -129,7 +130,7 @@ void UpdateableGraph::flushInDdsgFormat(string filePath) {
 
     printf("Actually flushing the CH graph into the file\n");
     flushHeader(output);
-    flushCnts(output, (unsigned int) followingNodes.size(), (unsigned int) edges.size(), (unsigned int) shortcuts.size());
+    flushCnts(output, boost::numeric_cast<unsigned int>(followingNodes.size()), boost::numeric_cast<unsigned int>(edges.size()), boost::numeric_cast<unsigned int>(shortcuts.size()));
     flushRanks(output);
     flushOriginalEdges(output, edges);
     flushShortcutEdges(output, shortcuts);
@@ -147,9 +148,9 @@ void UpdateableGraph::outputAsXenGraph(string filePath) {
         printf("Couldn't open file '%s'!", (filePath + ".xeng").c_str());
     }
 
-    unsigned int edges = 0;
+    size_t edges = 0;
     for(unsigned int i = 0; i < nodes(); ++i) {
-        edges += (unsigned int) followingNodes[i].size();
+        edges += followingNodes[i].size();
     }
 
     output << "XGI " << nodes() << " " << edges << endl;
@@ -187,14 +188,14 @@ void UpdateableGraph::flushCnts(ostream & output, const unsigned int nodes, cons
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushRanks(ostream & output) {
-    for(unsigned int i = 0; i < ranks.size(); i++) {
+    for(auto i = 0; i < ranks.size(); i++) {
         output.write((char *) &ranks[i], sizeof (unsigned int));
     }
 }
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushOriginalEdges(ostream & output, vector < OutputEdge > & edges) {
-    for(unsigned int i = 0; i < edges.size(); i++) {
+    for(auto i = 0; i < edges.size(); i++) {
         output.write((char *) &edges[i].sourceNode, sizeof (unsigned int));
         output.write((char *) &edges[i].targetNode, sizeof (unsigned int));
         output.write((char *) &edges[i].weight, sizeof (unsigned int));
@@ -204,7 +205,7 @@ void UpdateableGraph::flushOriginalEdges(ostream & output, vector < OutputEdge >
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::flushShortcutEdges(ostream & output, vector < OutputShortcutEdge > & edges) {
-    for(unsigned int i = 0; i < edges.size(); i++) {
+    for(auto i = 0; i < edges.size(); i++) {
         output.write((char *) &edges[i].sourceNode, sizeof (unsigned int));
         output.write((char *) &edges[i].targetNode, sizeof (unsigned int));
         output.write((char *) &edges[i].weight, sizeof (unsigned int));
@@ -221,7 +222,7 @@ void UpdateableGraph::flushTerminator(ostream & output) {
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
-   for(unsigned int i = 0; i < followingNodes.size(); i++) {
+   for(auto i = 0; i < followingNodes.size(); i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
@@ -256,7 +257,7 @@ void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vec
 void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
     vector<pair<pair<unsigned int, unsigned int>, PreprocessingEdgeData>> removedEdges;
 
-    for(unsigned int i = 0; i < followingNodes.size(); i++) {
+    for(auto i = 0; i < followingNodes.size(); i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
@@ -288,7 +289,7 @@ void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > 
         }
     }
 
-    for(unsigned int i = 0; i < removedEdges.size(); i++) {
+    for(auto i = 0; i < removedEdges.size(); i++) {
         followingNodes[removedEdges[i].first.first].insert(make_pair(removedEdges[i].first.second, PreprocessingEdgeData(removedEdges[i].second)));
     }
 }

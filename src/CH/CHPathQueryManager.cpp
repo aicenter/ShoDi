@@ -338,24 +338,24 @@ void CHPathQueryManager::backwardStall(unsigned int stallnode, unsigned int stal
 // Reset information for the nodes that were changed in the current query.
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::prepareStructuresForNextQuery() {
-    for (unsigned int i = 0; i < forwardChanged.size(); i++) {
+    for (size_t i = 0; i < forwardChanged.size(); i++) {
         graph.resetForwardInfo(forwardChanged[i]);
         graph.resetForwardPrev(forwardChanged[i]);
     }
     forwardChanged.clear();
 
-    for (unsigned int i = 0; i < backwardChanged.size(); i++) {
+    for (size_t i = 0; i < backwardChanged.size(); i++) {
         graph.resetBackwardInfo(backwardChanged[i]);
         graph.resetBackwardPrev(backwardChanged[i]);
     }
     backwardChanged.clear();
 
-    for (unsigned int i = 0; i < forwardStallChanged.size(); i++) {
+    for (size_t i = 0; i < forwardStallChanged.size(); i++) {
         graph.resetForwardStall(forwardStallChanged[i]);
     }
     forwardStallChanged.clear();
 
-    for (unsigned int i = 0; i < backwardStallChanged.size(); i++) {
+    for (size_t i = 0; i < backwardStallChanged.size(); i++) {
         graph.resetBackwardStall(backwardStallChanged[i]);
     }
     backwardStallChanged.clear();
@@ -443,56 +443,56 @@ void CHPathQueryManager::fillToPath(const unsigned int meetingNode, vector<pair<
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::unpackPrevious(vector<pair<unsigned int, unsigned int> > & fromPath) {
-    for(int i = (int) fromPath.size()-1; i >= 0; i--) {
+    for(size_t i = fromPath.size()-1; i >= 0; i--) {
         unpackForwardEdge(fromPath[i].first, fromPath[i].second);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsigned int> > & toPath) {
-    for(unsigned int i = 0; i < (unsigned int) toPath.size(); i++) {
+    for(size_t i = 0; i < toPath.size(); i++) {
         unpackBackwardEdge(toPath[i].first, toPath[i].second);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getPreviousPathPart(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
-    for(int i = (int) fromPath.size()-1; i >= 0; i--) {
+    for(size_t i = fromPath.size()-1; i >= 0; i--) {
         getForwardEdge(fromPath[i].first, fromPath[i].second, edges, edgeLengths);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getFollowingPathPart(vector<pair<unsigned int, unsigned int> > & toPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
-    for(unsigned int i = 0; i < toPath.size(); i++) {
+    for(size_t i = 0; i < toPath.size(); i++) {
         getBackwardEdge(toPath[i].first, toPath[i].second, edges, edgeLengths);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges) {
-    for(int i = (int) fromPath.size()-1; i >= 0; i--) {
+    for(size_t i = fromPath.size()-1; i >= 0; i--) {
         getForwardEdgeWithoutLength(fromPath[i].first, fromPath[i].second, edges);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & toPath, vector<pair<unsigned int, unsigned int>> & edges) {
-    for(unsigned int i = 0; i < toPath.size(); i++) {
+    for(size_t i = 0; i < toPath.size(); i++) {
         getBackwardEdgeWithoutLength(toPath[i].first, toPath[i].second, edges);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<SimpleEdge> & path) {
-    for(int i = (int) fromPath.size()-1; i >= 0; i--) {
+    for(size_t i = fromPath.size()-1; i >= 0; i--) {
         getForwardEdgeWithoutLength(fromPath[i].first, fromPath[i].second, path);
     }
 }
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & toPath, vector<SimpleEdge> & path) {
-    for(unsigned int i = 0; i < toPath.size(); i++) {
+    for(size_t i = 0; i < toPath.size(); i++) {
         getBackwardEdgeWithoutLength(toPath[i].first, toPath[i].second, path);
     }
 }

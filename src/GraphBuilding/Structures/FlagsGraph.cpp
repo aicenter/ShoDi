@@ -4,6 +4,7 @@
 //
 
 #include <climits>
+#include <boost/numeric/conversion/cast.hpp>
 #include "FlagsGraph.h"
 
 //______________________________________________________________________________________________________________________
@@ -14,7 +15,7 @@ FlagsGraph::FlagsGraph(unsigned int n) {
 
 //______________________________________________________________________________________________________________________
 FlagsGraph::FlagsGraph(UpdateableGraph & g) {
-    unsigned int nodesCnt = g.nodes();
+    auto nodesCnt = g.nodes();
     neighbours.resize(nodesCnt);
     nodesData.resize(nodesCnt);
 
@@ -35,8 +36,8 @@ FlagsGraph::~FlagsGraph() = default;
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges) {
-    for(unsigned int i = 0; i < neighbours.size(); i++) {
-        for(unsigned int j = 0; j < neighbours[i].size(); j++) {
+    for(auto i = 0; i < neighbours.size(); i++) {
+        for(auto j = 0; j < neighbours[i].size(); j++) {
             allEdges.push_back(make_pair(i, QueryEdge(neighbours[i][j])));
         }
     }
@@ -44,7 +45,7 @@ void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > >
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::processOriginalEdges(vector < OutputEdge > & edges) {
-    for(unsigned int i = 0; i < edges.size(); i++) {
+    for(auto i = 0; i < edges.size(); i++) {
         unsigned int from, to, weight, flags;
         from = edges[i].sourceNode;
         to = edges[i].targetNode;
@@ -69,7 +70,7 @@ void FlagsGraph::processOriginalEdges(vector < OutputEdge > & edges) {
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::processShortcuts( vector < OutputShortcutEdge > & shortcuts) {
-    for(unsigned int i = 0; i < shortcuts.size(); i++) {
+    for(auto i = 0; i < shortcuts.size(); i++) {
         unsigned int from, to, weight, flags;
         from = shortcuts[i].sourceNode;
         to = shortcuts[i].targetNode;
@@ -99,7 +100,7 @@ void FlagsGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight
 
 //______________________________________________________________________________________________________________________
 unsigned int FlagsGraph::nodes() const {
-    return (unsigned int) neighbours.size();
+    return boost::numeric_cast<unsigned int>(neighbours.size());
 }
 
 //______________________________________________________________________________________________________________________

@@ -15,7 +15,7 @@ public:
 	 * (which can be updated with updateLastPrintedMessage()).
 	 */
 	ProgressBar(
-		uint32_t expectedIterations, const std::string& initialMessage = "");
+		size_t expectedIterations, const std::string& initialMessage = "");
 
 	/**
 	 * Destructor to guarantee RAII.
@@ -55,8 +55,8 @@ public:
 	void operator++();
 
 private:
-	unsigned int mTotalIterations;
-	unsigned int mNumberOfTicks;
+	size_t mTotalIterations;
+	size_t mNumberOfTicks;
 	bool mEnded;
 	size_t mLengthOfLastPrintedMessage;
 	std::mutex g_mutex;
