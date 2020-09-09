@@ -15,7 +15,7 @@ void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
     ofstream output;
     output.open(path + ".csv");
     if (!output.is_open()) {
-        printf("Couldn't open file '%s'!", (path + ".xdm").c_str());
+        printf("Couldn't open file '%s'!", (path + ".csv").c_str());
     }
 
     const vector<dist_t> &distances = dm.getRawData();
