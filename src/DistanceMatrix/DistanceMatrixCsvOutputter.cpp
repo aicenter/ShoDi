@@ -8,6 +8,7 @@
 #include <fstream>
 #include "DistanceMatrixCsvOutputter.h"
 #include "constants.h"
+#include "CLI/ProgressBar.hpp"
 
 void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
     printf("Storing the distance matrix.\n");
@@ -19,11 +20,14 @@ void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
 
     const vector<dist_t> &distances = dm.getRawData();
     const auto nodesCnt = dm.nodes();
+
+    ProgressBar progress(nodesCnt);
     for(size_t i = 0; i < distances.size(); i++) {
         output << distances[i];
 
         if ((i + 1) % nodesCnt == 0) {
             output << endl;
+            ++progress;
         } else {
             output << ",";
         }
