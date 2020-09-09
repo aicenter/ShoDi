@@ -109,7 +109,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
   const dist_t max = std::numeric_limits<dist_t>::max();
 
 #pragma omp parallel for
-  for (size_t i = 0; i < V; i++) {
+  for (long i = 0; i < V; i++) {
     dist[i] = max;
   }
   dist[src] = 0;
@@ -142,7 +142,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
 void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 
   size_t V = gr->V;
-  const unsigned int V_uint = boost::numeric_cast<unsigned int>(V);
+  const int V_uint = boost::numeric_cast<int>(V);
 
   // Make new graph for Bellman-Ford
   // First, a new node q is added to the graph, connected by zero-weight edges
@@ -158,7 +158,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   std::memset(&bf_graph->weights[gr->E], 0, V * sizeof(dist_t));
 
 #pragma omp parallel for
-  for (unsigned int e = 0; e < V_uint; e++) {
+  for (int e = 0; e < V_uint; e++) {
     bf_graph->edge_array[((size_t) e) + gr->E] = Edge(V_uint, e);
   }
 
@@ -178,7 +178,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   size_t ec = gr->E;
 
 #pragma omp parallel for
-  for (size_t e = 0; e < ec; e++) {
+  for (long e = 0; e < ec; e++) {
     unsigned int u = std::get<0>(gr->edge_array[e]);
     unsigned int v = std::get<1>(gr->edge_array[e]);
     gr->weights[e] = gr->weights[e] + h[u] - h[v];
@@ -189,7 +189,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   ProgressBar progress(V);
 
 #pragma omp parallel for schedule(dynamic)
-  for (unsigned int s = 0; s < V_uint; s++) {
+  for (int s = 0; s < V_uint; s++) {
     std::vector<dist_t> d(num_vertices(G));
     dijkstra_shortest_paths(G, s, boost::distance_map(&d[0]));
     for (size_t v = 0; v < V; v++) {
