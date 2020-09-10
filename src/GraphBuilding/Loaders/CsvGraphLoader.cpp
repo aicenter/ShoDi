@@ -12,9 +12,12 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <limits>
 #include <stdexcept>
+#include <iostream>
 
 #define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
 #include <csv2/reader.hpp>
+
+using namespace std;
 
 CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {}
 
@@ -23,7 +26,7 @@ typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
                      csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
     DefaultCSVReader;
 
-dist_t parse_distance(std::string str) {
+dist_t parse_distance(std::string str, std::string inputFile) {
   float val;
   try {
     val = stof(str);
@@ -36,6 +39,11 @@ dist_t parse_distance(std::string str) {
   }
 
   if(isnan(val)) {
+    return std::numeric_limits<dist_t>::max();
+  }
+
+  if(val < 0) {
+    cerr << "Warning: Found a negative value (" << val << ") in '" << inputFile << "'. It will be interpreted as 'no edge'." << endl;
     return std::numeric_limits<dist_t>::max();
   }
 
@@ -62,7 +70,7 @@ std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
       for (const auto &cell : row) {
         string val;
         cell.read_value(val);
-        adj[index++] = parse_distance(val);
+        adj[index++] = parse_distance(val, inputFile);
       }
       ++progress;
     }
@@ -96,7 +104,7 @@ Graph *CsvGraphLoader::loadGraph() {
       for (const auto &cell : row) {
         string val;
         cell.read_value(val);
-        const dist_t dist = parse_distance(val);
+        const dist_t dist = parse_distance(val, inputFile);
         if (dist != max)
           graph->addEdge(boost::numeric_cast<unsigned int>(i), boost::numeric_cast<unsigned int>(j), dist);
         ++j;
@@ -134,7 +142,7 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
       for (const auto &cell : row) {
         string val;
         cell.read_value(val);
-        const dist_t dist = parse_distance(val);
+        const dist_t dist = parse_distance(val, inputFile);
         if (dist != max)
           graph->addEdge(boost::numeric_cast<unsigned int>(i), boost::numeric_cast<unsigned int>(j), dist);
         ++j;
@@ -171,7 +179,7 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
       for (const auto &cell : row) {
         string val;
         cell.read_value(val);
-        const dist_t dist = parse_distance(val);
+        const dist_t dist = parse_distance(val, inputFile);
         if (dist != max)
           graph.addEdge(boost::numeric_cast<unsigned int>(i), boost::numeric_cast<unsigned int>(j), dist);
         ++j;
