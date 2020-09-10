@@ -85,6 +85,10 @@ From Source
 3. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
 4. `cmake --build . --target shortestPathsPreprocessor --config Release`
 
+There are also additional build targets such as `shortestPaths` (which is just
+the library, excluding the standalone application), `doc` (the documentation
+- requires Doxygen to be installed), `tests` and `thesisTests`.
+
 Usage
 =====
 
