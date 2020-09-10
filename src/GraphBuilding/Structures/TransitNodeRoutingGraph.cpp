@@ -3,6 +3,7 @@
 // Created on: 06.08.19
 //
 
+#include <boost/numeric/conversion/cast.hpp>
 #include <climits>
 #include "TransitNodeRoutingGraph.h"
 
@@ -79,7 +80,9 @@ void TransitNodeRoutingGraph::accessNodesTest(DistanceMatrix & dm) {
     unsigned int allAccessNodes = 0;
     unsigned int invalidDistanceNodes = 0;
 
-    for(size_t i = 0; i < forwardAccessNodes.size(); ++i) {
+    const unsigned int fwNodesCnt = boost::numeric_cast<unsigned int>(forwardAccessNodes.size());
+
+    for(unsigned int i = 0; i < fwNodesCnt; ++i) {
         for(size_t j = 0; j < forwardAccessNodes[i].size(); ++j) {
             allAccessNodes++;
             if(forwardAccessNodes[i][j].distanceToNode != dm.findDistance(i, forwardAccessNodes[i][j].accessNodeID)) {

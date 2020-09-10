@@ -58,6 +58,6 @@ void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned 
     }
 
     cout << "Finished paths validation." << endl;
-    cout << "Found '" << pathMismatches << "' path mismatches (" << (double) pathMismatches / trips.size() * 100 << " %)" << endl;
-    cout << "Found '" << distanceSumMismatches << "' distance sum mismatches (" << (double) distanceSumMismatches / trips.size() * 100 << " %)" << endl;
+    cout << "Found '" << pathMismatches << "' path mismatches (" << (double) pathMismatches / (double) trips.size() * 100 << " %)" << endl;
+    cout << "Found '" << distanceSumMismatches << "' distance sum mismatches (" << (double) distanceSumMismatches / (double) trips.size() * 100 << " %)" << endl;
 }

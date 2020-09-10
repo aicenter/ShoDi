@@ -222,7 +222,9 @@ void UpdateableGraph::flushTerminator(ostream & output) {
 
 //______________________________________________________________________________________________________________________
 void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
-   for(size_t i = 0; i < followingNodes.size(); i++) {
+   const unsigned int followingNodesCnt = boost::numeric_cast<unsigned int>(followingNodes.size());
+
+   for(unsigned int i = 0; i < followingNodesCnt; i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;
@@ -257,7 +259,9 @@ void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vec
 void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
     vector<pair<pair<unsigned int, unsigned int>, PreprocessingEdgeData>> removedEdges;
 
-    for(size_t i = 0; i < followingNodes.size(); i++) {
+   const unsigned int followingNodesCnt = boost::numeric_cast<unsigned int>(followingNodes.size());
+
+   for(unsigned int i = 0; i < followingNodesCnt; i++) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
             if (ranks[i] < ranks[(*iter).first]) {
                 unsigned int flags = 1;

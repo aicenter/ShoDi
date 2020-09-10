@@ -52,9 +52,9 @@ void DistanceMatrix::printInfo() {
 
     const auto optCount = distances.size();
     cout << "Computed distance matrix info." << endl;
-    cout << "Distance matrix contains " << maxCnt << " UINF values. That is " << (double) maxCnt / optCount << " %." << endl;
+    cout << "Distance matrix contains " << maxCnt << " UINF values. That is " << (double) maxCnt / (double) optCount << " %." << endl;
     cout << "Distance matrix contains " << halfCnt << " values that are at least half of std::numeric_limits<dist_t>::max(). That is "
-        << (double) halfCnt / optCount << " %." << endl;
+        << (double) halfCnt / (double) optCount << " %." << endl;
 }
 
 const vector<dist_t> &DistanceMatrix::getRawData() {

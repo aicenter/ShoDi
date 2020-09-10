@@ -23,10 +23,10 @@ void Timer::finish() {
 
 //______________________________________________________________________________________________________________________
 void Timer::printMeasuredTime() {
-    printf("Timer '%s' counted %lf seconds.\n", name.c_str(), (std::chrono::duration_cast<std::chrono::microseconds>(finishTimePoint - beginTimePoint).count()) /1000000.0);
+    printf("Timer '%s' counted %lf seconds.\n", name.c_str(), ((double) std::chrono::duration_cast<std::chrono::microseconds>(finishTimePoint - beginTimePoint).count()) /1000000.0);
 }
 
 //______________________________________________________________________________________________________________________
 double Timer::getMeasuredTimeInSeconds() {
-    return (std::chrono::duration_cast<std::chrono::microseconds>(finishTimePoint - beginTimePoint).count()) /1000000.0;
+    return ((double) std::chrono::duration_cast<std::chrono::microseconds>(finishTimePoint - beginTimePoint).count()) /1000000.0;
 }

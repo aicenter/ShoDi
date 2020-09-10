@@ -17,9 +17,7 @@ namespace
 		ss << " " << std::setw(3) << std::right << percentage << "% ";
 		std::string bar("[" + std::string(LENGTH_OF_PROGRESS_BAR - 2, ' ') + "]");
 
-		unsigned int numberOfSymbols = std::min(
-			std::max(0, progress - 1),
-			LENGTH_OF_PROGRESS_BAR - 2);
+		unsigned int numberOfSymbols = (unsigned int) std::min(std::max(0, progress - 1), LENGTH_OF_PROGRESS_BAR - 2);
 
 		bar.replace(1, numberOfSymbols, std::string(numberOfSymbols, '|'));
 
@@ -54,7 +52,7 @@ void ProgressBar::operator++()
 
 	mNumberOfTicks = std::min(mTotalIterations, mNumberOfTicks + 1);
 	const unsigned int percentage = static_cast<unsigned int>(
-		mNumberOfTicks * 100.0 / mTotalIterations);
+		(double) mNumberOfTicks * 100.0 / (double) mTotalIterations);
 
 	std::cout << generateProgressBar(percentage) << "\r" << std::flush;
 	g_mutex.unlock();
@@ -74,7 +72,7 @@ void ProgressBar::printNewMessage(const std::string& message)
 		<< message << "\n";
 	mLengthOfLastPrintedMessage = message.size();
 	const unsigned int percentage = static_cast<unsigned int>(
-		mNumberOfTicks * 100.0 / mTotalIterations);
+		(double) mNumberOfTicks * 100.0 / (double) mTotalIterations);
 
 	std::cout << generateProgressBar(percentage) << "\r" << std::flush;
 
@@ -90,7 +88,7 @@ void ProgressBar::updateLastPrintedMessage(const std::string& message)
 
 	std::cout << "\r\033[F"
 		<< std::left
-		<< std::setw(mLengthOfLastPrintedMessage)
+		<< std::setw((int) mLengthOfLastPrintedMessage)
 		<< message << "\n";
 	mLengthOfLastPrintedMessage = message.size();
 }

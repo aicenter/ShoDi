@@ -109,7 +109,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
   const dist_t max = std::numeric_limits<dist_t>::max();
 
 #pragma omp parallel for
-  for (long i = 0; i < V; i++) {
+  for (long long i = 0; i < (long long) V; i++) {
     dist[i] = max;
   }
   dist[src] = 0;
@@ -178,7 +178,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   size_t ec = gr->E;
 
 #pragma omp parallel for
-  for (long e = 0; e < ec; e++) {
+  for (long long e = 0; e < (long long) ec; e++) {
     unsigned int u = std::get<0>(gr->edge_array[e]);
     unsigned int v = std::get<1>(gr->edge_array[e]);
     gr->weights[e] = gr->weights[e] + h[u] - h[v];
@@ -191,7 +191,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
 #pragma omp parallel for schedule(dynamic)
   for (int s = 0; s < V_uint; s++) {
     std::vector<dist_t> d(num_vertices(G));
-    dijkstra_shortest_paths(G, s, boost::distance_map(&d[0]));
+    dijkstra_shortest_paths(G, (unsigned long) s, boost::distance_map(&d[0]));
     for (size_t v = 0; v < V; v++) {
       output[((size_t) s) * V + v] = d[v] + h[v] - h[s];
     }

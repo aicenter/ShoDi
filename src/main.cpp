@@ -9,6 +9,7 @@
 #include <cstring>
 #include <memory>
 #include <iostream>
+#include <boost/numeric/conversion/cast.hpp>
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
@@ -103,7 +104,7 @@ void createTNRFast(
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessUsingCH(*graph, outputFilePath, atol(transitNodeSetSize));
+    TNRPreprocessor::preprocessUsingCH(*graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
     timer.finish();
     timer.printMeasuredTime();
@@ -131,7 +132,7 @@ void createTNRSlow(
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessUsingCHslower(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize));
+    TNRPreprocessor::preprocessUsingCHslower(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
     timer.finish();
     timer.printMeasuredTime();
@@ -159,7 +160,7 @@ void createTNRUsingDM(
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize));
+    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
     timer.finish();
     timer.printMeasuredTime();
@@ -214,7 +215,7 @@ void createTNRAFSlow(
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize), 32, false);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, false);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -244,7 +245,7 @@ void createTNRAFUsingDM(
     CHPreprocessor::preprocessForDDSG(*graph);
     graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, atol(transitNodeSetSize), 32, true);
+    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, true);
 
     timer.finish();
     timer.printMeasuredTime();
@@ -350,7 +351,7 @@ void benchmarkDijkstra(
     delete dijkstraGraph;
 
     cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds." << endl;
-    cout << "That means " << (dijkstraTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (dijkstraTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
@@ -405,7 +406,7 @@ void benchmarkDijkstraWithMapping(
 
     cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds" << endl;
     cout << "using '" << mappingFilePath << "' as mapping." << endl;
-    cout << "That means " << (dijkstraTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (dijkstraTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
 
     if (outputDistances) {
@@ -455,7 +456,7 @@ void benchmarkCH(
     delete ch;
 
     cout << "Run " << trips.size() << " queries using Contraction Hierarchies query algorithm in " << chTime << " seconds." << endl;
-    cout << "That means " << (chTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (chTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
@@ -508,7 +509,7 @@ void benchmarkCHwithMapping(
 
     cout << "Run " << trips.size() << " queries using Contraction Hierarchies query algorithm in " << chTime << " seconds" << endl;
     cout << "using '" << mappingFilePath << "' as mapping." << endl;
-    cout << "That means " << (chTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (chTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
@@ -557,7 +558,7 @@ void benchmarkTNR(
     delete tnrGraph;
 
     cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrTime << " seconds." << endl;
-    cout << "That means " << (tnrTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (tnrTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
@@ -609,7 +610,7 @@ void benchmarkTNRwithMapping(
     delete tnrGraph;
 
     cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrTime << " seconds." << endl;
-    cout << "That means " << (tnrTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (tnrTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
@@ -659,7 +660,7 @@ void benchmarkTNRAF(
     delete tnrafGraph;
 
     cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrafTime << " seconds." << endl;
-    cout << "That means " << (tnrafTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (tnrafTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;
@@ -712,7 +713,7 @@ void benchmarkTNRAFwithMapping(
     delete tnrafGraph;
 
     cout << "Run " << trips.size() << " queries using Transit Node Routing query algorithm in " << tnrafTime << " seconds." << endl;
-    cout << "That means " << (tnrafTime / trips.size()) * 1000 << " ms per query." << endl;
+    cout << "That means " << (tnrafTime / (double) trips.size()) * 1000 << " ms per query." << endl;
 
     if (outputDistances) {
         cout << "Now outputting distances to '" << distancesOutputPath << "'." << endl;

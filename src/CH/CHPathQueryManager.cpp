@@ -4,6 +4,7 @@
 //
 
 #include <climits>
+#include <cstddef>
 #include "CHPathQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "../GraphBuilding/Structures/constants_defines.h"
@@ -443,8 +444,8 @@ void CHPathQueryManager::fillToPath(const unsigned int meetingNode, vector<pair<
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::unpackPrevious(vector<pair<unsigned int, unsigned int> > & fromPath) {
-    for(size_t i = fromPath.size()-1; i >= 0; i--) {
-        unpackForwardEdge(fromPath[i].first, fromPath[i].second);
+    for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
+        unpackForwardEdge(fromPath[(size_t) i].first, fromPath[(size_t) i].second);
     }
 }
 
@@ -457,8 +458,8 @@ void CHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsigned int>
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getPreviousPathPart(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
-    for(size_t i = fromPath.size()-1; i >= 0; i--) {
-        getForwardEdge(fromPath[i].first, fromPath[i].second, edges, edgeLengths);
+    for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
+        getForwardEdge(fromPath[(size_t) i].first, fromPath[(size_t) i].second, edges, edgeLengths);
     }
 }
 
@@ -471,8 +472,8 @@ void CHPathQueryManager::getFollowingPathPart(vector<pair<unsigned int, unsigned
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges) {
-    for(size_t i = fromPath.size()-1; i >= 0; i--) {
-        getForwardEdgeWithoutLength(fromPath[i].first, fromPath[i].second, edges);
+    for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
+        getForwardEdgeWithoutLength(fromPath[(size_t) i].first, fromPath[(size_t) i].second, edges);
     }
 }
 
@@ -485,8 +486,8 @@ void CHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int,
 
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<SimpleEdge> & path) {
-    for(size_t i = fromPath.size()-1; i >= 0; i--) {
-        getForwardEdgeWithoutLength(fromPath[i].first, fromPath[i].second, path);
+    for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
+        getForwardEdgeWithoutLength(fromPath[(size_t) i].first, fromPath[(size_t) i].second, path);
     }
 }
 
