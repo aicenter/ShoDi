@@ -10,47 +10,36 @@
 #include "GraphBuilding/Structures/Graph.h"
 #include "GraphBuilding/Structures/UpdateableGraph.h"
 #include <boost/numeric/conversion/cast.hpp>
-#include <algorithm>
-#include <cctype>
-#include <climits>
-#include <cmath>
+#include <limits>
+#include <stdexcept>
 
 #define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
 #include <csv2/reader.hpp>
-
-#include <limits>
-#include <stdexcept>
-#include <string>
 
 CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {}
 
 typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
                      csv2::first_row_is_header<false>,
-                     csv2::trim_policy::trim_whitespace>
+                     csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
     DefaultCSVReader;
 
-inline bool stricmp(const string s1, const string s2) {
-  size_t size1 = s1.size();
-
-  if (size1 != s2.size())
-    return false;
-
-  for(size_t i = 0; i < size1; ++i) {
-    if (tolower(s1[i]) != tolower(s2[i]))
-      return false;
-  }
-
-  return true;
-}
-
-const string NAN_STR = string("nan");
-
 dist_t parse_distance(std::string str) {
-  if (stricmp(str, NAN_STR)) {
-    return std::numeric_limits<dist_t>::max();
-  } else {
-    return (dist_t)round(stof(str));
+  float val;
+  try {
+    val = stof(str);
   }
+  catch(std::invalid_argument &e) {
+    return std::numeric_limits<dist_t>::max();
+  }
+  catch(std::out_of_range &e) {
+    return std::numeric_limits<dist_t>::max();
+  }
+
+  if(isnan(val)) {
+    return std::numeric_limits<dist_t>::max();
+  }
+
+  return (dist_t) round(val);
 }
 
 std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
@@ -69,8 +58,8 @@ std::vector<dist_t> CsvGraphLoader::loadAdjacencyMatrix() {
     ProgressBar progress(size, "Loading CSV file:");
 
     size_t index = 0;
-    for (const auto row : reader) {
-      for (const auto cell : row) {
+    for (const auto &row : reader) {
+      for (const auto &cell : row) {
         string val;
         cell.read_value(val);
         adj[index++] = parse_distance(val);
@@ -102,9 +91,9 @@ Graph *CsvGraphLoader::loadGraph() {
     ProgressBar progress(size, "Loading CSV file:");
 
     size_t i = 0;
-    for (const auto row : reader) {
+    for (const auto &row : reader) {
       size_t j = 0;
-      for (const auto cell : row) {
+      for (const auto &cell : row) {
         string val;
         cell.read_value(val);
         const dist_t dist = parse_distance(val);
@@ -140,9 +129,9 @@ UpdateableGraph *CsvGraphLoader::loadUpdateableGraph() {
     ProgressBar progress(size, "Loading CSV file:");
 
     size_t i = 0;
-    for (const auto row : reader) {
+    for (const auto &row : reader) {
       size_t j = 0;
-      for (const auto cell : row) {
+      for (const auto &cell : row) {
         string val;
         cell.read_value(val);
         const dist_t dist = parse_distance(val);
@@ -177,9 +166,9 @@ void CsvGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) {
     ProgressBar progress(size, "Loading CSV file:");
 
     size_t i = 0;
-    for (const auto row : reader) {
+    for (const auto &row : reader) {
       size_t j = 0;
-      for (const auto cell : row) {
+      for (const auto &cell : row) {
         string val;
         cell.read_value(val);
         const dist_t dist = parse_distance(val);
