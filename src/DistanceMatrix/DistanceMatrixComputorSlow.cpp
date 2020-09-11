@@ -20,7 +20,7 @@
 void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
     const unsigned int nodesCnt = graph.nodes();
 
-    distanceTable.resize(((dist_t) nodesCnt) * ((dist_t) nodesCnt));
+    distanceTable.resize(((size_t) nodesCnt) * ((size_t) nodesCnt));
 
     for (unsigned int i = 0; i < nodesCnt; ++i) {
         if (i % 100 == 0) {
@@ -36,7 +36,7 @@ void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
 void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Graph & graph) {
     const unsigned int nodesCnt = graph.nodes();
 
-    distanceTable.resize(((dist_t) nodesCnt) * ((dist_t) nodesCnt));
+    distanceTable.resize(((size_t) nodesCnt) * ((size_t) nodesCnt));
 
     for (unsigned int i = 0; i < nodesCnt; ++i) {
         if (i % 100 == 0) {
