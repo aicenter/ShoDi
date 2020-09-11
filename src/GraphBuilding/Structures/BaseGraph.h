@@ -33,6 +33,8 @@ public:
    * @return The amount of nodes in the graph.
    */
   virtual unsigned int nodes() const = 0;
+
+  virtual ~BaseGraph() = default;
 };
 
 #endif /* end of include guard: BASEGRAPH_H_IQX7DWCB */

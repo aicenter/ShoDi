@@ -43,14 +43,15 @@ size_t DIMACSLoader::edges() {
   return edgesAmount;
 }
 
-void DIMACSLoader::loadGraph(BaseGraph &graph) {
+
+void DIMACSLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
   parseAmounts();
 
   if (instanceof <SimpleGraph>(graph) || instanceof <UpdateableGraph>(graph)) {
-    parseEdges(input, graph, edgesAmount);
+    parseEdges(input, graph, edgesAmount, precisionLoss);
   } else {
     SimpleGraph sg(nodesAmount);
-    parseEdges(input, graph, edgesAmount);
+    parseEdges(input, graph, edgesAmount, precisionLoss);
 
     for (unsigned int i = 0; i < nodesAmount; i++) {
       for (auto &p : sg.edges(i)) {
@@ -97,7 +98,7 @@ void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes,
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(ifstream &input, BaseGraph &graph, size_t edges) {
+void DIMACSLoader::parseEdges(ifstream &input, BaseGraph &graph, size_t edges, unsigned int precisionLoss) {
   size_t loadededgescnt = 0;
   while (loadededgescnt < edges) {
     string buffer;
@@ -106,6 +107,9 @@ void DIMACSLoader::parseEdges(ifstream &input, BaseGraph &graph, size_t edges) {
       unsigned int from, to;
       dist_t weight;
       getEdge(buffer, from, to, weight);
+
+      weight /= precisionLoss;
+
       if (from != to) {
         graph.addEdge(from, to, weight);
       }

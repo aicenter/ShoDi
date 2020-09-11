@@ -63,6 +63,19 @@ void UpdateableGraph::addAllEdges(UpdateableGraph &other) {
 }
 
 //______________________________________________________________________________________________________________________
+void UpdateableGraph::addAllEdges(Graph &other) {
+   const auto n = nodes();
+   if (n != other.nodes())
+      throw runtime_error("Cannot execute UpdateableGraph::addAllEdges: Graphs have different amounts of nodes.");
+
+   for (unsigned int i = 0; i < n; ++i) {
+      for(auto &p : other.outgoingEdges(i)) {
+         addEdge(i, p.first, p.second);
+      }
+   }
+}
+
+//______________________________________________________________________________________________________________________
 bool UpdateableGraph::addShortcutEdge(unsigned int from, unsigned int to, dist_t weight, unsigned int middlenode) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to).weight > weight) {

@@ -43,7 +43,7 @@ void createCH(
 
     XenGraphLoader graphLoader(inputFilePath);
     UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1);
+    graphLoader.loadGraph(g1, 1);
 
     UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
@@ -68,15 +68,16 @@ void createTNR(
     timer.begin();
 
     XenGraphLoader graphLoader(inputFilePath);
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1);
-    Graph *originalGraph = g1.createCopy();
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, 1);
+    Graph *originalGraph = graph.createCopy();
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graph.addAllEdges(*originalGraph);
 
     TNRPreprocessor::preprocessWithDMvalidation(graph, *originalGraph, outputFilePath, transitNodeSetSize);
+
+    delete originalGraph;
 
     timer.finish();
     timer.printMeasuredTime();
@@ -96,15 +97,16 @@ void createTNRAF(
     timer.begin();
 
     XenGraphLoader graphLoader(inputFilePath);
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1);
-    Graph *originalGraph = g1.createCopy();
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, 1);
+    Graph *originalGraph = graph.createCopy();
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graph.addAllEdges(*originalGraph);
 
     TNRAFPreprocessor::preprocessUsingCH(graph, *originalGraph, outputFilePath, transitNodeSetSize, 32, true);
+
+    delete originalGraph;
 
     timer.finish();
     timer.printMeasuredTime();
@@ -125,7 +127,7 @@ void createDM(
     XenGraphLoader dijkstraGraphLoader(inputFilePath);
 
     DistanceMatrixComputorSlow dmComputor;
-    dmComputor.computeDistanceMatrix(dijkstraGraphLoader);
+    dmComputor.computeDistanceMatrix(dijkstraGraphLoader, 1);
 
     DistanceMatrix * dm = dmComputor.getDistanceMatrixInstance();
     DistanceMatrixXdmOutputter outputter;
@@ -167,7 +169,7 @@ void computeStructuresForAllMethodsBerlin(char const * inputFilePath = "../thesi
  * @param inputFilePath[in] The path to the graph of SouthwestBohemia in the XenGraph format.
  */
 void computeStructuresForAllMethodsSouthwestBohemia(char const * inputFilePath = "../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng") {
-    createCH(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
+    //createCH(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
     createTNR(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
     createTNRAF(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
     createDM(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
@@ -213,7 +215,7 @@ void computeTNRAFvariousTransitNodeSetSizes(char const * inputFilePath = "../the
 void compareAllMethodsOnPrague(unsigned int runs = 20) {
     XenGraphLoader dijkstraGraphLoader("../thesisTestsData/Prague/Prague.xeng");
     Graph dijkstraGraph(dijkstraGraphLoader.nodes());
-    dijkstraGraphLoader.loadGraph(dijkstraGraph);
+    dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Prague/Prague.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
@@ -319,7 +321,7 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
 void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     XenGraphLoader dijkstraGraphLoader("../thesisTestsData/Berlin/Berlin.xeng");
     Graph dijkstraGraph(dijkstraGraphLoader.nodes());
-    dijkstraGraphLoader.loadGraph(dijkstraGraph);
+    dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Berlin/Berlin.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
@@ -425,7 +427,7 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
 void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     XenGraphLoader dijkstraGraphLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
     Graph dijkstraGraph(dijkstraGraphLoader.nodes());
-    dijkstraGraphLoader.loadGraph(dijkstraGraph);
+    dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
@@ -725,12 +727,12 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
 int main() {
     setbuf(stdout, NULL);
 
-    computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");
-    computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
-    computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
+    //computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");
+    //computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
+    //computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
 
-    computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
-    computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
+    //computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
+    //computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
 
     compareAllMethodsOnPrague(20);
     compareAllMethodsOnBerlin(20);

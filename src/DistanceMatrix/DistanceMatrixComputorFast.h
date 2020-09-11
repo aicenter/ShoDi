@@ -16,7 +16,7 @@ using namespace std;
 
 class DistanceMatrixComputorFast : public DistanceMatrixComputor {
 public:
-    void computeDistanceMatrix(GraphLoader &graphLoader) override;
+    void computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss) override;
 
     DistanceMatrix * getDistanceMatrixInstance() override;
 

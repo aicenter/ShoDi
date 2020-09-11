@@ -31,8 +31,10 @@ public:
      *
      * @param graphLoader[in] instance of GraphLoader that will provide the graph
      * for which we want to compute the distance matrix.
+     * @param[in] precisionLoss This parameter allows us to lose some precision
+     * of the weight values. Each loaded weight will be divided by this value before rounding.
      */
-    virtual void computeDistanceMatrix(GraphLoader &graphLoader) = 0;
+    virtual void computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss) = 0;
 
     /**
      * Allows us to get a DistanceMatrix instance immediately from the DistanceMatrixComputor without the need to first

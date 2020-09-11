@@ -28,6 +28,8 @@ public:
    * Retrieve the adjacency matrix itself
    */
   std::vector<dist_t> matrix();
+
+  ~AdjMatrixGraph() = default;
 };
 
 #endif /* end of include guard: ADJMATRIXGRAPH_H_8R9FHUCS */

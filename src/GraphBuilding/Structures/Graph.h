@@ -74,6 +74,8 @@ public:
      * @return All the edges in the graph that have 'x' as their source node.
      */
     const vector<pair<unsigned int, dist_t>> & outgoingEdges(const unsigned int x)const;
+
+    ~Graph() = default;
 };
 
 #endif //TRANSIT_NODE_ROUTING_GRAPH_H

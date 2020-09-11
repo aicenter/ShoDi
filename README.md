@@ -120,7 +120,7 @@ create <method name> <method specific arg 1>  <method specific arg 2>...
 To preprocess a graph using Contraction Hierarchies, call the preprocessor with the following arguments:
 
 ```
-create ch <input_format> <input_file> <output_file>
+create ch <input_format> <input_file> <output_file> [<precision_loss>]
 ```
 
 where:
@@ -128,6 +128,8 @@ where:
  * `input_format` is one of `xengraph`, `dimacs`, `csv`
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the `.ch` extension will be added automatically)
+ * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
+Each loaded weight will be divided by this value before rounding. (default: 1)
 
 
 ##### Example Usage
@@ -141,7 +143,7 @@ create ch xengraph my_graph.xeng my_graph
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create tnr <input_format> <preprocessing_mode> <tnodes_cnt> <input_file> <output_file>
+create tnr <input_format> <preprocessing_mode> <tnodes_cnt> <input_file> <output_file> [<precision_loss>]
 ```
 
 where:
@@ -153,6 +155,8 @@ where:
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added 
 	automatically)
+ * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
+Each loaded weight will be divided by this value before rounding. (default: 1)
 
 ##### Preprocessing Mode
 
@@ -180,7 +184,7 @@ create tnr xengraph dm 1000 my_graph.xeng my_graph
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create tnraf <input_format> <preprocessing_mode> <tnodes_cnt> <input_file> <output_file>
+create tnraf <input_format> <preprocessing_mode> <tnodes_cnt> <input_file> <output_file> [<precision_loss>]
 ```
 
 where:
@@ -192,6 +196,8 @@ where:
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added 
 	automatically)
+ * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
+Each loaded weight will be divided by this value before rounding. (default: 1)
 
 
 ##### Example Usage
@@ -205,7 +211,7 @@ create tnraf xengraph dm 1000 my_graph.xeng my_graph
 To generate the distance matrix of a graph, call the preprocessor with the following arguments:
 
 ```
-create dm <input_format> <output_format> <preprocessing_mode> <input_file> <output_file>
+create dm <input_format> <output_format> <preprocessing_mode> <input_file> <output_file> [<precision_loss>]
 ```
 
 where:
@@ -216,6 +222,8 @@ where:
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on 
 	`output_format` will be added automatically)
+ * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
+Each loaded weight will be divided by this value before rounding. (default: 1)
 
 ##### Preprocessing Mode
 

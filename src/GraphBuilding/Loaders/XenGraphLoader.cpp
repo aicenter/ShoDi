@@ -53,10 +53,13 @@ size_t XenGraphLoader::edges() {
   return edgesAmount;
 }
 
-void XenGraphLoader::parseEdges(BaseGraph &graph) {
+void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
   unsigned int from, to, oneWayFlag, weight;
   for (size_t i = 0; i < edgesAmount; i++) {
     input >> from >> to >> weight >> oneWayFlag;
+
+    weight /= precisionLoss;
+
     if (from != to) {
       if (oneWayFlag == 1) {
         graph.addEdge(from, to, weight);
@@ -68,14 +71,14 @@ void XenGraphLoader::parseEdges(BaseGraph &graph) {
   }
 }
 
-void XenGraphLoader::loadGraph(BaseGraph &graph) {
+void XenGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
   parseAmounts();
 
   if (instanceof <SimpleGraph>(graph) || instanceof <UpdateableGraph>(graph)) {
-    parseEdges(graph);
+    parseEdges(graph, precisionLoss);
   } else {
     SimpleGraph sg(nodesAmount);
-    parseEdges(sg);
+    parseEdges(sg, precisionLoss);
 
     for (unsigned int i = 0; i < nodesAmount; i++) {
       for (auto &p : sg.edges(i)) {

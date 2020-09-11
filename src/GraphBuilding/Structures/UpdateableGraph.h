@@ -177,6 +177,13 @@ public:
     void addAllEdges(UpdateableGraph &other);
 
     /**
+     * Executes `addEdge` for every edge in `other`.
+     *
+     * @param other[in] The source graph to add edges from
+     */
+    void addAllEdges(Graph &other);
+
+    /**
      * Tries to insert an shortcut edge from one node to another with the given weight into the graph. The edge is not
      * inserted if there already exists an edge connecting the two nodes with a lower weight. With shortcut edges,
      * we additionally need to keep track of the middle node for the shortcut, in order to be able to later unpack the
@@ -283,6 +290,8 @@ public:
      */
      unsigned int degree(
             unsigned int node)const;
+
+     ~UpdateableGraph() = default;
 };
 
 

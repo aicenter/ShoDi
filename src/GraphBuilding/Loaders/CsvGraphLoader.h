@@ -26,7 +26,7 @@ private:
 public:
     CsvGraphLoader(string inputFile);
 
-    void loadGraph(BaseGraph &graph) override;
+    void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
 
     unsigned int nodes() override;
 

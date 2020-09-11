@@ -23,10 +23,10 @@ CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {
   }
 }
 
-dist_t parse_distance(std::string str, std::string inputFile) {
-  float val;
+dist_t parse_distance(std::string str, std::string inputFile, double precisionLoss) {
+  double val;
   try {
-    val = stof(str);
+    val = stod(str);
   }
   catch(std::invalid_argument &e) {
     return std::numeric_limits<dist_t>::max();
@@ -44,14 +44,14 @@ dist_t parse_distance(std::string str, std::string inputFile) {
     return std::numeric_limits<dist_t>::max();
   }
 
-  return (dist_t) round(val);
+  return (dist_t) round(val / (double) precisionLoss);
 }
 
 unsigned int CsvGraphLoader::nodes() {
   return boost::numeric_cast<unsigned int>(reader.cols());
 }
 
-void CsvGraphLoader::loadGraph(BaseGraph &graph) {
+void CsvGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
     const unsigned int size = nodes();
 
     if (size != reader.rows())
@@ -69,7 +69,7 @@ void CsvGraphLoader::loadGraph(BaseGraph &graph) {
       for (const auto &cell : row) {
         string val;
         cell.read_value(val);
-        const dist_t dist = parse_distance(val, inputFile);
+        const dist_t dist = parse_distance(val, inputFile, (double) precisionLoss);
         if (dist != max)
           graph.addEdge(i, j, dist);
         ++j;

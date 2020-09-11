@@ -55,6 +55,8 @@ public:
      * @return A map containing all the edges in the graph that have 'x' as their source node along with their weights.
      */
     const map<unsigned int, dist_t> & edges(unsigned int x)const;
+
+    ~SimpleGraph() = default;
 };
 
 
