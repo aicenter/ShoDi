@@ -115,8 +115,11 @@ add_library(shortestPaths SHARED
         src/GraphBuilding/Structures/FlagsGraph.h
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
+        src/GraphBuilding/Structures/BaseGraph.h
         src/GraphBuilding/Structures/Graph.cpp
         src/GraphBuilding/Structures/Graph.h
+        src/GraphBuilding/Structures/AdjMatrixGraph.cpp
+        src/GraphBuilding/Structures/AdjMatrixGraph.h
         src/GraphBuilding/Structures/OutputEdge.cpp
         src/GraphBuilding/Structures/OutputEdge.h
         src/GraphBuilding/Structures/OutputShortcutEdge.cpp

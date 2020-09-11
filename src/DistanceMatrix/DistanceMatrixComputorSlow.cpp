@@ -7,6 +7,7 @@
 #include <climits>
 #include <cstddef>
 #include <fstream>
+#include <iostream>
 #include <limits>
 #include <queue>
 #include <stdexcept>
@@ -98,9 +99,10 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrix(GraphLoader &graphLoader) {
-    auto * graph = graphLoader.loadGraph();
-    computeDistanceMatrix(*graph);
-    delete graph;
+    Graph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph);
+
+    computeDistanceMatrix(graph);
 }
 
 //______________________________________________________________________________________________________________________

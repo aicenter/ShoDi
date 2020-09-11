@@ -12,7 +12,7 @@
 
 using namespace johnson;
 
-graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
+graph_t *johnson::johnson_init(const std::vector<dist_t> &adj_matrix) {
   const dist_t max = std::numeric_limits<dist_t>::max();
   size_t E = 0;
   for (size_t i = 0; i < adj_matrix.size(); i++) {

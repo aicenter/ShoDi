@@ -20,7 +20,7 @@ typedef struct graph {
   std::vector<dist_t> weights;
 } graph_t;
 
-graph_t *johnson_init(std::vector<dist_t>);
+graph_t *johnson_init(const std::vector<dist_t>&);
 
 graph_t *johnson_init2(const unsigned int n, const double p,
                        const unsigned long seed);

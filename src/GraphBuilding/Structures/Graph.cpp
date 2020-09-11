@@ -28,9 +28,10 @@ Graph::Graph(SimpleGraph & x) {
 }
 
 //______________________________________________________________________________________________________________________
-void Graph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
+bool Graph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     this->followingNodes.at(from).push_back(make_pair(to, weight));
     this->previousNodes.at(to).push_back(make_pair(from, weight));
+    return true;
 }
 
 //______________________________________________________________________________________________________________________

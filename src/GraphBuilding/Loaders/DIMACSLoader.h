@@ -6,10 +6,12 @@
 #ifndef TRANSIT_NODE_ROUTING_LOADER_H
 #define TRANSIT_NODE_ROUTING_LOADER_H
 
+#include <fstream>
 #include <string>
 #include <map>
 #include "../Structures/Graph.h"
 #include "../Structures/UpdateableGraph.h"
+#include "GraphBuilding/Structures/BaseGraph.h"
 #include "GraphLoader.h"
 
 using namespace std;
@@ -26,6 +28,12 @@ using namespace std;
 class DIMACSLoader : public GraphLoader {
 private:
     string inputFile;
+    ifstream input;
+    bool amountsParsed;
+    unsigned int nodesAmount;
+    size_t edgesAmount;
+
+    void parseAmounts();
 
     /**
      * Auxiliary function used to parse the problem line of the input file (first line that is not a comment).
@@ -37,22 +45,13 @@ private:
     void parseGraphProblemLine(ifstream & input, unsigned int & nodes, size_t & edges);
 
     /**
-     Auxiliary function used to parse the edges when loading the graph.
-     *
-     * @param input[in] The input stream corresponding to the input file.
-     * @param graph[in, out] The graph instance that the edges will be inserted into.
-     * @param edges[in] The number of edges that need to be loaded.
-     */
-    void parseEdges(ifstream & input, SimpleGraph & graph, size_t edges);
-
-    /**
      * Auxiliary function used to parse the edges when loading the graph.
      *
      * @param input[in] The input stream corresponding to the input file.
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
      */
-    void parseEdges(ifstream & input, UpdateableGraph & graph, size_t edges);
+    void parseEdges(ifstream & input, BaseGraph & graph, size_t edges);
 
     /**
      * Auxiliary function that extracts the number of nodes and the number of edges from the problem line.
@@ -81,13 +80,11 @@ public:
      */
     explicit DIMACSLoader(string inputFile);
 
-    vector<dist_t> loadAdjacencyMatrix() override;
+    unsigned int nodes() override;
 
-    Graph *loadGraph() override;
+    size_t edges();
 
-    UpdateableGraph *loadUpdateableGraph() override;
-
-    void putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) override;
+    void loadGraph(BaseGraph &graph) override;
 
     ~DIMACSLoader() override = default;
 };

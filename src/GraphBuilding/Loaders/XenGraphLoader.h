@@ -8,9 +8,11 @@
 
 #include <string>
 #include <map>
+#include <fstream>
 #include "../Structures/Graph.h"
 #include "../Structures/SimpleGraph.h"
 #include "../Structures/UpdateableGraph.h"
+#include "GraphBuilding/Structures/BaseGraph.h"
 #include "GraphLoader.h"
 
 /**
@@ -23,15 +25,10 @@
 class XenGraphLoader : public GraphLoader {
 private:
     string inputFile;
-
-    /**
-     * Auxiliary function used to parse the first (header) line of the input file.
-     *
-     * @param input[in] The input stream corresponding to the input file.
-     * @param nodes[out] The number of nodes in the graph.
-     * @param edges[out] The number of edges in the graph.
-     */
-    void parseFirstLine(ifstream & input, unsigned int & nodes, size_t & edges);
+    ifstream input;
+    bool amountsParsed;
+    unsigned int nodesAmount;
+    size_t edgesAmount;
 
     /**
      * Auxiliary function used to parse the edges when loading the graph.
@@ -40,24 +37,9 @@ private:
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
      */
-    void parseEdges(ifstream & input, SimpleGraph & graph, size_t edges);
+    void parseEdges(BaseGraph & graph);
 
-    /**
-     * Auxiliary function used to parse the edges when loading the graph.
-     *
-     * @param input[in] The input stream corresponding to the input file.
-     * @param graph[in, out] The graph instance that the edges will be inserted into.
-     * @param edges[in] The number of edges that need to be loaded.
-     */
-    void parseEdges(ifstream & input, UpdateableGraph & graph, size_t edges);
-
-    /**
-     * Auxiliary function used to parse the mapping.
-     *
-     * @param input[in] The input stream corresponding to the input file.
-     * @param mapping[out] An unordered map that will be filled with the mapping data.
-     */
-    void parseNodesMapping(ifstream & input, unordered_map <long long unsigned int, unsigned int> & mapping);
+    void parseAmounts();
 
 public:
     /**
@@ -76,13 +58,11 @@ public:
      */
     void loadNodesMapping(unordered_map <long long unsigned int, unsigned int> & mapping);
 
-    vector<dist_t> loadAdjacencyMatrix() override;
+    void loadGraph(BaseGraph &graph) override;
 
-    Graph *loadGraph() override;
+    unsigned int nodes() override;
 
-    UpdateableGraph *loadUpdateableGraph() override;
-
-    void putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) override;
+    size_t edges();
 
     ~XenGraphLoader() override = default;
 };

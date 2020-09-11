@@ -8,6 +8,7 @@
 
 #include <utility>
 #include <vector>
+#include "BaseGraph.h"
 #include "SimpleGraph.h"
 #include "constants.h"
 
@@ -19,7 +20,7 @@ using namespace std;
  * other representation seem to work better. This representation is also used at some points during the preprocessing
  * process for some methods using some modes.
  */
-class Graph{
+class Graph : public BaseGraph {
 private:
     vector< vector < pair< unsigned int, dist_t > > > followingNodes;
     vector< vector < pair< unsigned int, dist_t > > > previousNodes;
@@ -49,14 +50,14 @@ public:
      * @param to[in] Target node of the edge.
      * @param weight[in] The weight of the edge.
      */
-    void addEdge(unsigned int from, unsigned int to, dist_t weight);
+    bool addEdge(unsigned int from, unsigned int to, dist_t weight) override;
 
     /**
      * Returns the number of nodes in the graph.
      *
      * @return The number of nodes in the graph.
      */
-    unsigned int nodes() const;
+    unsigned int nodes() const override;
 
     /**
      * Returns all the edges with the node 'x' as their target node.

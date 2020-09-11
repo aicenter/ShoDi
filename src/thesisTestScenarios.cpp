@@ -17,10 +17,12 @@
 #include "Benchmarking/DistanceMatrixBenchmark.h"
 #include "Benchmarking/CorrectnessValidator.h"
 #include "CH/CHPreprocessor.h"
+#include "GraphBuilding/Structures/UpdateableGraph.h"
 #include "Timer/Timer.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
 #include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 /*
  * The exact code in this file was used to obtain the benchmark data presented in the thesis.
@@ -39,16 +41,17 @@ void createCH(
     Timer timer("Contraction Hierarchies from XenGraph preprocessing");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat(outputFilePath);
+    XenGraphLoader graphLoader(inputFilePath);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+    graph.flushInDdsgFormat(outputFilePath);
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -64,18 +67,19 @@ void createTNR(
     Timer timer("Transit Node Routing from XenGraph preprocessing (using distance matrix)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    XenGraphLoader graphLoader(inputFilePath);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+    Graph *originalGraph = g1.createCopy();
 
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, outputFilePath, transitNodeSetSize);
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRPreprocessor::preprocessWithDMvalidation(graph, *originalGraph, outputFilePath, transitNodeSetSize);
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -91,18 +95,19 @@ void createTNRAF(
     Timer timer("Transit Node Routing with Arc Flags from XenGraph preprocessing (using distance matrix)");
     timer.begin();
 
-    XenGraphLoader graphLoader = XenGraphLoader(inputFilePath);
-    UpdateableGraph * graph = graphLoader.loadUpdateableGraph();
-    Graph * originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    XenGraphLoader graphLoader(inputFilePath);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+    Graph *originalGraph = g1.createCopy();
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, transitNodeSetSize, 32, true);
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRAFPreprocessor::preprocessUsingCH(graph, *originalGraph, outputFilePath, transitNodeSetSize, 32, true);
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -117,7 +122,7 @@ void createDM(
     Timer timer("Whole Distance Matrix computation timer");
     timer.begin();
 
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
+    XenGraphLoader dijkstraGraphLoader(inputFilePath);
 
     DistanceMatrixComputorSlow dmComputor;
     dmComputor.computeDistanceMatrix(dijkstraGraphLoader);
@@ -206,8 +211,9 @@ void computeTNRAFvariousTransitNodeSetSizes(char const * inputFilePath = "../the
  * More runs should provide more accurate values.
  */
 void compareAllMethodsOnPrague(unsigned int runs = 20) {
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Prague/Prague.xeng");
-    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader("../thesisTestsData/Prague/Prague.xeng");
+    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
+    dijkstraGraphLoader.loadGraph(dijkstraGraph);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Prague/Prague.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
@@ -224,7 +230,7 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
-    unsigned int queriesCnt = querySet.size();
+    unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
     double cummulativeDijkstraTime = 0;
     double cummulativeCHTime = 0;
@@ -243,7 +249,7 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
         vector<unsigned int> tnrafDistances(queriesCnt);
         vector<unsigned int> dmDistances(queriesCnt);
 
-        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, *dijkstraGraph, dijkstraDistances);
+        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
         cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
         cummulativeTNRTime += TNRBenchmark::benchmark(querySet, *tnrGraph, tnrDistances);
         cummulativeTNRAFTime += TNRAFBenchmark::benchmark(querySet, *tnrafGraph, tnrafDistances);
@@ -297,7 +303,6 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
         printf("  %f times faster than Transit Node Routing with Arc Flags.\n", cummulativeTNRAFTime/cummulativeDMTime);
     }
 
-    delete dijkstraGraph;
     delete chGraph;
     delete tnrGraph;
     delete tnrafGraph;
@@ -312,8 +317,9 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
  * More runs should provide more accurate values.
  */
 void compareAllMethodsOnBerlin(unsigned int runs = 20) {
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/Berlin/Berlin.xeng");
-    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader("../thesisTestsData/Berlin/Berlin.xeng");
+    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
+    dijkstraGraphLoader.loadGraph(dijkstraGraph);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Berlin/Berlin.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
@@ -330,7 +336,7 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Berlin/Berlin100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
-    unsigned int queriesCnt = querySet.size();
+    unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
     double cummulativeDijkstraTime = 0;
     double cummulativeCHTime = 0;
@@ -349,7 +355,7 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
         vector<unsigned int> tnrafDistances(queriesCnt);
         vector<unsigned int> dmDistances(queriesCnt);
 
-        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, *dijkstraGraph, dijkstraDistances);
+        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
         cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
         cummulativeTNRTime += TNRBenchmark::benchmark(querySet, *tnrGraph, tnrDistances);
         cummulativeTNRAFTime += TNRAFBenchmark::benchmark(querySet, *tnrafGraph, tnrafDistances);
@@ -403,7 +409,6 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
         printf("  %f times faster than Transit Node Routing with Arc Flags.\n", cummulativeTNRAFTime/cummulativeDMTime);
     }
 
-    delete dijkstraGraph;
     delete chGraph;
     delete tnrGraph;
     delete tnrafGraph;
@@ -418,8 +423,9 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
  * More runs should provide more accurate values.
  */
 void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
-    Graph * dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
+    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
+    dijkstraGraphLoader.loadGraph(dijkstraGraph);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.ch");
     FlagsGraph * chGraph = chLoader.loadFlagsGraph();
@@ -436,7 +442,7 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
-    unsigned int queriesCnt = querySet.size();
+    unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
     double cummulativeDijkstraTime = 0;
     double cummulativeCHTime = 0;
@@ -455,7 +461,7 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
         vector<unsigned int> tnrafDistances(queriesCnt);
         vector<unsigned int> dmDistances(queriesCnt);
 
-        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, *dijkstraGraph, dijkstraDistances);
+        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
         cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
         cummulativeTNRTime += TNRBenchmark::benchmark(querySet, *tnrGraph, tnrDistances);
         cummulativeTNRAFTime += TNRAFBenchmark::benchmark(querySet, *tnrafGraph, tnrafDistances);
@@ -509,7 +515,6 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
         printf("  %f times faster than Transit Node Routing with Arc Flags.\n", cummulativeTNRAFTime/cummulativeDMTime);
     }
 
-    delete dijkstraGraph;
     delete chGraph;
     delete tnrGraph;
     delete tnrafGraph;
@@ -546,7 +551,7 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
-    unsigned int queriesCnt = querySet.size();
+    unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
     double cummulative200tNodesTime = 0;
     double cummulative500tNodesTime = 0;
@@ -645,7 +650,7 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
-    unsigned int queriesCnt = querySet.size();
+    unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
     double cummulative200tNodesTime = 0;
     double cummulative500tNodesTime = 0;
@@ -717,7 +722,7 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
 /**
  * A main function that by default runs all the tests. You can comment out the tests you do not want to perform.
  */
-int main(int argc, char * argv[]) {
+int main() {
     setbuf(stdout, NULL);
 
     computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");

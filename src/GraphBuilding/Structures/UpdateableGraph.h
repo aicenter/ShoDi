@@ -16,6 +16,8 @@
 #include "Graph.h"
 #include "constants.h"
 
+#include "BaseGraph.h"
+
 using namespace std;
 
 /**
@@ -23,7 +25,7 @@ using namespace std;
  * and reasonably quick edge adding and removing. It also keeps track of which edges are shortcut edges and which
  * are original edges. The information in this structure can be directly used to generate a .ch file.
  */
-class UpdateableGraph{
+class UpdateableGraph : public BaseGraph {
 protected:
     /**
      * Auxiliary function for the output process.
@@ -165,7 +167,14 @@ public:
     bool addEdge(
             unsigned int from,
             unsigned int to,
-            dist_t weight);
+            dist_t weight) override;
+
+    /**
+     * Executes `addEdge` for every edge in `other`.
+     *
+     * @param other[in] The source graph to add edges from
+     */
+    void addAllEdges(UpdateableGraph &other);
 
     /**
      * Tries to insert an shortcut edge from one node to another with the given weight into the graph. The edge is not
@@ -246,7 +255,7 @@ public:
      *
      * @return The number of nodes in the graph.
      */
-    unsigned int nodes() const;
+    unsigned int nodes() const override;
 
     /**
      * Returns all the edges with the node 'x' as their target node.

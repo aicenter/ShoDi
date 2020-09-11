@@ -12,7 +12,7 @@ SimpleGraph::SimpleGraph(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
-void SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
+bool SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to) > weight) {
             followingNodes.at(from).at(to) = weight;
@@ -20,6 +20,8 @@ void SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     } else {
         followingNodes.at(from).insert(make_pair(to, weight));
     }
+
+    return true;
 }
 
 //______________________________________________________________________________________________________________________

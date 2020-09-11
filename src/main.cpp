@@ -13,6 +13,7 @@
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
 #include "GraphBuilding/Loaders/XenGraphLoader.h"
+#include "GraphBuilding/Structures/UpdateableGraph.h"
 #include "Timer/Timer.h"
 #include "CH/CHPreprocessor.h"
 #include "TNR/TNRPreprocessor.h"
@@ -74,15 +75,16 @@ void createCH(
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
     timer.begin();
 
-    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
-    graph->flushInDdsgFormat(outputFilePath);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+    graph.flushInDdsgFormat(outputFilePath);
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -100,16 +102,17 @@ void createTNRFast(
     Timer timer("Transit Node Routing preprocessing (fast mode)");
     timer.begin();
 
-    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
 
-    TNRPreprocessor::preprocessUsingCH(*graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRPreprocessor::preprocessUsingCH(graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -127,17 +130,20 @@ void createTNRSlow(
     Timer timer("Transit Node Routing preprocessing (slow mode)");
     timer.begin();
 
-    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
-    Graph *originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+    Graph *originalGraph = g1.createCopy();
 
-    TNRPreprocessor::preprocessUsingCHslower(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRPreprocessor::preprocessUsingCHslower(
+        graph, *originalGraph, outputFilePath,
+        boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -155,17 +161,20 @@ void createTNRUsingDM(
     Timer timer("Transit Node Routing preprocessing (using distance matrix)");
     timer.begin();
 
-    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
-    Graph *originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+    Graph *originalGraph = g1.createCopy();
 
-    TNRPreprocessor::preprocessWithDMvalidation(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRPreprocessor::preprocessWithDMvalidation(
+        graph, *originalGraph, outputFilePath,
+        boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -210,17 +219,20 @@ void createTNRAFSlow(
     Timer timer("Transit Node Routing with Arc Flags preprocessing (slow mode)");
     timer.begin();
 
-    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
-    Graph *originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+    Graph *originalGraph = g1.createCopy();
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, false);
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRAFPreprocessor::preprocessUsingCH(
+        graph, *originalGraph, outputFilePath,
+        boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, false);
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -240,17 +252,20 @@ void createTNRAFUsingDM(
 
     // TODO tahle funkce je buhviproc uplne stejna jako createTNRAFSlow. Uz to tak bylo, tak jenom davam vedet.
 
-    UpdateableGraph *graph = graphLoader.loadUpdateableGraph();
-    Graph *originalGraph = graph->createCopy();
-    CHPreprocessor::preprocessForDDSG(*graph);
-    graphLoader.putAllEdgesIntoUpdateableGraph(*graph);
+    UpdateableGraph g1(graphLoader.nodes());
+    graphLoader.loadGraph(g1);
+    Graph *originalGraph = g1.createCopy();
 
-    TNRAFPreprocessor::preprocessUsingCH(*graph, *originalGraph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, true);
+    UpdateableGraph graph(g1);
+    CHPreprocessor::preprocessForDDSG(graph);
+    graph.addAllEdges(g1);
+
+    TNRAFPreprocessor::preprocessUsingCH(
+        graph, *originalGraph, outputFilePath,
+        boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, true);
 
     timer.finish();
     timer.printMeasuredTime();
-
-    delete graph;
 }
 
 /**
@@ -342,13 +357,12 @@ void benchmarkDijkstra(
     vector<pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
-    Graph *dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader(inputFilePath);
+    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
+    dijkstraGraphLoader.loadGraph(dijkstraGraph);
 
     vector<unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = DijkstraBenchmark::benchmark(trips, *dijkstraGraph, dijkstraDistances);
-
-    delete dijkstraGraph;
+    double dijkstraTime = DijkstraBenchmark::benchmark(trips, dijkstraGraph, dijkstraDistances);
 
     cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds." << endl;
     cout << "That means " << (dijkstraTime / (double) trips.size()) * 1000 << " ms per query." << endl;
@@ -395,14 +409,13 @@ void benchmarkDijkstraWithMapping(
     vector<pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
-    XenGraphLoader dijkstraGraphLoader = XenGraphLoader(inputFilePath);
-    Graph *dijkstraGraph = dijkstraGraphLoader.loadGraph();
+    XenGraphLoader dijkstraGraphLoader(inputFilePath);
+    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
+    dijkstraGraphLoader.loadGraph(dijkstraGraph);
 
     vector<unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, *dijkstraGraph, dijkstraDistances,
+    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, dijkstraGraph, dijkstraDistances,
                                                                    mappingFilePath);
-
-    delete dijkstraGraph;
 
     cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds" << endl;
     cout << "using '" << mappingFilePath << "' as mapping." << endl;

@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <boost/numeric/conversion/cast.hpp>
+#include <stdexcept>
 #include "UpdateableGraph.h"
 
 //______________________________________________________________________________________________________________________
@@ -42,6 +43,23 @@ bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, dist_t weight)
         previousNodes.at(to).insert(make_pair(from, weight));
         return true;
     }
+}
+
+//______________________________________________________________________________________________________________________
+void UpdateableGraph::addAllEdges(UpdateableGraph &other) {
+   const auto n = nodes();
+   if (n != other.nodes())
+      throw runtime_error("Cannot execute UpdateableGraph::addAllEdges: Graphs have different amounts of nodes.");
+
+   for (unsigned int i = 0; i < n; ++i) {
+      for(auto &p : other.outgoingEdges(i)) {
+         if (p.second.isShortcut) {
+            addShortcutEdge(i, p.first, p.second.weight, p.second.middleNode);
+         } else {
+            addEdge(i, p.first, p.second.weight);
+         }
+      }
+   }
 }
 
 //______________________________________________________________________________________________________________________

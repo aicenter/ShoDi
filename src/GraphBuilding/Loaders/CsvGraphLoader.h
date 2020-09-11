@@ -11,19 +11,24 @@
 
 #include "GraphLoader.h"
 
+#define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
+#include <csv2/reader.hpp>
+
+typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
+                     csv2::first_row_is_header<false>,
+                     csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
+    DefaultCSVReader;
+
 class CsvGraphLoader : public GraphLoader {
 private:
+    DefaultCSVReader reader;
     string inputFile;
 public:
     CsvGraphLoader(string inputFile);
 
-    vector<dist_t> loadAdjacencyMatrix() override;
+    void loadGraph(BaseGraph &graph) override;
 
-    Graph *loadGraph() override;
-
-    UpdateableGraph *loadUpdateableGraph() override;
-
-    void putAllEdgesIntoUpdateableGraph(UpdateableGraph &graph) override;
+    unsigned int nodes() override;
 
     ~CsvGraphLoader() override = default;
 

@@ -66,7 +66,7 @@ bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor &computor, stri
     obtainTrueValues(trueValues, trueDistancesFilePath);
 
     vector<dist_t> dmDistances(querySet.size());
-    double time = DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
+    DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
 
     delete dm;
     return CorrectnessValidator::validate(trueValues, dmDistances);
@@ -108,7 +108,7 @@ void runTests(std::initializer_list<Test> tests) {
  * This main function could serve as a simple test suite. In the future, using a C++ test framework such as Catch,
  * Boost.Test or Google Test would probably be helpful.
  */
-int main(int argc, char *argv[]) {
+int main() {
     setbuf(stdout, NULL);
 
     /*
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     runTests({
         smallSlowTest,
         smallFastTest,
-        //mediumSlowTest,
+        mediumSlowTest,
         mediumFastTest
     });
 
