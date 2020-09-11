@@ -2,6 +2,7 @@
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <cstddef>
+#include <vector>
 
 namespace johnson {
 
@@ -15,13 +16,14 @@ typedef std::pair<unsigned int, unsigned int> Edge;
 typedef struct graph {
   size_t V;
   size_t E;
-  Edge *edge_array;
-  dist_t *weights;
+  std::vector<Edge> edge_array;
+  std::vector<dist_t> weights;
 } graph_t;
 
 graph_t *johnson_init(std::vector<dist_t>);
 
-graph_t *johnson_init2(const unsigned int n, const double p, const unsigned long seed);
+graph_t *johnson_init2(const unsigned int n, const double p,
+                       const unsigned long seed);
 
 typedef struct edge {
   unsigned int u;

@@ -4,7 +4,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <iostream> // cerr
 #include <limits>
-#include <random>   // mt19937_64, uniform_x_distribution
+#include <random> // mt19937_64, uniform_x_distribution
 #include <vector>
 
 #include "CLI/ProgressBar.hpp"
@@ -21,27 +21,27 @@ graph_t *johnson::johnson_init(std::vector<dist_t> adj_matrix) {
     }
   }
 
-  unsigned int n = boost::numeric_cast<unsigned int>(sqrt((double) adj_matrix.size()));
-
-  Edge *edge_array = new Edge[E];
-  dist_t *weights = new dist_t[E];
-  size_t ei = 0;
-
-  for (unsigned int i = 0; i < n; i++) {
-    for (unsigned int j = 0; j < n; j++) {
-      if (adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] != 0 && adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] != max) {
-        edge_array[ei] = Edge(i, j);
-        weights[ei] = adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)];
-        ei++;
-      }
-    }
-  }
+  unsigned int n =
+      boost::numeric_cast<unsigned int>(sqrt((double)adj_matrix.size()));
 
   graph_t *gr = new graph_t;
   gr->V = n;
   gr->E = E;
-  gr->edge_array = edge_array;
-  gr->weights = weights;
+  gr->edge_array.clear();
+  gr->edge_array.reserve(E);
+  gr->weights.clear();
+  gr->weights.reserve(E);
+
+  for (unsigned int i = 0; i < n; i++) {
+    for (unsigned int j = 0; j < n; j++) {
+      if (adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != 0 &&
+          adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != max) {
+        gr->edge_array.push_back(Edge(i, j));
+        gr->weights.push_back(
+            adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)]);
+      }
+    }
+  }
 
   return gr;
 }
@@ -55,61 +55,60 @@ graph_t *johnson::johnson_init2(const unsigned int n, const double p,
 
   std::mt19937_64 rand_engine(seed);
 
-  dist_t *adj_matrix = new dist_t[((size_t) n) * ((size_t) n)];
+  dist_t *adj_matrix = new dist_t[((size_t)n) * ((size_t)n)];
 
   size_t E = 0;
   for (unsigned int i = 0; i < n; i++) {
     for (unsigned int j = 0; j < n; j++) {
       if (i == j) {
-        adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] = 0;
+        adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] = 0;
       } else if (flip(rand_engine) < p) {
-        adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] = choose_weight(rand_engine);
+        adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] =
+            choose_weight(rand_engine);
         E++;
       } else {
-        adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] = max;
+        adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] = max;
       }
     }
   }
-  Edge *edge_array = new Edge[E];
-  dist_t *weights = new dist_t[E];
-  size_t ei = 0;
+
+  graph_t *gr = new graph_t;
+  gr->V = n;
+  gr->E = E;
+  gr->edge_array.clear();
+  gr->edge_array.reserve(E);
+  gr->weights.clear();
+  gr->weights.reserve(E);
+
   for (unsigned int i = 0; i < n; i++) {
     for (unsigned int j = 0; j < n; j++) {
-      if (adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] != 0 && adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)] != max) {
-        edge_array[ei] = Edge(i, j);
-        weights[ei] = adj_matrix[((size_t) i) * ((size_t) n) + ((size_t) j)];
-        ei++;
+      if (adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != 0 &&
+          adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != max) {
+        gr->edge_array.push_back(Edge(i, j));
+        gr->weights.push_back(adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)]);
       }
     }
   }
 
   delete[] adj_matrix;
 
-  graph_t *gr = new graph_t;
-  gr->V = n;
-  gr->E = E;
-  gr->edge_array = edge_array;
-  gr->weights = weights;
-
   return gr;
 }
 
 void johnson::free_graph(graph_t *g) {
-  delete[] g->edge_array;
-  delete[] g->weights;
   delete g;
 }
 
 inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
   auto V = gr->V;
   auto E = gr->E;
-  Edge *edges = gr->edge_array;
-  dist_t *weights = gr->weights;
+  std::vector<Edge> &edges = gr->edge_array;
+  std::vector<dist_t> &weights = gr->weights;
 
   const dist_t max = std::numeric_limits<dist_t>::max();
 
 #pragma omp parallel for
-  for (long long i = 0; i < (long long) V; i++) {
+  for (long long i = 0; i < (long long)V; i++) {
     dist[i] = max;
   }
   dist[src] = 0;
@@ -150,16 +149,15 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   graph_t *bf_graph = new graph_t;
   bf_graph->V = V + 1;
   bf_graph->E = gr->E + V;
-  bf_graph->edge_array = new Edge[bf_graph->E];
-  bf_graph->weights = new dist_t[bf_graph->E];
+  bf_graph->edge_array = gr->edge_array;
+  bf_graph->weights = gr->weights;
 
-  std::memcpy(bf_graph->edge_array, gr->edge_array, gr->E * sizeof(Edge));
-  std::memcpy(bf_graph->weights, gr->weights, gr->E * sizeof(dist_t));
-  std::memset(&bf_graph->weights[gr->E], 0, V * sizeof(dist_t));
+  bf_graph->edge_array.reserve(bf_graph->E);
+  bf_graph->weights.reserve(bf_graph->E);
 
 #pragma omp parallel for
   for (int e = 0; e < V_uint; e++) {
-    bf_graph->edge_array[((size_t) e) + gr->E] = Edge(V_uint, e);
+    bf_graph->edge_array[((size_t)e) + gr->E] = Edge(V_uint, e);
   }
 
   // Second, the Bellman–Ford algorithm is used, starting from the new vertex q,
@@ -178,22 +176,22 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   size_t ec = gr->E;
 
 #pragma omp parallel for
-  for (long long e = 0; e < (long long) ec; e++) {
-    unsigned int u = std::get<0>(gr->edge_array[e]);
-    unsigned int v = std::get<1>(gr->edge_array[e]);
-    gr->weights[e] = gr->weights[e] + h[u] - h[v];
+  for (long long e = 0; e < (long long)ec; e++) {
+    unsigned int u = std::get<0>(gr->edge_array[(size_t) e]);
+    unsigned int v = std::get<1>(gr->edge_array[(size_t) e]);
+    gr->weights[(size_t) e] += h[u] - h[v];
   }
 
-  Graph G(gr->edge_array, gr->edge_array + gr->E, gr->weights, V);
+  Graph G(gr->edge_array.data(), gr->edge_array.data() + gr->E, gr->weights.data(), V);
 
   ProgressBar progress(V);
 
 #pragma omp parallel for schedule(dynamic)
   for (int s = 0; s < V_uint; s++) {
     std::vector<dist_t> d(num_vertices(G));
-    dijkstra_shortest_paths(G, (unsigned long) s, boost::distance_map(&d[0]));
+    dijkstra_shortest_paths(G, (unsigned long)s, boost::distance_map(&d[0]));
     for (size_t v = 0; v < V; v++) {
-      output[((size_t) s) * V + v] = d[v] + h[v] - h[s];
+      output[((size_t)s) * V + v] = d[v] + h[v] - h[s];
     }
     ++progress;
   }
