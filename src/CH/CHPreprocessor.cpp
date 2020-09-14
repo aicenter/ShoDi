@@ -66,7 +66,7 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
         clearStructures();
         preprocessingDegrees[i] = graph.degree(i);
         int edgeDifference = EdgeDifferenceManager::difference(UINT_MAX, i, shortcuts, preprocessingDegrees[i]);
-        priorityQueue.pushOnly(i, (unsigned int) edgeDifference);
+        priorityQueue.pushOnly(i, edgeDifference);
     }
     priorityQueue.buildProperHeap();
     printf("\rPriority queue initialized.\n");

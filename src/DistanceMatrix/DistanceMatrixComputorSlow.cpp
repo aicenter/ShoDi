@@ -69,7 +69,7 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
 
         if (useReversedGraph) {
             const vector < pair < unsigned int, unsigned int > > & neighbours = graph.incomingEdges(current.ID);
-            for (auto neighbour : neighbours) {
+            for (auto &neighbour : neighbours) {
                 unsigned int newDistance = current.weight + neighbour.second;
                 if (newDistance < distance[neighbour.first]) {
                     distance[neighbour.first] = newDistance;
@@ -78,7 +78,7 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
             }
         } else {
             const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
-            for (auto neighbour : neighbours) {
+            for (auto &neighbour : neighbours) {
                 unsigned int newDistance = current.weight + neighbour.second;
                 if (newDistance < distance[neighbour.first]) {
                     distance[neighbour.first] = newDistance;

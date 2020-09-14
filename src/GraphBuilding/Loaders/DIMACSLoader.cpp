@@ -28,32 +28,30 @@ DIMACSLoader::DIMACSLoader(string inputFile)
 }
 
 void DIMACSLoader::parseAmounts() {
-  if (!amountsParsed) {
-    input.seekg(0, std::ios::beg);
-    parseGraphProblemLine(input, nodesAmount, edgesAmount);
-    amountsParsed = true;
-  }
+  if(input.eof())
+    input.clear();
+
+  input.seekg(0, std::ios::beg);
+
+  parseGraphProblemLine(input, nodesAmount, edgesAmount);
+  amountsParsed = true;
 }
 
 unsigned int DIMACSLoader::nodes() {
-  parseAmounts();
+  if(!amountsParsed)
+    parseAmounts();
   return nodesAmount;
 }
 
 size_t DIMACSLoader::edges() {
-  parseAmounts();
+  if(!amountsParsed)
+    parseAmounts();
   return edgesAmount;
 }
 
 
 void DIMACSLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
   parseAmounts();
-
-  {
-    string skippedLine;
-    input.seekg(0, std::ios::beg);
-    getline(input, skippedLine);
-  }
 
   if (graph.handlesDuplicateEdges()) {
     parseEdges(input, graph, edgesAmount, precisionLoss);

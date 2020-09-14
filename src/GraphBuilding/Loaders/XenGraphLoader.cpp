@@ -27,41 +27,39 @@ XenGraphLoader::XenGraphLoader(string inputFile)
 }
 
 void XenGraphLoader::parseAmounts() {
-  if(!amountsParsed) {
-    input.seekg(0, std::ios::beg);
+  if(input.eof())
+    input.clear();
 
-    char c1, c2, c3;
-    input >> c1 >> c2 >> c3;
-    if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
-      cout
-          << "The input file is missing the XenGraph header." << endl
-          << "Are you sure the input file is in the correct format?" << endl
-          << "The loading will proceed but the loaded graph might be corrupted."
-          << endl;
-    }
+  input.seekg(0, std::ios::beg);
 
-    input >> nodesAmount >> edgesAmount;
-    amountsParsed = true;
+  char c1, c2, c3;
+  input >> c1 >> c2 >> c3;
+  if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
+    cout
+      << "The input file is missing the XenGraph header." << endl
+      << "Are you sure the input file is in the correct format?" << endl
+      << "The loading will proceed but the loaded graph might be corrupted."
+      << endl;
   }
+
+  input >> nodesAmount >> edgesAmount;
+  amountsParsed = true;
+
 }
 
 unsigned int XenGraphLoader::nodes() {
-  parseAmounts();
+  if(!amountsParsed)
+    parseAmounts();
   return nodesAmount;
 }
 
 size_t XenGraphLoader::edges() {
-  parseAmounts();
+  if(!amountsParsed)
+    parseAmounts();
   return edgesAmount;
 }
 
 void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
-  {
-    string skippedLine;
-    input.seekg(0, std::ios::beg);
-    getline(input, skippedLine);
-  }
-
   unsigned int from, to, oneWayFlag, weight;
   for (size_t i = 0; i < edgesAmount; i++) {
     input >> from >> to >> weight >> oneWayFlag;
