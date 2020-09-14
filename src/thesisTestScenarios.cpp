@@ -727,18 +727,18 @@ int main() {
     setbuf(stdout, NULL);
 
     computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");
-    //computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
-    //computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
+    computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
+    computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
 
     computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
-    //computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
+    computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
 
     compareAllMethodsOnPrague(20);
-    //compareAllMethodsOnBerlin(20);
-    //compareAllMethodsOnSouthwestBohemia(20);
+    compareAllMethodsOnBerlin(20);
+    compareAllMethodsOnSouthwestBohemia(20);
 
-    //compareTNRwithVariousTransitNodeSetSizes(20);
-    //compareTNRAFwithVariousTransitNodeSetSizes(20);
+    compareTNRwithVariousTransitNodeSetSizes(20);
+    compareTNRAFwithVariousTransitNodeSetSizes(20);
 
     return 0;
 }
