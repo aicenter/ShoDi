@@ -177,7 +177,7 @@ void computeStructuresForAllMethodsBerlin(char const * inputFilePath = "../thesi
  * @param inputFilePath[in] The path to the graph of SouthwestBohemia in the XenGraph format.
  */
 void computeStructuresForAllMethodsSouthwestBohemia(char const * inputFilePath = "../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng") {
-    //createCH(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
+    createCH(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
     createTNR(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
     createTNRAF(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
     createDM(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
