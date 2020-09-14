@@ -23,15 +23,17 @@ CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {
   }
 }
 
-dist_t parse_distance(std::string str, std::string inputFile, double precisionLoss) {
+inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned int nodeTo, std::string inputFile, double precisionLoss) {
   double val;
   try {
     val = stod(str);
   }
   catch(std::invalid_argument &e) {
+    cerr << "Warning: Found an unexpected value (" << str << ") in '" << inputFile << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
     return std::numeric_limits<dist_t>::max();
   }
   catch(std::out_of_range &e) {
+    cerr << "Warning: Found an out of range value (" << str << ") in '" << inputFile << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
     return std::numeric_limits<dist_t>::max();
   }
 
@@ -40,7 +42,7 @@ dist_t parse_distance(std::string str, std::string inputFile, double precisionLo
   }
 
   if(val < 0) {
-    cerr << "Warning: Found a negative value (" << val << ") in '" << inputFile << "'. It will be interpreted as 'no edge'." << endl;
+    cerr << "Warning: Found a negative value (" << str << ") in '" << inputFile << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
     return std::numeric_limits<dist_t>::max();
   }
 
@@ -69,7 +71,7 @@ void CsvGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
       for (const auto &cell : row) {
         string val;
         cell.read_value(val);
-        const dist_t dist = parse_distance(val, inputFile, (double) precisionLoss);
+        const dist_t dist = parse_distance(val, i, j, inputFile, (double) precisionLoss);
         if (dist != max)
           graph.addEdge(i, j, dist);
         ++j;
