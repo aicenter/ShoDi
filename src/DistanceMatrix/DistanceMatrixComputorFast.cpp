@@ -16,12 +16,11 @@ void DistanceMatrixComputorFast::computeDistanceMatrix(const vector<dist_t> &gra
     johnson::johnson_parallel(graph, distanceTable.data());
 }
 
-void DistanceMatrixComputorFast::computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss) {
+vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
     AdjMatrixGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
 
-    vector<dist_t> adjMatrix = graph.matrix();
-    computeDistanceMatrix(adjMatrix);
+    return graph.matrix();
 }
 
 DistanceMatrix *DistanceMatrixComputorFast::getDistanceMatrixInstance() {

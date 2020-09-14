@@ -13,12 +13,12 @@
 
 using namespace std;
 
-class DistanceMatrixComputorSlow : public DistanceMatrixComputor {
+class DistanceMatrixComputorSlow : public DistanceMatrixComputor<Graph> {
 public:
 
-    void computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss) override;
-
     DistanceMatrix * getDistanceMatrixInstance() override;
+
+    Graph loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) override;
 
     /**
      * this function will compute the full distance matrix for the given graph.
@@ -27,7 +27,7 @@ public:
      *
      * @param graph[in] the graph for which we want to compute the distance matrix.
      */
-    void computeDistanceMatrix(const Graph & graph);
+    void computeDistanceMatrix(const Graph & graph) override;
 
     /**
      * This function will compute the full distance matrix for the given graph as if the directions for all the edges

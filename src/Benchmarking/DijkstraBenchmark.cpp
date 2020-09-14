@@ -19,7 +19,7 @@ double DijkstraBenchmark::benchmark(const vector < pair < unsigned int, unsigned
     }
 
     dijkstraTimer.finish();
-    return dijkstraTimer.getMeasuredTimeInSeconds();
+    return dijkstraTimer.getRealTimeSeconds();
 }
 
 //______________________________________________________________________________________________________________________
@@ -36,5 +36,5 @@ double DijkstraBenchmark::benchmarkUsingMapping(const vector < pair < long long 
     }
 
     dijkstraTimer.finish();
-    return dijkstraTimer.getMeasuredTimeInSeconds();
+    return dijkstraTimer.getRealTimeSeconds();
 }

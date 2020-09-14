@@ -25,13 +25,16 @@ using namespace std;
  * @param inputFilePath[in] The path to the file containing the graph
  * @return An instance of the DistanceMatrix class containing shortest distances for all pairs of nodes.
  */
-DistanceMatrix *obtainDM(GraphLoader &loader, DistanceMatrixComputor &computor) {
+template <typename T>
+DistanceMatrix *obtainDM(GraphLoader &loader, DistanceMatrixComputor<T> &computor) {
     Timer timer("Whole Distance Matrix computation timer");
+
+    auto graphData = computor.loadGraph(loader, 1);
+
     timer.begin();
-
-    computor.computeDistanceMatrix(loader, 1);
-
+    computor.computeDistanceMatrix(graphData);
     timer.finish();
+
     timer.printMeasuredTime();
 
     return computor.getDistanceMatrixInstance();
@@ -54,7 +57,8 @@ void obtainTrueValues(vector<unsigned int> &trueValues, const string &inputFileP
     }
 }
 
-bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor &computor, string tripsFilePath,
+template<typename T>
+bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor<T> &computor, string tripsFilePath,
                 string trueDistancesFilePath) {
     DistanceMatrix * dm = obtainDM(graphLoader, computor);
 

@@ -98,11 +98,10 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixComputorSlow::computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss) {
+Graph DistanceMatrixComputorSlow::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
     Graph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
-
-    computeDistanceMatrix(graph);
+    return graph;
 }
 
 //______________________________________________________________________________________________________________________

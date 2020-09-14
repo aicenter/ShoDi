@@ -39,17 +39,18 @@ void createCH(
         char const * inputFilePath,
         char const * outputFilePath) {
     Timer timer("Contraction Hierarchies from XenGraph preprocessing");
-    timer.begin();
 
     XenGraphLoader graphLoader(inputFilePath);
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, 1);
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, 1);
     graph.flushInDdsgFormat(outputFilePath);
 
-    timer.finish();
     timer.printMeasuredTime();
 }
 
@@ -64,21 +65,24 @@ void createTNR(
         unsigned int transitNodeSetSize,
         char const * outputFilePath) {
     Timer timer("Transit Node Routing from XenGraph preprocessing (using distance matrix)");
-    timer.begin();
 
     XenGraphLoader graphLoader(inputFilePath);
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, 1);
     Graph *originalGraph = graph.createCopy();
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, 1);
 
+    timer.begin();
     TNRPreprocessor::preprocessWithDMvalidation(graph, *originalGraph, outputFilePath, transitNodeSetSize);
+    timer.finish();
 
     delete originalGraph;
 
-    timer.finish();
     timer.printMeasuredTime();
 }
 
@@ -93,21 +97,24 @@ void createTNRAF(
         unsigned int transitNodeSetSize,
         char const * outputFilePath) {
     Timer timer("Transit Node Routing with Arc Flags from XenGraph preprocessing (using distance matrix)");
-    timer.begin();
 
     XenGraphLoader graphLoader(inputFilePath);
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, 1);
     Graph *originalGraph = graph.createCopy();
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, 1);
 
+    timer.begin();
     TNRAFPreprocessor::preprocessUsingCH(graph, *originalGraph, outputFilePath, transitNodeSetSize, 32, true);
+    timer.finish();
 
     delete originalGraph;
 
-    timer.finish();
     timer.printMeasuredTime();
 }
 
@@ -121,18 +128,20 @@ void createDM(
         char const * inputFilePath,
         char const * outputFilePath) {
     Timer timer("Whole Distance Matrix computation timer");
-    timer.begin();
 
     XenGraphLoader dijkstraGraphLoader(inputFilePath);
 
     DistanceMatrixComputorSlow dmComputor;
-    dmComputor.computeDistanceMatrix(dijkstraGraphLoader, 1);
+    auto graphData = dmComputor.loadGraph(dijkstraGraphLoader, 1);
+
+    timer.begin();
+    dmComputor.computeDistanceMatrix(graphData);
+    timer.finish();
 
     DistanceMatrix * dm = dmComputor.getDistanceMatrixInstance();
     DistanceMatrixXdmOutputter outputter;
     outputter.store(*dm, outputFilePath);
 
-    timer.finish();
     timer.printMeasuredTime();
 
     delete dm;

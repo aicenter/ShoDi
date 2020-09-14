@@ -20,7 +20,7 @@ double TNRBenchmark::benchmark(const vector < pair < unsigned int, unsigned int>
     }
 
     tnrTimer.finish();
-    return tnrTimer.getMeasuredTimeInSeconds();
+    return tnrTimer.getRealTimeSeconds();
 }
 
 //______________________________________________________________________________________________________________________
@@ -35,5 +35,5 @@ double TNRBenchmark::benchmarkWithMapping(const vector < pair < long long unsign
     }
 
     tnrTimer.finish();
-    return tnrTimer.getMeasuredTimeInSeconds();
+    return tnrTimer.getRealTimeSeconds();
 }

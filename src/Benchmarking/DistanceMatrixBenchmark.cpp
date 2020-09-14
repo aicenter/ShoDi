@@ -16,5 +16,5 @@ double DistanceMatrixBenchmark::benchmark(const vector < pair < unsigned int, un
     }
 
     dijkstraTimer.finish();
-    return dijkstraTimer.getMeasuredTimeInSeconds();
+    return dijkstraTimer.getRealTimeSeconds();
 }

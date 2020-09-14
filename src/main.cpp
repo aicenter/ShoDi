@@ -15,6 +15,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <string>
 #include <tuple>
+#include "DistanceMatrix/DistanceMatrix.h"
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/GraphLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
@@ -80,16 +81,17 @@ void createCH(
         char *outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
-    timer.begin();
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, precisionLoss);
     graph.flushInDdsgFormat(outputFilePath);
 
-    timer.finish();
     timer.printMeasuredTime();
 }
 
@@ -107,17 +109,20 @@ void createTNRFast(
         char *outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (fast mode)");
-    timer.begin();
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     TNRPreprocessor::preprocessUsingCH(graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
-
     timer.finish();
+
     timer.printMeasuredTime();
 }
 
@@ -135,22 +140,25 @@ void createTNRSlow(
         char *outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (slow mode)");
-    timer.begin();
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
     Graph *originalGraph = graph.createCopy();
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     TNRPreprocessor::preprocessUsingCHslower(
         graph, *originalGraph, outputFilePath,
         boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+    timer.finish();
 
     delete originalGraph;
 
-    timer.finish();
     timer.printMeasuredTime();
 }
 
@@ -168,22 +176,25 @@ void createTNRUsingDM(
         char *outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (using distance matrix)");
-    timer.begin();
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
     Graph *originalGraph = graph.createCopy();
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     TNRPreprocessor::preprocessWithDMvalidation(
         graph, *originalGraph, outputFilePath,
         boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+    timer.finish();
 
     delete originalGraph;
 
-    timer.finish();
     timer.printMeasuredTime();
 }
 
@@ -229,20 +240,23 @@ void createTNRAFSlow(
         char *outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing with Arc Flags preprocessing (slow mode)");
-    timer.begin();
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
     Graph *originalGraph = graph.createCopy();
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     TNRAFPreprocessor::preprocessUsingCH(
         graph, *originalGraph, outputFilePath,
         boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, false);
-
     timer.finish();
+
     timer.printMeasuredTime();
 }
 
@@ -260,7 +274,6 @@ void createTNRAFUsingDM(
         char *outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing with Arc Flags preprocessing (using distance matrix)");
-    timer.begin();
 
     // TODO tahle funkce je buhviproc uplne stejna jako createTNRAFSlow. Uz to tak bylo, tak jenom davam vedet.
 
@@ -268,14 +281,18 @@ void createTNRAFUsingDM(
     graphLoader.loadGraph(graph, precisionLoss);
     Graph *originalGraph = graph.createCopy();
 
+    timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
+    timer.finish();
+
     graphLoader.loadGraph(graph, precisionLoss);
 
+    timer.begin();
     TNRAFPreprocessor::preprocessUsingCH(
         graph, *originalGraph, outputFilePath,
         boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)), 32, true);
-
     timer.finish();
+
     timer.printMeasuredTime();
 }
 
@@ -305,20 +322,37 @@ void createTNRAF(
     }
 }
 
+template<typename ComputorType>
+DistanceMatrix *computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss, string timerName) {
+    ComputorType computor;
+    auto graph = computor.loadGraph(graphLoader, precisionLoss);
+
+    Timer timer(timerName);
+
+    timer.begin();
+    computor.computeDistanceMatrix(graph);
+    timer.finish();
+
+    timer.printMeasuredTime();
+
+    return computor.getDistanceMatrixInstance();
+}
+
 void createDM(
         char *outputType,
         char *preprocessingMode,
         GraphLoader &graphLoader,
         char *outputFilePath,
         unsigned int precisionLoss) {
-    std::unique_ptr<DistanceMatrixComputor> computor{nullptr};
+    std::function<DistanceMatrix* (GraphLoader &, unsigned int, string)> computor;
+
     std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
     std::unique_ptr<DistanceMatrix> dm{nullptr};
 
     if (strcmp(preprocessingMode, "slow") == 0) {
-        computor = std::unique_ptr<DistanceMatrixComputorSlow> {new DistanceMatrixComputorSlow()};
+        computor = computeDistanceMatrix<DistanceMatrixComputorSlow>;
     } else if (strcmp(preprocessingMode, "fast") == 0) {
-        computor = std::unique_ptr<DistanceMatrixComputorFast> { new DistanceMatrixComputorFast()};
+        computor = computeDistanceMatrix<DistanceMatrixComputorFast>;
     } else {
         throw input_error(string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
@@ -333,15 +367,7 @@ void createDM(
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    Timer timer("Distance Matrix preprocessing");
-    timer.begin();
-
-    computor->computeDistanceMatrix(graphLoader, precisionLoss);
-
-    timer.finish();
-    timer.printMeasuredTime();
-
-    dm = std::unique_ptr<DistanceMatrix> {computor->getDistanceMatrixInstance()};
+    dm = std::unique_ptr<DistanceMatrix> {computor(graphLoader, precisionLoss, "Distance Matrix preprocessing")};
     outputter->store(*dm, outputFilePath);
 }
 

@@ -31,7 +31,7 @@ void PathCorrectnessValidator::validateTNRPaths(Graph * originalGraph, TNRPathQu
     }
 
     pathQueriesTimer.finish();
-    double time = pathQueriesTimer.getMeasuredTimeInSeconds();
+    double time = pathQueriesTimer.getRealTimeSeconds();
     cout << "Performed " << trips.size() << " path queries using TNR in " << time << " seconds." << endl;
     cout << "One query took " << time / ((double) trips.size()) << " seconds." << endl;
 }
@@ -59,7 +59,7 @@ void PathCorrectnessValidator::validateCHPaths(Graph * originalGraph, CHPathQuer
     }
 
     pathQueriesTimer.finish();
-    double time = pathQueriesTimer.getMeasuredTimeInSeconds();
+    double time = pathQueriesTimer.getRealTimeSeconds();
     cout << "Performed " << trips.size() << " path queries using CH in " << time << " seconds." << endl;
     cout << "One query took " << ((float) time) / ((float) trips.size()) << " seconds." << endl;
 }
