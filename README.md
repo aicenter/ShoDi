@@ -80,7 +80,7 @@ From Source
  - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
 ### Building the project
-1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph p-ranav-csv2`
+1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2`
 2. `mkdir build && cd build`
 3. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
 4. `cmake --build . --target shortestPathsPreprocessor --config Release`
