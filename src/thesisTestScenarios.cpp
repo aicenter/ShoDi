@@ -42,12 +42,11 @@ void createCH(
     timer.begin();
 
     XenGraphLoader graphLoader(inputFilePath);
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1, 1);
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, 1);
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graphLoader.loadGraph(graph, 1);
     graph.flushInDdsgFormat(outputFilePath);
 
     timer.finish();
@@ -73,7 +72,7 @@ void createTNR(
     Graph *originalGraph = graph.createCopy();
 
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(*originalGraph);
+    graphLoader.loadGraph(graph, 1);
 
     TNRPreprocessor::preprocessWithDMvalidation(graph, *originalGraph, outputFilePath, transitNodeSetSize);
 
@@ -102,7 +101,7 @@ void createTNRAF(
     Graph *originalGraph = graph.createCopy();
 
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(*originalGraph);
+    graphLoader.loadGraph(graph, 1);
 
     TNRAFPreprocessor::preprocessUsingCH(graph, *originalGraph, outputFilePath, transitNodeSetSize, 32, true);
 
@@ -727,19 +726,19 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
 int main() {
     setbuf(stdout, NULL);
 
-    //computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");
+    computeStructuresForAllMethodsPrague("../thesisTestsData/Prague/Prague.xeng");
     //computeStructuresForAllMethodsBerlin("../thesisTestsData/Berlin/Berlin.xeng");
     //computeStructuresForAllMethodsSouthwestBohemia("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xeng");
 
-    //computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
+    computeTNRvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
     //computeTNRAFvariousTransitNodeSetSizes("../thesisTestsData/Prague/Prague.xeng");
 
     compareAllMethodsOnPrague(20);
-    compareAllMethodsOnBerlin(20);
-    compareAllMethodsOnSouthwestBohemia(20);
+    //compareAllMethodsOnBerlin(20);
+    //compareAllMethodsOnSouthwestBohemia(20);
 
-    compareTNRwithVariousTransitNodeSetSizes(20);
-    compareTNRAFwithVariousTransitNodeSetSizes(20);
+    //compareTNRwithVariousTransitNodeSetSizes(20);
+    //compareTNRAFwithVariousTransitNodeSetSizes(20);
 
     return 0;
 }

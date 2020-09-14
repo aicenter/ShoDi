@@ -195,9 +195,9 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
     vector<uint32_t> powersOf2(regionsCnt);
     initPowersOf2(powersOf2);
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        auto fwSize = forwardAccessNodes[i].size();
+        unsigned int fwSize = boost::numeric_cast<unsigned int>(forwardAccessNodes[i].size());
         output.write((char *) &fwSize, sizeof(fwSize));
-        for(size_t j = 0; j < forwardAccessNodes[i].size(); j++) {
+        for(unsigned int j = 0; j < fwSize; j++) {
             output.write((char *) &forwardAccessNodes[i][j].accessNodeID, sizeof(forwardAccessNodes[i][j].accessNodeID));
             output.write((char *) &forwardAccessNodes[i][j].distanceToNode, sizeof(forwardAccessNodes[i][j].distanceToNode));
             uint32_t regionsOutput = 0;
@@ -208,9 +208,9 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
             }
             output.write((char *) &regionsOutput, sizeof(regionsOutput));
         }
-        auto bwSize = backwardAccessNodes[i].size();
+        unsigned int bwSize = boost::numeric_cast<unsigned int>(backwardAccessNodes[i].size());
         output.write((char *) &bwSize, sizeof(bwSize));
-        for(size_t j = 0; j < backwardAccessNodes[i].size(); j++) {
+        for(unsigned int j = 0; j < bwSize; j++) {
             output.write((char *) &backwardAccessNodes[i][j].accessNodeID, sizeof(backwardAccessNodes[i][j].accessNodeID));
             output.write((char *) &backwardAccessNodes[i][j].distanceToNode, sizeof(backwardAccessNodes[i][j].distanceToNode));
             uint32_t regionsOutput = 0;
@@ -226,19 +226,19 @@ void TNRAFPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, 
 
     // Output search spaces (those are needed for the locality filter).
     printf("Will now output search spaces.\n");
-    size_t fwSearchSpaceSum = 0;
-    size_t bwSearchSpaceSum = 0;
+    unsigned int fwSearchSpaceSum = 0;
+    unsigned int bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        auto fwSearchSpaceSize = forwardSearchSpaces[i].size();
+        unsigned int fwSearchSpaceSize = boost::numeric_cast<unsigned int>(forwardSearchSpaces[i].size());
         output.write((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
-        for(size_t j = 0; j < fwSearchSpaceSize; j++) {
+        for(unsigned int j = 0; j < fwSearchSpaceSize; j++) {
             output.write((char *) &forwardSearchSpaces[i][j], sizeof(forwardSearchSpaces[i][j]));
         }
         fwSearchSpaceSum += fwSearchSpaceSize;
 
-        auto bwSearchSpaceSize = backwardSearchSpaces[i].size();
+        unsigned int bwSearchSpaceSize = boost::numeric_cast<unsigned int>(backwardSearchSpaces[i].size());
         output.write((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
-        for(size_t j = 0; j < bwSearchSpaceSize; j++) {
+        for(unsigned int j = 0; j < bwSearchSpaceSize; j++) {
             output.write((char *) &backwardSearchSpaces[i][j], sizeof(backwardSearchSpaces[i][j]));
         }
         bwSearchSpaceSum += bwSearchSpaceSize;

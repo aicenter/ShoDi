@@ -34,6 +34,16 @@ public:
    */
   virtual unsigned int nodes() const = 0;
 
+  /**
+   * Returns whether this implementation of Graph has built-in checks for
+   * duplicate edge entries. If true, loading a duplicate edge should result in
+   * only a single edge being stored in the data - specifically the edge with
+   * the lowest weight.
+   *
+   * @return The boolean value
+   */
+  virtual bool handlesDuplicateEdges() = 0;
+
   virtual ~BaseGraph() = default;
 };
 

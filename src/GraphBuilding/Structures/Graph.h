@@ -75,6 +75,10 @@ public:
      */
     const vector<pair<unsigned int, dist_t>> & outgoingEdges(const unsigned int x)const;
 
+    bool handlesDuplicateEdges() override {
+        return false;
+    }
+
     ~Graph() = default;
 };
 

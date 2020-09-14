@@ -29,6 +29,10 @@ public:
    */
   std::vector<dist_t> matrix();
 
+  bool handlesDuplicateEdges() override {
+    return true;
+  }
+
   ~AdjMatrixGraph() = default;
 };
 

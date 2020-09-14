@@ -82,12 +82,11 @@ void createCH(
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
     timer.begin();
 
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1, precisionLoss);
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, precisionLoss);
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graphLoader.loadGraph(graph, precisionLoss);
     graph.flushInDdsgFormat(outputFilePath);
 
     timer.finish();
@@ -110,12 +109,11 @@ void createTNRFast(
     Timer timer("Transit Node Routing preprocessing (fast mode)");
     timer.begin();
 
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1, precisionLoss);
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, precisionLoss);
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graphLoader.loadGraph(graph, precisionLoss);
 
     TNRPreprocessor::preprocessUsingCH(graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
 
@@ -144,7 +142,7 @@ void createTNRSlow(
     Graph *originalGraph = graph.createCopy();
 
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(*originalGraph);
+    graphLoader.loadGraph(graph, precisionLoss);
 
     TNRPreprocessor::preprocessUsingCHslower(
         graph, *originalGraph, outputFilePath,
@@ -177,7 +175,7 @@ void createTNRUsingDM(
     Graph *originalGraph = graph.createCopy();
 
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(*originalGraph);
+    graphLoader.loadGraph(graph, precisionLoss);
 
     TNRPreprocessor::preprocessWithDMvalidation(
         graph, *originalGraph, outputFilePath,
@@ -233,13 +231,12 @@ void createTNRAFSlow(
     Timer timer("Transit Node Routing with Arc Flags preprocessing (slow mode)");
     timer.begin();
 
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1, precisionLoss);
-    Graph *originalGraph = g1.createCopy();
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, precisionLoss);
+    Graph *originalGraph = graph.createCopy();
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graphLoader.loadGraph(graph, precisionLoss);
 
     TNRAFPreprocessor::preprocessUsingCH(
         graph, *originalGraph, outputFilePath,
@@ -267,13 +264,12 @@ void createTNRAFUsingDM(
 
     // TODO tahle funkce je buhviproc uplne stejna jako createTNRAFSlow. Uz to tak bylo, tak jenom davam vedet.
 
-    UpdateableGraph g1(graphLoader.nodes());
-    graphLoader.loadGraph(g1, precisionLoss);
-    Graph *originalGraph = g1.createCopy();
+    UpdateableGraph graph(graphLoader.nodes());
+    graphLoader.loadGraph(graph, precisionLoss);
+    Graph *originalGraph = graph.createCopy();
 
-    UpdateableGraph graph(g1);
     CHPreprocessor::preprocessForDDSG(graph);
-    graph.addAllEdges(g1);
+    graphLoader.loadGraph(graph, precisionLoss);
 
     TNRAFPreprocessor::preprocessUsingCH(
         graph, *originalGraph, outputFilePath,

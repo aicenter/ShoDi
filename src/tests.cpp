@@ -29,7 +29,7 @@ DistanceMatrix *obtainDM(GraphLoader &loader, DistanceMatrixComputor &computor) 
     Timer timer("Whole Distance Matrix computation timer");
     timer.begin();
 
-    computor.computeDistanceMatrix(loader);
+    computor.computeDistanceMatrix(loader, 1);
 
     timer.finish();
     timer.printMeasuredTime();

@@ -28,6 +28,8 @@ XenGraphLoader::XenGraphLoader(string inputFile)
 
 void XenGraphLoader::parseAmounts() {
   if(!amountsParsed) {
+    input.seekg(0, std::ios::beg);
+
     char c1, c2, c3;
     input >> c1 >> c2 >> c3;
     if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
@@ -54,6 +56,12 @@ size_t XenGraphLoader::edges() {
 }
 
 void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
+  {
+    string skippedLine;
+    input.seekg(0, std::ios::beg);
+    getline(input, skippedLine);
+  }
+
   unsigned int from, to, oneWayFlag, weight;
   for (size_t i = 0; i < edgesAmount; i++) {
     input >> from >> to >> weight >> oneWayFlag;
@@ -74,7 +82,7 @@ void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
 void XenGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
   parseAmounts();
 
-  if (instanceof <SimpleGraph>(graph) || instanceof <UpdateableGraph>(graph)) {
+  if (graph.handlesDuplicateEdges()) {
     parseEdges(graph, precisionLoss);
   } else {
     SimpleGraph sg(nodesAmount);

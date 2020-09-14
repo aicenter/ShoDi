@@ -17,8 +17,14 @@ AdjMatrixGraph::AdjMatrixGraph(unsigned int nodes)
 
 bool AdjMatrixGraph::addEdge(unsigned int from, unsigned int to,
                              dist_t weight) {
-  mtx[(size_t)from * (size_t)nodesAmount + (size_t)to] = weight;
-  return true;
+  const size_t index = (size_t)from * (size_t)nodesAmount + (size_t)to;
+
+  if (weight < mtx[index]) {
+    mtx[index] = weight;
+    return true;
+  }
+
+  return false;
 }
 
 unsigned int AdjMatrixGraph::nodes() const { return nodesAmount; }

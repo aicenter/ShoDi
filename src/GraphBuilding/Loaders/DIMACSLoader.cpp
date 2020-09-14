@@ -14,6 +14,7 @@
 #include <climits>
 #include <fstream>
 #include <memory>
+#include <string>
 #include <type_traits>
 
 //______________________________________________________________________________________________________________________
@@ -28,6 +29,7 @@ DIMACSLoader::DIMACSLoader(string inputFile)
 
 void DIMACSLoader::parseAmounts() {
   if (!amountsParsed) {
+    input.seekg(0, std::ios::beg);
     parseGraphProblemLine(input, nodesAmount, edgesAmount);
     amountsParsed = true;
   }
@@ -47,7 +49,13 @@ size_t DIMACSLoader::edges() {
 void DIMACSLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
   parseAmounts();
 
-  if (instanceof <SimpleGraph>(graph) || instanceof <UpdateableGraph>(graph)) {
+  {
+    string skippedLine;
+    input.seekg(0, std::ios::beg);
+    getline(input, skippedLine);
+  }
+
+  if (graph.handlesDuplicateEdges()) {
     parseEdges(input, graph, edgesAmount, precisionLoss);
   } else {
     SimpleGraph sg(nodesAmount);

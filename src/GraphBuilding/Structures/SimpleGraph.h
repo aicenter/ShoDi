@@ -56,6 +56,10 @@ public:
      */
     const map<unsigned int, dist_t> & edges(unsigned int x)const;
 
+    bool handlesDuplicateEdges() override {
+        return true;
+    }
+
     ~SimpleGraph() = default;
 };
 
