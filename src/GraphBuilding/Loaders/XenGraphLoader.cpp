@@ -97,7 +97,22 @@ void XenGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
 //______________________________________________________________________________________________________________________
 void XenGraphLoader::loadNodesMapping(
     unordered_map<long long unsigned int, unsigned int> &mapping) {
-  parseAmounts();
+  if(input.eof())
+    input.clear();
+
+  input.seekg(0, std::ios::beg);
+
+  char c1, c2, c3;
+  input >> c1 >> c2 >> c3;
+  if (c1 != 'X' || c2 != 'I' || c3 != 'D') {
+    cout
+      << "The input file is missing the XenGraph indices file header." << endl
+      << "Are you sure the input file is in the correct format?" << endl
+      << "The loading will proceed but the mapping might be corrupted."
+      << endl;
+  }
+
+  input >> nodesAmount;
 
   long long unsigned int cur;
   for (unsigned int i = 0; i < nodesAmount; i++) {
