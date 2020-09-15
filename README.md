@@ -55,8 +55,10 @@ Table of Contents
          * [CSV input format](#csv-input-format)
          * [The query set input format](#the-query-set-input-format)
          * [The mapping file format](#the-mapping-file-format)
+   * [Integration With Other Languages](#integration-with-other-languages)
+   * [Amod-to-agentpolis](#amod-to-agentpolis)
 
-<!-- Added by: nojmy, at: Pá 31. �?ervence 2020, 11:34:25 CEST -->
+<!-- Added by: nojmy, at: Pá 31. �?ervence 2020, 11:34:25 CEST -->
 
 <!--te-->
 
@@ -435,7 +437,7 @@ The third line contains the original ID of the node with the ID 1, and so on up 
 original ID for the node with the ID `n-1` in our application.
 
 
-# Integraion to Other Languages
+# Integration With Other Languages
 Integration of this library into an application written in languages other than `C++` and `Java` is also possible,
 but it will require you to generate new 'glue code' for the desired language using a tool called `SWIG`. 
 You will also need to change the `CMakeLists.txt` file in order to compile the library for such usage. 
