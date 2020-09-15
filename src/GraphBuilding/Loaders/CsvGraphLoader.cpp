@@ -28,11 +28,11 @@ inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned in
   try {
     val = stod(str);
   }
-  catch(std::invalid_argument &e) {
+  catch(std::invalid_argument &) {
     cerr << "Warning: Found an unexpected value (" << str << ") in '" << inputFile << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
     return std::numeric_limits<dist_t>::max();
   }
-  catch(std::out_of_range &e) {
+  catch(std::out_of_range &) {
     cerr << "Warning: Found an out of range value (" << str << ") in '" << inputFile << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
     return std::numeric_limits<dist_t>::max();
   }

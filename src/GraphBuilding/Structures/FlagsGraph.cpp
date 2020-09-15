@@ -36,8 +36,10 @@ FlagsGraph::~FlagsGraph() = default;
 
 //______________________________________________________________________________________________________________________
 void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges) {
-    for(size_t i = 0; i < neighbours.size(); i++) {
-        for(size_t j = 0; j < neighbours[i].size(); j++) {
+    const unsigned int nbs = boost::numeric_cast<unsigned int>(neighbours.size());
+    for(unsigned int i = 0; i < nbs; i++) {
+        const unsigned int nbs2 = boost::numeric_cast<unsigned int>(neighbours[i].size());
+        for(unsigned int j = 0; j < nbs2; j++) {
             allEdges.push_back(make_pair(i, QueryEdge(neighbours[i][j])));
         }
     }
