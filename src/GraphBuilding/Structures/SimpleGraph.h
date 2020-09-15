@@ -8,6 +8,9 @@
 
 #include <vector>
 #include <map>
+#include "constants.h"
+
+#include "BaseGraph.h"
 
 using namespace std;
 
@@ -16,9 +19,9 @@ using namespace std;
  * pair of nodes. Simple graph doesn't contain multiple edges (parallel edges). In our case, if there are more edges
  * than one between two nodes in the original graph, we only preserve the one with the lowest weight.
  */
-class SimpleGraph{
+class SimpleGraph : public BaseGraph {
 private:
-    vector< map < unsigned int, unsigned int > > followingNodes;
+    vector< map < unsigned int, dist_t > > followingNodes;
 public:
     /**
      * A simple constructor.
@@ -36,14 +39,14 @@ public:
      * @param to[in] The target node of the edge.
      * @param weight[in] The weight of the edge.
      */
-    void addEdge(unsigned int from, unsigned int to, unsigned int weight);
+    bool addEdge(unsigned int from, unsigned int to, dist_t weight) override;
 
     /**
      * Returns the amount of nodes in the graph.
      *
-     * @return The amoung of nodes in the graph.
+     * @return The amount of nodes in the graph.
      */
-    unsigned int nodes() const;
+    unsigned int nodes() const override;
 
     /**
      * Returns all the edges in the graph that have 'x' as their source node.
@@ -51,7 +54,13 @@ public:
      * @param x[in] The node we are interested in.
      * @return A map containing all the edges in the graph that have 'x' as their source node along with their weights.
      */
-    const map<unsigned int, unsigned int> & edges(unsigned int x)const;
+    const map<unsigned int, dist_t> & edges(unsigned int x)const;
+
+    bool handlesDuplicateEdges() override {
+        return true;
+    }
+
+    ~SimpleGraph() = default;
 };
 
 

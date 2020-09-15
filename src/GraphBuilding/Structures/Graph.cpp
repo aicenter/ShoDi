@@ -4,6 +4,7 @@
 //
 
 #include <cstdio>
+#include <boost/numeric/conversion/cast.hpp>
 #include "Graph.h"
 
 //______________________________________________________________________________________________________________________
@@ -14,7 +15,7 @@ Graph::Graph(unsigned int n) {
 
 //______________________________________________________________________________________________________________________
 Graph::Graph(SimpleGraph & x) {
-    const unsigned int nodes = x.nodes();
+    const auto nodes = x.nodes();
     this->followingNodes.resize(nodes);
     this->previousNodes.resize(nodes);
 
@@ -27,22 +28,23 @@ Graph::Graph(SimpleGraph & x) {
 }
 
 //______________________________________________________________________________________________________________________
-void Graph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
+bool Graph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     this->followingNodes.at(from).push_back(make_pair(to, weight));
     this->previousNodes.at(to).push_back(make_pair(from, weight));
+    return true;
 }
 
 //______________________________________________________________________________________________________________________
 unsigned int Graph::nodes()const {
-    return this->followingNodes.size();
+    return boost::numeric_cast<unsigned int>(this->followingNodes.size());
 }
 
 //______________________________________________________________________________________________________________________
-const vector<pair<unsigned int, unsigned int>> & Graph::incomingEdges(const unsigned int x)const {
+const vector<pair<unsigned int, dist_t>> & Graph::incomingEdges(const unsigned int x)const {
     return this->previousNodes.at(x);
 }
 
 //______________________________________________________________________________________________________________________
-const vector<pair<unsigned int, unsigned int>> & Graph::outgoingEdges(const unsigned int x)const {
+const vector<pair<unsigned int, dist_t>> & Graph::outgoingEdges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }

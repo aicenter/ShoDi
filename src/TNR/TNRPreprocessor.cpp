@@ -6,13 +6,14 @@
 #include <climits>
 #include <fstream>
 #include <iostream>
+#include <boost/numeric/conversion/cast.hpp>
 #include "TNRPreprocessor.h"
 #include "../GraphBuilding/Structures/FlagsGraph.h"
 #include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeData.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "../DistanceMatrix/DistanceMatrix.h"
-#include "../DistanceMatrix/DistanceMatrixComputor.h"
+#include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "../Dijkstra/BasicDijkstra.h"
 
 //______________________________________________________________________________________________________________________
@@ -132,7 +133,7 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
 
     DistanceMatrix * distanceMatrix;
     {
-        DistanceMatrixComputor dmComputor;
+        DistanceMatrixComputorSlow dmComputor;
         dmComputor.computeDistanceMatrix(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
     }
@@ -167,7 +168,7 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
 
     {
         delete distanceMatrix;
-        DistanceMatrixComputor dmComputor;
+        DistanceMatrixComputorSlow dmComputor;
         dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
     }
@@ -195,7 +196,7 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     ofstream output;
     output.open ( outputPath + ".tnrg", ios::binary );
     if( ! output.is_open() ) {
-        printf("Couldn't open file '%s'!", (outputPath + ".ch").c_str());
+        printf("Couldn't open file '%s'!", (outputPath + ".tnrg").c_str());
     }
 
     char c1, c2, c3, c4;
@@ -208,12 +209,13 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     output.write(&c3, sizeof (c3));
     output.write(&c4, sizeof (c4));
     unsigned int nodes = graph.nodes();
-    unsigned int edges = allEdges.size();
+    // TODO endes as unsigned long or unsigned long long
+    unsigned int edges = boost::numeric_cast<unsigned int>(allEdges.size());
     output.write((char *) &nodes, sizeof(nodes));
     output.write((char *) &edges, sizeof(edges));
     output.write((char *) &transitNodesAmount, sizeof(transitNodesAmount));
 
-    for(unsigned int i = 0; i < allEdges.size(); i++) {
+    for(size_t i = 0; i < allEdges.size(); i++) {
         output.write((char *) &allEdges[i].first, sizeof(allEdges[i].first));
         output.write((char *) &allEdges[i].second.targetNode, sizeof(allEdges[i].second.targetNode));
         unsigned int weight = allEdges[i].second.weight;
@@ -251,31 +253,31 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        unsigned int fwSize = forwardAccessNodes[i].size();
+        unsigned int fwSize = boost::numeric_cast<unsigned int>(forwardAccessNodes[i].size());
         output.write((char *) &fwSize, sizeof(fwSize));
-        for(unsigned int j = 0; j < forwardAccessNodes[i].size(); j++) {
+        for(unsigned int j = 0; j < fwSize; j++) {
             output.write((char *) &forwardAccessNodes[i][j].accessNodeID, sizeof(forwardAccessNodes[i][j].accessNodeID));
             output.write((char *) &forwardAccessNodes[i][j].distanceToNode, sizeof(forwardAccessNodes[i][j].distanceToNode));
         }
-        unsigned int bwSize = backwardAccessNodes[i].size();
+        unsigned int bwSize = boost::numeric_cast<unsigned int>(backwardAccessNodes[i].size());
         output.write((char *) &bwSize, sizeof(bwSize));
-        for(unsigned int j = 0; j < backwardAccessNodes[i].size(); j++) {
+        for(unsigned int j = 0; j < bwSize; j++) {
             output.write((char *) &backwardAccessNodes[i][j].accessNodeID, sizeof(backwardAccessNodes[i][j].accessNodeID));
             output.write((char *) &backwardAccessNodes[i][j].distanceToNode, sizeof(backwardAccessNodes[i][j].distanceToNode));
         }
     }
 
-    unsigned int fwSearchSpaceSum = 0;
-    unsigned int bwSearchSpaceSum = 0;
+    size_t fwSearchSpaceSum = 0;
+    size_t bwSearchSpaceSum = 0;
     for(unsigned int i = 0; i < graph.nodes(); i++) {
-        unsigned int fwSearchSpaceSize = forwardSearchSpaces[i].size();
+        unsigned int fwSearchSpaceSize = boost::numeric_cast<unsigned int>(forwardSearchSpaces[i].size());
         output.write((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
         for(unsigned int j = 0; j < fwSearchSpaceSize; j++) {
             output.write((char *) &forwardSearchSpaces[i][j], sizeof(forwardSearchSpaces[i][j]));
         }
         fwSearchSpaceSum += fwSearchSpaceSize;
 
-        unsigned int bwSearchSpaceSize = backwardSearchSpaces[i].size();
+        unsigned int bwSearchSpaceSize = boost::numeric_cast<unsigned int>(backwardSearchSpaces[i].size());
         output.write((char *) &bwSearchSpaceSize, sizeof(bwSearchSpaceSize));
         for(unsigned int j = 0; j < bwSearchSpaceSize; j++) {
             output.write((char *) &backwardSearchSpaces[i][j], sizeof(backwardSearchSpaces[i][j]));
@@ -455,7 +457,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 
     }
 
-    for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
+    for(size_t i = 0; i < accessNodesSuperset.size(); i++) {
         unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
         unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
         unsigned int realDistance = dm.findDistance(source, accessNode);
@@ -572,7 +574,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
     }
 
 
-    for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
+    for(size_t i = 0; i < accessNodesSuperset.size(); i++) {
         unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
         unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
         unsigned int realDistance = distsFromNode[accessNode];
@@ -636,7 +638,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
     }
 
 
-    for(unsigned int i = 0; i < accessNodesSuperset.size(); i++) {
+    for(size_t i = 0; i < accessNodesSuperset.size(); i++) {
         unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
         unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
         unsigned int realDistance = dm.findDistance(source, accessNode);

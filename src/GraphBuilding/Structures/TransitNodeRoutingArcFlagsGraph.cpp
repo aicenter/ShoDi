@@ -37,9 +37,9 @@ unsigned int TransitNodeRoutingArcFlagsGraph::findTNRAFDistance(unsigned int sta
     unsigned int sourceRegion = nodesData[start].region;
     unsigned int targetRegion = nodesData[goal].region;
 
-    for(unsigned int i = 0; i < forwardAccessNodes[start].size(); i++) {
+    for(size_t i = 0; i < forwardAccessNodes[start].size(); i++) {
         if (forwardAccessNodes[start][i].regionFlags[targetRegion]) {
-            for (unsigned int j = 0; j < backwardAccessNodes[goal].size(); j++) {
+            for(size_t j = 0; j < backwardAccessNodes[goal].size(); j++) {
                 if (backwardAccessNodes[goal][j].regionFlags[sourceRegion]) {
                     unsigned int id1 = transitNodeMapping[forwardAccessNodes[start][i].accessNodeID];
                     unsigned int id2 = transitNodeMapping[backwardAccessNodes[goal][j].accessNodeID];

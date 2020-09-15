@@ -5,46 +5,62 @@
 
 #include <cstdio>
 #include <climits>
+#include <fstream>
+#include <cmath>
+#include <limits>
+#include <iostream>
+#include <boost/numeric/conversion/cast.hpp>
 #include "DistanceMatrix.h"
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix::DistanceMatrix(const unsigned int nodes) : distances(nodes, vector<unsigned int>(nodes)) {
+DistanceMatrix::DistanceMatrix(const unsigned int nodes) : nodesCnt(nodes), distances(((size_t) nodes) * ((size_t) nodes)) {
 
 }
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix::DistanceMatrix(vector<vector<unsigned int>> && distMatrix) : distances(move(distMatrix)) {
+DistanceMatrix::DistanceMatrix(vector<dist_t> &&distMatrix) : nodesCnt(boost::numeric_cast<unsigned int>(sqrt(distMatrix.size()))),
+                                                           distances(move(distMatrix)) {
 
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int DistanceMatrix::findDistance(const unsigned int start, const unsigned int goal) {
-    return distances[start][goal];
+dist_t DistanceMatrix::findDistance(const unsigned int start, const unsigned int goal) {
+    return distances[((size_t) start) * ((size_t) nodesCnt) + ((size_t) goal)];
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrix::setDistance(unsigned int source, unsigned int target, unsigned int distance) {
-    distances[source][target] = distance;
+void DistanceMatrix::setDistance(unsigned int source, unsigned int target, dist_t distance) {
+    distances[((size_t) source) * ((size_t) nodesCnt) + ((size_t) target)] = distance;
 }
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrix::printInfo() {
-    unsigned int half = UINT_MAX / 2;
+    const dist_t max = std::numeric_limits<dist_t>::max();
+    const dist_t half = max / 2;
     unsigned int halfCnt = 0;
     unsigned int maxCnt = 0;
-    for(unsigned int i = 0; i < distances.size(); ++i) {
-        for(unsigned int j = 0; j < distances.size(); ++j) {
-            if(distances[i][j] == UINT_MAX) {
+    for(unsigned int i = 0; i < nodesCnt; i++) {
+        for(unsigned int j = 0; j < nodesCnt; j++) {
+            if (distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)] == max) {
                 maxCnt++;
             }
-            if(distances[i][j] >= half) {
+            if (distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)] >= half) {
                 halfCnt++;
             }
         }
     }
 
-    unsigned int optCount = distances.size() * distances.size();
-    printf("Computed distance matrix info.\n");
-    printf("Distance matrix contains %u INF values. That is %f %%.\n", maxCnt, (double) maxCnt / optCount);
-    printf("Distance matrix contains %u values that are at least half of UINT_MAX. That is %f %%.\n", halfCnt, (double) halfCnt / optCount);
+    const auto optCount = distances.size();
+    cout << "Computed distance matrix info." << endl;
+    cout << "Distance matrix contains " << maxCnt << " UINF values. That is " << (double) maxCnt / (double) optCount << " %." << endl;
+    cout << "Distance matrix contains " << halfCnt << " values that are at least half of std::numeric_limits<dist_t>::max(). That is "
+        << (double) halfCnt / (double) optCount << " %." << endl;
+}
+
+const vector<dist_t> &DistanceMatrix::getRawData() {
+    return distances;
+}
+
+unsigned int DistanceMatrix::nodes() {
+    return nodesCnt;
 }

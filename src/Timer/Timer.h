@@ -7,6 +7,7 @@
 #define TRANSIT_NODE_ROUTING_TIMER_H
 
 #include <chrono>
+#include <ctime>
 #include <string>
 
 using namespace std;
@@ -34,21 +35,28 @@ public:
     void finish();
 
     /**
+     * Function to reset the timer to 0.
+     */
+    void reset();
+
+    /**
      * Prints the measured time as a string in seconds.
      */
     void printMeasuredTime();
 
     /**
-     * Returns the measured time in seconds. The measured time is the time between the call of the 'begin' function
-     * and the call of the 'finish' function. Both 'begin' and 'finish' can be called multiple times on the same timer
-     * and the returned times will still be correct.
+     * Returns the measured real time in seconds. The measured time is the real time between each call to the 'begin' function
+     * and to the 'finish' function. Both 'begin' and 'finish' can be called multiple times on the same timer
+     * and the sum will be returned, unless 'reset' is called.
      *
-     * @return The time measured by the timer in seconds.
+     * @return The real time measured by the timer in seconds.
      */
-    double getMeasuredTimeInSeconds();
+    double getRealTimeSeconds();
+
 private:
-    chrono::steady_clock::time_point beginTimePoint;
-    chrono::steady_clock::time_point finishTimePoint;
+    std::chrono::microseconds realTimeSum;
+    std::chrono::steady_clock::time_point realBeginTimePoint;
+    std::chrono::steady_clock::time_point realFinishTimePoint;
     const string name;
 };
 

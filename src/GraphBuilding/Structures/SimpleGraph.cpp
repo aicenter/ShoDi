@@ -4,6 +4,7 @@
 //
 
 #include "SimpleGraph.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 //______________________________________________________________________________________________________________________
 SimpleGraph::SimpleGraph(unsigned int n) {
@@ -11,7 +12,7 @@ SimpleGraph::SimpleGraph(unsigned int n) {
 }
 
 //______________________________________________________________________________________________________________________
-void SimpleGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight) {
+bool SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
     if (followingNodes.at(from).count(to) == 1) {
         if (followingNodes.at(from).at(to) > weight) {
             followingNodes.at(from).at(to) = weight;
@@ -19,15 +20,17 @@ void SimpleGraph::addEdge(unsigned int from, unsigned int to, unsigned int weigh
     } else {
         followingNodes.at(from).insert(make_pair(to, weight));
     }
+
+    return true;
 }
 
 //______________________________________________________________________________________________________________________
 unsigned int SimpleGraph::nodes()const {
-    return this->followingNodes.size();
+    return boost::numeric_cast<unsigned int>(this->followingNodes.size());
 }
 
 //______________________________________________________________________________________________________________________
-const map<unsigned int, unsigned int> & SimpleGraph::edges(const unsigned int x)const {
+const map<unsigned int, dist_t> & SimpleGraph::edges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }
 

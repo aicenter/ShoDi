@@ -336,7 +336,7 @@ SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_shortestpaths_shortestPathsJNI_CHD
         }
         jenv->ReleaseByteArrayElements(ba, bae, 0);
     }
-    result = (unsigned int)(arg1)->distanceQuery(arg2,arg3);
+    result = (arg1)->distanceQuery(arg2,arg3);
     jresult = (jlong)result;
     return jresult;
 }
@@ -461,7 +461,7 @@ SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_shortestpaths_shortestPathsJNI_TNR
         }
         jenv->ReleaseByteArrayElements(ba, bae, 0);
     }
-    result = (unsigned int)(arg1)->distanceQuery(arg2,arg3);
+    result = (arg1)->distanceQuery(arg2,arg3);
     jresult = (jlong)result;
     return jresult;
 }
@@ -586,7 +586,7 @@ SWIGEXPORT jlong JNICALL Java_cz_cvut_fel_aic_shortestpaths_shortestPathsJNI_TNR
         }
         jenv->ReleaseByteArrayElements(ba, bae, 0);
     }
-    result = (unsigned int)(arg1)->distanceQuery(arg2,arg3);
+    result = (arg1)->distanceQuery(arg2,arg3);
     jresult = (jlong)result;
     return jresult;
 }

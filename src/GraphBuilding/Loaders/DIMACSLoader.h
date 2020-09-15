@@ -6,10 +6,13 @@
 #ifndef TRANSIT_NODE_ROUTING_LOADER_H
 #define TRANSIT_NODE_ROUTING_LOADER_H
 
+#include <fstream>
 #include <string>
 #include <map>
 #include "../Structures/Graph.h"
 #include "../Structures/UpdateableGraph.h"
+#include "GraphBuilding/Structures/BaseGraph.h"
+#include "GraphLoader.h"
 
 using namespace std;
 
@@ -22,9 +25,15 @@ using namespace std;
  * sample graphs that can be directly used with this program can be found here:
  * http://www.dis.uniroma1.it/challenge9/download.shtml
  */
-class DIMACSLoader{
+class DIMACSLoader : public GraphLoader {
 private:
     string inputFile;
+    ifstream input;
+    bool amountsParsed;
+    unsigned int nodesAmount;
+    size_t edgesAmount;
+
+    void parseAmounts();
 
     /**
      * Auxiliary function used to parse the problem line of the input file (first line that is not a comment).
@@ -33,16 +42,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void parseGraphProblemLine(ifstream & input, unsigned int & nodes, unsigned int & edges);
-
-    /**
-     Auxiliary function used to parse the edges when loading the graph.
-     *
-     * @param input[in] The input stream corresponding to the input file.
-     * @param graph[in, out] The graph instance that the edges will be inserted into.
-     * @param edges[in] The number of edges that need to be loaded.
-     */
-    void parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges);
+    void parseGraphProblemLine(ifstream & input, unsigned int & nodes, size_t & edges);
 
     /**
      * Auxiliary function used to parse the edges when loading the graph.
@@ -50,8 +50,10 @@ private:
      * @param input[in] The input stream corresponding to the input file.
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
+     * @param[in] precisionLoss This parameter allows us to lose some precision
+     * of the weight values. Each loaded weight will be divided by this value before rounding.
      */
-    void parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges);
+    void parseEdges(ifstream & input, BaseGraph & graph, size_t edges, unsigned int precisionLoss);
 
     /**
      * Auxiliary function that extracts the number of nodes and the number of edges from the problem line.
@@ -60,7 +62,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void processGraphProblemLine(string & buffer, unsigned int & nodes, unsigned int & edges);
+    void processGraphProblemLine(string & buffer, unsigned int & nodes, size_t & edges);
 
     /**
      * Extracts an edge data from an input line representing an edge.
@@ -70,7 +72,7 @@ private:
      * @param to[out] The target node of the edge.
      * @param weight[out] The weight of the edge.
      */
-    void getEdge(string & buffer, unsigned int & from, unsigned int & to, unsigned int & weight);
+    void getEdge(string & buffer, unsigned int & from, unsigned int & to, dist_t & weight);
 
 public:
     /**
@@ -80,31 +82,13 @@ public:
      */
     explicit DIMACSLoader(string inputFile);
 
-    /**
-     * Function used to load a graph for the Dijkstra's algorithm. One minor improvement is that we first load the edges
-     * into an 'SimpleGraph' instance, which automatically removes multiple (parallel) edges and then
-     * construct a 'Graph' from that.
-     *
-     * @return An instance of the Graph class containing the graph obtained from the input file.
-     */
-    Graph * loadGraph();
+    unsigned int nodes() override;
 
-    /**
-     * This function is used to load the graph data into an 'UpdateableGraph' instance, which can be used for the
-     * preprocessing to create a Contraction Hierarchy from the input graph.
-     *
-     * @return An instance of the UpdateableGraph class containing the graph obtained from the input file.
-     */
-    UpdateableGraph * loadUpdateableGraph();
+    size_t edges();
 
-    /**
-     * This function is used to reinsert all the original edges into the graph after the preprocessing has been
-     * finished. Since during preprocessing edges are deleted during the contraction process, this puts the original
-     * edges back into the graph.
-     *
-     * @param graph[in, out] An existing graph we will insert the edges into.
-     */
-    void putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph);
+    void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
+
+    ~DIMACSLoader() override = default;
 };
 
 #endif //TRANSIT_NODE_ROUTING_LOADER_H

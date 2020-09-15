@@ -3,6 +3,7 @@
 // Created on: 20.08.19
 //
 
+#include <iostream>
 #include "DistanceCorrectnessValidator.h"
 #include "../CH/CHPathQueryManager.h"
 
@@ -12,21 +13,22 @@ void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned 
 
     unsigned int pathMismatches = 0;
     unsigned int distanceSumMismatches = 0;
-    for(unsigned int i = 0; i < trips.size(); i++) {
+    for(size_t i = 0; i < trips.size(); i++) {
         vector < pair < unsigned int, unsigned int > > path;
         vector < unsigned int > distances;
         unsigned int reportedDistance = qm.findPath(trips[i].first, trips[i].second, path, distances);
 
-        for(unsigned int j = 0; j < path.size(); j++) {
+        for(size_t j = 0; j < path.size(); j++) {
             unsigned int curSource = path[j].first;
             vector<pair<unsigned int, unsigned int>> neighbours = originalGraph.outgoingEdges(curSource);
 
             bool found = false;
-            for(unsigned int k = 0; k < neighbours.size(); k++) {
+            for(size_t k = 0; k < neighbours.size(); k++) {
                 if (neighbours[k].first == path[j].second) {
                     found = true;
                     if (neighbours[k].second != distances[j]) {
-                        printf("Found mismatch in trip '%u': length of edge '%u -> %u' reported by CH was %u, actual length is %u.\n", i, curSource, path[j].second, distances[j], neighbours[k].second);
+                        cout << "Found mismatch in trip '" << i << "': ";
+                        cout << "length of edge '" << curSource  << " -> " << path[j].second << "' reported by CH was " << distances[j] << ", actual length is " << neighbours[k].second << "." << endl;
                         pathMismatches++;
                     }
                     break;
@@ -34,7 +36,8 @@ void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned 
             }
 
             if(! found) {
-                printf("Found mismatch in trip '%u': CH reported edge '%u -> %u' which doesn't exist in the original graph.\n", i, curSource, path[j].second);
+                cout << "Found mismatch in trip '" << i << "': ";
+                cout << "CH reported edge '" << curSource << " -> " << path[j].second << "' which doesn't exist in the original graph." << endl;
                 pathMismatches++;
                 break;
             }
@@ -42,18 +45,19 @@ void DistanceCorrectnessValidator::validateOnGivenTrips(vector< pair < unsigned 
         }
 
         unsigned int sumDistance = 0;
-        for(unsigned int j = 0; j < distances.size(); j++) {
+        for(size_t j = 0; j < distances.size(); j++) {
             sumDistance += distances[j];
         }
 
         if (sumDistance != reportedDistance && reportedDistance != UINT_MAX) {
-            printf("Found mismatch in trip '%u': Reported distance was %u while the sum of all the reported edges was %u\n", i, reportedDistance, sumDistance);
+            cout << "Found mismatch in trip '" << i << "': ";
+            cout << "Reported distance was " << reportedDistance << " while the sum of all the reported edges was " << sumDistance << endl;
             distanceSumMismatches++;
         }
 
     }
 
-    printf("Finished paths validation.\n"
-           "Found %u path mismatches (%f %%)\n"
-           "Found %u distance sum mismatches (%f %%)\n", pathMismatches, (double) pathMismatches / trips.size() * 100, distanceSumMismatches, (double) distanceSumMismatches / trips.size() * 100);
+    cout << "Finished paths validation." << endl;
+    cout << "Found '" << pathMismatches << "' path mismatches (" << (double) pathMismatches / (double) trips.size() * 100 << " %)" << endl;
+    cout << "Found '" << distanceSumMismatches << "' distance sum mismatches (" << (double) distanceSumMismatches / (double) trips.size() * 100 << " %)" << endl;
 }

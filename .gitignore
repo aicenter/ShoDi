@@ -1,0 +1,10 @@
+.idea/
+.vs
+.clangd/
+.vscode/
+build/
+cmake-build-debug
+cmake-build-debug-wsl
+vcpkg/
+compile_commands.json
+/javatests/target/

@@ -3,151 +3,120 @@
 // Created on: 31.07.19
 //
 
-#include "../../Timer/Timer.h"
 #include "XenGraphLoader.h"
+#include "../../Error/Error.h"
+#include "../../Timer/Timer.h"
+#include "GraphBuilding/Structures/SimpleGraph.h"
+#include "GraphBuilding/Structures/UpdateableGraph.h"
+#include "constants.h"
+#include <climits>
 #include <fstream>
 #include <iostream>
+#include <limits>
+#include <memory>
+#include <type_traits>
 
 //______________________________________________________________________________________________________________________
-XenGraphLoader::XenGraphLoader(string inputFile) {
-    this->inputFile = inputFile;
+XenGraphLoader::XenGraphLoader(string inputFile)
+    : inputFile(inputFile), amountsParsed(false) {
+  input.open(inputFile);
+  if (!input.is_open()) {
+    throw runtime_error(string("Couldn't open file '") + this->inputFile +
+                        "'!");
+  }
 }
 
-//______________________________________________________________________________________________________________________
-Graph * XenGraphLoader::loadGraph() {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
+void XenGraphLoader::parseAmounts() {
+  if(input.eof())
+    input.clear();
 
-    unsigned int nodes, edges;
-    parseFirstLine(input, nodes, edges);
+  input.seekg(0, std::ios::beg);
 
-    SimpleGraph * graph = new SimpleGraph(nodes);
-    parseEdges(input, *graph, edges);
+  char c1, c2, c3;
+  input >> c1 >> c2 >> c3;
+  if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
+    cout
+      << "The input file is missing the XenGraph header." << endl
+      << "Are you sure the input file is in the correct format?" << endl
+      << "The loading will proceed but the loaded graph might be corrupted."
+      << endl;
+  }
 
-    Graph * retvalGraph = new Graph(*graph);
-
-    delete graph;
-
-    input.close();
-
-    return retvalGraph;
-}
-
-//______________________________________________________________________________________________________________________
-UpdateableGraph * XenGraphLoader::loadUpdateableGraph() {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    unsigned int nodes, edges;
-    parseFirstLine(input, nodes, edges);
-
-    UpdateableGraph * graph = new UpdateableGraph(nodes);
-    parseEdges(input, *graph, edges);
-
-    input.close();
-
-    return graph;
-}
-
-//______________________________________________________________________________________________________________________
-void XenGraphLoader::loadNodesMapping(unordered_map <long long unsigned int, unsigned int> & mapping) {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    parseNodesMapping(input, mapping);
-
-    input.close();
-}
-
-//______________________________________________________________________________________________________________________
-void XenGraphLoader::putAllEdgesIntoUpdateableGraph(UpdateableGraph & graph) {
-    ifstream input;
-    input.open(this->inputFile);
-    if( ! input.is_open() ) {
-        printf("Couldn't open file '%s'!", this->inputFile.c_str());
-    }
-
-    unsigned int nodes, edges;
-    parseFirstLine(input, nodes, edges);
-
-    parseEdges(input, graph, edges);
-
-    input.close();
+  input >> nodesAmount >> edgesAmount;
+  amountsParsed = true;
 
 }
 
-//______________________________________________________________________________________________________________________
-void XenGraphLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges) {
-    char c1, c2, c3;
-    input >> c1 >> c2 >> c3;
-    if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
-        cout << "The input file is missing the XenGraph header." << endl
-             << "Are you sure the input file is in the correct format?" << endl
-             << "The loading will proceed but the loaded graph might be corrupted." << endl;
-    }
+unsigned int XenGraphLoader::nodes() {
+  if(!amountsParsed)
+    parseAmounts();
+  return nodesAmount;
+}
 
-    input >> nodes >> edges;
+size_t XenGraphLoader::edges() {
+  if(!amountsParsed)
+    parseAmounts();
+  return edgesAmount;
+}
+
+void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
+  unsigned int from, to, oneWayFlag, weight;
+  for (size_t i = 0; i < edgesAmount; i++) {
+    input >> from >> to >> weight >> oneWayFlag;
+
+    weight /= precisionLoss;
+
+    if (from != to) {
+      if (oneWayFlag == 1) {
+        graph.addEdge(from, to, weight);
+      } else {
+        graph.addEdge(from, to, weight);
+        graph.addEdge(to, from, weight);
+      }
+    }
+  }
+}
+
+void XenGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
+  parseAmounts();
+
+  if (graph.handlesDuplicateEdges()) {
+    parseEdges(graph, precisionLoss);
+  } else {
+    SimpleGraph sg(nodesAmount);
+    parseEdges(sg, precisionLoss);
+
+    for (unsigned int i = 0; i < nodesAmount; i++) {
+      for (auto &p : sg.edges(i)) {
+        graph.addEdge(i, p.first, p.second);
+      }
+    }
+  }
 }
 
 //______________________________________________________________________________________________________________________
-void XenGraphLoader::parseEdges(ifstream & input, SimpleGraph & graph, unsigned int edges) {
-    unsigned int from, to, oneWayFlag, weight;
-    for(unsigned int i = 0; i < edges; i++) {
-        input >> from >> to >> weight >> oneWayFlag;
-        if (from != to) {
-            if (oneWayFlag == 1) {
-                graph.addEdge(from, to, weight);
-            } else {
-                graph.addEdge(from, to, weight);
-                graph.addEdge(to, from, weight);
-            }
-        }
-    }
-}
+void XenGraphLoader::loadNodesMapping(
+    unordered_map<long long unsigned int, unsigned int> &mapping) {
+  if(input.eof())
+    input.clear();
 
-//______________________________________________________________________________________________________________________
-void XenGraphLoader::parseEdges(ifstream & input, UpdateableGraph & graph, unsigned int edges) {
-    unsigned int from, to, oneWayFlag, weight;
-    for(unsigned int i = 0; i < edges; i++) {
-        input >> from >> to >> weight >> oneWayFlag;
-        if (from != to) {
-            if (oneWayFlag == 1) {
-                graph.addEdge(from, to, weight);
-            } else {
-                graph.addEdge(from, to, weight);
-                graph.addEdge(to, from, weight);
-            }
-        }
-    }
-}
+  input.seekg(0, std::ios::beg);
 
-//______________________________________________________________________________________________________________________
-void XenGraphLoader::parseNodesMapping(ifstream & input, unordered_map <long long unsigned int, unsigned int> & mapping) {
-    unsigned int nodes;
-    long long unsigned int cur;
+  char c1, c2, c3;
+  input >> c1 >> c2 >> c3;
+  if (c1 != 'X' || c2 != 'I' || c3 != 'D') {
+    cout
+      << "The input file is missing the XenGraph indices file header." << endl
+      << "Are you sure the input file is in the correct format?" << endl
+      << "The loading will proceed but the mapping might be corrupted."
+      << endl;
+  }
 
-    char c1, c2, c3;
-    input >> c1 >> c2 >> c3;
-    if (c1 != 'X' || c2 != 'I' || c3 != 'D') {
-        cout << "The input file is missing the XenGraph indices file header." << endl
-             << "Are you sure the input file is in the correct format?" << endl
-             << "The loading will proceed but the mapping might be corrupted." << endl;
-    }
+  input >> nodesAmount;
 
-    input >> nodes;
-
-    for(unsigned int i = 0; i < nodes; i++) {
-        input >> cur;
-        mapping.insert(make_pair(cur, i));
-    }
-
+  long long unsigned int cur;
+  for (unsigned int i = 0; i < nodesAmount; i++) {
+    input >> cur;
+    mapping.insert(make_pair(cur, i));
+  }
 }

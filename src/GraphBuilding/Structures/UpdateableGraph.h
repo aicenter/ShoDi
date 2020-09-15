@@ -6,12 +6,17 @@
 #ifndef TRANSIT_NODE_ROUTING_UPDATEABLEGRAPH_H
 #define TRANSIT_NODE_ROUTING_UPDATEABLEGRAPH_H
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
+#include <string>
+#include <iostream>
 #include "PreprocessingEdgeData.h"
 #include "OutputEdge.h"
 #include "OutputShortcutEdge.h"
 #include "Graph.h"
+#include "constants.h"
+
+#include "BaseGraph.h"
 
 using namespace std;
 
@@ -20,7 +25,7 @@ using namespace std;
  * and reasonably quick edge adding and removing. It also keeps track of which edges are shortcut edges and which
  * are original edges. The information in this structure can be directly used to generate a .ch file.
  */
-class UpdateableGraph{
+class UpdateableGraph : public BaseGraph {
 protected:
     /**
      * Auxiliary function for the output process.
@@ -81,7 +86,7 @@ protected:
             ostream & output);
 
     vector< unordered_map < unsigned int, PreprocessingEdgeData > > followingNodes;
-    vector< unordered_map < unsigned int, unsigned int > > previousNodes;
+    vector< unordered_map < unsigned int, dist_t > > previousNodes;
     vector< unsigned int > ranks;
 
 public:
@@ -162,7 +167,7 @@ public:
     bool addEdge(
             unsigned int from,
             unsigned int to,
-            unsigned int weight);
+            dist_t weight) override;
 
     /**
      * Tries to insert an shortcut edge from one node to another with the given weight into the graph. The edge is not
@@ -181,7 +186,7 @@ public:
     bool addShortcutEdge(
             unsigned int from,
             unsigned int to,
-            unsigned int weight,
+            dist_t weight,
             unsigned int middlenode);
 
     /**
@@ -243,7 +248,7 @@ public:
      *
      * @return The number of nodes in the graph.
      */
-    unsigned int nodes() const;
+    unsigned int nodes() const override;
 
     /**
      * Returns all the edges with the node 'x' as their target node.
@@ -251,7 +256,7 @@ public:
      * @param x[in] The target node we are interested in.
      * @return All the edges in the graph that have 'x' as their target node.
      */
-    const unordered_map<unsigned int, unsigned int> & incomingEdges(
+    const unordered_map<unsigned int, dist_t> & incomingEdges(
             const unsigned int x)const;
 
     /**
@@ -271,6 +276,12 @@ public:
      */
      unsigned int degree(
             unsigned int node)const;
+
+     bool handlesDuplicateEdges() override {
+         return true;
+     }
+
+     ~UpdateableGraph() = default;
 };
 
 

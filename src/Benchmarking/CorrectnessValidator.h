@@ -7,6 +7,7 @@
 #define TRANSIT_NODE_ROUTING_CORECTNESSVALIDATOR_H
 
 #include <vector>
+#include "constants.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ public:
      * @param b[in] A second vector of values to be compared.
      * @return Returns 'true' if all the pairs of values in the two vectors are the same, 'false' otherwise.
      */
-    static bool validate(vector < unsigned int > & a, vector < unsigned int > & b);
+    static bool validate(vector<dist_t> &a, vector<dist_t> &b);
 
     /**
      * Compares the two vectors containing some computed distances element by element. Prints out the all the mismatches
@@ -39,7 +40,8 @@ public:
      * @return Currently returns 'true' all the time, so you should make decisions based on the printed output.
      * If you want some machine processing for example, use the basic 'validate' function instead.
      */
-    static bool validateVerbose(vector < unsigned int > & a, vector < unsigned int > & b);
+    static bool validateVerbose(vector<dist_t> &a, vector<dist_t> &b);
+
 private:
 };
 
