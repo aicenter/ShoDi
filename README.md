@@ -48,7 +48,6 @@ Table of Contents
       * [The Library](#the-library)
          * [The Library Interface](#the-library-interface)
          * [Javatests Example and Unit Tests](#javatests-example-and-unit-tests)
-      * [Amod-to-agentpolis](#amod-to-agentpolis)
       * [Input/Output File Formats](#inputoutput-file-formats)
          * [XenGraph Input Format](#xengraph-input-format)
          * [DIMACS input format](#dimacs-input-format)
