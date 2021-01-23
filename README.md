@@ -73,9 +73,9 @@ The `./prebuilt` directory contains precompiled `shortestPaths` library and
 `shortestPathsPreprocessor` executable for Linux and Windows for the x86-64 CPU
 architecture.
 
+
 From Source
 -----------
-
 
 ### Requirements
  - [vcpkg](https://github.com/microsoft/vcpkg) for dependency management.
@@ -84,9 +84,10 @@ From Source
 
 ### Building the project
 1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2`
-2. `mkdir build && cd build`
-3. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
-4. `cmake --build . --target shortestPathsPreprocessor --config Release`
+2. Create a `JAVA_HOME` system property with the abolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
+3. `mkdir build && cd build`
+4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
+5. `cmake --build . --target shortestPathsPreprocessor --config Release`
 
 There are also additional build targets such as `shortestPaths` (which is just
 the library, excluding the standalone executable), `doc` (the documentation:
