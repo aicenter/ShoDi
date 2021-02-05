@@ -8,3 +8,4 @@ cmake-build-debug-wsl
 vcpkg/
 compile_commands.json
 /javatests/target/
+/CMakeSettings.json

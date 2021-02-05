@@ -12,6 +12,7 @@
 #include "GraphLoader.h"
 
 #define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
+#include <string>
 #include <csv2/reader.hpp>
 
 typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,

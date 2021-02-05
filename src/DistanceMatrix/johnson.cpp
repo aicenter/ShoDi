@@ -16,7 +16,7 @@ graph_t *johnson::johnson_init(const std::vector<dist_t> &adj_matrix) {
   const dist_t max = std::numeric_limits<dist_t>::max();
   size_t E = 0;
   for (size_t i = 0; i < adj_matrix.size(); i++) {
-    if (adj_matrix[i] < max) {
+  	if (adj_matrix[i] != max) {
       E++;
     }
   }
@@ -34,8 +34,7 @@ graph_t *johnson::johnson_init(const std::vector<dist_t> &adj_matrix) {
 
   for (unsigned int i = 0; i < n; i++) {
     for (unsigned int j = 0; j < n; j++) {
-      if (adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != 0 &&
-          adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != max) {
+      if (adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)] != max) {
         gr->edge_array.push_back(Edge(i, j));
         gr->weights.push_back(
             adj_matrix[((size_t)i) * ((size_t)n) + ((size_t)j)]);
@@ -152,12 +151,12 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
   bf_graph->edge_array = gr->edge_array;
   bf_graph->weights = gr->weights;
 
-  bf_graph->edge_array.reserve(bf_graph->E);
-  bf_graph->weights.reserve(bf_graph->E);
+  bf_graph->edge_array.resize(bf_graph->E);
+  bf_graph->weights.resize(bf_graph->E);
 
 #pragma omp parallel for
   for (int e = 0; e < V_uint; e++) {
-    bf_graph->edge_array[((size_t)e) + gr->E] = Edge(V_uint, e);
+  	bf_graph->edge_array[((size_t)e) + gr->E] = Edge(V_uint, e);
   }
 
   // Second, the Bellman–Ford algorithm is used, starting from the new vertex q,
