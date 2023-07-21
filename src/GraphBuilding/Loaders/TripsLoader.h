@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+
 
 /**
  * This class is used to load trips which can then be used to test the hierarchy either to measure time or validate
@@ -21,30 +21,30 @@ using namespace std;
  */
 class TripsLoader {
 private:
-    string inputFile;
+    std::string inputFile;
 
     /**
      * Auxiliary function used to parse the queries from the input file.
      *
      * @param input[in] The input stream corresponding to the input file.
-     * @param x[out] The vector that will be filled with the queries.
+     * @param x[out] The std::vector that will be filled with the queries.
      */
-    void parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x);
+    void parseTrips(std::ifstream & input, std::vector < std::pair< unsigned int, unsigned int > > & x);
 
     /**
      * Auxiliary function used to parse the queries from the input file.
      *
      * @param input[in] The input stream corresponding to the input file.
-     * @param x[out] The vector that will be filled with the queries.
+     * @param x[out] The std::vector that will be filled with the queries.
      */
-    void parseLongLongTrips(ifstream & input, vector < pair < long long unsigned int, long long unsigned int > > & x);
+    void parseLongLongTrips(std::ifstream & input, std::vector < std::pair< long long unsigned int, long long unsigned int > > & x);
 public:
     /**
      * A simple constructor.
      *
      * @param inputFile[in] A path towards a file that should be loaded using this loader.
      */
-    explicit TripsLoader(string inputFile);
+    explicit TripsLoader(std::string inputFile);
 
     /**
      * This function just loads trips in a simple format.
@@ -53,10 +53,10 @@ public:
      * This function doesn't validate that the sources and targets are valid (that means that they are lower number than
      * the amount of edges in the used graph), it just loads the pairs. Do any validations yourself, if necessary.
      *
-     * @param x[out] The vector that will be filled with the query pairs. The vector need to be resized before calling
+     * @param x[out] The std::vector that will be filled with the query pairs. The std::vector need to be resized before calling
      * this function to be able to contain all the queries.
      */
-    void loadTrips(vector < pair < unsigned int, unsigned int > > & x);
+    void loadTrips(std::vector < std::pair< unsigned int, unsigned int > > & x);
 
     /**
      * Loads the queries in a simple format.
@@ -65,10 +65,10 @@ public:
      * This function doesn't validate that the sources and targets are valid (that means that the nodes with the given
      * IDs actually exist in the original graph), it just loads the pairs. Do any validations yourself, if necessary.
      *
-     * @param x[out] The vector that will be filled with the query pairs. The vector need to be resized before calling
+     * @param x[out] The std::vector that will be filled with the query pairs. The std::vector need to be resized before calling
      * this function to be able to contain all the queries.
      */
-    void loadLongLongTrips(vector < pair < long long unsigned int, long long unsigned int > > & x);
+    void loadLongLongTrips(std::vector < std::pair< long long unsigned int, long long unsigned int > > & x);
 };
 
 

@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-using namespace std;
+
 
 /**
  * Allows us to answer distance queries using the original indices of the nodes. Internally, nodes are indexed from
@@ -29,7 +29,7 @@ public:
      * @param mappingFilepath[in] The path to the file that contains the mapping from original indices to indices
      * in the data structure.
      */
-    CHDistanceQueryManagerWithMapping(FlagsGraph & g, string mappingFilepath);
+    CHDistanceQueryManagerWithMapping(FlagsGraph & g, std::string mappingFilepath);
 
     /**
      * Used to find the shortest distance from start to goal where start and goal are the original indices.
@@ -43,7 +43,7 @@ public:
 
 private:
     CHDistanceQueryManager qm;
-    unordered_map<long long unsigned int, unsigned int> mapping;
+    std::unordered_map<long long unsigned int, unsigned int> mapping;
 };
 
 

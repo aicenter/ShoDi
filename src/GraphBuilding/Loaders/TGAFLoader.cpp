@@ -11,14 +11,14 @@
 #include "../../TNRAF/TNRAFPreprocessor.h"
 
 //______________________________________________________________________________________________________________________
-TGAFLoader::TGAFLoader(string inputFile) : TNRGLoader(inputFile) {
+TGAFLoader::TGAFLoader(std::string inputFile) : TNRGLoader(inputFile) {
 
 }
 
 //______________________________________________________________________________________________________________________
 TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
-    ifstream input;
-    input.open(this->inputFile, ios::binary);
+    std::ifstream input;
+    input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
@@ -41,17 +41,17 @@ TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount, unsigned int & regionsCnt) {
+void TGAFLoader::parseFirstLine(std::ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount, unsigned int & regionsCnt) {
     char c1, c2, c3, c4;
     input.read (&c1, sizeof(c1));
     input.read (&c2, sizeof(c2));
     input.read (&c3, sizeof(c3));
     input.read (&c4, sizeof(c4));
     if (c1 != 'T' || c2 != 'G' || c3 != 'A' || c4 != 'F') {
-        cout << "The input file is missing the expected header!" << endl
-             << "Transit Node Routing Graph file should begin with the string 'TNRG'." << endl
-             << "Are you sure the input file is in the correct format?" << endl
-             << "The loading will proceed but the loaded graph might be corrupted." << endl;
+        std::cout << "The input file is missing the expected header!" << std::endl
+             << "Transit Node Routing Graph file should begin with the std::string 'TNRG'." << std::endl
+             << "Are you sure the input file is in the correct format?" << std::endl
+             << "The loading will proceed but the loaded graph might be corrupted." << std::endl;
     }
 
     input.read ((char *) &nodes, sizeof(nodes));
@@ -61,7 +61,7 @@ void TGAFLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseRanks(ifstream & input, TransitNodeRoutingArcFlagsGraph * graph, unsigned int nodes) {
+void TGAFLoader::parseRanks(std::ifstream & input, TransitNodeRoutingArcFlagsGraph * graph, unsigned int nodes) {
     unsigned int rank;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &rank, sizeof(rank));
@@ -70,7 +70,7 @@ void TGAFLoader::parseRanks(ifstream & input, TransitNodeRoutingArcFlagsGraph * 
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseRegions(ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes) {
+void TGAFLoader::parseRegions(std::ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes) {
     unsigned int region;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &region, sizeof(region));
@@ -79,11 +79,11 @@ void TGAFLoader::parseRegions(ifstream & input, TransitNodeRoutingArcFlagsGraph 
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes, unsigned int regionsCnt) {
+void TGAFLoader::parseAccessNodes(std::ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes, unsigned int regionsCnt) {
     unsigned int forwardNodes, backwardNodes, nodeID, nodeDistance;
     uint32_t regionFlags;
 
-    vector<unsigned int> powersOf2(regionsCnt);
+    std::vector<unsigned int> powersOf2(regionsCnt);
     TNRAFPreprocessor::getPowersOf2(powersOf2);
 
     unsigned int validFlags = 0;

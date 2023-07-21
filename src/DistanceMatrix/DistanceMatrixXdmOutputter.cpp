@@ -9,15 +9,15 @@
 #include "DistanceMatrixXdmOutputter.h"
 #include "constants.h"
 
-void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const string &path) {
+void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const std::string &path) {
     printf("Storing the distance matrix.\n");
-    ofstream output;
-    output.open(path + ".xdm", ios::binary);
+    std::ofstream output;
+    output.open(path + ".xdm", std::ios::binary);
     if (!output.is_open()) {
         printf("Couldn't open file '%s'!", (path + ".xdm").c_str());
     }
 
-    const vector<dist_t> &distances = dm.getRawData();
+    const auto& distances = dm.getRawData();
     const unsigned int nodesCnt = dm.nodes();
 
     char c1, c2, c3;

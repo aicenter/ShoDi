@@ -24,7 +24,7 @@ public:
      * @param inputFile[in] A path towards a file that should be loaded using this loader.
      */
     explicit TGAFLoader(
-            string inputFile);
+            std::string inputFile);
 
     /**
      * Loads the Transit Node Routing with Arc Flags data structures from the file that was given to the loader during
@@ -37,7 +37,7 @@ public:
 
 protected:
     /**
-     * Auxiliary function that parses the header of the file. The header starts with the string "TGAF" which is used
+     * Auxiliary function that parses the header of the file. The header starts with the std::string "TGAF" which is used
      * as a some sort of a magic constant to validate the integrity of the file. After that, four unsigned int numbers
      * should follow, denoting the number of nodes, number of edges, the size of the transit node set,
      * and the number of regions for the Arc Flags.
@@ -49,7 +49,7 @@ protected:
      * @param regionsCnt[out] The number of regions used for the Arc Flags.
      */
     void parseFirstLine(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int & nodes,
             unsigned int & edges,
             unsigned int & tnodesAmount,
@@ -63,7 +63,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load rank for each of the nodes).
      */
     void parseRanks(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingArcFlagsGraph * graph,
             unsigned int nodes);
 
@@ -75,7 +75,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load a region number for each of the nodes).
      */
     void parseRegions(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingArcFlagsGraph & graph,
             unsigned int nodes);
 
@@ -89,7 +89,7 @@ protected:
      * @param regionsCnt[in] The number of regions used for the Arc Flags.
      */
     void parseAccessNodes(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingArcFlagsGraph & graph,
             unsigned int nodes,
             unsigned int regionsCnt);

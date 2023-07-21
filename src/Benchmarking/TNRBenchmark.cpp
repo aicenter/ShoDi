@@ -9,7 +9,7 @@
 #include "../TNR/TNRDistanceQueryManagerWithMapping.h"
 
 //______________________________________________________________________________________________________________________
-double TNRBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingGraph & graph, vector < unsigned int > & distances) {
+double TNRBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, TransitNodeRoutingGraph & graph, std::vector < unsigned int > & distances) {
     TNRDistanceQueryManager queryManager(graph);
 
     Timer tnrTimer("Transit Node Routing trips benchmark");
@@ -24,7 +24,7 @@ double TNRBenchmark::benchmark(const vector < pair < unsigned int, unsigned int>
 }
 
 //______________________________________________________________________________________________________________________
-double TNRBenchmark::benchmarkWithMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, TransitNodeRoutingGraph & graph, vector < unsigned int > & distances, string mappingFilePath) {
+double TNRBenchmark::benchmarkWithMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, TransitNodeRoutingGraph & graph, std::vector < unsigned int > & distances, std::string mappingFilePath) {
     TNRDistanceQueryManagerWithMapping queryManager(graph, mappingFilePath);
 
     Timer tnrTimer("Transit Node Routing trips benchmark with mapping");

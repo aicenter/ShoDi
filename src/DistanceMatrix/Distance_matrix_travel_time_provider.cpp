@@ -55,10 +55,10 @@ void Distance_matrix_travel_time_provider::printInfo() {
     }
 
     const auto optCount = nodesCnt * nodesCnt;
-    cout << "Computed distance matrix info." << endl;
-    cout << "Distance matrix contains " << maxCnt << " UINF values. That is " << (double) maxCnt / (double) optCount << " %." << endl;
-    cout << "Distance matrix contains " << halfCnt << " values that are at least half of std::numeric_limits<dist_t>::max(). That is "
-        << (double) halfCnt / (double) optCount << " %." << endl;
+    std::cout << "Computed distance matrix info." << std::endl;
+    std::cout << "Distance matrix contains " << maxCnt << " UINF values. That is " << (double) maxCnt / (double) optCount << " %." << std::endl;
+    std::cout << "Distance matrix contains " << halfCnt << " values that are at least half of std::numeric_limits<dist_t>::max(). That is "
+        << (double) halfCnt / (double) optCount << " %." << std::endl;
 }
 
 const std::unique_ptr<dist_t[]> &Distance_matrix_travel_time_provider::getRawData() {

@@ -8,7 +8,7 @@
 
 /**
  * A simple representation of one edge. This class is used during the queries where we are interested in the actual
- * shortest path and not just the shortest distance. In those cases, a vector of instances of this class is returned
+ * shortest path and not just the shortest distance. In those cases, a std::vector of instances of this class is returned
  * each instance representing one edge of the path.
  */
 class SimpleEdge {

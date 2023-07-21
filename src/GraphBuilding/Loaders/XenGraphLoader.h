@@ -24,8 +24,8 @@
  */
 class XenGraphLoader : public GraphLoader {
 private:
-    string inputFile;
-    ifstream input;
+    std::string inputFile;
+    std::ifstream input;
     bool amountsParsed;
     unsigned int nodesAmount;
     size_t edgesAmount;
@@ -49,7 +49,7 @@ public:
      *
      * @param inputFile[in] A path towards a file that should be loaded using this loader.
      */
-    explicit XenGraphLoader(string inputFile);
+    explicit XenGraphLoader(std::string inputFile);
 
     /**
      * This function can be used to load a mapping from the original IDs to IDs used by the query algorithms.
@@ -58,7 +58,7 @@ public:
      *
      * @param mapping[out] An unordered map that will be filled with the mapping data.
      */
-    void loadNodesMapping(unordered_map <long long unsigned int, unsigned int> & mapping);
+    void loadNodesMapping(std::unordered_map<long long unsigned int, unsigned int> & mapping);
 
     void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
 

@@ -1,4 +1,4 @@
-// the C++ STL is a mess for parsing numbers from strings, FAST. from_chars looked good but is not implemented in clang/gcc
+// the C++ STL is a mess for parsing numbers from std::strings, FAST. from_chars looked good but is not implemented in clang/gcc
 // crack_atof is a very very fast alternative
 
 

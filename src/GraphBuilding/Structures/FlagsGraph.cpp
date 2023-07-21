@@ -23,8 +23,8 @@ FlagsGraph::FlagsGraph(UpdateableGraph & g) {
         data(i).rank = g.getRank(i);
     }
 
-    vector < OutputEdge > edges;
-    vector < OutputShortcutEdge > shortcuts;
+    std::vector < OutputEdge > edges;
+    std::vector < OutputShortcutEdge > shortcuts;
     g.prepareEdgesForFlushingWithReinsert(edges, shortcuts);
 
     processOriginalEdges(edges);
@@ -35,18 +35,18 @@ FlagsGraph::FlagsGraph(UpdateableGraph & g) {
 FlagsGraph::~FlagsGraph() = default;
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges) {
+void FlagsGraph::getEdgesForFlushing(std::vector < std::pair< unsigned int, QueryEdge > > & allEdges) {
     const unsigned int nbs = boost::numeric_cast<unsigned int>(neighbours.size());
     for(unsigned int i = 0; i < nbs; i++) {
         const unsigned int nbs2 = boost::numeric_cast<unsigned int>(neighbours[i].size());
         for(unsigned int j = 0; j < nbs2; j++) {
-            allEdges.push_back(make_pair(i, QueryEdge(neighbours[i][j])));
+            allEdges.push_back(std::make_pair(i, QueryEdge(neighbours[i][j])));
         }
     }
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::processOriginalEdges(vector < OutputEdge > & edges) {
+void FlagsGraph::processOriginalEdges(std::vector < OutputEdge > & edges) {
     for(size_t i = 0; i < edges.size(); i++) {
         unsigned int from, to, weight, flags;
         from = edges[i].sourceNode;
@@ -71,7 +71,7 @@ void FlagsGraph::processOriginalEdges(vector < OutputEdge > & edges) {
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::processShortcuts( vector < OutputShortcutEdge > & shortcuts) {
+void FlagsGraph::processShortcuts( std::vector < OutputShortcutEdge > & shortcuts) {
     for(size_t i = 0; i < shortcuts.size(); i++) {
         unsigned int from, to, weight, flags;
         from = shortcuts[i].sourceNode;
@@ -106,7 +106,7 @@ unsigned int FlagsGraph::nodes() const {
 }
 
 //______________________________________________________________________________________________________________________
-const vector< QueryEdge > & FlagsGraph::nextNodes(const unsigned int x)const {
+const std::vector< QueryEdge > & FlagsGraph::nextNodes(const unsigned int x)const {
     return neighbours.at(x);
 }
 

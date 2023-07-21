@@ -12,7 +12,6 @@
 
 #include "BaseGraph.h"
 
-using namespace std;
 
 /**
  * Class representing a simple graph - Simple graph is a graph where there only exists at most one edge between each
@@ -21,7 +20,7 @@ using namespace std;
  */
 class SimpleGraph : public BaseGraph {
 private:
-    vector< map < unsigned int, dist_t > > followingNodes;
+    std::vector<std::map<unsigned int, dist_t>> followingNodes;
 public:
     /**
      * A simple constructor.
@@ -54,7 +53,7 @@ public:
      * @param x[in] The node we are interested in.
      * @return A map containing all the edges in the graph that have 'x' as their source node along with their weights.
      */
-    const map<unsigned int, dist_t> & edges(unsigned int x)const;
+    const std::map<unsigned int, dist_t> & edges(unsigned int x)const;
 
     bool handlesDuplicateEdges() override {
         return true;

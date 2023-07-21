@@ -14,7 +14,7 @@
 #include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 
-using namespace std;
+
 
 /**
  * This class can create a Transit Node Routing (TNR) data-structure based on a given UpdateableGraph. The user can
@@ -40,7 +40,7 @@ public:
      */
     static void preprocessUsingCH(
             UpdateableGraph & graph,
-            string outputPath,
+            std::string outputPath,
             unsigned int transitNodesAmount = 1000);
 
     /**
@@ -60,7 +60,7 @@ public:
     static void preprocessUsingCHslower(
             UpdateableGraph & graph,
             Graph & originalGraph,
-            string outputPath,
+            std::string outputPath,
             unsigned int transitNodesAmount = 1000);
 
     /**
@@ -79,7 +79,7 @@ public:
     static void preprocessWithDMvalidation(
             UpdateableGraph & graph,
             Graph & originalGraph,
-            string outputPath,
+            std::string outputPath,
             unsigned int transitNodesAmount = 1000);
 
 protected:
@@ -100,15 +100,15 @@ protected:
      * @param transitNodesAmount[in] Denotes the size of the transit node set.
      */
     static void outputGraph(
-            string outputPath,
+            std::string outputPath,
             UpdateableGraph & graph,
-            vector < pair < unsigned int, QueryEdge > > & allEdges,
-            vector < unsigned int > & transitNodes,
-            vector < vector < unsigned int > > & transitNodesDistanceTable,
-            vector < vector < AccessNodeData > > & forwardAccessNodes,
-            vector < vector < AccessNodeData > > & backwardAccessNodes,
-            vector < vector < unsigned int > > & forwardSearchSpaces,
-            vector < vector < unsigned int > > & backwardSearchSpaces,
+            std::vector < std::pair< unsigned int, QueryEdge > > & allEdges,
+            std::vector < unsigned int > & transitNodes,
+            std::vector < std::vector < unsigned int > > & transitNodesDistanceTable,
+            std::vector < std::vector < AccessNodeData > > & forwardAccessNodes,
+            std::vector < std::vector < AccessNodeData > > & backwardAccessNodes,
+            std::vector < std::vector < unsigned int > > & forwardSearchSpaces,
+            std::vector < std::vector < unsigned int > > & backwardSearchSpaces,
             unsigned int transitNodesAmount);
 
     /**
@@ -119,7 +119,7 @@ protected:
      * direction.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param forwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -128,9 +128,9 @@ protected:
      */
     static void findForwardAccessNodes(
             unsigned int source,
-            vector < AccessNodeData> & accessNodes,
-            vector < unsigned int > & forwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector < AccessNodeData> & accessNodes,
+            std::vector < unsigned int > & forwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph);
 
     /**
@@ -141,7 +141,7 @@ protected:
      * direction.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param forwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -150,9 +150,9 @@ protected:
      */
     static void findBackwardAccessNodes(
             unsigned int source,
-            vector < AccessNodeData> & accessNodes,
-            vector < unsigned int > & backwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector < AccessNodeData> & accessNodes,
+            std::vector < unsigned int > & backwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph);
 
     /**
@@ -163,7 +163,7 @@ protected:
      * 'preprocessUsingCHslower' function.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param forwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -174,10 +174,10 @@ protected:
      */
     static void findForwardAccessNodes(
             unsigned int source,
-            vector < AccessNodeData> & accessNodes,
-            vector < unsigned int > & forwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
-            vector < unsigned int > & distsFromNode,
+            std::vector < AccessNodeData> & accessNodes,
+            std::vector < unsigned int > & forwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector < unsigned int > & distsFromNode,
             FlagsGraph & graph);
 
     /**
@@ -188,7 +188,7 @@ protected:
      * 'preprocessUsingCHslower' function.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param backwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -199,10 +199,10 @@ protected:
      */
     static void findBackwardAccessNodes(
             unsigned int source,
-            vector < AccessNodeData> & accessNodes,
-            vector < unsigned int > & backwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
-            vector < unsigned int > & distsFromNode,
+            std::vector < AccessNodeData> & accessNodes,
+            std::vector < unsigned int > & backwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector < unsigned int > & distsFromNode,
             FlagsGraph & graph);
 
     /**
@@ -212,7 +212,7 @@ protected:
      * value in the distance matrix. This function is used in the 'preprocessWithDMvalidation' function.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param forwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -222,9 +222,9 @@ protected:
      */
     static void findForwardAccessNodes(
             unsigned int source,
-            vector < AccessNodeData> & accessNodes,
-            vector < unsigned int > & forwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector < AccessNodeData> & accessNodes,
+            std::vector < unsigned int > & forwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph,
             Distance_matrix_travel_time_provider & dm);
 
@@ -235,7 +235,7 @@ protected:
      * value in the distance matrix. This function is used in the 'preprocessWithDMvalidation' function.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param backwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -245,9 +245,9 @@ protected:
      */
     static void findBackwardAccessNodes(
             unsigned int source,
-            vector < AccessNodeData> & accessNodes,
-            vector < unsigned int > & backwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector < AccessNodeData> & accessNodes,
+            std::vector < unsigned int > & backwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph,
             Distance_matrix_travel_time_provider & dm);
 

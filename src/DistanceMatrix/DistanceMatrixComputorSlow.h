@@ -11,7 +11,7 @@
 #include "DistanceMatrixComputor.h"
 #include <cstddef>
 
-using namespace std;
+
 
 class DistanceMatrixComputorSlow : public DistanceMatrixComputor<Graph> {
 public:

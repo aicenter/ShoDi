@@ -9,7 +9,7 @@
 
 #include "../TNRAF/TNRAFDistanceQueryManagerWithMapping.h"
 
-using namespace std;
+
 
 /**
  * This class server as the API which will be used to call the Transit Node Routing with Arc Flags functionality
@@ -28,7 +28,7 @@ public:
      * @param tnrafFile[in] The path to the Transit Node Routing with Arc Flags data structure file.
      * @param mappingFile[in] The path to the mapping file.
      */
-    void initializeTNRAF(string tnrafFile, string mappingFile);
+    void initializeTNRAF(std::string tnrafFile, std::string mappingFile);
 
     /**
      * This function will answer a query using the Transit Node Routing with Arc Flags query algorithm.

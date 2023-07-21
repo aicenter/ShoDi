@@ -14,7 +14,7 @@
 #include "GraphBuilding/Structures/BaseGraph.h"
 #include "GraphLoader.h"
 
-using namespace std;
+
 
 /**
  * This class is responsible for loading input files in the DIMACS format. This means either loading the graph into
@@ -27,8 +27,8 @@ using namespace std;
  */
 class DIMACSLoader : public GraphLoader {
 private:
-    string inputFile;
-    ifstream input;
+    std::string inputFile;
+    std::ifstream input;
     bool amountsParsed;
     unsigned int nodesAmount;
     size_t edgesAmount;
@@ -42,7 +42,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void parseGraphProblemLine(ifstream & input, unsigned int & nodes, size_t & edges);
+    void parseGraphProblemLine(std::ifstream & input, unsigned int & nodes, size_t & edges);
 
     /**
      * Auxiliary function used to parse the edges when loading the graph.
@@ -53,7 +53,7 @@ private:
      * @param[in] precisionLoss This parameter allows us to lose some precision
      * of the weight values. Each loaded weight will be divided by this value before rounding.
      */
-    void parseEdges(ifstream & input, BaseGraph & graph, size_t edges, unsigned int precisionLoss);
+    void parseEdges(std::ifstream & input, BaseGraph & graph, size_t edges, unsigned int precisionLoss);
 
     /**
      * Auxiliary function that extracts the number of nodes and the number of edges from the problem line.
@@ -62,7 +62,7 @@ private:
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      */
-    void processGraphProblemLine(string & buffer, unsigned int & nodes, size_t & edges);
+    void processGraphProblemLine(std::string & buffer, unsigned int & nodes, size_t & edges);
 
     /**
      * Extracts an edge data from an input line representing an edge.
@@ -72,7 +72,7 @@ private:
      * @param to[out] The target node of the edge.
      * @param weight[out] The weight of the edge.
      */
-    void getEdge(string & buffer, unsigned int & from, unsigned int & to, dist_t & weight);
+    void getEdge(std::string & buffer, unsigned int & from, unsigned int & to, dist_t & weight);
 
 public:
     /**
@@ -80,7 +80,7 @@ public:
      *
      * @param inputFile[in] A path towards a file that should be loaded using this loader.
      */
-    explicit DIMACSLoader(string inputFile);
+    explicit DIMACSLoader(std::string inputFile);
 
     unsigned int nodes() override;
 

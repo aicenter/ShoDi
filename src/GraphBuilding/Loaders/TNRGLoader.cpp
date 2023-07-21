@@ -10,14 +10,14 @@
 #include "../Structures/Graph.h"
 
 //______________________________________________________________________________________________________________________
-TNRGLoader::TNRGLoader(string inputFile) : inputFile(inputFile) {
+TNRGLoader::TNRGLoader(std::string inputFile) : inputFile(inputFile) {
 
 }
 
 //______________________________________________________________________________________________________________________
 TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
-    ifstream input;
-    input.open(this->inputFile, ios::binary);
+    std::ifstream input;
+    input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
@@ -40,8 +40,8 @@ TransitNodeRoutingGraph * TNRGLoader::loadTNRforDistanceQueries() {
 
 //______________________________________________________________________________________________________________________
 TransitNodeRoutingGraphForPathQueries * TNRGLoader::loadTNRforPathQueries() {
-    ifstream input;
-    input.open(this->inputFile, ios::binary);
+    std::ifstream input;
+    input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
@@ -63,17 +63,17 @@ TransitNodeRoutingGraphForPathQueries * TNRGLoader::loadTNRforPathQueries() {
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount) {
+void TNRGLoader::parseFirstLine(std::ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount) {
     char c1, c2, c3, c4;
     input.read (&c1, sizeof(c1));
     input.read (&c2, sizeof(c2));
     input.read (&c3, sizeof(c3));
     input.read (&c4, sizeof(c4));
     if (c1 != 'T' || c2 != 'N' || c3 != 'R' || c4 != 'G') {
-        cout << "The input file is missing the expected header!" << endl
-             << "Transit Node Routing Graph file should begin with the string 'TNRG'." << endl
-             << "Are you sure the input file is in the correct format?" << endl
-             << "The loading will proceed but the loaded graph might be corrupted." << endl;
+        std::cout << "The input file is missing the expected header!" << std::endl
+             << "Transit Node Routing Graph file should begin with the std::string 'TNRG'." << std::endl
+             << "Are you sure the input file is in the correct format?" << std::endl
+             << "The loading will proceed but the loaded graph might be corrupted." << std::endl;
     }
 
     input.read ((char *) &nodes, sizeof(nodes));
@@ -82,7 +82,7 @@ void TNRGLoader::parseFirstLine(ifstream & input, unsigned int & nodes, unsigned
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseEdgesForDistanceQueries(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges) {
+void TNRGLoader::parseEdgesForDistanceQueries(std::ifstream & input, TransitNodeRoutingGraph & graph, unsigned int edges) {
     unsigned int from, to, weight;
     bool forward, backward, fwShortcutFlag, bwShortcutFlag;
 
@@ -99,7 +99,7 @@ void TNRGLoader::parseEdgesForDistanceQueries(ifstream & input, TransitNodeRouti
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int edges) {
+void TNRGLoader::parseEdgesForPathQueries(std::ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int edges) {
     unsigned int from, to, weight;
     bool forward, backward, fwShortcutFlag, bwShortcutFlag;
 
@@ -122,7 +122,7 @@ void TNRGLoader::parseEdgesForPathQueries(ifstream & input, TransitNodeRoutingGr
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraph * graph, unsigned int nodes) {
+void TNRGLoader::parseRanks(std::ifstream & input, TransitNodeRoutingGraph * graph, unsigned int nodes) {
     unsigned int rank;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &rank, sizeof(rank));
@@ -131,7 +131,7 @@ void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraph * graph, u
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount) {
+void TNRGLoader::parseTransitNodesMapping(std::ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount) {
     unsigned int originalID;
     for(unsigned int i = 0; i < tnodesAmount; i++) {
         input.read ((char*) &originalID, sizeof(originalID));
@@ -140,7 +140,7 @@ void TNRGLoader::parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGr
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseTransitNodesDistanceTable(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount) {
+void TNRGLoader::parseTransitNodesDistanceTable(std::ifstream & input, TransitNodeRoutingGraph & graph, unsigned int tnodesAmount) {
     unsigned int value;
     for(unsigned int i = 0; i < tnodesAmount; i++) {
         for(unsigned int j = 0; j < tnodesAmount; j++) {
@@ -151,7 +151,7 @@ void TNRGLoader::parseTransitNodesDistanceTable(ifstream & input, TransitNodeRou
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
+void TNRGLoader::parseAccessNodes(std::ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
     unsigned int forwardNodes, backwardNodes, nodeID, nodeDistance;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char *) &forwardNodes, sizeof(forwardNodes));
@@ -170,7 +170,7 @@ void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraph & gr
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseSearchSpaces(ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
+void TNRGLoader::parseSearchSpaces(std::ifstream & input, TransitNodeRoutingGraph & graph, unsigned int nodes) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int fwSearchSpaceSize, bwSearchSpaceSize, searchSpaceNode;
         input.read((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));
@@ -188,7 +188,7 @@ void TNRGLoader::parseSearchSpaces(ifstream & input, TransitNodeRoutingGraph & g
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
+void TNRGLoader::parseRanks(std::ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
     unsigned int rank;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &rank, sizeof(rank));
@@ -197,7 +197,7 @@ void TNRGLoader::parseRanks(ifstream & input, TransitNodeRoutingGraphForPathQuer
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int tnodesAmount) {
+void TNRGLoader::parseTransitNodesMapping(std::ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int tnodesAmount) {
     unsigned int originalID;
     for(unsigned int i = 0; i < tnodesAmount; i++) {
         input.read ((char*) &originalID, sizeof(originalID));
@@ -206,7 +206,7 @@ void TNRGLoader::parseTransitNodesMapping(ifstream & input, TransitNodeRoutingGr
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseTransitNodesDistanceTable(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int tnodesAmount) {
+void TNRGLoader::parseTransitNodesDistanceTable(std::ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int tnodesAmount) {
     unsigned int value;
     for(unsigned int i = 0; i < tnodesAmount; i++) {
         for(unsigned int j = 0; j < tnodesAmount; j++) {
@@ -217,7 +217,7 @@ void TNRGLoader::parseTransitNodesDistanceTable(ifstream & input, TransitNodeRou
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
+void TNRGLoader::parseAccessNodes(std::ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
     unsigned int forwardNodes, backwardNodes, nodeID, nodeDistance;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char *) &forwardNodes, sizeof(forwardNodes));
@@ -236,7 +236,7 @@ void TNRGLoader::parseAccessNodes(ifstream & input, TransitNodeRoutingGraphForPa
 }
 
 //______________________________________________________________________________________________________________________
-void TNRGLoader::parseSearchSpaces(ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
+void TNRGLoader::parseSearchSpaces(std::ifstream & input, TransitNodeRoutingGraphForPathQueries & graph, unsigned int nodes) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int fwSearchSpaceSize, bwSearchSpaceSize, searchSpaceNode;
         input.read((char *) &fwSearchSpaceSize, sizeof(fwSearchSpaceSize));

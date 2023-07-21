@@ -5,6 +5,7 @@
 build/
 cmake-build-debug
 cmake-build-debug-wsl
+cmake-build-debug-visual-studio
 vcpkg/
 compile_commands.json
 /javatests/target/

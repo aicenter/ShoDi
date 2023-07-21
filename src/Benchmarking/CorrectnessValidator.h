@@ -9,7 +9,7 @@
 #include <vector>
 #include "constants.h"
 
-using namespace std;
+
 
 /**
  * This class is used mainly for validation whether the Dijkstra and Contraction Hierarchies provide the same results.
@@ -21,26 +21,26 @@ using namespace std;
 class CorrectnessValidator {
 public:
     /**
-     * Compares the two vectors containing some computed distances element by element. Returns either 'true' if all
+     * Compares the two std::vectors containing some computed distances element by element. Returns either 'true' if all
      * the pairs are exactly the same, of 'false' if at least one mismatch is found.
      *
-     * @param a[in] One vector of values to be compared.
-     * @param b[in] A second vector of values to be compared.
-     * @return Returns 'true' if all the pairs of values in the two vectors are the same, 'false' otherwise.
+     * @param a[in] One std::vector of values to be compared.
+     * @param b[in] A second std::vector of values to be compared.
+     * @return Returns 'true' if all the pairs of values in the two std::vectors are the same, 'false' otherwise.
      */
-    static bool validate(vector<dist_t> &a, vector<dist_t> &b);
+    static bool validate(std::vector<dist_t> &a, std::vector<dist_t> &b);
 
     /**
-     * Compares the two vectors containing some computed distances element by element. Prints out the all the mismatches
-     * along with the values in both of the vectors on the mismatch positions. Also prints the number of mismatches
+     * Compares the two std::vectors containing some computed distances element by element. Prints out the all the mismatches
+     * along with the values in both of the std::vectors on the mismatch positions. Also prints the number of mismatches
      * at the end.
      *
-     * @param a[in] One vector of values to be compared.
-     * @param b[in] A second vector of values to be compared.
+     * @param a[in] One std::vector of values to be compared.
+     * @param b[in] A second std::vector of values to be compared.
      * @return Currently returns 'true' all the time, so you should make decisions based on the printed output.
      * If you want some machine processing for example, use the basic 'validate' function instead.
      */
-    static bool validateVerbose(vector<dist_t> &a, vector<dist_t> &b);
+    static bool validateVerbose(std::vector<dist_t> &a, std::vector<dist_t> &b);
 
 private:
 };

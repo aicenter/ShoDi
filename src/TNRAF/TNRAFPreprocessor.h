@@ -13,7 +13,7 @@
 #include "Structures/RegionsStructure.h"
 #include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
-using namespace std;
+
 
 /**
  * This class is responsible for creating a Transit Node Routing with Arc Flags data-structure based on a given
@@ -51,7 +51,7 @@ public:
     static void preprocessUsingCH(
             UpdateableGraph & graph,
             Graph & originalGraph,
-            string outputPath,
+            std::string outputPath,
             unsigned int transitNodesAmount = 1000,
             unsigned int regionsCnt = 32,
             bool useDistanceMatrix = false);
@@ -61,7 +61,7 @@ public:
      *
      * @param[out] powersOf2
      */
-    static void getPowersOf2(vector<uint32_t> & powersOf2);
+    static void getPowersOf2(std::vector<uint32_t> & powersOf2);
 protected:
 
     /**
@@ -70,9 +70,9 @@ protected:
      *
      * @param outputPath[in] The desired ouput path where the precomputed data structure will be output.
      * @param graph[in] The graph representation.
-     * @param allEdges[in] A vector containing all edges that need to be put into the data structure (includes
+     * @param allEdges[in] A std::vector containing all edges that need to be put into the data structure (includes
      * shortcuts).
-     * @param transitNodes[in] A vector containing the IDs of the nodes that were chosen as transit nodes.
+     * @param transitNodes[in] A std::vector containing the IDs of the nodes that were chosen as transit nodes.
      * @param transitNodesDistanceTable[in] 2D matrix containing pairwise distances between all pairs of transit nodes.
      * @param forwardAccessNodes[in] Contains forward access nodes for each node with all their information.
      * @param backwardAccessNodes[in] Contains backward access nodes for each node with all their information.
@@ -83,15 +83,15 @@ protected:
      * @param regionsCnt[in] Denotes the number of regions.
      */
     static void outputGraph(
-            string outputPath,
+            std::string outputPath,
             UpdateableGraph & graph,
-            vector < pair < unsigned int, QueryEdge > > & allEdges,
-            vector < unsigned int > & transitNodes,
-            vector < vector < unsigned int > > & transitNodesDistanceTable,
-            vector < vector < AccessNodeDataArcFlags > > & forwardAccessNodes,
-            vector < vector < AccessNodeDataArcFlags > > & backwardAccessNodes,
-            vector < vector < unsigned int > > & forwardSearchSpaces,
-            vector < vector < unsigned int > > & backwardSearchSpaces,
+            std::vector < std::pair< unsigned int, QueryEdge > > & allEdges,
+            std::vector < unsigned int > & transitNodes,
+            std::vector < std::vector < unsigned int > > & transitNodesDistanceTable,
+            std::vector < std::vector < AccessNodeDataArcFlags > > & forwardAccessNodes,
+            std::vector < std::vector < AccessNodeDataArcFlags > > & backwardAccessNodes,
+            std::vector < std::vector < unsigned int > > & forwardSearchSpaces,
+            std::vector < std::vector < unsigned int > > & backwardSearchSpaces,
             unsigned int transitNodesAmount,
             RegionsStructure & regions,
             unsigned int regionsCnt);
@@ -100,15 +100,15 @@ protected:
      * Computes the full distance matrix for the transit node set. This is done by t runs of one-to-all Dijkstra
      * (where t denotes the amount of transit nodes).
      *
-     * @param transitNodes[in] A vector containing the IDs of the nodes that were chosen as transit nodes.
+     * @param transitNodes[in] A std::vector containing the IDs of the nodes that were chosen as transit nodes.
      * @param distanceTable[out] 2D matrix that will contain pairwise distances between all pairs of transit nodes
      * after this function finishes.
      * @param transitNodesCnt[in] The number denoting the transit node set size.
      * @param originalGraph[in] The original graph that is used to compute the distances.
      */
     static void computeTransitNodeDistanceTable(
-            vector<unsigned int> & transitNodes,
-            vector<vector<unsigned int>> & distanceTable,
+            std::vector<unsigned int> & transitNodes,
+            std::vector<std::vector<unsigned int>> & distanceTable,
             unsigned int transitNodesCnt,
             Graph & originalGraph);
 
@@ -116,14 +116,14 @@ protected:
      * Fills the full distance matrix for the transit node set using value from the full distance matrix for the graph,
      * when the distance matrix is used to speed up the preprocessing phase (when the 'dm' mode is used).
      *
-     * @param transitNodes[in] A vector containing the IDs of the nodes that were chosen as transit nodes.
+     * @param transitNodes[in] A std::vector containing the IDs of the nodes that were chosen as transit nodes.
      * @param distanceTable[out] 2D matrix that will contain pairwise distances between all pairs of transit nodes
      * after this function finishes.
      * @param transitNodesCnt[in] The number denoting the transit node set size.
      */
     static void fillTransitNodeDistanceTable(
-            vector<unsigned int> & transitNodes,
-            vector<vector<unsigned int>> & distanceTable,
+            std::vector<unsigned int> & transitNodes,
+            std::vector<std::vector<unsigned int>> & distanceTable,
             unsigned int transitNodesCnt);
 
     /**
@@ -133,7 +133,7 @@ protected:
      * Arc Flags then have to be computed for the actual set of access nodes.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param forwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -145,9 +145,9 @@ protected:
      */
     static void findForwardAccessNodes(
             unsigned int source,
-            vector <AccessNodeDataArcFlags> & accessNodes,
-            vector < unsigned int > & forwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector <AccessNodeDataArcFlags> & accessNodes,
+            std::vector < unsigned int > & forwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph,
             Graph & originalGraph,
             RegionsStructure & regions,
@@ -160,7 +160,7 @@ protected:
      * Arc Flags then have to be computed for the actual set of access nodes.
      *
      * @param source[in] The ID of the node for which the access nodes are being computed.
-     * @param accessNodes[out] The vector into which the found access nodes will be stored (along with their data).
+     * @param accessNodes[out] The std::vector into which the found access nodes will be stored (along with their data).
      * @param backwardSearchSpace[out] The search space that was explored during the process of finding access nodes.
      * This is used for the locality filter.
      * @param transitNodes[in] Mapping from node IDs to their positions in the transit node distance matrix. Nodes that
@@ -172,9 +172,9 @@ protected:
      */
     static void findBackwardAccessNodes(
             unsigned int source,
-            vector <AccessNodeDataArcFlags> & accessNodes,
-            vector < unsigned int > & backwardSearchSpace,
-            unordered_map< unsigned int, unsigned int > & transitNodes,
+            std::vector <AccessNodeDataArcFlags> & accessNodes,
+            std::vector < unsigned int > & backwardSearchSpace,
+            std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph, Graph & originalGraph,
             RegionsStructure & regions,
             bool useDistanceMatrix);
@@ -192,18 +192,18 @@ protected:
      * @param originalGraph[in]
      * @param regions[in] The structure containing all the information about the regions for the Arc Flags.
      * @param useDistanceMatrix[in]
-     * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The vector
+     * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The std::vector
      * contains distances from 'node' to all the other nodes in the graph. This is needed to set the Arc Flags
      * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
      * matrix so this is not needed.
      */
     static void computeForwardArcFlags(
             unsigned int node,
-            vector<AccessNodeDataArcFlags> & accessNodes,
+            std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
             RegionsStructure & regions,
             bool useDistanceMatrix,
-            vector<unsigned int> & optionalDistancesFromNode);
+            std::vector<unsigned int> & optionalDistancesFromNode);
 
     /**
      * Computes the backward Arc Flags for a set of access nodes of a given node.
@@ -214,18 +214,18 @@ protected:
      * @param originalGraph[in]
      * @param regions[in] The structure containing all the information about the regions for the Arc Flags.
      * @param useDistanceMatrix[in]
-     * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The vector
+     * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The std::vector
      * contains distances from 'node' to all the other nodes in the graph. This is needed to set the Arc Flags
      * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
      * matrix so this is not needed.
      */
     static void computeBackwardArcFlags(
             unsigned int node,
-            vector<AccessNodeDataArcFlags> & accessNodes,
+            std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
             RegionsStructure & regions,
             bool useDistanceMatrix,
-            vector<unsigned int> & optionalDistancesFromNode);
+            std::vector<unsigned int> & optionalDistancesFromNode);
 
     /**
      * Generates a clustering that is used for the regions (and those are used for Arc Flags). The query algorithm will
@@ -253,13 +253,13 @@ protected:
      * if no such node exists, assigns some other unassigned node.
      *
      * @param assignedClusters Contains the IDs of the clusters to which the nodes in the graph are assigned. If some
-     * node is not assigned to any cluster yet, this vector contains UINT_MAX.
+     * node is not assigned to any cluster yet, this std::vector contains UINT_MAX.
      * @param q The queue containing the IDs of the candidates that could be added into the currently processed cluster.
      * @return The ID of the node that should be added to the currently processed cluster.
      */
     static unsigned int getNewNodeForCluster(
-            vector < unsigned int > & assignedClusters,
-            queue < unsigned int > & q);
+            std::vector < unsigned int > & assignedClusters,
+            std::queue < unsigned int > & q);
 
     /**
      * Auxiliary function that precomputes powers of 2 up to 2^32. This is used for the Arc Flags output. In order to
@@ -268,7 +268,7 @@ protected:
      *
      * @param powersOf2[out]
      */
-    static void initPowersOf2(vector<uint32_t> & powersOf2);
+    static void initPowersOf2(std::vector<uint32_t> & powersOf2);
 
     static Distance_matrix_travel_time_provider * distanceMatrix;
 };

@@ -8,14 +8,14 @@
 #include "../../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-DistanceMatrixLoader::DistanceMatrixLoader(string inputFile) {
+DistanceMatrixLoader::DistanceMatrixLoader(std::string inputFile) {
     this->inputFile = inputFile;
 }
 
 //______________________________________________________________________________________________________________________
 Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadDistanceMatrix() {
-    ifstream input;
-    input.open(this->inputFile, ios::binary);
+    std::ifstream input;
+    input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
     }
@@ -33,7 +33,7 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadDistanceMatrix(
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixLoader::parseHeader(ifstream & input, unsigned int & nodes) {
+void DistanceMatrixLoader::parseHeader(std::ifstream & input, unsigned int & nodes) {
     char c1, c2, c3;
     input.read(&c1, sizeof(c1));
     input.read(&c2, sizeof(c2));
@@ -48,7 +48,7 @@ void DistanceMatrixLoader::parseHeader(ifstream & input, unsigned int & nodes) {
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixLoader::parseDistances(ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix) {
+void DistanceMatrixLoader::parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix) {
     unsigned int distance;
     for(unsigned int i = 0; i < nodes; i++) {
         for(unsigned int j = 0; j < nodes; j++) {

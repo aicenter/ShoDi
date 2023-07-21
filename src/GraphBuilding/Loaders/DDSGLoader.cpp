@@ -8,14 +8,14 @@
 #include "../../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-DDSGLoader::DDSGLoader(string inputFile) : inputFile(inputFile) {
+DDSGLoader::DDSGLoader(std::string inputFile) : inputFile(inputFile) {
 
 }
 
 //______________________________________________________________________________________________________________________
 FlagsGraph * DDSGLoader::loadFlagsGraph() {
-    ifstream input;
-    input.open(inputFile, ios::binary);
+    std::ifstream input;
+    input.open(inputFile, std::ios::binary);
 
     if ( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
@@ -47,8 +47,8 @@ FlagsGraph * DDSGLoader::loadFlagsGraph() {
 
 //______________________________________________________________________________________________________________________
 FlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
-    ifstream input;
-    input.open(inputFile, ios::binary);
+    std::ifstream input;
+    input.open(inputFile, std::ios::binary);
 
     if ( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
@@ -80,7 +80,7 @@ FlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraph & graph) {
+void DDSGLoader::loadRanks(std::ifstream & input, unsigned int nodes, FlagsGraph & graph) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int rank;
         input.read((char*)&rank, sizeof(rank));
@@ -89,7 +89,7 @@ void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraph & gr
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraphWithUnpackingData & graph) {
+void DDSGLoader::loadRanks(std::ifstream & input, unsigned int nodes, FlagsGraphWithUnpackingData & graph) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int rank;
         input.read((char*)&rank, sizeof(rank));
@@ -98,7 +98,7 @@ void DDSGLoader::loadRanks(ifstream & input, unsigned int nodes, FlagsGraphWithU
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraph & graph) {
+void DDSGLoader::loadOriginalEdges(std::ifstream & input, unsigned int edges, FlagsGraph & graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
         input.read((char*)&from, sizeof(from));
@@ -124,7 +124,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGr
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGraphWithUnpackingData & graph) {
+void DDSGLoader::loadOriginalEdges(std::ifstream & input, unsigned int edges, FlagsGraphWithUnpackingData & graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
         input.read((char*)&from, sizeof(from));
@@ -151,7 +151,7 @@ void DDSGLoader::loadOriginalEdges(ifstream & input, unsigned int edges, FlagsGr
 
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph) {
+void DDSGLoader::loadShortcutEdges(std::ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph) {
     for(unsigned int i = 0; i < shortcutEdges; i++) {
         unsigned int from, to, weight, flags, middleNode;
         input.read((char*)&from, sizeof(from));
@@ -178,7 +178,7 @@ void DDSGLoader::loadShortcutEdges(ifstream & input, unsigned int shortcutEdges,
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned int shortcutEdges, FlagsGraphWithUnpackingData & graph) {
+void DDSGLoader::loadShortcutEdgesWithUnpackingData(std::ifstream & input, unsigned int shortcutEdges, FlagsGraphWithUnpackingData & graph) {
     for(unsigned int i = 0; i < shortcutEdges; i++) {
         unsigned int from, to, weight, flags, middleNode;
         input.read((char*)&from, sizeof(from));
@@ -205,7 +205,7 @@ void DDSGLoader::loadShortcutEdgesWithUnpackingData(ifstream & input, unsigned i
 }
 
 //______________________________________________________________________________________________________________________
-bool DDSGLoader::verifyHeader(ifstream & input) {
+bool DDSGLoader::verifyHeader(std::ifstream & input) {
     char tmp;
     input.read (&tmp, sizeof(tmp));
     if(tmp != 0x43) {
@@ -235,7 +235,7 @@ bool DDSGLoader::verifyHeader(ifstream & input) {
 }
 
 //______________________________________________________________________________________________________________________
-bool DDSGLoader::verifyFooter(ifstream & input) {
+bool DDSGLoader::verifyFooter(std::ifstream & input) {
     unsigned int footerNum;
     input.read((char*)&footerNum, sizeof(footerNum));
     if (footerNum != 0x12345678) {
@@ -245,7 +245,7 @@ bool DDSGLoader::verifyFooter(ifstream & input) {
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadCnts(ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & shortcutEdges) {
+void DDSGLoader::loadCnts(std::ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & shortcutEdges) {
     input.read ((char*)&nodes, sizeof(nodes));
     input.read ((char*)&edges, sizeof(edges));
     input.read ((char*)&shortcutEdges, sizeof(shortcutEdges));

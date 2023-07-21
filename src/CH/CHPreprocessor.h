@@ -15,7 +15,7 @@
 #include "Structures/CHpriorityQueue.h"
 
 
-using namespace std;
+
 
 /*
  * This class is responsible for preprocessing a given graph for the Contraction Hierarchies.
@@ -229,16 +229,16 @@ private:
         }
     };
 
-    static vector<bool> contracted;
-    static vector<unsigned int> preprocessingDegrees;
-    static vector<unsigned int> dijkstraDistance;
-    static vector<ShortcutEdge> allShortcuts;
-    static unordered_map<pair<unsigned int, unsigned int>, unsigned int, pair_hash> distances;
-    static unordered_map<pair<unsigned int, unsigned int>, unsigned int, pair_hash> distancesWithoutX;
-    static vector<unsigned int> sources;
-    static vector<unsigned int> targets;
-    static unordered_set<unsigned int> targetsSet;
-    static unordered_map<unsigned int, vector<pair<unsigned int, unsigned int > > > buckets;
+    static std::vector<bool> contracted;
+    static std::vector<unsigned int> preprocessingDegrees;
+    static std::vector<unsigned int> dijkstraDistance;
+    static std::vector<ShortcutEdge> allShortcuts;
+    static std::unordered_map<std::pair<unsigned int, unsigned int>, unsigned int, pair_hash> distances;
+    static std::unordered_map<std::pair<unsigned int, unsigned int>, unsigned int, pair_hash> distancesWithoutX;
+    static std::vector<unsigned int> sources;
+    static std::vector<unsigned int> targets;
+    static std::unordered_set<unsigned int> targetsSet;
+    static std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, unsigned int > > > buckets;
 
 
 

@@ -9,7 +9,7 @@
 
 #include "../TNR/TNRDistanceQueryManagerWithMapping.h"
 
-using namespace std;
+
 
 /**
  * This class server as the API which will be used to call the Transit Node Routing functionality from Java.
@@ -27,7 +27,7 @@ public:
      * @param tnrFile[in] The path to the Transit Node Routing data structure file.
      * @param mappingFile[in] The path to the mapping file.
      */
-    void initializeTNR(string tnrFile, string mappingFile);
+    void initializeTNR(std::string tnrFile, std::string mappingFile);
 
     /**
      * This function will answer a query using the Transit Node Routing query algorithm.

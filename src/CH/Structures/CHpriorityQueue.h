@@ -9,7 +9,7 @@
 #include <vector>
 #include "CHNode.h"
 
-using namespace std;
+
 
 /**
  * A simple implementation of a Min Binary Heap which is used as a priority queue for node contraction. This heap
@@ -105,8 +105,8 @@ private:
      */
     void swap(const unsigned int x, const unsigned int y);
 
-    vector<CHNode> content;
-    vector<unsigned int> mapping;
+    std::vector<CHNode> content;
+    std::vector<unsigned int> mapping;
 };
 
 

@@ -10,7 +10,7 @@
 #include "../CH/CHDistanceQueryManager.h"
 #include <string>
 
-using namespace std;
+
 
 /**
  * This class serves as the API which will be used to call the Contraction Hierarchies functionality from Java.
@@ -31,7 +31,7 @@ public:
      *
      * @param chFile[in] The path to the Contraction Hierarchy data structure that will be used to answer queries.
      */
-    void initializeCH(string chFile);
+    void initializeCH(std::string chFile);
 
     /**
      * Queries after initialization are pretty straightforward, we just let the initialized QueryManager instance answer

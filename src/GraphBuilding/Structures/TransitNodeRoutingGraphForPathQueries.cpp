@@ -6,18 +6,18 @@
 #include "TransitNodeRoutingGraphForPathQueries.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraphForPathQueries::TransitNodeRoutingGraphForPathQueries(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraphWithUnpackingData(nodes), unpackingGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)) {
+TransitNodeRoutingGraphForPathQueries::TransitNodeRoutingGraphForPathQueries(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraphWithUnpackingData(nodes), unpackingGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, std::vector<unsigned int>(transitNodesAmount)) {
 
 }
 
 //______________________________________________________________________________________________________________________
-const vector < pair < unsigned int , unsigned int > > & TransitNodeRoutingGraphForPathQueries::unpackingNeighbours(unsigned int nodeID) {
+const std::vector < std::pair< unsigned int , unsigned int > > & TransitNodeRoutingGraphForPathQueries::unpackingNeighbours(unsigned int nodeID) {
     return unpackingGraph[nodeID];
 }
 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraphForPathQueries::addUnpackingEdge(unsigned int from, unsigned int to, unsigned int weight) {
-    unpackingGraph[from].push_back(make_pair(to, weight));
+    unpackingGraph[from].push_back(std::make_pair(to, weight));
 }
 
 // FROM TNRGraph
@@ -61,7 +61,7 @@ unsigned int TransitNodeRoutingGraphForPathQueries::findTNRDistance(unsigned int
 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraphForPathQueries::addMappingPair(unsigned int realID, unsigned int transitNodesID) {
-    transitNodeMapping.insert(make_pair(realID, transitNodesID));
+    transitNodeMapping.insert(std::make_pair(realID, transitNodesID));
 }
 
 //______________________________________________________________________________________________________________________

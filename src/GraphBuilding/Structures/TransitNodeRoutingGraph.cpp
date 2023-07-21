@@ -8,7 +8,7 @@
 #include "TransitNodeRoutingGraph.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, vector<unsigned int>(transitNodesAmount)) {
+TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, std::vector<unsigned int>(transitNodesAmount)) {
 
 }
 
@@ -47,7 +47,7 @@ unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int start, unsign
 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingGraph::addMappingPair(unsigned int realID, unsigned int transitNodesID) {
-    transitNodeMapping.insert(make_pair(realID, transitNodesID));
+    transitNodeMapping.insert(std::make_pair(realID, transitNodesID));
 }
 
 //______________________________________________________________________________________________________________________

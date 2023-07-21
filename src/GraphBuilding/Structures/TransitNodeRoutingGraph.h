@@ -143,12 +143,12 @@ public:
     void accessNodesTest(Distance_matrix_travel_time_provider & dm);
 
 protected:
-    vector < vector < AccessNodeData > > forwardAccessNodes;
-    vector < vector < AccessNodeData > > backwardAccessNodes;
-    vector < vector < unsigned int > > forwardSearchSpaces;
-    vector < vector < unsigned int > > backwardSearchSpaces;
-    vector < vector < unsigned int > > transitNodesDistanceTable;
-    unordered_map < unsigned int, unsigned int > transitNodeMapping;
+    std::vector < std::vector < AccessNodeData > > forwardAccessNodes;
+    std::vector < std::vector < AccessNodeData > > backwardAccessNodes;
+    std::vector < std::vector < unsigned int > > forwardSearchSpaces;
+    std::vector < std::vector < unsigned int > > backwardSearchSpaces;
+    std::vector < std::vector < unsigned int > > transitNodesDistanceTable;
+    std::unordered_map< unsigned int, unsigned int > transitNodeMapping;
 };
 
 

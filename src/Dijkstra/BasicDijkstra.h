@@ -44,19 +44,19 @@ public:
 
     /**
      * Compute distances from source to all nodes in the graph. Fills those distances into the parameter
-     * vector distances. Can be used for example to fill the full distance matrix - each call of this function
+     * std::vector distances. Can be used for example to fill the full distance matrix - each call of this function
      * will compute one row of the matrix. This is also used in some of the preprocessing functions of some of the
      * methods.
      *
      * @param source[in] The node we want to start the search from.
      * @param graph[in] The graph we are interested in.
-     * @param distances[out] A vector that will be filled with shortest distances from 'source' to all nodes.
-     * The vector must be resized before this function is called to be able to contain values for all nodes.
+     * @param distances[out] A std::vector that will be filled with shortest distances from 'source' to all nodes.
+     * The std::vector must be resized before this function is called to be able to contain values for all nodes.
      */
     static void computeOneToAllDistances(
             const unsigned int source,
             const Graph & graph,
-            vector<unsigned int> & distances);
+            std::vector<unsigned int> & distances);
 
     /**
      * Compute distances from source to all nodes in the reversed graph. This is useful for example when computing
@@ -64,14 +64,14 @@ public:
      *
      * @param source[in] The node we want to start the search from.
      * @param graph[in] The graph we are interested in.
-     * @param distances[out] A vector that will be filled with shortest distances from 'source' to all nodes in the
-     * reversed graph. The vector must be resized before this function is called to be able to contain values for
+     * @param distances[out] A std::vector that will be filled with shortest distances from 'source' to all nodes in the
+     * reversed graph. The std::vector must be resized before this function is called to be able to contain values for
      * all nodes.
      */
     static void computeOneToAllDistancesInReversedGraph(
             const unsigned int source,
             const Graph & graph,
-            vector<unsigned int> & distances);
+            std::vector<unsigned int> & distances);
 
 private:
     /**
@@ -80,12 +80,12 @@ private:
      *
      * @param x[in] The currently processed node.
      * @param dist[in] distances from the start node of the query to all the nodes expanded during the query.
-     * @param prev[in] A vector containing the predecessors for each node.
+     * @param prev[in] A std::vector containing the predecessors for each node.
      */
     static void outputPath(
             const unsigned int x,
             const unsigned int * dist,
-            const vector < vector < unsigned int > > & prev);
+            const std::vector < std::vector < unsigned int > > & prev);
 };
 
 

@@ -29,8 +29,8 @@ Graph::Graph(SimpleGraph & x) {
 
 //______________________________________________________________________________________________________________________
 bool Graph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
-    this->followingNodes.at(from).push_back(make_pair(to, weight));
-    this->previousNodes.at(to).push_back(make_pair(from, weight));
+    this->followingNodes.at(from).push_back(std::make_pair(to, weight));
+    this->previousNodes.at(to).push_back(std::make_pair(from, weight));
     return true;
 }
 
@@ -40,11 +40,11 @@ unsigned int Graph::nodes()const {
 }
 
 //______________________________________________________________________________________________________________________
-const vector<pair<unsigned int, dist_t>> & Graph::incomingEdges(const unsigned int x)const {
+const std::vector<std::pair<unsigned int, dist_t>> & Graph::incomingEdges(const unsigned int x)const {
     return this->previousNodes.at(x);
 }
 
 //______________________________________________________________________________________________________________________
-const vector<pair<unsigned int, dist_t>> & Graph::outgoingEdges(const unsigned int x)const {
+const std::vector<std::pair<unsigned int, dist_t>> & Graph::outgoingEdges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }

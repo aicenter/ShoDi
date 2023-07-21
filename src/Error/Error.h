@@ -7,20 +7,20 @@
 
 #include <stdexcept>
 
-using namespace std;
 
-class input_error : public runtime_error {
+
+class input_error : public std::runtime_error {
 public:
-    explicit input_error(const string &arg) : runtime_error(arg) {}
+    explicit input_error(const std::string &arg) : std::runtime_error(arg) {}
 
-    explicit input_error(const char *string) : runtime_error(string) {}
+    explicit input_error(const char* message) : std::runtime_error(message) {}
 };
 
-class not_implemented_error : public runtime_error {
+class not_implemented_error : public std::runtime_error {
 public:
-    explicit not_implemented_error(const string &arg) : runtime_error(arg) {}
+    explicit not_implemented_error(const std::string& arg) : std::runtime_error(arg) {}
 
-    explicit not_implemented_error(const char *string) : runtime_error(string) {}
+    explicit not_implemented_error(const char* message) : std::runtime_error(message) {}
 };
 
 #endif //SHORTEST_PATHS_ERROR_H

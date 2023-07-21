@@ -12,16 +12,16 @@
 #include "Distance_matrix_travel_time_provider.h"
 #include "DistanceMatrixComputor.h"
 
-using namespace std;
 
-class DistanceMatrixComputorFast : public DistanceMatrixComputor<vector<dist_t>> {
+
+class DistanceMatrixComputorFast : public DistanceMatrixComputor<std::vector<dist_t>> {
 public:
 
     Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
 
-    vector<dist_t> loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) override;
+    std::vector<dist_t> loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) override;
 
-    void computeDistanceMatrix(const vector<dist_t> &graphData) override;
+    void computeDistanceMatrix(const std::vector<dist_t> &graphData) override;
 };
 
 

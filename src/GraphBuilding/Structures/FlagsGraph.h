@@ -12,7 +12,6 @@
 #include "UpdateableGraph.h"
 #include "../../CH/Structures/NodeData.h"
 
-using namespace std;
 
 /**
  * Class representing a graph for specifically for the CH query algorithm.
@@ -23,24 +22,24 @@ using namespace std;
  * going from lower ranked nodes to higher ranked nodes in the query algorithm anyway. We store additional flags
  * "forward" and "backward" with each edge to determine in which direction the edge should be expanded.
  */
-class FlagsGraph{
+class FlagsGraph {
 protected:
-    vector< vector < QueryEdge > > neighbours;
-    vector< NodeData > nodesData;
+    std::vector<std::vector<QueryEdge> > neighbours;
+    std::vector<NodeData> nodesData;
 
     /**
      * Auxiliary function used to load original edges into the FlagsGraph.
      *
-     * @param edges[in] A vector of the original edges (edges that are not shortcuts).
+     * @param edges[in] A std::vector of the original edges (edges that are not shortcuts).
      */
-    void processOriginalEdges(vector < OutputEdge > & edges);
+    void processOriginalEdges(std::vector<OutputEdge> &edges);
 
     /**
      * Auxiliary function used to load shortcut edges into the FlagsGraph.
      *
-     * @param shortcuts[in] A vector of the shortcut edges (must have middle node set).
+     * @param shortcuts[in] A std::vector of the shortcut edges (must have middle node set).
      */
-    void processShortcuts( vector < OutputShortcutEdge > & shortcuts);
+    void processShortcuts(std::vector<OutputShortcutEdge> &shortcuts);
 
 public:
     /**
@@ -57,7 +56,7 @@ public:
      *
      * @param g[in] An instance of the UpdateableGraph that will be used to initialize an instance of the Flags Graph.
      */
-    explicit FlagsGraph(UpdateableGraph & g);
+    explicit FlagsGraph(UpdateableGraph &g);
 
     /**
      * An explicit virtual destructor to avoid undefined behavior.
@@ -65,11 +64,11 @@ public:
     virtual ~FlagsGraph();
 
     /**
-     * Puts all edges currently present in the graph into one vector.
+     * Puts all edges currently present in the graph into one std::vector.
      *
-     * @param allEdges[out] A vector that will be filled with edges from the graph.
+     * @param allEdges[out] A std::vector that will be filled with edges from the graph.
      */
-    void getEdgesForFlushing(vector < pair < unsigned int, QueryEdge > > & allEdges);
+    void getEdgesForFlushing(std::vector<std::pair<unsigned int, QueryEdge> > &allEdges);
 
     /**
      * Adds one edge into the graph. Does not do any checks. An edge should always be added to the incident node with
@@ -99,7 +98,7 @@ public:
      * @param x[in] The ID of the node we are interested in.
      * @return Vector of edges that are incident with 'x' (They can have 'x' both as source and as target).
      */
-    const vector< QueryEdge > & nextNodes(unsigned int x)const;
+    const std::vector<QueryEdge> &nextNodes(unsigned int x) const;
 
     /**
      * Returns the data for a certain node.
@@ -107,7 +106,7 @@ public:
      * @param node[in] The node we are interested in.
      * @return Reference to the data about the node.
      */
-    virtual NodeData & data(unsigned int node);
+    virtual NodeData &data(unsigned int node);
 
     /**
      * Auxiliary function used to reset some data that could be changed during queries to their initial state so that

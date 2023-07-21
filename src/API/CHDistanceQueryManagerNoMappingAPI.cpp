@@ -7,7 +7,7 @@
 #include "../GraphBuilding/Loaders/DDSGLoader.h"
 
 //______________________________________________________________________________________________________________________
-void CHDistanceQueryManagerNoMappingAPI::initializeCH(string chFile) {
+void CHDistanceQueryManagerNoMappingAPI::initializeCH(std::string chFile) {
     DDSGLoader chLoader = DDSGLoader(chFile);
     graph = chLoader.loadFlagsGraph();
     qm = new CHDistanceQueryManager(*graph);

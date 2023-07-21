@@ -39,8 +39,8 @@ bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, dist_t weight)
         }
         return false;
     } else {
-        followingNodes.at(from).insert(make_pair(to, PreprocessingEdgeData(weight, 0, false)));
-        previousNodes.at(to).insert(make_pair(from, weight));
+        followingNodes.at(from).insert(std::make_pair(to, PreprocessingEdgeData(weight, 0, false)));
+        previousNodes.at(to).insert(std::make_pair(from, weight));
         return true;
     }
 }
@@ -57,8 +57,8 @@ bool UpdateableGraph::addShortcutEdge(unsigned int from, unsigned int to, dist_t
         }
         return false;
     } else {
-        followingNodes.at(from).insert(make_pair(to, PreprocessingEdgeData(weight, middlenode, true)));
-        previousNodes.at(to).insert(make_pair(from, weight));
+        followingNodes.at(from).insert(std::make_pair(to, PreprocessingEdgeData(weight, middlenode, true)));
+        previousNodes.at(to).insert(std::make_pair(from, weight));
         return true;
     }
 }
@@ -85,12 +85,12 @@ bool UpdateableGraph::isShortcut(const unsigned int from, const unsigned int to)
 }
 
 //______________________________________________________________________________________________________________________
-const unordered_map<unsigned int, unsigned int> & UpdateableGraph::incomingEdges(const unsigned int x)const {
+const std::unordered_map<unsigned int, unsigned int> & UpdateableGraph::incomingEdges(const unsigned int x)const {
     return previousNodes.at(x);
 }
 
 //______________________________________________________________________________________________________________________
-const unordered_map<unsigned int, PreprocessingEdgeData> & UpdateableGraph::outgoingEdges(const unsigned int x)const {
+const std::unordered_map<unsigned int, PreprocessingEdgeData> & UpdateableGraph::outgoingEdges(const unsigned int x)const {
     return followingNodes.at(x);
 }
 
@@ -105,7 +105,7 @@ void UpdateableGraph::setRank(unsigned int node, unsigned int rank) {
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::getNodesWithHighestRank(vector< unsigned int > & highestNodes, unsigned int requestedAmount) {
+void UpdateableGraph::getNodesWithHighestRank(std::vector< unsigned int > & highestNodes, unsigned int requestedAmount) {
     unsigned int curPosition = 0;
     for(unsigned int i = 0; i < requestedAmount; i++) {
         while(ranks[curPosition] <= nodes() - requestedAmount) {
@@ -117,14 +117,14 @@ void UpdateableGraph::getNodesWithHighestRank(vector< unsigned int > & highestNo
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushInDdsgFormat(string filePath) {
-    vector < OutputEdge > edges;
-    vector < OutputShortcutEdge > shortcuts;
+void UpdateableGraph::flushInDdsgFormat(std::string filePath) {
+    std::vector < OutputEdge > edges;
+    std::vector < OutputShortcutEdge > shortcuts;
     printf("Reordering edges for file writing\n");
     prepareEdgesForFlushing(edges, shortcuts);
 
-    ofstream output;
-    output.open ( filePath + ".ch", ios::binary );
+    std::ofstream output;
+    output.open ( filePath + ".ch", std::ios::binary );
     if( ! output.is_open() ) {
         printf("Couldn't open file '%s'!", (filePath + ".ch").c_str());
     }
@@ -142,8 +142,8 @@ void UpdateableGraph::flushInDdsgFormat(string filePath) {
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::outputAsXenGraph(string filePath) {
-    ofstream output;
+void UpdateableGraph::outputAsXenGraph(std::string filePath) {
+    std::ofstream output;
     output.open ( filePath + ".xeng" );
     if( ! output.is_open() ) {
         printf("Couldn't open file '%s'!", (filePath + ".xeng").c_str());
@@ -154,11 +154,11 @@ void UpdateableGraph::outputAsXenGraph(string filePath) {
         edges += followingNodes[i].size();
     }
 
-    output << "XGI " << nodes() << " " << edges << endl;
+    output << "XGI " << nodes() << " " << edges << std::endl;
 
     for(unsigned int i = 0; i < nodes(); ++i) {
         for(auto iter = followingNodes[i].begin(); iter != followingNodes[i].end(); ++iter) {
-            output << i << " " << (*iter).first << " " << (*iter).second.weight << " 1" << endl;
+            output << i << " " << (*iter).first << " " << (*iter).second.weight << " 1" << std::endl;
         }
     }
 
@@ -166,7 +166,7 @@ void UpdateableGraph::outputAsXenGraph(string filePath) {
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushHeader(ostream & output) {
+void UpdateableGraph::flushHeader(std::ostream & output) {
     char a, b, c, d;
     a = 0x43;
     b = 0x48;
@@ -181,21 +181,21 @@ void UpdateableGraph::flushHeader(ostream & output) {
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushCnts(ostream & output, const unsigned int nodes, const unsigned int edges, const unsigned int shortcuts) {
+void UpdateableGraph::flushCnts(std::ostream & output, const unsigned int nodes, const unsigned int edges, const unsigned int shortcuts) {
     output.write((char *) &nodes, sizeof (nodes));
     output.write((char *) &edges, sizeof (edges));
     output.write((char *) &shortcuts, sizeof (shortcuts));
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushRanks(ostream & output) {
+void UpdateableGraph::flushRanks(std::ostream & output) {
     for(size_t i = 0; i < ranks.size(); i++) {
         output.write((char *) &ranks[i], sizeof (unsigned int));
     }
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushOriginalEdges(ostream & output, vector < OutputEdge > & edges) {
+void UpdateableGraph::flushOriginalEdges(std::ostream & output, std::vector < OutputEdge > & edges) {
     for(size_t i = 0; i < edges.size(); i++) {
         output.write((char *) &edges[i].sourceNode, sizeof (unsigned int));
         output.write((char *) &edges[i].targetNode, sizeof (unsigned int));
@@ -205,7 +205,7 @@ void UpdateableGraph::flushOriginalEdges(ostream & output, vector < OutputEdge >
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushShortcutEdges(ostream & output, vector < OutputShortcutEdge > & edges) {
+void UpdateableGraph::flushShortcutEdges(std::ostream & output, std::vector < OutputShortcutEdge > & edges) {
     for(size_t i = 0; i < edges.size(); i++) {
         output.write((char *) &edges[i].sourceNode, sizeof (unsigned int));
         output.write((char *) &edges[i].targetNode, sizeof (unsigned int));
@@ -216,13 +216,13 @@ void UpdateableGraph::flushShortcutEdges(ostream & output, vector < OutputShortc
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::flushTerminator(ostream & output) {
+void UpdateableGraph::flushTerminator(std::ostream & output) {
     unsigned int footerNum = 0x12345678;
     output.write((char *) &footerNum, sizeof (footerNum));
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
+void UpdateableGraph::prepareEdgesForFlushing(std::vector < OutputEdge > & edges, std::vector < OutputShortcutEdge > & shortcuts) {
    const unsigned int followingNodesCnt = boost::numeric_cast<unsigned int>(followingNodes.size());
 
    for(unsigned int i = 0; i < followingNodesCnt; i++) {
@@ -257,8 +257,8 @@ void UpdateableGraph::prepareEdgesForFlushing(vector < OutputEdge > & edges, vec
 }
 
 //______________________________________________________________________________________________________________________
-void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > & edges, vector < OutputShortcutEdge > & shortcuts) {
-    vector<pair<pair<unsigned int, unsigned int>, PreprocessingEdgeData>> removedEdges;
+void UpdateableGraph::prepareEdgesForFlushingWithReinsert(std::vector < OutputEdge > & edges, std::vector < OutputShortcutEdge > & shortcuts) {
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, PreprocessingEdgeData>> removedEdges;
 
    const unsigned int followingNodesCnt = boost::numeric_cast<unsigned int>(followingNodes.size());
 
@@ -268,7 +268,7 @@ void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > 
                 unsigned int flags = 1;
                 if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight && followingNodes[(*iter).first].at(i).middleNode == (*iter).second.middleNode) {
                     flags += 2;
-                    removedEdges.push_back(make_pair(make_pair((*iter).first, i), PreprocessingEdgeData(followingNodes[(*iter).first].at(i))));
+                    removedEdges.push_back(std::make_pair(std::make_pair((*iter).first, i), PreprocessingEdgeData(followingNodes[(*iter).first].at(i))));
                     followingNodes[(*iter).first].erase(i);
                 }
                 if ((*iter).second.isShortcut) {
@@ -281,7 +281,7 @@ void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > 
                 unsigned int flags = 2;
                 if (followingNodes[(*iter).first].count(i) == 1 && followingNodes[(*iter).first].at(i).weight == (*iter).second.weight && followingNodes[(*iter).first].at(i).middleNode == (*iter).second.middleNode) {
                     flags += 1;
-                    removedEdges.push_back(make_pair(make_pair((*iter).first, i), PreprocessingEdgeData(followingNodes[(*iter).first].at(i))));
+                    removedEdges.push_back(std::make_pair(std::make_pair((*iter).first, i), PreprocessingEdgeData(followingNodes[(*iter).first].at(i))));
                     followingNodes[(*iter).first].erase(i);
                 }
                 if ((*iter).second.isShortcut) {
@@ -295,6 +295,6 @@ void UpdateableGraph::prepareEdgesForFlushingWithReinsert(vector < OutputEdge > 
     }
 
     for(size_t i = 0; i < removedEdges.size(); i++) {
-        followingNodes[removedEdges[i].first.first].insert(make_pair(removedEdges[i].first.second, PreprocessingEdgeData(removedEdges[i].second)));
+        followingNodes[removedEdges[i].first.first].insert(std::make_pair(removedEdges[i].first.second, PreprocessingEdgeData(removedEdges[i].second)));
     }
 }

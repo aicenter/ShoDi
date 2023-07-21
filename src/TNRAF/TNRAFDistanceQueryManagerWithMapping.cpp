@@ -7,7 +7,7 @@
 #include "../GraphBuilding/Loaders/XenGraphLoader.h"
 
 //______________________________________________________________________________________________________________________
-TNRAFDistanceQueryManagerWithMapping::TNRAFDistanceQueryManagerWithMapping(TransitNodeRoutingArcFlagsGraph & g, string mappingFilepath) : qm(g) {
+TNRAFDistanceQueryManagerWithMapping::TNRAFDistanceQueryManagerWithMapping(TransitNodeRoutingArcFlagsGraph & g, std::string mappingFilepath) : qm(g) {
     XenGraphLoader mappingLoader(mappingFilepath);
     mappingLoader.loadNodesMapping(mapping);
 }

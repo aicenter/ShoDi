@@ -18,7 +18,7 @@
 class DistanceCorrectnessValidator {
 public:
     /**
-     * Gets a vector of trips (pairs of source target queries), for each query it finds a path using
+     * Gets a std::vector of trips (pairs of source target queries), for each query it finds a path using
      * Contraction Hierarchies and then validates if the path exists in the original graph. The amount of wrong
      * paths is counted. This does not check if the returned distances are correct, only validates if the paths exist
      * (those paths can still be suboptimal). With that in mind, this should be always used after we are sure that
@@ -30,7 +30,7 @@ public:
      * @param originalGraph[in] The original graph that will be used for the validation.
      */
     static void validateOnGivenTrips(
-            vector< pair < unsigned int, unsigned int > > & trips,
+            std::vector< std::pair< unsigned int, unsigned int > > & trips,
             FlagsGraphWithUnpackingData & chGraph,
             Graph & originalGraph);
 };

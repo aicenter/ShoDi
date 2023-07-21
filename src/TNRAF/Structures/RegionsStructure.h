@@ -8,7 +8,7 @@
 
 #include <vector>
 
-using namespace std;
+
 
 /**
  * Auxiliary structure that is used during the Arc Flags computation. This structure gathers information about the
@@ -37,12 +37,12 @@ public:
             unsigned int regionId);
 
     /**
-     * Returns a vector of nodes assigned to a certain region.
+     * Returns a std::vector of nodes assigned to a certain region.
      *
      * @param regionId[in] The region we are interested in.
-     * @return Reference to a vector containing all the nodes corresponding to the given region.
+     * @return Reference to a std::vector containing all the nodes corresponding to the given region.
      */
-    vector < unsigned int > & nodesInRegion(
+    std::vector < unsigned int > & nodesInRegion(
             unsigned int regionId);
 
     /**
@@ -61,8 +61,8 @@ public:
      */
     unsigned int getRegionsCnt();
 private:
-    vector < vector < unsigned int > > regions;
-    vector < unsigned int > mapping;
+    std::vector < std::vector < unsigned int > > regions;
+    std::vector < unsigned int > mapping;
     unsigned int regionsCnt;
 };
 

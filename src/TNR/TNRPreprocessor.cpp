@@ -17,18 +17,18 @@
 #include "../Dijkstra/BasicDijkstra.h"
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPath, unsigned int transitNodesAmount) {
-    cout << "Getting transit nodes" << endl;
-    vector < unsigned int > transitNodes(transitNodesAmount);
+void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, std::string outputPath, unsigned int transitNodesAmount) {
+    std::cout << "Getting transit nodes" << std::endl;
+    std::vector < unsigned int > transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
-    cout << "Computing transit nodes distance table" << endl;
+    std::cout << "Computing transit nodes distance table" << std::endl;
     FlagsGraph chGraph(graph);
     CHDistanceQueryManager qm(chGraph);
-    vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
+    std::vector < std::vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, std::vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         if(i % 100 == 0) {
-            cout << "\rComputed '" << i << "' transit nodes distance table rows.";
+            std::cout << "\rComputed '" << i << "' transit nodes distance table rows.";
         }
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
             if (i == j) {
@@ -39,94 +39,94 @@ void TNRPreprocessor::preprocessUsingCH(UpdateableGraph & graph, string outputPa
         }
     }
 
-    cout << "\rComputed the transit nodes distance table." << endl;
+    std::cout << "\rComputed the transit nodes distance table." << std::endl;
 
-    cout << "Computing access nodes" << endl;
-    vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
-    vector < vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
-    vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
-    vector < vector < unsigned int > > backwardSearchSpaces(graph.nodes());
-    unordered_map < unsigned int, unsigned int > transitNodesMapping;
+    std::cout << "Computing access nodes" << std::endl;
+    std::vector < std::vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
+    std::vector < std::vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
+    std::vector < std::vector < unsigned int > > forwardSearchSpaces(graph.nodes());
+    std::vector < std::vector < unsigned int > > backwardSearchSpaces(graph.nodes());
+    std::unordered_map< unsigned int, unsigned int > transitNodesMapping;
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        transitNodesMapping.insert(make_pair(transitNodes[i], i));
+        transitNodesMapping.insert(std::make_pair(transitNodes[i], i));
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if (i % 100 == 0) {
-            cout << "\rComputed access nodes for '" << i << "' nodes.";
+            std::cout << "\rComputed access nodes for '" << i << "' nodes.";
         }
 
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping,chGraph);
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph);
     }
 
-    cout << "\rComputed acess nodes for all the nodes in the graph." << endl;
+    std::cout << "\rComputed acess nodes for all the nodes in the graph." << std::endl;
 
-    vector < pair < unsigned int, QueryEdge > > allEdges;
+    std::vector < std::pair< unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
     outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount);
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & originalGraph, string outputPath, unsigned int transitNodesAmount) {
-    cout << "Getting transit nodes" << endl;
-    vector < unsigned int > transitNodes(transitNodesAmount);
+void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph & graph, Graph & originalGraph, std::string outputPath, unsigned int transitNodesAmount) {
+    std::cout << "Getting transit nodes" << std::endl;
+    std::vector < unsigned int > transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
-    cout << "Computing transit nodes distance table" << endl;
+    std::cout << "Computing transit nodes distance table" << std::endl;
     FlagsGraph chGraph(graph);
     CHDistanceQueryManager qm(chGraph);
-    vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
+    std::vector < std::vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, std::vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         if(i % 100 == 0) {
-            cout << "\rComputed '" << i << "' transit nodes distance table rows.";
+            std::cout << "\rComputed '" << i << "' transit nodes distance table rows.";
         }
 
-        vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
+        std::vector<unsigned int> distancesFromNodeI(originalGraph.nodes());
         BasicDijkstra::computeOneToAllDistances(transitNodes[i], originalGraph, distancesFromNodeI);
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
             transitNodesDistanceTable[i][j] = distancesFromNodeI[transitNodes[j]];
         }
     }
 
-    cout << "\rComputed the transit nodes distance table." << endl;
+    std::cout << "\rComputed the transit nodes distance table." << std::endl;
 
-    cout << "Computing access nodes" << endl;
-    vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
-    vector < vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
-    vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
-    vector < vector < unsigned int > > backwardSearchSpaces(graph.nodes());
-    unordered_map < unsigned int, unsigned int > transitNodesMapping;
+    std::cout << "Computing access nodes" << std::endl;
+    std::vector < std::vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
+    std::vector < std::vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
+    std::vector < std::vector < unsigned int > > forwardSearchSpaces(graph.nodes());
+    std::vector < std::vector < unsigned int > > backwardSearchSpaces(graph.nodes());
+    std::unordered_map< unsigned int, unsigned int > transitNodesMapping;
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        transitNodesMapping.insert(make_pair(transitNodes[i], i));
+        transitNodesMapping.insert(std::make_pair(transitNodes[i], i));
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if (i % 100 == 0) {
-            cout << "\rComputed access nodes for '" << i << "' nodes.";
+            std::cout << "\rComputed access nodes for '" << i << "' nodes.";
         }
 
-        vector<unsigned int> forwardDistsFromNode(graph.nodes());
+        std::vector<unsigned int> forwardDistsFromNode(graph.nodes());
         BasicDijkstra::computeOneToAllDistances(i, originalGraph, forwardDistsFromNode);
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, forwardDistsFromNode, chGraph);
-        vector<unsigned int> backwardDistsFromNode(graph.nodes());
+        std::vector<unsigned int> backwardDistsFromNode(graph.nodes());
         BasicDijkstra::computeOneToAllDistancesInReversedGraph(i, originalGraph, backwardDistsFromNode);
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, backwardDistsFromNode, chGraph);
     }
 
-    cout << "\rComputed acess nodes for all the nodes in the graph." << endl;
+    std::cout << "\rComputed acess nodes for all the nodes in the graph." << std::endl;
 
-    vector < pair < unsigned int, QueryEdge > > allEdges;
+    std::vector < std::pair< unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
     outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount);
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph & originalGraph, string outputPath, unsigned int transitNodesAmount) {
-    cout << "Getting transit nodes" << endl;
-    vector < unsigned int > transitNodes(transitNodesAmount);
+void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph & originalGraph, std::string outputPath, unsigned int transitNodesAmount) {
+    std::cout << "Getting transit nodes" << std::endl;
+    std::vector < unsigned int > transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
     FlagsGraph chGraph(graph);
@@ -138,33 +138,33 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
         distanceMatrix = dmComputor.getDistanceMatrixInstance();
     }
 
-    cout << "Computing transit nodes distance table" << endl;
-    vector < vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, vector < unsigned int > (transitNodesAmount));
+    std::cout << "Computing transit nodes distance table" << std::endl;
+    std::vector < std::vector < unsigned int > > transitNodesDistanceTable(transitNodesAmount, std::vector < unsigned int > (transitNodesAmount));
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
         for(unsigned int j = 0; j < transitNodesAmount; j++) {
             transitNodesDistanceTable[i][j] = distanceMatrix->findDistance(transitNodes[i], transitNodes[j]);
         }
     }
 
-    cout << "Computing access nodes" << endl;
-    vector < vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
-    vector < vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
-    vector < vector < unsigned int > > forwardSearchSpaces(graph.nodes());
-    vector < vector < unsigned int > > backwardSearchSpaces(graph.nodes());
-    unordered_map < unsigned int, unsigned int > transitNodesMapping;
+    std::cout << "Computing access nodes" << std::endl;
+    std::vector < std::vector < AccessNodeData > > forwardAccessNodes(graph.nodes());
+    std::vector < std::vector < AccessNodeData > > backwardAccessNodes(graph.nodes());
+    std::vector < std::vector < unsigned int > > forwardSearchSpaces(graph.nodes());
+    std::vector < std::vector < unsigned int > > backwardSearchSpaces(graph.nodes());
+    std::unordered_map< unsigned int, unsigned int > transitNodesMapping;
     for(unsigned int i = 0; i < transitNodesAmount; i++) {
-        transitNodesMapping.insert(make_pair(transitNodes[i], i));
+        transitNodesMapping.insert(std::make_pair(transitNodes[i], i));
     }
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if (i % 100 == 0) {
-            cout << "\rComputed forward access nodes for '" << i << "' nodes.";
+            std::cout << "\rComputed forward access nodes for '" << i << "' nodes.";
         }
 
         findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph, *distanceMatrix);
     }
 
-    cout << "\rComputed forward acess nodes for all the nodes in the graph." << endl;
+    std::cout << "\rComputed forward acess nodes for all the nodes in the graph." << std::endl;
 
     {
         delete distanceMatrix;
@@ -174,27 +174,27 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph & graph, Graph 
     }
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         if (i % 100 == 0) {
-            cout << "\rComputed backward access nodes for '" << i << "' nodes.";
+            std::cout << "\rComputed backward access nodes for '" << i << "' nodes.";
         }
 
         findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph, *distanceMatrix);
     }
 
-    cout << "\rComputed backward acess nodes for all the nodes in the graph." << endl;
+    std::cout << "\rComputed backward acess nodes for all the nodes in the graph." << std::endl;
 
     delete distanceMatrix;
 
-    vector < pair < unsigned int, QueryEdge > > allEdges;
+    std::vector < std::pair< unsigned int, QueryEdge > > allEdges;
     chGraph.getEdgesForFlushing(allEdges);
 
     outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes, backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount);
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, vector < pair < unsigned int, QueryEdge > > & allEdges, vector < unsigned int > & transitNodes, vector < vector < unsigned int > > & transitNodesDistanceTable, vector < vector < AccessNodeData > > & forwardAccessNodes, vector < vector < AccessNodeData > > & backwardAccessNodes, vector < vector < unsigned int > > & forwardSearchSpaces, vector < vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount) {
-    cout << "Outputting TNR" << endl;
-    ofstream output;
-    output.open ( outputPath + ".tnrg", ios::binary );
+void TNRPreprocessor::outputGraph(std::string outputPath, UpdateableGraph & graph, std::vector < std::pair< unsigned int, QueryEdge > > & allEdges, std::vector < unsigned int > & transitNodes, std::vector < std::vector < unsigned int > > & transitNodesDistanceTable, std::vector < std::vector < AccessNodeData > > & forwardAccessNodes, std::vector < std::vector < AccessNodeData > > & backwardAccessNodes, std::vector < std::vector < unsigned int > > & forwardSearchSpaces, std::vector < std::vector < unsigned int > > & backwardSearchSpaces, unsigned int transitNodesAmount) {
+    std::cout << "Outputting TNR" << std::endl;
+    std::ofstream output;
+    output.open ( outputPath + ".tnrg", std::ios::binary );
     if( ! output.is_open() ) {
         printf("Couldn't open file '%s'!", (outputPath + ".tnrg").c_str());
     }
@@ -290,11 +290,11 @@ void TNRPreprocessor::outputGraph(string outputPath, UpdateableGraph & graph, ve
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph) {
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector < AccessNodeData > & accessNodes, std::vector < unsigned int > & forwardSearchSpace, std::unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
-    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> settled(graph.nodes(), false);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    std::vector<bool> settled(graph.nodes(), false);
 
     forwardQ.push(DijkstraNode(source, 0));
 
@@ -315,7 +315,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         } else {
             forwardSearchSpace.push_back(curNode);
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).forward) {
@@ -342,17 +342,17 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData> & accessNodes, vector < unsigned int > & forwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, vector < unsigned int > & distsFromNode, FlagsGraph & graph) {
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector < AccessNodeData> & accessNodes, std::vector < unsigned int > & forwardSearchSpace, std::unordered_map< unsigned int, unsigned int > & transitNodes, std::vector < unsigned int > & distsFromNode, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
-    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> settled(graph.nodes(), false);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    std::vector<bool> settled(graph.nodes(), false);
 
     forwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
-    vector < AccessNodeData > accessNodesSuperset;
+    std::vector < AccessNodeData > accessNodesSuperset;
 
     while (! forwardQ.empty() ) {
         unsigned int curNode = forwardQ.top().ID;
@@ -369,7 +369,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         } else {
             forwardSearchSpace.push_back(curNode);
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).forward) {
@@ -405,17 +405,17 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & forwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph, Distance_matrix_travel_time_provider & dm) {
+void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector < AccessNodeData > & accessNodes, std::vector < unsigned int > & forwardSearchSpace, std::unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph, Distance_matrix_travel_time_provider & dm) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
-    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> settled(graph.nodes(), false);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    std::vector<bool> settled(graph.nodes(), false);
 
     forwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
-    vector < AccessNodeData > accessNodesSuperset;
+    std::vector < AccessNodeData > accessNodesSuperset;
 
     while (! forwardQ.empty() ) {
         unsigned int curNode = forwardQ.top().ID;
@@ -432,7 +432,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
         } else {
             forwardSearchSpace.push_back(curNode);
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).forward) {
@@ -469,11 +469,11 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, vector < Acces
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & backwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph) {
+void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector < AccessNodeData > & accessNodes, std::vector < unsigned int > & backwardSearchSpace, std::unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
-    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> settled(graph.nodes(), false);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
+    std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    std::vector<bool> settled(graph.nodes(), false);
 
     backwardQ.push(DijkstraNode(source, 0));
 
@@ -494,7 +494,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         } else {
             backwardSearchSpace.push_back(curNode);
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).backward) {
@@ -521,17 +521,17 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData> & accessNodes, vector < unsigned int > & backwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, vector < unsigned int > & distsFromNode, FlagsGraph & graph) {
+void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector < AccessNodeData> & accessNodes, std::vector < unsigned int > & backwardSearchSpace, std::unordered_map< unsigned int, unsigned int > & transitNodes, std::vector < unsigned int > & distsFromNode, FlagsGraph & graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
-    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> settled(graph.nodes(), false);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
+    std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    std::vector<bool> settled(graph.nodes(), false);
 
     backwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
-    vector < AccessNodeData > accessNodesSuperset;
+    std::vector < AccessNodeData > accessNodesSuperset;
 
     while (! backwardQ.empty() ) {
         unsigned int curNode = backwardQ.top().ID;
@@ -548,7 +548,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         } else {
             backwardSearchSpace.push_back(curNode);
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).backward) {
@@ -585,17 +585,17 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
 }
 
 //______________________________________________________________________________________________________________________
-void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < AccessNodeData > & accessNodes, vector < unsigned int > & backwardSearchSpace, unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph, Distance_matrix_travel_time_provider & dm) {
+void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector < AccessNodeData > & accessNodes, std::vector < unsigned int > & backwardSearchSpace, std::unordered_map< unsigned int, unsigned int > & transitNodes, FlagsGraph & graph, Distance_matrix_travel_time_provider & dm) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
-    vector<unsigned int> distances(graph.nodes(), UINT_MAX);
-    vector<bool> settled(graph.nodes(), false);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
+    std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
+    std::vector<bool> settled(graph.nodes(), false);
 
     backwardQ.push(DijkstraNode(source, 0));
 
     distances[source] = 0;
 
-    vector < AccessNodeData > accessNodesSuperset;
+    std::vector < AccessNodeData > accessNodesSuperset;
 
     while (! backwardQ.empty() ) {
         unsigned int curNode = backwardQ.top().ID;
@@ -612,7 +612,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, vector < Acce
         } else {
             backwardSearchSpace.push_back(curNode);
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Skip edge if it is only in the other direction.
                 if (! (*iter).backward) {

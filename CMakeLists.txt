@@ -31,10 +31,16 @@ find_package(JNI REQUIRED)
 include_directories(${JNI_INCLUDE_DIRS})
 
 ## Boost
-find_path(BOOST_CONFIG_INCLUDE_DIRS "/boost/config.hpp")
-include_directories(${BOOST_CONFIG_INCLUDE_DIRS})
-find_path(BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS "boost/cast.hpp")
-include_directories(${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
+find_package(Boost REQUIRED)
+#find_path(BOOST_CONFIG_INCLUDE_DIRS "/boost/config.hpp")
+#include_directories(${BOOST_CONFIG_INCLUDE_DIRS})
+#find_path(BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS "boost/cast.hpp")
+#include_directories(${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
+
+# Check boost header-only components
+if(NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
+    message(FATAL_ERROR "Boost graph component not found. Search path: ${Boost_INCLUDE_DIRS}/boost/graph")
+endif()
 
 ## CSV
 find_package(csv2 CONFIG REQUIRED)

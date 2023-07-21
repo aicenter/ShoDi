@@ -23,8 +23,8 @@ CHPathQueryManager::CHPathQueryManager(FlagsGraphWithUnpackingData & g) : graph(
 //______________________________________________________________________________________________________________________
 unsigned int CHPathQueryManager::processQuery(const unsigned int source, const unsigned int target) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
 
     forwardQ.push(DijkstraNode(source, 0));
     backwardQ.push(DijkstraNode(target, 0));
@@ -82,7 +82,7 @@ unsigned int CHPathQueryManager::processQuery(const unsigned int source, const u
             }
 
             // Classic edges relaxation
-            const vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 // Here we stall a node if it's reached on a suboptimal path. This can happen in the Contraction
                 // Hierarchies query algorithm, because we can reach a node from the wrong direction (for example
@@ -144,7 +144,7 @@ unsigned int CHPathQueryManager::processQuery(const unsigned int source, const u
                 }
             }
 
-            const vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 /*if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;
@@ -190,7 +190,7 @@ unsigned int CHPathQueryManager::processQuery(const unsigned int source, const u
 
 // Finds and returns the distance. Additionally reconstructs the actual path and outputs it to standard output
 // in a somewhat human readable format. Mostly useful for debug, for actual queries, findPath() should be a better
-// option since it creates a vector of all the edges on the path which can be then processed further.
+// option since it creates a std::vector of all the edges on the path which can be then processed further.
 //______________________________________________________________________________________________________________________
 unsigned int CHPathQueryManager::findDistanceOutputPath(const unsigned int source, const unsigned int target) {
     unsigned int distance = processQuery(source, target);
@@ -211,11 +211,11 @@ unsigned int CHPathQueryManager::findDistanceOnly(const unsigned int source, con
     return distance;
 }
 
-// Finds the path, returns the distance, and additionally fills the vector 'edges' with all pairs of 'source->target'
-// edges in the original graph (in order as they appear on the path). The vector 'edgeLengths' is filled with respective
+// Finds the path, returns the distance, and additionally fills the std::vector 'edges' with all pairs of 'source->target'
+// edges in the original graph (in order as they appear on the path). The std::vector 'edgeLengths' is filled with respective
 // lengths of the edges in the original graph.
 //______________________________________________________________________________________________________________________
-unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
+unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, std::vector<std::pair<unsigned int, unsigned int>> & edges, std::vector<unsigned int> & edgeLengths) {
     unsigned int distance = processQuery(source, target);
 
     fillPathInfo(meetingNode, edges, edgeLengths);
@@ -225,10 +225,10 @@ unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsig
     return distance;
 }
 
-// Finds the path, returns the distance, and additionally fills the vector 'edges' with all pairs of 'source->target'
+// Finds the path, returns the distance, and additionally fills the std::vector 'edges' with all pairs of 'source->target'
 // edges in the original graph (in order as they appear on the path).
 //______________________________________________________________________________________________________________________
-unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, vector<pair<unsigned int, unsigned int>> & edges) {
+unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, std::vector<std::pair<unsigned int, unsigned int>> & edges) {
     unsigned int distance = processQuery(source, target);
 
     fillPathInfoEdgesOnly(meetingNode, edges);
@@ -238,10 +238,10 @@ unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsig
     return distance;
 }
 
-// Finds the path, returns the distance, and additionally fills the vector 'edges' with all pairs of 'source->target'
+// Finds the path, returns the distance, and additionally fills the std::vector 'edges' with all pairs of 'source->target'
 // edges in the original graph (in order as they appear on the path).
 //______________________________________________________________________________________________________________________
-unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, vector<SimpleEdge> & path) {
+unsigned int CHPathQueryManager::findPath(const unsigned int source, const unsigned int target, std::vector<SimpleEdge> & path) {
     unsigned int distance = processQuery(source, target);
 
     fillPathInfoEdgesOnly(meetingNode, path);
@@ -265,7 +265,7 @@ void CHPathQueryManager::printEdgesBackwardShortcut(const unsigned int source, c
 // reach already stalled nodes or nodes that can't be stalled.
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::forwardStall(unsigned int stallnode, unsigned int stalldistance) {
-    queue<DijkstraNode> stallQueue;
+    std::queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
     while (! stallQueue.empty()) {
@@ -275,7 +275,7 @@ void CHPathQueryManager::forwardStall(unsigned int stallnode, unsigned int stall
         graph.data(curNode).forwardStalled = true;
         forwardStallChanged.push_back(curNode);
 
-        const vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
+        const std::vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
         for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
             if (! (*iter).forward) {
                 continue;
@@ -303,7 +303,7 @@ void CHPathQueryManager::forwardStall(unsigned int stallnode, unsigned int stall
 // reach already stalled nodes or nodes that can't be stalled.
 //______________________________________________________________________________________________________________________
 void CHPathQueryManager::backwardStall(unsigned int stallnode, unsigned int stalldistance) {
-    queue<DijkstraNode> stallQueue;
+    std::queue<DijkstraNode> stallQueue;
     stallQueue.push(DijkstraNode(stallnode, stalldistance));
 
     while (! stallQueue.empty()) {
@@ -313,7 +313,7 @@ void CHPathQueryManager::backwardStall(unsigned int stallnode, unsigned int stal
         graph.data(curNode).backwardStalled = true;
         backwardStallChanged.push_back(curNode);
 
-        const vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
+        const std::vector<QueryEdgeWithUnpackingData> & neighbours = graph.nextNodes(curNode);
         for (auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
             if (! (*iter).backward) {
                 continue;
@@ -373,8 +373,8 @@ void CHPathQueryManager::outputPath(const unsigned int meetingNode) {
     }
 
     printf("~~~ Outputting shortest path (unpacked from CH) ~~~\n");
-    vector<pair<unsigned int, unsigned int> > fromPath;
-    vector<pair<unsigned int, unsigned int> > toPath;
+    std::vector<std::pair<unsigned int, unsigned int> > fromPath;
+    std::vector<std::pair<unsigned int, unsigned int> > toPath;
     fillFromPath(meetingNode, fromPath);
     fillToPath(meetingNode, toPath);
     unpackPrevious(fromPath);
@@ -383,13 +383,13 @@ void CHPathQueryManager::outputPath(const unsigned int meetingNode) {
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillPathInfo(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
+void CHPathQueryManager::fillPathInfo(const unsigned int meetingNode, std::vector<std::pair<unsigned int, unsigned int>> & edges, std::vector<unsigned int> & edgeLengths) {
     if (meetingNode == UINT_MAX) {
         return;
     }
 
-    vector<pair<unsigned int, unsigned int> > fromPath;
-    vector<pair<unsigned int, unsigned int> > toPath;
+    std::vector<std::pair<unsigned int, unsigned int> > fromPath;
+    std::vector<std::pair<unsigned int, unsigned int> > toPath;
     fillFromPath(meetingNode, fromPath);
     fillToPath(meetingNode, toPath);
     getPreviousPathPart(fromPath, edges, edgeLengths);
@@ -397,13 +397,13 @@ void CHPathQueryManager::fillPathInfo(const unsigned int meetingNode, vector<pai
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int>> & edges) {
+void CHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, std::vector<std::pair<unsigned int, unsigned int>> & edges) {
     if (meetingNode == UINT_MAX) {
         return;
     }
 
-    vector<pair<unsigned int, unsigned int> > fromPath;
-    vector<pair<unsigned int, unsigned int> > toPath;
+    std::vector<std::pair<unsigned int, unsigned int> > fromPath;
+    std::vector<std::pair<unsigned int, unsigned int> > toPath;
     fillFromPath(meetingNode, fromPath);
     fillToPath(meetingNode, toPath);
     getPreviousPathPartEdgesOnly(fromPath, edges);
@@ -411,13 +411,13 @@ void CHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, v
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, vector<SimpleEdge> & edges) {
+void CHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, std::vector<SimpleEdge> & edges) {
     if (meetingNode == UINT_MAX) {
         return;
     }
 
-    vector<pair<unsigned int, unsigned int> > fromPath;
-    vector<pair<unsigned int, unsigned int> > toPath;
+    std::vector<std::pair<unsigned int, unsigned int> > fromPath;
+    std::vector<std::pair<unsigned int, unsigned int> > toPath;
     fillFromPath(meetingNode, fromPath);
     fillToPath(meetingNode, toPath);
     getPreviousPathPartEdgesOnly(fromPath, edges);
@@ -425,74 +425,74 @@ void CHPathQueryManager::fillPathInfoEdgesOnly(const unsigned int meetingNode, v
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillFromPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & fromPath) {
+void CHPathQueryManager::fillFromPath(const unsigned int meetingNode, std::vector<std::pair<unsigned int, unsigned int> > & fromPath) {
     unsigned int current = meetingNode;
     while(graph.getForwardPrev(current) != UINT_MAX) {
-        fromPath.push_back(make_pair(graph.getForwardPrev(current), current));
+        fromPath.push_back(std::make_pair(graph.getForwardPrev(current), current));
         current = graph.getForwardPrev(current);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::fillToPath(const unsigned int meetingNode, vector<pair<unsigned int, unsigned int> > & toPath) {
+void CHPathQueryManager::fillToPath(const unsigned int meetingNode, std::vector<std::pair<unsigned int, unsigned int> > & toPath) {
     unsigned int current = meetingNode;
     while(graph.getBackwardPrev(current) != UINT_MAX) {
-        toPath.push_back(make_pair(current, graph.getBackwardPrev(current)));
+        toPath.push_back(std::make_pair(current, graph.getBackwardPrev(current)));
         current = graph.getBackwardPrev(current);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::unpackPrevious(vector<pair<unsigned int, unsigned int> > & fromPath) {
+void CHPathQueryManager::unpackPrevious(std::vector<std::pair<unsigned int, unsigned int> > & fromPath) {
     for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
         unpackForwardEdge(fromPath[(size_t) i].first, fromPath[(size_t) i].second);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::unpackFollowing(vector<pair<unsigned int, unsigned int> > & toPath) {
+void CHPathQueryManager::unpackFollowing(std::vector<std::pair<unsigned int, unsigned int> > & toPath) {
     for(size_t i = 0; i < toPath.size(); i++) {
         unpackBackwardEdge(toPath[i].first, toPath[i].second);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getPreviousPathPart(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
+void CHPathQueryManager::getPreviousPathPart(std::vector<std::pair<unsigned int, unsigned int> > & fromPath, std::vector<std::pair<unsigned int, unsigned int>> & edges, std::vector<unsigned int> & edgeLengths) {
     for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
         getForwardEdge(fromPath[(size_t) i].first, fromPath[(size_t) i].second, edges, edgeLengths);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getFollowingPathPart(vector<pair<unsigned int, unsigned int> > & toPath, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
+void CHPathQueryManager::getFollowingPathPart(std::vector<std::pair<unsigned int, unsigned int> > & toPath, std::vector<std::pair<unsigned int, unsigned int>> & edges, std::vector<unsigned int> & edgeLengths) {
     for(size_t i = 0; i < toPath.size(); i++) {
         getBackwardEdge(toPath[i].first, toPath[i].second, edges, edgeLengths);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<pair<unsigned int, unsigned int>> & edges) {
+void CHPathQueryManager::getPreviousPathPartEdgesOnly(std::vector<std::pair<unsigned int, unsigned int> > & fromPath, std::vector<std::pair<unsigned int, unsigned int>> & edges) {
     for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
         getForwardEdgeWithoutLength(fromPath[(size_t) i].first, fromPath[(size_t) i].second, edges);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & toPath, vector<pair<unsigned int, unsigned int>> & edges) {
+void CHPathQueryManager::getFollowingPathPartEdgesOnly(std::vector<std::pair<unsigned int, unsigned int> > & toPath, std::vector<std::pair<unsigned int, unsigned int>> & edges) {
     for(size_t i = 0; i < toPath.size(); i++) {
         getBackwardEdgeWithoutLength(toPath[i].first, toPath[i].second, edges);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getPreviousPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & fromPath, vector<SimpleEdge> & path) {
+void CHPathQueryManager::getPreviousPathPartEdgesOnly(std::vector<std::pair<unsigned int, unsigned int> > & fromPath, std::vector<SimpleEdge> & path) {
     for(long long i = (long long) fromPath.size()-1; i >= 0; i--) {
         getForwardEdgeWithoutLength(fromPath[(size_t) i].first, fromPath[(size_t) i].second, path);
     }
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getFollowingPathPartEdgesOnly(vector<pair<unsigned int, unsigned int> > & toPath, vector<SimpleEdge> & path) {
+void CHPathQueryManager::getFollowingPathPartEdgesOnly(std::vector<std::pair<unsigned int, unsigned int> > & toPath, std::vector<SimpleEdge> & path) {
     for(size_t i = 0; i < toPath.size(); i++) {
         getBackwardEdgeWithoutLength(toPath[i].first, toPath[i].second, path);
     }
@@ -535,7 +535,7 @@ void CHPathQueryManager::unpackBackwardEdge(unsigned int s, unsigned int t) {
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getForwardEdge(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
+void CHPathQueryManager::getForwardEdge(unsigned int s, unsigned int t, std::vector<std::pair<unsigned int, unsigned int>> & edges, std::vector<unsigned int> & edgeLengths) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
         m = graph.getMiddleNode(s, t, FORWARD);
@@ -544,7 +544,7 @@ void CHPathQueryManager::getForwardEdge(unsigned int s, unsigned int t, vector<p
     }
 
     if (m == UINT_MAX) {
-        edges.push_back(make_pair(s, t));
+        edges.push_back(std::make_pair(s, t));
         edgeLengths.push_back(graph.getDistance(s, t, FORWARD));
         return;
     }
@@ -554,7 +554,7 @@ void CHPathQueryManager::getForwardEdge(unsigned int s, unsigned int t, vector<p
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getBackwardEdge(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges, vector<unsigned int> & edgeLengths) {
+void CHPathQueryManager::getBackwardEdge(unsigned int s, unsigned int t, std::vector<std::pair<unsigned int, unsigned int>> & edges, std::vector<unsigned int> & edgeLengths) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
         m = graph.getMiddleNode(s, t, BACKWARD);
@@ -563,7 +563,7 @@ void CHPathQueryManager::getBackwardEdge(unsigned int s, unsigned int t, vector<
     }
 
     if (m == UINT_MAX) {
-        edges.push_back(make_pair(s, t));
+        edges.push_back(std::make_pair(s, t));
         edgeLengths.push_back(graph.getDistance(s, t, BACKWARD));
         return;
     }
@@ -573,7 +573,7 @@ void CHPathQueryManager::getBackwardEdge(unsigned int s, unsigned int t, vector<
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges) {
+void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned int t, std::vector<std::pair<unsigned int, unsigned int>> & edges) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
         m = graph.getMiddleNode(s, t, FORWARD);
@@ -582,7 +582,7 @@ void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned in
     }
 
     if (m == UINT_MAX) {
-        edges.push_back(make_pair(s, t));
+        edges.push_back(std::make_pair(s, t));
         return;
     }
 
@@ -591,7 +591,7 @@ void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned in
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<pair<unsigned int, unsigned int>> & edges) {
+void CHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, std::vector<std::pair<unsigned int, unsigned int>> & edges) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
         m = graph.getMiddleNode(s, t, BACKWARD);
@@ -600,7 +600,7 @@ void CHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned i
     }
 
     if (m == UINT_MAX) {
-        edges.push_back(make_pair(s, t));
+        edges.push_back(std::make_pair(s, t));
         return;
     }
 
@@ -609,7 +609,7 @@ void CHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned i
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<SimpleEdge> & path) {
+void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned int t, std::vector<SimpleEdge> & path) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
         m = graph.getMiddleNode(s, t, FORWARD);
@@ -627,7 +627,7 @@ void CHPathQueryManager::getForwardEdgeWithoutLength(unsigned int s, unsigned in
 }
 
 //______________________________________________________________________________________________________________________
-void CHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, vector<SimpleEdge> & path) {
+void CHPathQueryManager::getBackwardEdgeWithoutLength(unsigned int s, unsigned int t, std::vector<SimpleEdge> & path) {
     unsigned int m;
     if (graph.data(s).rank < graph.data(t).rank) {
         m = graph.getMiddleNode(s, t, BACKWARD);

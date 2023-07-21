@@ -12,7 +12,6 @@
 #include "SimpleGraph.h"
 #include "constants.h"
 
-using namespace std;
 
 /**
  * Class representing a graph.
@@ -22,8 +21,8 @@ using namespace std;
  */
 class Graph : public BaseGraph {
 private:
-    vector< vector < pair< unsigned int, dist_t > > > followingNodes;
-    vector< vector < pair< unsigned int, dist_t > > > previousNodes;
+    std::vector<std::vector<std::pair<unsigned int, dist_t>>> followingNodes;
+    std::vector<std::vector<std::pair<unsigned int, dist_t>>> previousNodes;
 public:
     /**
      * A simple constructor.
@@ -38,7 +37,7 @@ public:
      *
      * @param x[in] An instance of the SimpleGraph class that will be used to initialize an instance of Graph.
      */
-    Graph(SimpleGraph & x);
+    Graph(SimpleGraph &x);
 
     /**
      * Adds an edge into the graph. This function does not validate that there is not another edge between the two
@@ -65,7 +64,7 @@ public:
      * @param x[in] The target node we are interested in.
      * @return All the edges in the graph that have 'x' as their target node.
      */
-    const vector<pair<unsigned int, dist_t>> & incomingEdges(const unsigned int x)const;
+    const std::vector<std::pair<unsigned int, dist_t>> &incomingEdges(const unsigned int x) const;
 
     /**
      * Returns all the edges with the node 'x' as their source node.
@@ -73,7 +72,7 @@ public:
      * @param x[in] The source node we are interested in.
      * @return All the edges in the graph that have 'x' as their source node.
      */
-    const vector<pair<unsigned int, dist_t>> & outgoingEdges(const unsigned int x)const;
+    const std::vector<std::pair<unsigned int, dist_t>> &outgoingEdges(const unsigned int x) const;
 
     bool handlesDuplicateEdges() override {
         return false;

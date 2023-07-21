@@ -17,7 +17,7 @@ void RegionsStructure::addNode(unsigned int nodeId, unsigned int regionId) {
 }
 
 //______________________________________________________________________________________________________________________
-vector < unsigned int > & RegionsStructure::nodesInRegion(unsigned int regionId) {
+std::vector < unsigned int > & RegionsStructure::nodesInRegion(unsigned int regionId) {
     return regions[regionId];
 }
 

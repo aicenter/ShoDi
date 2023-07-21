@@ -16,7 +16,7 @@ class TransitNodeRoutingGraphForPathQueries : public FlagsGraphWithUnpackingData
 public:
     TransitNodeRoutingGraphForPathQueries(unsigned int nodes, unsigned int transitNodesAmount);
     void addUnpackingEdge(unsigned int from, unsigned int to, unsigned int weight);
-    const vector < pair < unsigned int , unsigned int > > & unpackingNeighbours(unsigned int nodeID);
+    const std::vector < std::pair< unsigned int , unsigned int > > & unpackingNeighbours(unsigned int nodeID);
 
     // From TNRGraph
     bool isLocalQuery(unsigned int source, unsigned int target);
@@ -28,15 +28,15 @@ public:
     void addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
     void addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode);
 protected:
-    vector < vector < pair < unsigned int, unsigned int > > > unpackingGraph;
+    std::vector < std::vector < std::pair< unsigned int, unsigned int > > > unpackingGraph;
 
     // From TNRGraph
-    vector < vector < AccessNodeData > > forwardAccessNodes;
-    vector < vector < AccessNodeData > > backwardAccessNodes;
-    vector < vector < unsigned int > > forwardSearchSpaces;
-    vector < vector < unsigned int > > backwardSearchSpaces;
-    vector < vector < unsigned int > > transitNodesDistanceTable;
-    unordered_map < unsigned int, unsigned int > transitNodeMapping;
+    std::vector < std::vector < AccessNodeData > > forwardAccessNodes;
+    std::vector < std::vector < AccessNodeData > > backwardAccessNodes;
+    std::vector < std::vector < unsigned int > > forwardSearchSpaces;
+    std::vector < std::vector < unsigned int > > backwardSearchSpaces;
+    std::vector < std::vector < unsigned int > > transitNodesDistanceTable;
+    std::unordered_map< unsigned int, unsigned int > transitNodeMapping;
 };
 
 

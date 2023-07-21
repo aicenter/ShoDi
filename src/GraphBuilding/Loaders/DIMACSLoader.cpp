@@ -18,11 +18,11 @@
 #include <type_traits>
 
 //______________________________________________________________________________________________________________________
-DIMACSLoader::DIMACSLoader(string inputFile)
+DIMACSLoader::DIMACSLoader(std::string inputFile)
     : inputFile(inputFile), amountsParsed(false) {
   input.open(inputFile);
   if (!input.is_open()) {
-    throw runtime_error(string("Couldn't open file '") + this->inputFile +
+    throw std::runtime_error(std::string("Couldn't open file '") + this->inputFile +
                         "'!");
   }
 }
@@ -68,10 +68,10 @@ void DIMACSLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseGraphProblemLine(ifstream &input, unsigned int &nodes,
+void DIMACSLoader::parseGraphProblemLine(std::ifstream &input, unsigned int &nodes,
                                          size_t &edges) {
   while (true) {
-    string buffer;
+    std::string buffer;
     getline(input, buffer);
     if (buffer[0] == 'p') {
       processGraphProblemLine(buffer, nodes, edges);
@@ -81,7 +81,7 @@ void DIMACSLoader::parseGraphProblemLine(ifstream &input, unsigned int &nodes,
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes,
+void DIMACSLoader::processGraphProblemLine(std::string &buffer, unsigned int &nodes,
                                            size_t &edges) {
   size_t position = 5;
   unsigned int tmpnodes = 0;
@@ -104,10 +104,10 @@ void DIMACSLoader::processGraphProblemLine(string &buffer, unsigned int &nodes,
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(ifstream &input, BaseGraph &graph, size_t edges, unsigned int precisionLoss) {
+void DIMACSLoader::parseEdges(std::ifstream &input, BaseGraph &graph, size_t edges, unsigned int precisionLoss) {
   size_t loadededgescnt = 0;
   while (loadededgescnt < edges) {
-    string buffer;
+    std::string buffer;
     getline(input, buffer);
     if (buffer[0] == 'a') {
       unsigned int from, to;
@@ -125,7 +125,7 @@ void DIMACSLoader::parseEdges(ifstream &input, BaseGraph &graph, size_t edges, u
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::getEdge(string &buffer, unsigned int &from, unsigned int &to,
+void DIMACSLoader::getEdge(std::string &buffer, unsigned int &from, unsigned int &to,
                            dist_t &weight) {
   size_t position = 2;
   unsigned int tmpfrom = 0;

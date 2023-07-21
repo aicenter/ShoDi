@@ -8,7 +8,7 @@
 
 #include <vector>
 
-using namespace std;
+
 
 /**
  * Auxiliary class than can compute the weight of a node for the contraction order. There are multiple terms that we
@@ -47,8 +47,8 @@ public:
             const unsigned int degree);
 
 private:
-    static vector<unsigned int> neighboursContracted;
-    static vector<unsigned int> previousContracted;
+    static std::vector<unsigned int> neighboursContracted;
+    static std::vector<unsigned int> previousContracted;
 };
 
 

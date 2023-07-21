@@ -10,7 +10,6 @@
 #include "../Structures/TransitNodeRoutingGraph.h"
 #include "../Structures/TransitNodeRoutingGraphForPathQueries.h"
 
-using namespace std;
 
 /**
  * Class used for loading the Transit Node Routing data-structure from a file.
@@ -19,7 +18,7 @@ using namespace std;
 class TNRGLoader {
 protected:
     /**
-     * Auxiliary function that parses the header. The file should start with the string "TNRG" which is used as some
+     * Auxiliary function that parses the header. The file should start with the std::string "TNRG" which is used as some
      * sort of a magic number  to check the integrity of the file. Then three unsigned ints should follow
      * denoting the number of nodes, the number of edges and the size of the transit node set.
      *
@@ -29,7 +28,7 @@ protected:
      * @param tnodesAmount[out] The size of the transit node set for the Transit Node Routing data-structure.
      */
     void parseFirstLine(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int & nodes,
             unsigned int & edges,
             unsigned int & tnodesAmount);
@@ -42,7 +41,7 @@ protected:
      * @param edges[in] The number of edges that need to be processed (loaded).
      */
     void parseEdgesForDistanceQueries(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraph & graph,
             unsigned int edges);
 
@@ -54,7 +53,7 @@ protected:
      * @param edges[in] The number of edges that need to be processed (loaded).
      */
     void parseEdgesForPathQueries(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int edges);
 
@@ -66,7 +65,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load rank for each of the nodes).
      */
     void parseRanks(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraph * graph,
             unsigned int nodes);
 
@@ -79,7 +78,7 @@ protected:
      * @param tnodesAmount[in] The size of the transit node set.
      */
     void parseTransitNodesMapping(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraph & graph,
             unsigned int tnodesAmount);
 
@@ -91,7 +90,7 @@ protected:
      * @param tnodesAmount[in] The size of the transit node set.
      */
     void parseTransitNodesDistanceTable(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraph & graph,
             unsigned int tnodesAmount);
 
@@ -104,7 +103,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need access nodes for each node in the graph).
      */
     void parseAccessNodes(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraph & graph,
             unsigned int nodes);
 
@@ -117,7 +116,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need search spaces for each node in the graph).
      */
     void parseSearchSpaces(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraph & graph,
             unsigned int nodes);
 
@@ -129,7 +128,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load rank for each of the nodes).
      */
     void parseRanks(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int nodes);
 
@@ -142,7 +141,7 @@ protected:
      * @param tnodesAmount[in] The size of the transit node set.
      */
     void parseTransitNodesMapping(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int tnodesAmount);
 
@@ -154,7 +153,7 @@ protected:
      * @param tnodesAmount[in] The size of the transit node set.
      */
     void parseTransitNodesDistanceTable(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int tnodesAmount);
 
@@ -167,7 +166,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need access nodes for each node in the graph).
      */
     void parseAccessNodes(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int nodes);
 
@@ -180,11 +179,11 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need search spaces for each node in the graph).
      */
     void parseSearchSpaces(
-            ifstream & input,
+            std::ifstream & input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int nodes);
 
-    string inputFile;
+    std::string inputFile;
 
 public:
     /**
@@ -193,7 +192,7 @@ public:
      * @param inputFile[in] A path towards a file that should be loaded using this loader.
      */
     explicit TNRGLoader(
-            string inputFile);
+            std::string inputFile);
 
     /**
      * Can be used to load Transit Node Routing data structures from a file given to the loader during its

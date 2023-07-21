@@ -11,7 +11,7 @@
 #include "../Structures/FlagsGraph.h"
 #include "../Structures/FlagsGraphWithUnpackingData.h"
 
-using namespace std;
+
 
 
 /**
@@ -21,7 +21,7 @@ using namespace std;
  */
 class DDSGLoader {
 private:
-    string inputFile;
+    std::string inputFile;
 
     /**
      * Auxiliary function that verifies that the input file starts with the correct header. This serves as a basic
@@ -31,7 +31,7 @@ private:
      * @return Returns true if the correct header is present at the beginning of the file, false otherwise.
      */
     bool verifyHeader(
-            ifstream & input);
+            std::ifstream & input);
 
     /**
      * Auxiliary function that verifies that the input file ends with the correct footer. This serves as a basic
@@ -41,7 +41,7 @@ private:
      * @return Returns true if the correct footer is present at the end of the file, false otherwise.
      */
     bool verifyFooter(
-            ifstream & input);
+            std::ifstream & input);
 
     /**
      * Auxiliary function that loads the numbers of nodes, edges and shortcut edges from the input file.
@@ -52,7 +52,7 @@ private:
      * @param shortcutEdges[out] The number of shortcut edges in the graph.
      */
     void loadCnts(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int & nodes,
             unsigned int & edges,
             unsigned int & shortcutEdges);
@@ -65,7 +65,7 @@ private:
      * @param graph[in, out] The graph instance we will be loading the rank into.
      */
     void loadRanks(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int nodes,
             FlagsGraph & graph);
 
@@ -77,7 +77,7 @@ private:
      * @param graph[in, out] The graph instance we will be loading the rank into.
      */
     void loadRanks(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int nodes,
             FlagsGraphWithUnpackingData & graph);
 
@@ -89,7 +89,7 @@ private:
      * @param graph[in, out] The graph instance we will be inserting the edges into.
      */
     void loadOriginalEdges(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int edges,
             FlagsGraph & graph);
 
@@ -101,7 +101,7 @@ private:
      * @param graph[in, out] The graph instance we will be inserting the edges into.
      */
     void loadOriginalEdges(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int edges,
             FlagsGraphWithUnpackingData & graph);
 
@@ -113,7 +113,7 @@ private:
      * @param graph[in, out] The graph instance we will be inserting the shortcut edges into.
      */
     void loadShortcutEdges(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int shortcutEdges,
             FlagsGraph & graph);
 
@@ -125,7 +125,7 @@ private:
      * @param graph[in, out] The graph instance we will be inserting the shortcut edges into.
      */
     void loadShortcutEdgesWithUnpackingData(
-            ifstream & input,
+            std::ifstream & input,
             unsigned int shortcutEdges,
             FlagsGraphWithUnpackingData & graph);
 
@@ -136,7 +136,7 @@ public:
      * @param inputFile[in] A path towards a file that should be loaded using this loader.
      */
     DDSGLoader(
-            string inputFile);
+            std::string inputFile);
 
     /**
      * This function reads the input file and puts all the Contraction Hierarchies data into a FlagsGraph instance.

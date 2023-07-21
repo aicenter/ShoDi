@@ -9,7 +9,7 @@
 #include "../TNRAF/TNRAFDistanceQueryManagerWithMapping.h"
 
 //______________________________________________________________________________________________________________________
-double TNRAFBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances) {
+double TNRAFBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, std::vector < unsigned int > & distances) {
     TNRAFDistanceQueryManager queryManager(graph);
 
     Timer tnrTimer("Transit Node Routing with Arc Flags trips benchmark");
@@ -24,7 +24,7 @@ double TNRAFBenchmark::benchmark(const vector < pair < unsigned int, unsigned in
 }
 
 //______________________________________________________________________________________________________________________
-double TNRAFBenchmark::benchmarkWithMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, vector < unsigned int > & distances, string mappingFilePath) {
+double TNRAFBenchmark::benchmarkWithMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, TransitNodeRoutingArcFlagsGraph & graph, std::vector < unsigned int > & distances, std::string mappingFilePath) {
     TNRAFDistanceQueryManagerWithMapping queryManager(graph, mappingFilePath);
 
     Timer tnrTimer("Transit Node Routing with Arc Flags trips benchmark with mapping");

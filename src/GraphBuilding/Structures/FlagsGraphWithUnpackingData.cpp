@@ -29,7 +29,7 @@ unsigned int FlagsGraphWithUnpackingData::nodes() const {
 // Returns all neighbours of a given node 'x'. Keep in mind that this returns neighbour both in the forward and
 // backward direction, so we always have to check if the neighbour is in the correct direction when expanding a node.
 //______________________________________________________________________________________________________________________
-const vector< QueryEdgeWithUnpackingData > & FlagsGraphWithUnpackingData::nextNodes(const unsigned int x)const {
+const std::vector< QueryEdgeWithUnpackingData > & FlagsGraphWithUnpackingData::nextNodes(const unsigned int x)const {
     return neighbours.at(x);
 }
 

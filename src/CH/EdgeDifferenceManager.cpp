@@ -8,8 +8,8 @@
 #include "EdgeDifferenceManager.h"
 
 //______________________________________________________________________________________________________________________
-vector<unsigned int> EdgeDifferenceManager::neighboursContracted(0);
-vector<unsigned int> EdgeDifferenceManager::previousContracted(0);
+std::vector<unsigned int> EdgeDifferenceManager::neighboursContracted(0);
+std::vector<unsigned int> EdgeDifferenceManager::previousContracted(0);
 
 //______________________________________________________________________________________________________________________
 void EdgeDifferenceManager::init(const unsigned int nodes) {

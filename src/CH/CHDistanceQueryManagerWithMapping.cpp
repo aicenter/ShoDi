@@ -8,7 +8,7 @@
 
 // Initializes the query manager. Here, the mapping from the original indices to our indices is loaded.
 //______________________________________________________________________________________________________________________
-CHDistanceQueryManagerWithMapping::CHDistanceQueryManagerWithMapping(FlagsGraph & g, string mappingFilepath) : qm(g) {
+CHDistanceQueryManagerWithMapping::CHDistanceQueryManagerWithMapping(FlagsGraph & g, std::string mappingFilepath) : qm(g) {
     XenGraphLoader mappingLoader(mappingFilepath);
     mappingLoader.loadNodesMapping(mapping);
 }

@@ -30,7 +30,7 @@ unsigned int TNRPathQueryManager::findDistance(const unsigned int start, const u
         return UINT_MAX;
     }
 
-    vector < pair < unsigned int, unsigned int > > additionalNextNodes = graph.unpackingNeighbours(start);
+    std::vector < std::pair< unsigned int, unsigned int > > additionalNextNodes = graph.unpackingNeighbours(start);
     for(size_t i = 0; i < additionalNextNodes.size(); i++) {
         //printf("Trying %u (rank %u) as middle node. Distances: %u and %u, that is: %u\n", additionalNextNodes[i].first, graph.data(additionalNextNodes[i].first).rank, additionalNextNodes[i].second, quickFindDistance(additionalNextNodes[i].first, goal), quickFindDistance(additionalNextNodes[i].first, goal) + unpackingNeighbours[i].second);
         if(distance - additionalNextNodes[i].second == quickFindDistance(additionalNextNodes[i].first, goal)) {
@@ -47,7 +47,7 @@ unsigned int TNRPathQueryManager::findDistance(const unsigned int start, const u
 
 
 //______________________________________________________________________________________________________________________
-unsigned int TNRPathQueryManager::findPath(const unsigned int start, const unsigned int goal, vector<SimpleEdge> & path) {
+unsigned int TNRPathQueryManager::findPath(const unsigned int start, const unsigned int goal, std::vector<SimpleEdge> & path) {
     unsigned int distance = 0;
     if(start == goal) {
         return 0;
@@ -67,7 +67,7 @@ unsigned int TNRPathQueryManager::findPath(const unsigned int start, const unsig
         return UINT_MAX;
     }
 
-    vector < pair < unsigned int, unsigned int > > additionalNextNodes = graph.unpackingNeighbours(start);
+    std::vector < std::pair< unsigned int, unsigned int > > additionalNextNodes = graph.unpackingNeighbours(start);
     for(size_t i = 0; i < additionalNextNodes.size(); i++) {
         //printf("Trying %u (rank %u) as middle node. Distances: %u and %u, that is: %u\n", additionalNextNodes[i].first, graph.data(additionalNextNodes[i].first).rank, additionalNextNodes[i].second, quickFindDistance(additionalNextNodes[i].first, goal), quickFindDistance(additionalNextNodes[i].first, goal) + unpackingNeighbours[i].second);
         if(distance - additionalNextNodes[i].second == quickFindDistance(additionalNextNodes[i].first, goal)) {

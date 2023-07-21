@@ -14,11 +14,11 @@
 #include <stdexcept>
 #include <iostream>
 
-using namespace std;
 
-CsvGraphLoader::CsvGraphLoader(string inputFile) : inputFile(inputFile) {
+
+CsvGraphLoader::CsvGraphLoader(std::string inputFile) : inputFile(inputFile) {
     if (!reader.mmap(inputFile)) {
-        throw runtime_error(string("Error reading file ") + this->inputFile + " using mmap.\n");
+        throw std::runtime_error(std::string("Error reading file ") + this->inputFile + " using mmap.\n");
     }
 }
 
@@ -29,13 +29,13 @@ inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned in
         val = stod(str);
     }
     catch (std::invalid_argument &) {
-        cerr << "Warning: Found an unexpected value (" << str << ") in '" << inputFile
-             << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
+        std::cerr << "Warning: Found an unexpected value (" << str << ") in '" << inputFile
+             << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << std::endl;
         return std::numeric_limits<dist_t>::max();
     }
     catch (std::out_of_range &) {
-        cerr << "Warning: Found an out of range value (" << str << ") in '" << inputFile
-             << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
+        std::cerr << "Warning: Found an out of range value (" << str << ") in '" << inputFile
+             << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << std::endl;
         return std::numeric_limits<dist_t>::max();
     }
 
@@ -44,8 +44,8 @@ inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned in
     }
 
     if (val < 0) {
-        cerr << "Warning: Found a negative value (" << str << ") in '" << inputFile
-             << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << endl;
+        std::cerr << "Warning: Found a negative value (" << str << ") in '" << inputFile
+             << "'. It will be interpreted as 'no edge' from node " << nodeFrom << " to node " << nodeTo << "." << std::endl;
         return std::numeric_limits<dist_t>::max();
     }
 
@@ -60,10 +60,10 @@ void CsvGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
     const unsigned int size = nodes();
 
     if (size != reader.rows())
-        throw runtime_error(this->inputFile +
+        throw std::runtime_error(this->inputFile +
                             " does not contain a square matrix. Found " +
-                            to_string(reader.rows()) + " rows and " +
-                            to_string(size) + " cols.\n");
+                            std::to_string(reader.rows()) + " rows and " +
+                            std::to_string(size) + " cols.\n");
 
     const dist_t max = std::numeric_limits<dist_t>::max();
     ProgressBar progress(size, "Loading CSV file:");
@@ -72,7 +72,7 @@ void CsvGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
     for (const auto &row: reader) {
         unsigned int j = 0;
         for (const auto &cell: row) {
-            string val;
+            std::string val;
             cell.read_value(val);
             const dist_t dist = parse_distance(val, i, j, inputFile, (double) precisionLoss);
             if (dist != max)

@@ -11,7 +11,7 @@
 #include <queue>
 #include "../GraphBuilding/Structures/FlagsGraph.h"
 
-using namespace std;
+
 
 /**
  * This class is responsible for the Contraction Hierarchies 'distance' queries - when we only require the 'distance'
@@ -50,10 +50,10 @@ protected:
 
     FlagsGraph & graph;
     unsigned int upperbound;
-    vector<unsigned int> forwardChanged;
-    vector<unsigned int> backwardChanged;
-    vector<unsigned int> forwardStallChanged;
-    vector<unsigned int> backwardStallChanged;
+    std::vector<unsigned int> forwardChanged;
+    std::vector<unsigned int> backwardChanged;
+    std::vector<unsigned int> forwardStallChanged;
+    std::vector<unsigned int> backwardStallChanged;
 };
 
 #endif //TRANSIT_NODE_ROUTING_CHFLAGSGRAPHQUERYMANAGER_H

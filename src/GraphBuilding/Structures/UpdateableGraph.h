@@ -18,7 +18,6 @@
 
 #include "BaseGraph.h"
 
-using namespace std;
 
 /**
  * This class is used to represent the graph during the preprocessing phase. This representation supports pretty simple
@@ -32,8 +31,7 @@ protected:
      *
      * @param output[in] The stream into which the data should be output.
      */
-    void flushHeader(
-            ostream & output);
+    void flushHeader(std::ostream &output);
 
     /**
      * Auxiliary function for the output process.
@@ -44,7 +42,7 @@ protected:
      * @param shortcuts[in] The number of shortcut edges in the graph.
      */
     void flushCnts(
-            ostream & output,
+            std::ostream &output,
             const unsigned int nodes,
             const unsigned int edges,
             const unsigned int shortcuts);
@@ -54,40 +52,38 @@ protected:
      *
      * @param output[in] The stream into which the data should be output.
      */
-    void flushRanks(
-            ostream & output);
+    void flushRanks(std::ostream &output);
 
     /**
      * Auxiliary function for the output process.
      *
      * @param output[in] The stream into which the data should be output.
-     * @param edges[in] A vector containing all the original edges (not shortcuts) in the graph.
+     * @param edges[in] A std::vector containing all the original edges (not shortcuts) in the graph.
      */
     void flushOriginalEdges(
-            ostream & output,
-            vector < OutputEdge > & edges);
+            std::ostream &output,
+            std::vector<OutputEdge> &edges);
 
     /**
      * Auxiliary function for the output process.
      *
      * @param output[in] The stream into which the data should be output.
-     * @param edges[in] A vector containing all the shortcut edges in the graph.
+     * @param edges[in] A std::vector containing all the shortcut edges in the graph.
      */
     void flushShortcutEdges(
-            ostream & output,
-            vector < OutputShortcutEdge > & edges);
+            std::ostream &output,
+            std::vector<OutputShortcutEdge> &edges);
 
     /**
      * Auxiliary function for the output process.
      *
      * @param output[in] The stream into which the data should be output.
      */
-    void flushTerminator(
-            ostream & output);
+    void flushTerminator(std::ostream &output);
 
-    vector< unordered_map < unsigned int, PreprocessingEdgeData > > followingNodes;
-    vector< unordered_map < unsigned int, dist_t > > previousNodes;
-    vector< unsigned int > ranks;
+    std::vector<std::unordered_map<unsigned int, PreprocessingEdgeData> > followingNodes;
+    std::vector<std::unordered_map<unsigned int, dist_t> > previousNodes;
+    std::vector<unsigned int> ranks;
 
 public:
     /**
@@ -95,35 +91,35 @@ public:
      *
      * @return The new copy of the graph as an instance of the Graph class.
      */
-    Graph * createCopy();
+    Graph *createCopy();
 
     /**
-     * Auxiliary function that fills the vectors with edges and shortcut edges that have to be output. This processes
+     * Auxiliary function that fills the std::vectors with edges and shortcut edges that have to be output. This processes
      * the edges so that they fit the Contraction Hierarchies concept of only keeping each edge at the node with the
-     * lower rank, so here bidirectional edges are only put in the corresponding vector once with the node with the
+     * lower rank, so here bidirectional edges are only put in the corresponding std::vector once with the node with the
      * lower rank as the source node. After this function finishes, the graph is no longer usable, because edges
      * are removed from the graph during the process.
      *
-     * @param edges[out] A vector that will contain all the original edges that should remain in the output.
-     * @param shortcuts[out] A vector that will contain all the shortcut edges for the output.
+     * @param edges[out] A std::vector that will contain all the original edges that should remain in the output.
+     * @param shortcuts[out] A std::vector that will contain all the shortcut edges for the output.
      */
     void prepareEdgesForFlushing(
-            vector < OutputEdge > & edges,
-            vector < OutputShortcutEdge > & shortcuts);
+            std::vector<OutputEdge> &edges,
+            std::vector<OutputShortcutEdge> &shortcuts);
 
     /**
-     * Auxiliary function that fills the vectors with edges and shortcut edges that have to be output. This processes
+     * Auxiliary function that fills the std::vectors with edges and shortcut edges that have to be output. This processes
      * the edges so that they fit the Contraction Hierarchies concept of only keeping each edge at the node with the
-     * lower rank, so here bidirectional edges are only put in the corresponding vector once with the node with the
+     * lower rank, so here bidirectional edges are only put in the corresponding std::vector once with the node with the
      * lower rank as the source node. After this function, the graph can be used further, because this function keeps
      * track of the removed edges and reinserts them at the end.
      *
-     * @param edges[out] A vector that will contain all the original edges that should remain in the output.
-     * @param shortcuts[out] A vector that will contain all the shortcut edges for the output.
+     * @param edges[out] A std::vector that will contain all the original edges that should remain in the output.
+     * @param shortcuts[out] A std::vector that will contain all the shortcut edges for the output.
      */
     void prepareEdgesForFlushingWithReinsert(
-            vector < OutputEdge > & edges,
-            vector < OutputShortcutEdge > & shortcuts);
+            std::vector<OutputEdge> &edges,
+            std::vector<OutputShortcutEdge> &shortcuts);
 
     /**
      * A simple constructor.
@@ -139,8 +135,7 @@ public:
      *
      * @param filePath[in] The desired path where the Contraction Hierarchy should be output.
      */
-    void flushInDdsgFormat(
-            string filePath);
+    void flushInDdsgFormat(std::string filePath);
 
     /**
      * Outputs the graph in the XenGraph format. The output file can then be used for example as input for Dijkstra's
@@ -150,8 +145,7 @@ public:
      *
      * @param filePath[in] The desired path where the graph should be output.
      */
-    void outputAsXenGraph(
-            string filePath);
+    void outputAsXenGraph(std::string filePath);
 
     /**
      * Tries to insert an edge from one node to another with the given weight into the graph. The edge is not inserted
@@ -226,12 +220,12 @@ public:
      * Gets requested amount of highest rank nodes from the Contraction Hierarchy.
      * Those are used in Transit Node Routing as Transit Nodes.
      *
-     * @param highestNodes[out] A vector that will be filled with the desired amount of nodes with the highest ranks.
-     * The vector must be resized in order to be able to contain 'requestedAmount' beforehand.
+     * @param highestNodes[out] A std::vector that will be filled with the desired amount of nodes with the highest ranks.
+     * The std::vector must be resized in order to be able to contain 'requestedAmount' beforehand.
      * @param requestedAmount[in] A desired amount of transit nodes.
      */
     void getNodesWithHighestRank(
-            vector< unsigned int > & highestNodes,
+            std::vector<unsigned int> &highestNodes,
             unsigned int requestedAmount);
 
     /**
@@ -256,8 +250,8 @@ public:
      * @param x[in] The target node we are interested in.
      * @return All the edges in the graph that have 'x' as their target node.
      */
-    const unordered_map<unsigned int, dist_t> & incomingEdges(
-            const unsigned int x)const;
+    const std::unordered_map<unsigned int, dist_t> &incomingEdges(
+            const unsigned int x) const;
 
     /**
      * Returns all the edges with the node 'x' as their source node.
@@ -265,8 +259,8 @@ public:
      * @param x[in] The source node we are interested in.
      * @return All the edges in the graph that have 'x' as their source node.
      */
-    const unordered_map<unsigned int, PreprocessingEdgeData> & outgoingEdges(
-            const unsigned int x)const;
+    const std::unordered_map<unsigned int, PreprocessingEdgeData> &outgoingEdges(
+            const unsigned int x) const;
 
     /**
      * Returns the degree of a node in the graph.
@@ -274,17 +268,15 @@ public:
      * @param node[in] The node we are interested in.
      * @return The degree of the node.
      */
-     unsigned int degree(
-            unsigned int node)const;
+    unsigned int degree(
+            unsigned int node) const;
 
-     bool handlesDuplicateEdges() override {
-         return true;
-     }
+    bool handlesDuplicateEdges() override {
+        return true;
+    }
 
-     ~UpdateableGraph() = default;
+    ~UpdateableGraph() = default;
 };
-
-
 
 
 #endif //TRANSIT_NODE_ROUTING_UPDATEABLEGRAPH_H

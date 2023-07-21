@@ -238,7 +238,7 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
-    vector<pair<unsigned int, unsigned int>> querySet;
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
@@ -253,11 +253,11 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     for(unsigned int i = 0; i < runs; ++i) {
         printf("\r%u runs completed.", i);
 
-        vector<unsigned int> dijkstraDistances(queriesCnt);
-        vector<unsigned int> chDistances(queriesCnt);
-        vector<unsigned int> tnrDistances(queriesCnt);
-        vector<unsigned int> tnrafDistances(queriesCnt);
-        vector<unsigned int> dmDistances(queriesCnt);
+        std::vector<unsigned int> dijkstraDistances(queriesCnt);
+        std::vector<unsigned int> chDistances(queriesCnt);
+        std::vector<unsigned int> tnrDistances(queriesCnt);
+        std::vector<unsigned int> tnrafDistances(queriesCnt);
+        std::vector<unsigned int> dmDistances(queriesCnt);
 
         cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
         cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
@@ -344,7 +344,7 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Berlin/Berlin100000randomQueries.txt");
-    vector<pair<unsigned int, unsigned int>> querySet;
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
@@ -359,11 +359,11 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     for(unsigned int i = 0; i < runs; ++i) {
         printf("\r%u runs completed.", i);
 
-        vector<unsigned int> dijkstraDistances(queriesCnt);
-        vector<unsigned int> chDistances(queriesCnt);
-        vector<unsigned int> tnrDistances(queriesCnt);
-        vector<unsigned int> tnrafDistances(queriesCnt);
-        vector<unsigned int> dmDistances(queriesCnt);
+        std::vector<unsigned int> dijkstraDistances(queriesCnt);
+        std::vector<unsigned int> chDistances(queriesCnt);
+        std::vector<unsigned int> tnrDistances(queriesCnt);
+        std::vector<unsigned int> tnrafDistances(queriesCnt);
+        std::vector<unsigned int> dmDistances(queriesCnt);
 
         cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
         cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
@@ -450,7 +450,7 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia100000randomQueries.txt");
-    vector<pair<unsigned int, unsigned int>> querySet;
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
@@ -465,11 +465,11 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     for(unsigned int i = 0; i < runs; ++i) {
         printf("\r%u runs completed.", i);
 
-        vector<unsigned int> dijkstraDistances(queriesCnt);
-        vector<unsigned int> chDistances(queriesCnt);
-        vector<unsigned int> tnrDistances(queriesCnt);
-        vector<unsigned int> tnrafDistances(queriesCnt);
-        vector<unsigned int> dmDistances(queriesCnt);
+        std::vector<unsigned int> dijkstraDistances(queriesCnt);
+        std::vector<unsigned int> chDistances(queriesCnt);
+        std::vector<unsigned int> tnrDistances(queriesCnt);
+        std::vector<unsigned int> tnrafDistances(queriesCnt);
+        std::vector<unsigned int> dmDistances(queriesCnt);
 
         cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
         cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
@@ -559,7 +559,7 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TransitNodeRoutingGraph * tnr10000Graph = tnr10000Loader.loadTNRforDistanceQueries();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
-    vector<pair<unsigned int, unsigned int>> querySet;
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
@@ -575,12 +575,12 @@ void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     for(unsigned int i = 0; i < runs; ++i) {
         printf("\r%u runs completed.", i);
 
-        vector<unsigned int> distances200tNodes(queriesCnt);
-        vector<unsigned int> distances500tNodes(queriesCnt);
-        vector<unsigned int> distances1000tNodes(queriesCnt);
-        vector<unsigned int> distances2000tNodes(queriesCnt);
-        vector<unsigned int> distances5000tNodes(queriesCnt);
-        vector<unsigned int> distances10000tNodes(queriesCnt);
+        std::vector<unsigned int> distances200tNodes(queriesCnt);
+        std::vector<unsigned int> distances500tNodes(queriesCnt);
+        std::vector<unsigned int> distances1000tNodes(queriesCnt);
+        std::vector<unsigned int> distances2000tNodes(queriesCnt);
+        std::vector<unsigned int> distances5000tNodes(queriesCnt);
+        std::vector<unsigned int> distances10000tNodes(queriesCnt);
 
         cummulative200tNodesTime += TNRBenchmark::benchmark(querySet, *tnr200Graph, distances200tNodes);
         cummulative500tNodesTime += TNRBenchmark::benchmark(querySet, *tnr500Graph, distances500tNodes);
@@ -658,7 +658,7 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnraf10000Graph = tnraf10000Loader.loadTNRAFforDistanceQueries();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
-    vector<pair<unsigned int, unsigned int>> querySet;
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
 
@@ -674,12 +674,12 @@ void compareTNRAFwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     for(unsigned int i = 0; i < runs; ++i) {
         printf("\r%u runs completed.", i);
 
-        vector<unsigned int> distances200tNodes(queriesCnt);
-        vector<unsigned int> distances500tNodes(queriesCnt);
-        vector<unsigned int> distances1000tNodes(queriesCnt);
-        vector<unsigned int> distances2000tNodes(queriesCnt);
-        vector<unsigned int> distances5000tNodes(queriesCnt);
-        vector<unsigned int> distances10000tNodes(queriesCnt);
+        std::vector<unsigned int> distances200tNodes(queriesCnt);
+        std::vector<unsigned int> distances500tNodes(queriesCnt);
+        std::vector<unsigned int> distances1000tNodes(queriesCnt);
+        std::vector<unsigned int> distances2000tNodes(queriesCnt);
+        std::vector<unsigned int> distances5000tNodes(queriesCnt);
+        std::vector<unsigned int> distances10000tNodes(queriesCnt);
 
         cummulative200tNodesTime += TNRAFBenchmark::benchmark(querySet, *tnraf200Graph, distances200tNodes);
         cummulative500tNodesTime += TNRAFBenchmark::benchmark(querySet, *tnraf500Graph, distances500tNodes);

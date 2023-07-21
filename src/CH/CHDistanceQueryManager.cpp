@@ -15,8 +15,8 @@ CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
 //______________________________________________________________________________________________________________________
 unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, const unsigned int goal) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
 
     forwardQ.push(DijkstraNode(start, 0));
     backwardQ.push(DijkstraNode(goal, 0));
@@ -72,7 +72,7 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, cons
             }
 
             // Classic edges relaxation
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 if ((*iter).backward && graph.data((*iter).targetNode).forwardReached) {
                     unsigned int newdistance = graph.data((*iter).targetNode).forwardDist + (*iter).weight;
@@ -127,7 +127,7 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, cons
                 }
             }
 
-            const vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
+            const std::vector<QueryEdge> & neighbours = graph.nextNodes(curNode);
             for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
                 if ((*iter).forward && graph.data((*iter).targetNode).backwardReached) {
                     unsigned int newdistance = graph.data((*iter).targetNode).backwardDist + (*iter).weight;

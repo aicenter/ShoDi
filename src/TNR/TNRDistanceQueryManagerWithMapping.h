@@ -8,7 +8,7 @@
 
 #include "TNRDistanceQueryManager.h"
 
-using namespace std;
+
 
 /**
  * Allows us to answer distance queries using the original indices of the nodes. Internally, nodes are indexed from
@@ -27,7 +27,7 @@ public:
      */
     TNRDistanceQueryManagerWithMapping(
             TransitNodeRoutingGraph & g,
-            string mappingFilepath);
+            std::string mappingFilepath);
 
     /**
      * Used to find the shortest distance from start to goal where start and goal are the original indices.
@@ -42,7 +42,7 @@ public:
             const long long unsigned int goal);
 private:
     TNRDistanceQueryManager qm;
-    unordered_map<long long unsigned int, unsigned int> mapping;
+    std::unordered_map<long long unsigned int, unsigned int> mapping;
 };
 
 

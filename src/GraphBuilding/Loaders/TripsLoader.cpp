@@ -7,13 +7,13 @@
 #include <fstream>
 
 //______________________________________________________________________________________________________________________
-TripsLoader::TripsLoader(string inputFile) {
+TripsLoader::TripsLoader(std::string inputFile) {
     this->inputFile = inputFile;
 }
 
 //______________________________________________________________________________________________________________________
-void TripsLoader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) {
-    ifstream input;
+void TripsLoader::loadTrips(std::vector < std::pair< unsigned int, unsigned int > > & x) {
+    std::ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
@@ -25,8 +25,8 @@ void TripsLoader::loadTrips(vector < pair < unsigned int, unsigned int > > & x) 
 }
 
 //______________________________________________________________________________________________________________________
-void TripsLoader::loadLongLongTrips(vector < pair < long long unsigned int, long long unsigned int > > & x) {
-    ifstream input;
+void TripsLoader::loadLongLongTrips(std::vector < std::pair< long long unsigned int, long long unsigned int > > & x) {
+    std::ifstream input;
     input.open(this->inputFile);
     if( ! input.is_open() ) {
         printf("Couldn't open file '%s'!", this->inputFile.c_str());
@@ -38,7 +38,7 @@ void TripsLoader::loadLongLongTrips(vector < pair < long long unsigned int, long
 }
 
 //______________________________________________________________________________________________________________________
-void TripsLoader::parseTrips(ifstream & input, vector < pair < unsigned int, unsigned int > > & x) {
+void TripsLoader::parseTrips(std::ifstream & input, std::vector < std::pair< unsigned int, unsigned int > > & x) {
     unsigned int tripscnt;
     input >> tripscnt;
     x.resize(tripscnt);
@@ -48,7 +48,7 @@ void TripsLoader::parseTrips(ifstream & input, vector < pair < unsigned int, uns
 }
 
 //______________________________________________________________________________________________________________________
-void TripsLoader::parseLongLongTrips(ifstream & input, vector < pair < long long unsigned int, long long unsigned int > > & x) {
+void TripsLoader::parseLongLongTrips(std::ifstream & input, std::vector < std::pair< long long unsigned int, long long unsigned int > > & x) {
     unsigned int tripscnt;
     input >> tripscnt;
     x.resize(tripscnt);

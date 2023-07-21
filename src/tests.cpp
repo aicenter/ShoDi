@@ -16,7 +16,7 @@
 #include "Benchmarking/CorrectnessValidator.h"
 #include "DistanceMatrix/DistanceMatrixComputorFast.h"
 
-using namespace std;
+
 
 /**
  * Precomputes a full Distance Matrix for a graph contained in a given file. Returns the obtained Distance Matrix
@@ -41,13 +41,13 @@ Distance_matrix_travel_time_provider *obtainDM(GraphLoader &loader, DistanceMatr
 }
 
 /**
- * Auxiliary function than can load the true (expected) values for a set of queries and store them in a vector.
+ * Auxiliary function than can load the true (expected) values for a set of queries and store them in a std::vector.
  *
- * @param trueValues[out] The vector that the true values will be loaded into.
+ * @param trueValues[out] The std::vector that the true values will be loaded into.
  * @param inputFilePath[in] The file path to the text file containing the true (expected) values.
  */
-void obtainTrueValues(vector<unsigned int> &trueValues, const string &inputFilePath) {
-    ifstream input;
+void obtainTrueValues(std::vector<unsigned int> &trueValues, const std::string &inputFilePath) {
+    std::ifstream input;
     input.open(inputFilePath);
     unsigned int queriesCnt;
     input >> queriesCnt;
@@ -58,18 +58,18 @@ void obtainTrueValues(vector<unsigned int> &trueValues, const string &inputFileP
 }
 
 template<typename T>
-bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor<T> &computor, string tripsFilePath,
-                string trueDistancesFilePath) {
+bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor<T> &computor, std::string tripsFilePath,
+                std::string trueDistancesFilePath) {
     Distance_matrix_travel_time_provider * dm = obtainDM(graphLoader, computor);
 
     TripsLoader querySetLoader = TripsLoader(tripsFilePath);
-    vector<pair<unsigned int, unsigned int>> querySet;
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
 
-    vector<dist_t> trueValues;
+    std::vector<dist_t> trueValues;
     obtainTrueValues(trueValues, trueDistancesFilePath);
 
-    vector<dist_t> dmDistances(querySet.size());
+    std::vector<dist_t> dmDistances(querySet.size());
     DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
 
     delete dm;
@@ -77,10 +77,10 @@ bool validateDM(GraphLoader &graphLoader, DistanceMatrixComputor<T> &computor, s
 }
 
 struct Test {
-    const string name;
+    const std::string name;
     bool (*const func)();
 
-    Test(string name, bool (*func)()) : name(name), func(func) {}
+    Test(std::string name, bool (*func)()) : name(name), func(func) {}
 };
 
 void runTests(std::initializer_list<Test> tests) {
@@ -89,22 +89,22 @@ void runTests(std::initializer_list<Test> tests) {
 
     for (const Test &test : tests) {
         const bool result = test.func();
-        cout << test.name << ": ";
+        std::cout << test.name << ": ";
 
         if (result) {
-            cout << "SUCCESS";
+            std::cout << "SUCCESS";
             ++successful;
         } else {
-            cout << "FAILED";
+            std::cout << "FAILED";
             ++failed;
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
-    cout << successful << '/' << (failed + successful) << " tests were successful." << endl;
+    std::cout << successful << '/' << (failed + successful) << " tests were successful." << std::endl;
 
     if (failed > 0) {
-        cout << failed << " tests FAILED." << endl;
+        std::cout << failed << " tests FAILED." << std::endl;
     }
 }
 

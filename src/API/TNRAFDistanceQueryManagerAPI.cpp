@@ -7,7 +7,7 @@
 #include "../GraphBuilding/Loaders/TGAFLoader.h"
 
 //______________________________________________________________________________________________________________________
-void TNRAFDistanceQueryManagerAPI::initializeTNRAF(string tnrafFile, string mappingFile) {
+void TNRAFDistanceQueryManagerAPI::initializeTNRAF(std::string tnrafFile, std::string mappingFile) {
     TGAFLoader tnrafLoader = TGAFLoader(tnrafFile);
     graph = tnrafLoader.loadTNRAFforDistanceQueries();
     qm = new TNRAFDistanceQueryManagerWithMapping(*graph, mappingFile);

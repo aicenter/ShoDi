@@ -13,19 +13,19 @@
 #include "CHPreprocessor.h"
 #include "EdgeDifferenceManager.h"
 
-using namespace std;
+
 
 //______________________________________________________________________________________________________________________
-vector<bool> CHPreprocessor::contracted(0);
-vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
-vector<unsigned int> CHPreprocessor::dijkstraDistance(0);
-vector<ShortcutEdge> CHPreprocessor::allShortcuts;
-unordered_map<pair<unsigned int, unsigned int>, unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distances;
-unordered_map<pair<unsigned int, unsigned int>, unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distancesWithoutX;
-vector<unsigned int> CHPreprocessor::sources(0);
-vector<unsigned int> CHPreprocessor::targets(0);
-unordered_set<unsigned int> CHPreprocessor::targetsSet;
-unordered_map<unsigned int, vector<pair<unsigned int, unsigned int > > > CHPreprocessor::buckets;
+std::vector<bool> CHPreprocessor::contracted(0);
+std::vector<unsigned int> CHPreprocessor::preprocessingDegrees(0);
+std::vector<unsigned int> CHPreprocessor::dijkstraDistance(0);
+std::vector<ShortcutEdge> CHPreprocessor::allShortcuts;
+std::unordered_map<std::pair<unsigned int, unsigned int>, unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distances;
+std::unordered_map<std::pair<unsigned int, unsigned int>, unsigned int, CHPreprocessor::pair_hash> CHPreprocessor::distancesWithoutX;
+std::vector<unsigned int> CHPreprocessor::sources(0);
+std::vector<unsigned int> CHPreprocessor::targets(0);
+std::unordered_set<unsigned int> CHPreprocessor::targetsSet;
+std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, unsigned int > > > CHPreprocessor::buckets;
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
@@ -121,8 +121,8 @@ void CHPreprocessor::reinsertShortcuts(UpdateableGraph & graph) {
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::adjustNeighboursDegrees(const unsigned int x, UpdateableGraph & graph) {
-    unordered_map < unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
-    unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
+    std::unordered_map< unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
+    std::unordered_map< unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
     for(auto iter = previousNodes.begin(); iter != previousNodes.end(); ++iter) {
         if (! contracted[(*iter).first]) {
@@ -138,10 +138,10 @@ void CHPreprocessor::adjustNeighboursDegrees(const unsigned int x, UpdateableGra
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, UpdateableGraph & graph, CHpriorityQueue & priorityQueue) {
-    unordered_map < unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
-    unordered_map < unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
+    std::unordered_map< unsigned int, unsigned int > previousNodes = graph.incomingEdges(x);
+    std::unordered_map< unsigned int, PreprocessingEdgeData > nextNodes = graph.outgoingEdges(x);
 
-    unordered_set < unsigned int > alreadyUpdated;
+    std::unordered_set< unsigned int > alreadyUpdated;
     for(auto iter = previousNodes.begin(); iter != previousNodes.end(); ++iter) {
         if (alreadyUpdated.count((*iter).first) == 0 && ! contracted[(*iter).first]) {
             getPossibleShortcuts((*iter).first, graph, true);
@@ -177,7 +177,7 @@ unsigned int CHPreprocessor::calculateShortcutsAmount() {
     for(auto iter1 = sources.begin(); iter1 != sources.end(); ++iter1) {
         for(auto iter2 = targets.begin(); iter2 != targets.end(); ++iter2) {
             if(*iter1 != *iter2) {
-                if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
+                if (distancesWithoutX.at(std::make_pair(*iter1, *iter2)) > distances.at(std::make_pair(*iter1, *iter2))) {
                     addedShortcuts++;
                 }
             }
@@ -192,11 +192,11 @@ void CHPreprocessor::actuallyAddShortcutsWithUnpackingData(UpdateableGraph & gra
     for(auto iter1 = sources.begin(); iter1 != sources.end(); ++iter1) {
         for(auto iter2 = targets.begin(); iter2 != targets.end(); ++iter2) {
             if(*iter1 != *iter2) {
-                if (distancesWithoutX.at(make_pair(*iter1, *iter2)) > distances.at(make_pair(*iter1, *iter2))) {
+                if (distancesWithoutX.at(std::make_pair(*iter1, *iter2)) > distances.at(std::make_pair(*iter1, *iter2))) {
                     preprocessingDegrees[*iter1]++;
                     preprocessingDegrees[*iter2]++;
-                    if (graph.addShortcutEdge(*iter1, *iter2, distances.at(make_pair(*iter1, *iter2)), x)) {
-                        allShortcuts.push_back(ShortcutEdge((*iter1), (*iter2), distances.at(make_pair(*iter1, *iter2)), x));
+                    if (graph.addShortcutEdge(*iter1, *iter2, distances.at(std::make_pair(*iter1, *iter2)), x)) {
+                        allShortcuts.push_back(ShortcutEdge((*iter1), (*iter2), distances.at(std::make_pair(*iter1, *iter2)), x));
                     }
                 }
             }
@@ -227,17 +227,17 @@ void CHPreprocessor::clearStructures() {
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph & graph ) {
-    unordered_map <unsigned int, unsigned int> i_sources = graph.incomingEdges(i);
-    unordered_map <unsigned int, PreprocessingEdgeData> i_targets = graph.outgoingEdges(i);
+    std::unordered_map<unsigned int, unsigned int> i_sources = graph.incomingEdges(i);
+    std::unordered_map<unsigned int, PreprocessingEdgeData> i_targets = graph.outgoingEdges(i);
     for(auto iter1 = i_sources.begin(); iter1 != i_sources.end(); ++iter1) {
         for(auto iter2 = i_targets.begin(); iter2 != i_targets.end(); ++iter2) {
             if((*iter1).first != (*iter2).first && ! contracted[(*iter1).first] && ! contracted[(*iter2).first]) {
-                if (distances.count(make_pair((*iter1).first, (*iter2).first))  == 1) {
-                    if((*iter1).second + (*iter2).second.weight < distances.at(make_pair((*iter1).first, (*iter2).first))) {
-                        distances[(make_pair((*iter1).first, (*iter2).first))] = (*iter1).second + (*iter2).second.weight;
+                if (distances.count(std::make_pair((*iter1).first, (*iter2).first))  == 1) {
+                    if((*iter1).second + (*iter2).second.weight < distances.at(std::make_pair((*iter1).first, (*iter2).first))) {
+                        distances[(std::make_pair((*iter1).first, (*iter2).first))] = (*iter1).second + (*iter2).second.weight;
                     }
                 } else {
-                    distances.insert(make_pair(make_pair((*iter1).first, (*iter2).first),
+                    distances.insert(std::make_pair(std::make_pair((*iter1).first, (*iter2).first),
                                                (*iter1).second + (*iter2).second.weight));
                 }
             }
@@ -264,8 +264,8 @@ unsigned int CHPreprocessor::longestPossibleShortcut(const unsigned int source) 
     for(auto iter = targets.begin(); iter != targets.end(); ++iter) {
         //printf("Will find distance for: %u -> %u\n", source, *iter);
         if(*iter != source) {
-            if (distances.at(make_pair(source, *iter)) > longest) {
-                longest = distances.at(make_pair(source, (*iter)));
+            if (distances.at(std::make_pair(source, *iter)) > longest) {
+                longest = distances.at(std::make_pair(source, (*iter)));
             }
         }
     }
@@ -294,13 +294,13 @@ void CHPreprocessor::manyToManyWithBuckets(UpdateableGraph & graph, bool deep) {
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, unsigned int & lowestBucketVal) {
-    const unordered_map<unsigned int, unsigned int> neighbours = graph.incomingEdges(x);
+    const std::unordered_map<unsigned int, unsigned int> neighbours = graph.incomingEdges(x);
     for(auto iter = neighbours.begin(); iter != neighbours.end(); ++iter) {
         if (! contracted[(*iter).first]) {
             if (buckets.count((*iter).first) == 0) {
-                buckets.insert(make_pair((*iter).first, vector<pair<unsigned int, unsigned int>>()));
+                buckets.insert(std::make_pair((*iter).first, std::vector<std::pair<unsigned int, unsigned int>>()));
             }
-            buckets.at((*iter).first).push_back(make_pair(x, (*iter).second));
+            buckets.at((*iter).first).push_back(std::make_pair(x, (*iter).second));
             if((*iter).second < lowestBucketVal) {
                 lowestBucketVal = (*iter).second;
             }
@@ -311,7 +311,7 @@ void CHPreprocessor::initBuckets(const unsigned int x, UpdateableGraph & graph, 
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsigned int upperBound, UpdateableGraph & graph, unsigned int hoplimit, unsigned int maxexpanded) {
-    vector<unsigned int> nodesWithChangedDistances;
+    std::vector<unsigned int> nodesWithChangedDistances;
     unsigned int targetsAmount = boost::numeric_cast<unsigned int>(targets.size());
     unsigned int targetsFound = 0;
     unsigned int expanded = 0;
@@ -320,7 +320,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsig
     nodesWithChangedDistances.push_back(source);
 
     auto cmp = [](HopsDijkstraNode left, HopsDijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<HopsDijkstraNode, vector<HopsDijkstraNode>, decltype(cmp)> q(cmp);
+    std::priority_queue<HopsDijkstraNode, std::vector<HopsDijkstraNode>, decltype(cmp)> q(cmp);
     q.push(HopsDijkstraNode(source, 0, 0));
 
     while(! q.empty() ) {
@@ -346,7 +346,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsig
             }
         }
 
-        const unordered_map < unsigned int, PreprocessingEdgeData > & neighbours = graph.outgoingEdges(current.ID);
+        const std::unordered_map< unsigned int, PreprocessingEdgeData > & neighbours = graph.outgoingEdges(current.ID);
         for ( auto n_iter = neighbours.begin(); n_iter != neighbours.end(); ++n_iter ) {
             if (buckets.count((*n_iter).first) == 1 ) {
                 for(auto iter = buckets[(*n_iter).first].begin(); iter != buckets[(*n_iter).first].end(); ++iter) {
@@ -370,7 +370,7 @@ void CHPreprocessor::oneToManyWithBuckets(const unsigned int source, const unsig
     }
 
     for(auto iter = targets.begin(); iter != targets.end(); ++iter) {
-        distancesWithoutX.insert(make_pair(make_pair(source, *iter), dijkstraDistance[*iter]));
+        distancesWithoutX.insert(std::make_pair(std::make_pair(source, *iter), dijkstraDistance[*iter]));
     }
 
     for(size_t i = 0; i < nodesWithChangedDistances.size(); i++) {

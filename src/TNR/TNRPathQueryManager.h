@@ -51,7 +51,7 @@ public:
     unsigned int findPath(
             const unsigned int start,
             const unsigned int goal,
-            vector<SimpleEdge> & path);
+            std::vector<SimpleEdge> & path);
 
     /**
      *

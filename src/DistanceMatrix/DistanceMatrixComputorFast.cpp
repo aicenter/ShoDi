@@ -10,14 +10,14 @@
 #include "GraphBuilding/Structures/AdjMatrixGraph.h"
 #include "johnson.hpp"
 
-void DistanceMatrixComputorFast::computeDistanceMatrix(const vector<dist_t> &graphAdjMatrix) {
+void DistanceMatrixComputorFast::computeDistanceMatrix(const std::vector<dist_t> &graphAdjMatrix) {
     auto* graph = johnson::johnson_init(graphAdjMatrix);
     distanceTable = std::make_unique<dist_t[]>(graphAdjMatrix.size());
     size = static_cast<unsigned>(std::sqrt(graphAdjMatrix.size()));
     johnson::johnson_parallel(graph, distanceTable.get());
 }
 
-vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
+std::vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
     AdjMatrixGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
 

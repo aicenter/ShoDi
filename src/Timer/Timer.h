@@ -10,7 +10,7 @@
 #include <ctime>
 #include <string>
 
-using namespace std;
+
 
 /**
  * Auxiliary class used for measurement. Each instance serves as a separate timer.
@@ -22,7 +22,7 @@ public:
      *
      * @param x[in] A optional name for the timer. This name will be used in output, so it can help with clarity.
      */
-    Timer(const string x);
+    Timer(const std::string x);
 
     /**
      * Function to start the timer.
@@ -40,7 +40,7 @@ public:
     void reset();
 
     /**
-     * Prints the measured time as a string in seconds.
+     * Prints the measured time as a std::string in seconds.
      */
     void printMeasuredTime();
 
@@ -57,7 +57,7 @@ private:
     std::chrono::microseconds realTimeSum;
     std::chrono::steady_clock::time_point realBeginTimePoint;
     std::chrono::steady_clock::time_point realFinishTimePoint;
-    const string name;
+    const std::string name;
 };
 
 

@@ -13,7 +13,7 @@ namespace
 	std::string generateProgressBar(unsigned int percentage)
 	{
 		const int progress = static_cast<int>(percentage / PERCENTAGE_BIN_SIZE);
-		std::ostringstream ss;
+		std::stringstream ss;
 		ss << " " << std::setw(3) << std::right << percentage << "% ";
 		std::string bar("[" + std::string(LENGTH_OF_PROGRESS_BAR - 2, ' ') + "]");
 

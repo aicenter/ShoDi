@@ -18,7 +18,7 @@ bool SimpleGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
             followingNodes.at(from).at(to) = weight;
         }
     } else {
-        followingNodes.at(from).insert(make_pair(to, weight));
+        followingNodes.at(from).insert(std::make_pair(to, weight));
     }
 
     return true;
@@ -30,7 +30,7 @@ unsigned int SimpleGraph::nodes()const {
 }
 
 //______________________________________________________________________________________________________________________
-const map<unsigned int, dist_t> & SimpleGraph::edges(const unsigned int x)const {
+const std::map<unsigned int, dist_t> & SimpleGraph::edges(const unsigned int x)const {
     return this->followingNodes.at(x);
 }
 

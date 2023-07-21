@@ -7,7 +7,7 @@
 #include "../GraphBuilding/Loaders/TNRGLoader.h"
 
 //______________________________________________________________________________________________________________________
-void TNRDistanceQueryManagerAPI::initializeTNR(string tnrFile, string mappingFile) {
+void TNRDistanceQueryManagerAPI::initializeTNR(std::string tnrFile, std::string mappingFile) {
     TNRGLoader tnrloader = TNRGLoader(tnrFile);
     graph = tnrloader.loadTNRforDistanceQueries();
     qm = new TNRDistanceQueryManagerWithMapping(*graph, mappingFile);

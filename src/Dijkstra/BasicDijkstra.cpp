@@ -21,7 +21,7 @@ unsigned int BasicDijkstra::run(const unsigned int start, const unsigned int goa
     distance[start] = 0;
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(start, 0));
 
     while(! q.empty() ) {
@@ -32,7 +32,7 @@ unsigned int BasicDijkstra::run(const unsigned int start, const unsigned int goa
             return current.weight;
         }
 
-        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        const std::vector < std::pair< unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
             unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distance[neighbours.at(i).first]) {
@@ -54,7 +54,7 @@ unsigned int BasicDijkstra::run(const unsigned int start, const unsigned int goa
 unsigned int BasicDijkstra::runWithPathOutput(const unsigned int start, const unsigned int goal, const Graph & graph) {
     unsigned int n = graph.nodes();
     unsigned int * distance = new unsigned int[n];
-    vector < vector < unsigned int > > previous(n);
+    std::vector < std::vector < unsigned int > > previous(n);
 
     for(size_t i = 0; i < n; i++) {
         distance[i] = UINT_MAX;
@@ -63,7 +63,7 @@ unsigned int BasicDijkstra::runWithPathOutput(const unsigned int start, const un
     distance[start] = 0;
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(start, 0));
 
     while(! q.empty() ) {
@@ -75,7 +75,7 @@ unsigned int BasicDijkstra::runWithPathOutput(const unsigned int start, const un
             return current.weight;
         }
 
-        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        const std::vector < std::pair< unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
             unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distance[neighbours.at(i).first]) {
@@ -98,8 +98,8 @@ unsigned int BasicDijkstra::runWithPathOutput(const unsigned int start, const un
 }
 
 //______________________________________________________________________________________________________________________
-void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, const vector < vector < unsigned int > > & prev) {
-    vector<pair<pair<unsigned int, unsigned int>, unsigned int> > path;
+void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, const std::vector < std::vector < unsigned int > > & prev) {
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> > path;
     unsigned int current = x;
     while (prev[current].size() > 0) {
         unsigned int distance = dist[prev[current].at(0)];
@@ -110,7 +110,7 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
                 pos = i;
             }
         }
-        path.push_back(make_pair(make_pair(prev[current].at(pos), current), dist[current] - dist[prev[current].at(pos)]));
+        path.push_back(std::make_pair(std::make_pair(prev[current].at(pos), current), dist[current] - dist[prev[current].at(pos)]));
         current = prev[current].at(pos);
     }
 
@@ -123,7 +123,7 @@ void BasicDijkstra::outputPath(const unsigned int x, const unsigned int * dist, 
 }
 
 //______________________________________________________________________________________________________________________
-void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Graph & graph, vector<unsigned int> & distances) {
+void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Graph & graph, std::vector<unsigned int> & distances) {
     size_t n = (size_t) graph.nodes();
 
     for(size_t i = 0; i < (size_t) n; i++) {
@@ -133,13 +133,13 @@ void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Gr
     distances[source] = 0;
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(source, 0));
 
     while(! q.empty() ) {
         const DijkstraNode current = q.top();
 
-        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
+        const std::vector < std::pair< unsigned int, unsigned int > > & neighbours = graph.outgoingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
             unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distances[neighbours.at(i).first]) {
@@ -154,7 +154,7 @@ void BasicDijkstra::computeOneToAllDistances(const unsigned int source, const Gr
 }
 
 //______________________________________________________________________________________________________________________
-void BasicDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int source, const Graph & graph, vector<unsigned int> & distances) {
+void BasicDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int source, const Graph & graph, std::vector<unsigned int> & distances) {
     size_t n = (size_t) graph.nodes();
 
     for(size_t i = 0; i < (size_t) n; i++) {
@@ -164,13 +164,13 @@ void BasicDijkstra::computeOneToAllDistancesInReversedGraph(const unsigned int s
     distances[source] = 0;
 
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
-    priority_queue<DijkstraNode, vector<DijkstraNode>, decltype(cmp)> q(cmp);
+    std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> q(cmp);
     q.push(DijkstraNode(source, 0));
 
     while(! q.empty() ) {
         const DijkstraNode current = q.top();
 
-        const vector < pair < unsigned int, unsigned int > > & neighbours = graph.incomingEdges(current.ID);
+        const std::vector < std::pair< unsigned int, unsigned int > > & neighbours = graph.incomingEdges(current.ID);
         for ( unsigned int i = 0; i < neighbours.size(); i++ ) {
             unsigned int newDistance = current.weight + neighbours.at(i).second;
             if (newDistance < distances[neighbours.at(i).first]) {

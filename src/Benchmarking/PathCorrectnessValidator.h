@@ -9,7 +9,7 @@
 #include "../GraphBuilding/Structures/Graph.h"
 #include "../TNR/TNRPathQueryManager.h"
 
-using namespace std;
+
 
 /**
  * This class can check whether a path found using some more complex method is valid in the original graph.
@@ -31,7 +31,7 @@ public:
     static void validateTNRPaths(
             Graph * originalGraph,
             TNRPathQueryManager & tnrQueryManager,
-            vector< pair < unsigned int, unsigned int > > & trips);
+            std::vector< std::pair< unsigned int, unsigned int > > & trips);
 
     /**
      * Validates that the paths reconstructed by the Contraction Hierarchies query algorithm are also valid in the
@@ -45,7 +45,7 @@ public:
     static void validateCHPaths(
             Graph * originalGraph,
             CHPathQueryManager & chQueryManager,
-            vector< pair < unsigned int, unsigned int > > & trips);
+            std::vector< std::pair< unsigned int, unsigned int > > & trips);
 
 private:
     /**
@@ -55,13 +55,13 @@ private:
      * @param distance[in] The distance returned by the query manager. Should be similar to the distance returned
      * by Dijkstra.
      * @param path[in] The path reconstructed by the complex method that needs to be validated. The path is represented
-     * as a vector of edges.
+     * as a std::vector of edges.
      * @return Returns 'true' if the reconstructed path is also a valid path in the original graph, 'false' otherwise.
      */
     static bool validatePath(
             Graph * originalGraph,
             const dist_t distance,
-            vector<SimpleEdge> & path);
+            std::vector<SimpleEdge> & path);
 
     /**
      * Auxiliary function that checks if an edge exists in the original graph. This is used to check if edges obtained

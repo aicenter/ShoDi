@@ -11,7 +11,7 @@
 #include <memory>
 #include "constants.h"
 
-using namespace std;
+
 
 /**
  * Represents a Distance Matrix for a given graph. The Distance Matrix is simply a n*n table ('n' is the number of nodes
@@ -33,7 +33,7 @@ public:
     /**
      * A move constructor.
      *
-     * @param distMatrix[in] A 2D vector that will be used as the distance matrix.
+     * @param distMatrix[in] A 2D std::vector that will be used as the distance matrix.
      */
     explicit Distance_matrix_travel_time_provider(std::unique_ptr<dist_t[]> distMatrix, unsigned int size);
 

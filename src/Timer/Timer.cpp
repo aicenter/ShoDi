@@ -10,17 +10,17 @@
 #include "Timer.h"
 
 //______________________________________________________________________________________________________________________
-Timer::Timer(const string x) : realTimeSum(0), name(x) {
+Timer::Timer(const std::string x) : realTimeSum(0), name(x) {
 }
 
 //______________________________________________________________________________________________________________________
 void Timer::begin() {
-    realBeginTimePoint = chrono::steady_clock::now();
+    realBeginTimePoint = std::chrono::steady_clock::now();
 }
 
 //______________________________________________________________________________________________________________________
 void Timer::finish() {
-    realFinishTimePoint = chrono::steady_clock::now();
+    realFinishTimePoint = std::chrono::steady_clock::now();
 
     realTimeSum += std::chrono::duration_cast<std::chrono::microseconds>(realFinishTimePoint - realBeginTimePoint);
 }
@@ -32,7 +32,7 @@ void Timer::reset() {
 
 //______________________________________________________________________________________________________________________
 void Timer::printMeasuredTime() {
-    cout << "Timer '" << name << "': Real time: " << getRealTimeSeconds() << endl;
+    std::cout << "Timer '" << name << "': Real time: " << getRealTimeSeconds() << std::endl;
 }
 
 //______________________________________________________________________________________________________________________

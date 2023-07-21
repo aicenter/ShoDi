@@ -10,7 +10,7 @@
 #include "../GraphBuilding/Loaders/XenGraphLoader.h"
 
 //______________________________________________________________________________________________________________________
-double DijkstraBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, const Graph & graph, vector < unsigned int > & distances) {
+double DijkstraBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, const Graph & graph, std::vector < unsigned int > & distances) {
     Timer dijkstraTimer("Dijkstra trips benchmark");
     dijkstraTimer.begin();
 
@@ -23,9 +23,9 @@ double DijkstraBenchmark::benchmark(const vector < pair < unsigned int, unsigned
 }
 
 //______________________________________________________________________________________________________________________
-double DijkstraBenchmark::benchmarkUsingMapping(const vector < pair < long long unsigned int, long long unsigned int> > & trips, const Graph & graph, vector < unsigned int > & distances, string mappingFilePath) {
+double DijkstraBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, const Graph & graph, std::vector < unsigned int > & distances, std::string mappingFilePath) {
     XenGraphLoader mappingLoader(mappingFilePath);
-    unordered_map<long long unsigned int, unsigned int> mapping;
+    std::unordered_map<long long unsigned int, unsigned int> mapping;
     mappingLoader.loadNodesMapping(mapping);
 
     Timer dijkstraTimer("Dijkstra trips benchmark");

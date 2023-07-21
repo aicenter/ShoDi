@@ -17,10 +17,10 @@
  */
 class FlagsGraphWithUnpackingData {
 protected:
-    vector< vector < QueryEdgeWithUnpackingData > > neighbours;
-    vector< NodeData > nodesData;
-    vector<unsigned int> forwardPrev;
-    vector<unsigned int> backwardPrev;
+    std::vector< std::vector < QueryEdgeWithUnpackingData > > neighbours;
+    std::vector< NodeData > nodesData;
+    std::vector<unsigned int> forwardPrev;
+    std::vector<unsigned int> backwardPrev;
 public:
     explicit FlagsGraphWithUnpackingData(unsigned int n);
     unsigned int getMiddleNode(unsigned int source, unsigned int target, bool direction);
@@ -33,7 +33,7 @@ public:
     void resetBackwardPrev(unsigned int x);
     void addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw, unsigned int mNode = UINT_MAX);
     unsigned int nodes() const;
-    const vector< QueryEdgeWithUnpackingData > & nextNodes(unsigned int x)const;
+    const std::vector< QueryEdgeWithUnpackingData > & nextNodes(unsigned int x)const;
     NodeData & data(unsigned int node);
     void resetForwardInfo(unsigned int node);
     void resetBackwardInfo(unsigned int node);

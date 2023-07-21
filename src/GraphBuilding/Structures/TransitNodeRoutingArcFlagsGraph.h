@@ -51,8 +51,8 @@ public:
      * @param accessNodeDistance[in] The distance from 'node' to the access node.
      * @param regionsCnt[in] The amount of regions we are working with (for the Arc Flags).
      * @param regionsFlags[in] Arc Flags for the node represented as an 32 bit unsigned integer.
-     * @param powersOf2[in] Auxiliary vector containing values useful for transforming the flags from the unsigned
-     * integer into a vector of bool values.
+     * @param powersOf2[in] Auxiliary std::vector containing values useful for transforming the flags from the unsigned
+     * integer into a std::vector of bool values.
      */
     void addForwardAccessNode(
             unsigned int node,
@@ -60,7 +60,7 @@ public:
             unsigned int accessNodeDistance,
             unsigned int regionsCnt,
             uint32_t regionsFlags,
-            vector<unsigned int> & powersOf2);
+            std::vector<unsigned int> & powersOf2);
 
     /**
      * Adds a backward access node to some node.
@@ -70,8 +70,8 @@ public:
      * @param accessNodeDistance[in] The distance from 'node' to the access node.
      * @param regionsCnt[in] The amount of regions we are working with (for the Arc Flags).
      * @param regionsFlags[in] Arc Flags for the node represented as an 32 bit unsigned integer.
-     * @param powersOf2[in] Auxiliary vector containing values useful for transforming the flags from the unsigned
-     * integer into a vector of bool values.
+     * @param powersOf2[in] Auxiliary std::vector containing values useful for transforming the flags from the unsigned
+     * integer into a std::vector of bool values.
      */
     void addBackwardAccessNode(
             unsigned int node,
@@ -79,7 +79,7 @@ public:
             unsigned int accessNodeDistance,
             unsigned int regionsCnt,
             uint32_t regionsFlags,
-            vector<unsigned int> & powersOf2);
+            std::vector<unsigned int> & powersOf2);
 
     /**
      * Returns the shortest distance from start to goal using the Transit Node Routing with Arc Flags query algorithm.
@@ -120,9 +120,9 @@ protected:
     void resetBackwardInfo(
             const unsigned int node) override;
 
-    vector < vector < AccessNodeDataArcFlags > > forwardAccessNodes;
-    vector < vector < AccessNodeDataArcFlags > > backwardAccessNodes;
-    vector< NodeDataRegions > nodesData;
+    std::vector < std::vector < AccessNodeDataArcFlags > > forwardAccessNodes;
+    std::vector < std::vector < AccessNodeDataArcFlags > > backwardAccessNodes;
+    std::vector< NodeDataRegions > nodesData;
 };
 
 

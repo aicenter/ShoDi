@@ -11,11 +11,11 @@
 #include <cstdint>
 #include "../../TNR/Structures/AccessNodeData.h"
 
-using namespace std;
+
 
 /**
  * Extension of the AccessNodeData class. In this case, each instance represents an access node, for the Arc Flags we
- * need the actual flags which are stored in a vector of bools.
+ * need the actual flags which are stored in a std::vector of bools.
  */
 class AccessNodeDataArcFlags : public AccessNodeData {
 public:
@@ -23,7 +23,7 @@ public:
      *
      * @param a[in] The ID for the access node.
      * @param b[in] The distance to the access node.
-     * @param regionsCnt[in] The amount of regions in the graph (determines how big flag vector will be needed for
+     * @param regionsCnt[in] The amount of regions in the graph (determines how big flag std::vector will be needed for
      * Arc Flags)
      */
     AccessNodeDataArcFlags(
@@ -36,10 +36,10 @@ public:
      *
      * @param a[in] The ID for the access node.
      * @param b[in] The distance to the access node.
-     * @param regionsCnt[in] The amount of regions in the graph (determines how big flag vector will be needed for
+     * @param regionsCnt[in] The amount of regions in the graph (determines how big flag std::vector will be needed for
      * Arc Flags)
      * @param regFlags[in] The Arc Flags for the access node stored in a 32 bit unsigned int variable.
-     * @param powersOf2[in] Auxiliary vector with values needed for extraction of the actual Arc FLags from the regFlags
+     * @param powersOf2[in] Auxiliary std::vector with values needed for extraction of the actual Arc FLags from the regFlags
      * variable.
      */
     AccessNodeDataArcFlags(
@@ -47,9 +47,9 @@ public:
             unsigned int b,
             unsigned int regionsCnt,
             uint32_t regFlags,
-            vector<unsigned int> & powersOf2);
+            std::vector<unsigned int> & powersOf2);
 
-    vector<bool> regionFlags;
+    std::vector<bool> regionFlags;
 };
 
 

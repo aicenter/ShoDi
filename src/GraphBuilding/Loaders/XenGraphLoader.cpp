@@ -17,11 +17,11 @@
 #include <type_traits>
 
 //______________________________________________________________________________________________________________________
-XenGraphLoader::XenGraphLoader(string inputFile)
+XenGraphLoader::XenGraphLoader(std::string inputFile)
     : inputFile(inputFile), amountsParsed(false) {
   input.open(inputFile);
   if (!input.is_open()) {
-    throw runtime_error(string("Couldn't open file '") + this->inputFile +
+    throw std::runtime_error(std::string("Couldn't open file '") + this->inputFile +
                         "'!");
   }
 }
@@ -35,11 +35,11 @@ void XenGraphLoader::parseAmounts() {
   char c1, c2, c3;
   input >> c1 >> c2 >> c3;
   if (c1 != 'X' || c2 != 'G' || c3 != 'I') {
-    cout
-      << "The input file is missing the XenGraph header." << endl
-      << "Are you sure the input file is in the correct format?" << endl
+    std::cout
+      << "The input file is missing the XenGraph header." << std::endl
+      << "Are you sure the input file is in the correct format?" << std::endl
       << "The loading will proceed but the loaded graph might be corrupted."
-      << endl;
+      << std::endl;
   }
 
   input >> nodesAmount >> edgesAmount;
@@ -96,7 +96,7 @@ void XenGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
 
 //______________________________________________________________________________________________________________________
 void XenGraphLoader::loadNodesMapping(
-    unordered_map<long long unsigned int, unsigned int> &mapping) {
+    std::unordered_map<long long unsigned int, unsigned int> &mapping) {
   if(input.eof())
     input.clear();
 
@@ -105,11 +105,11 @@ void XenGraphLoader::loadNodesMapping(
   char c1, c2, c3;
   input >> c1 >> c2 >> c3;
   if (c1 != 'X' || c2 != 'I' || c3 != 'D') {
-    cout
-      << "The input file is missing the XenGraph indices file header." << endl
-      << "Are you sure the input file is in the correct format?" << endl
+    std::cout
+      << "The input file is missing the XenGraph indices file header." << std::endl
+      << "Are you sure the input file is in the correct format?" << std::endl
       << "The loading will proceed but the mapping might be corrupted."
-      << endl;
+      << std::endl;
   }
 
   input >> nodesAmount;
@@ -117,6 +117,6 @@ void XenGraphLoader::loadNodesMapping(
   long long unsigned int cur;
   for (unsigned int i = 0; i < nodesAmount; i++) {
     input >> cur;
-    mapping.insert(make_pair(cur, i));
+    mapping.insert(std::make_pair(cur, i));
   }
 }
