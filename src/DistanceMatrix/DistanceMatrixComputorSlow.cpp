@@ -17,10 +17,10 @@
 #include "constants.h"
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
+void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph& graph) {
     const unsigned int nodesCnt = graph.nodes();
 
-    distanceTable.resize(((size_t) nodesCnt) * ((size_t) nodesCnt));
+    distanceTable = std::make_unique<dist_t[]>(((size_t) nodesCnt) * ((size_t) nodesCnt));
 
     for (unsigned int i = 0; i < nodesCnt; ++i) {
         if (i % 100 == 0) {
@@ -36,7 +36,8 @@ void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph & graph) {
 void DistanceMatrixComputorSlow::computeDistanceMatrixInReversedGraph(const Graph & graph) {
     const unsigned int nodesCnt = graph.nodes();
 
-    distanceTable.resize(((size_t) nodesCnt) * ((size_t) nodesCnt));
+    distanceTable = std::make_unique<dist_t[]>(((size_t) nodesCnt) * ((size_t) nodesCnt));
+    size = nodesCnt;
 
     for (unsigned int i = 0; i < nodesCnt; ++i) {
         if (i % 100 == 0) {
@@ -105,7 +106,7 @@ Graph DistanceMatrixComputorSlow::loadGraph(GraphLoader &graphLoader, unsigned i
 }
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix * DistanceMatrixComputorSlow::getDistanceMatrixInstance() {
-    DistanceMatrix * retval = new DistanceMatrix(std::move(distanceTable));
+Distance_matrix_travel_time_provider * DistanceMatrixComputorSlow::getDistanceMatrixInstance() {
+    auto* retval = new Distance_matrix_travel_time_provider(std::move(distanceTable), size);
     return retval;
 }

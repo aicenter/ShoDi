@@ -9,7 +9,7 @@
 #define SHORTEST_PATHS_DISTANCEMATRIXCOMPUTORFAST_H
 
 #include <vector>
-#include "DistanceMatrix.h"
+#include "Distance_matrix_travel_time_provider.h"
 #include "DistanceMatrixComputor.h"
 
 using namespace std;
@@ -17,14 +17,11 @@ using namespace std;
 class DistanceMatrixComputorFast : public DistanceMatrixComputor<vector<dist_t>> {
 public:
 
-    DistanceMatrix * getDistanceMatrixInstance() override;
+    Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
 
     vector<dist_t> loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) override;
 
     void computeDistanceMatrix(const vector<dist_t> &graphData) override;
-
-private:
-    vector<dist_t> distanceTable;
 };
 
 

@@ -8,7 +8,7 @@
 
 #include <utility>
 #include <vector>
-#include "../DistanceMatrix/DistanceMatrix.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 #include "constants.h"
 
 using namespace std;
@@ -31,7 +31,7 @@ public:
      */
     static double benchmark(
             const vector < pair < unsigned int, unsigned int> > & trips,
-            DistanceMatrix & matrix,
+            Distance_matrix_travel_time_provider & matrix,
             vector < dist_t > & distances);
 };
 

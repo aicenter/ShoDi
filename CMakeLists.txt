@@ -1,21 +1,30 @@
 cmake_minimum_required(VERSION 3.14)
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
-  CACHE STRING "Vcpkg toolchain file")
+#set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+#  CACHE STRING "Vcpkg toolchain file")
 
 project(shortest_paths)
-include(GenerateExportHeader)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# cmake modules
+include(FetchContent) # for dependencies that should be downloaded and built from source
+include(GenerateExportHeader) # for the GENERATE_EXPORT_HEADER macro
+include(GoogleTest) # for the gtest_discover_tests macro
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(CMAKE_CXX_STANDARD 11)
+
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 option(BUILD_DOC "Build documentation" ON)
 
-include_directories(src/)
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wconversion -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wconversion -pedantic")
 endif()
 
-# Packages
+
+# DEPENDENCIES
+include_directories(src/)
+find_package(indicators CONFIG REQUIRED)
 
 ## Java
 find_package(JNI REQUIRED)
@@ -60,8 +69,17 @@ else (DOXYGEN_FOUND)
     message("Doxygen needs to be installed to generate documentation.")
 endif (DOXYGEN_FOUND)
 
-# Targets
+# Google Test
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/d66ce585109eed6d2d891b7ed7ab3ca96e854483.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
+
+# Targets
 add_library(shortestPaths SHARED
         src/constants.h
         src/API/CHDistanceQueryManagerAPI.cpp
@@ -93,8 +111,8 @@ add_library(shortestPaths SHARED
         src/Dijkstra/BasicDijkstra.h
         src/Dijkstra/DijkstraNode.cpp
         src/Dijkstra/DijkstraNode.h
-        src/DistanceMatrix/DistanceMatrix.cpp
-        src/DistanceMatrix/DistanceMatrix.h
+        src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+        src/DistanceMatrix/Distance_matrix_travel_time_provider.h
         src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
         src/DistanceMatrix/DistanceMatrixComputorSlow.h
         src/GraphBuilding/Loaders/DDSGLoader.cpp
@@ -187,7 +205,8 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
         src/CLI/ProgressBar.cpp
-        src/CLI/ProgressBar.hpp)
+        src/CLI/ProgressBar.hpp
+        src/DistanceMatrix/Distance_matrix_reader.cpp src/DistanceMatrix/Distance_matrix_reader.h)
 
 GENERATE_EXPORT_HEADER(shortestPaths
         BASE_NAME shortestPaths
@@ -255,3 +274,30 @@ add_executable(tests
         src/Benchmarking/TNRAFBenchmark.h
         src/tests.cpp)
 target_link_libraries(tests shortestPaths)
+
+
+# Testing
+enable_testing()
+
+add_executable(test_runner
+    test/Simple_tests.cpp
+    test/dm_test.cpp
+    src/CLI/ProgressBar.cpp
+    src/Dijkstra/DijkstraNode.cpp
+    src/DistanceMatrix/CSV_reader.h
+    src/DistanceMatrix/CSV_reader.cpp
+    src/DistanceMatrix/DistanceMatrixComputorFast.cpp
+    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+    src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+    src/DistanceMatrix/johnson.cpp
+    src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+    src/GraphBuilding/Structures/AdjMatrixGraph.cpp
+    src/GraphBuilding/Structures/SimpleGraph.cpp
+    src/GraphBuilding/Structures/Graph.cpp
+    src/progress_bar.h
+
+)
+
+target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+
+gtest_discover_tests(test_runner)

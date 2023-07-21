@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include "constants.h"
 
 using namespace std;
@@ -20,21 +21,21 @@ using namespace std;
  * Matrix in memory at once, making it impossible to use it. Here, the Distance Matrix is used for comparison to get an
  * idea of how much slower the other methods are in comparison with the Distance Matrix approach.
  */
-class DistanceMatrix {
+class Distance_matrix_travel_time_provider {
 public:
     /**
      * A simple constructor.
      *
      * @param nodes[in] The number of nodes in the graph (also the number of rows and columns in the matrix).
      */
-    explicit DistanceMatrix(unsigned int nodes);
+    explicit Distance_matrix_travel_time_provider(unsigned int nodes);
 
     /**
      * A move constructor.
      *
      * @param distMatrix[in] A 2D vector that will be used as the distance matrix.
      */
-    explicit DistanceMatrix(vector<dist_t> && distMatrix);
+    explicit Distance_matrix_travel_time_provider(std::unique_ptr<dist_t[]> distMatrix, unsigned int size);
 
     /**
      * This is basically a query algorithm. Each query is answered using a single table lookup,
@@ -44,7 +45,7 @@ public:
      * @param goal[in] The goal node for the query.
      * @return Returns the shortest distance from start to goal or 'std::numeric_limits<dist_t>::max()' if goal is not reachable from start.
      */
-    dist_t findDistance(unsigned int start, unsigned int goal);
+    [[nodiscard]] dist_t findDistance(unsigned int start, unsigned int goal) const;
 
     /**
      * Auxiliary function used during the initialization to set the distances.
@@ -59,13 +60,13 @@ public:
      * Get the underlying data structure (a 1D array)
      * @return The underlying 1D array
      */
-    const vector<dist_t> &getRawData();
+    const std::unique_ptr<dist_t[]>& getRawData();
 
     /**
      * Get nodes count
      * @return nodes count
      */
-    unsigned int nodes();
+    [[nodiscard]] unsigned int nodes() const;
 
     /**
      * Prints some statistics about the distance matrix. Useful mainly during debugging, might be removed later.
@@ -77,7 +78,7 @@ public:
 
 private:
     const unsigned int nodesCnt;
-    vector<dist_t> distances;
+    std::unique_ptr<dist_t[]> distances;
 };
 
 

@@ -2,8 +2,7 @@
 // Created by Jan Neumann (neumaja5@fel.cvut.cz) on 27.07.20.
 //
 
-#ifndef SHORTEST_PATHS_GRAPHLOADER_H
-#define SHORTEST_PATHS_GRAPHLOADER_H
+#pragma once
 
 
 #include "constants.h"
@@ -11,7 +10,7 @@
 
 #include <vector>
 
-using namespace std;
+
 
 class GraphLoader {
 public:
@@ -25,6 +24,10 @@ public:
      */
     virtual void loadGraph(BaseGraph &graph, unsigned int precisionLoss) = 0;
 
+    void loadGraph(BaseGraph &graph){
+        loadGraph(graph, 1);
+    }
+
     /**
      * Retrieve amount of nodes in graph
      */
@@ -32,6 +35,3 @@ public:
 
     virtual ~GraphLoader() = default;
 };
-
-
-#endif //SHORTEST_PATHS_GRAPHLOADER_H

@@ -11,9 +11,10 @@
 #include "johnson.hpp"
 
 void DistanceMatrixComputorFast::computeDistanceMatrix(const vector<dist_t> &graphAdjMatrix) {
-    auto * graph = johnson::johnson_init(graphAdjMatrix);
-    distanceTable.resize(graphAdjMatrix.size());
-    johnson::johnson_parallel(graph, distanceTable.data());
+    auto* graph = johnson::johnson_init(graphAdjMatrix);
+    distanceTable = std::make_unique<dist_t[]>(graphAdjMatrix.size());
+    size = static_cast<unsigned>(std::sqrt(graphAdjMatrix.size()));
+    johnson::johnson_parallel(graph, distanceTable.get());
 }
 
 vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
@@ -23,6 +24,6 @@ vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, u
     return graph.matrix();
 }
 
-DistanceMatrix *DistanceMatrixComputorFast::getDistanceMatrixInstance() {
-    return new DistanceMatrix(std::move(distanceTable));
+Distance_matrix_travel_time_provider *DistanceMatrixComputorFast::getDistanceMatrixInstance() {
+    return new Distance_matrix_travel_time_provider(std::move(distanceTable), size);
 }

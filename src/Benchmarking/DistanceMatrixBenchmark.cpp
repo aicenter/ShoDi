@@ -7,7 +7,7 @@
 #include "../Timer/Timer.h"
 
 //______________________________________________________________________________________________________________________
-double DistanceMatrixBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, DistanceMatrix & matrix, vector <dist_t> & distances) {
+double DistanceMatrixBenchmark::benchmark(const vector < pair < unsigned int, unsigned int> > & trips, Distance_matrix_travel_time_provider & matrix, vector <dist_t> & distances) {
     Timer dijkstraTimer("Distance Matrix trips benchmark");
     dijkstraTimer.begin();
 

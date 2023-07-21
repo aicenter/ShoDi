@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_DISTANCEMATRIXLOADER_H
 
 #include <string>
-#include "../../DistanceMatrix/DistanceMatrix.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ public:
      *
      * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.
      */
-    DistanceMatrix * loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * loadDistanceMatrix();
 
 private:
     /**
@@ -47,7 +47,7 @@ private:
      * @param nodes[in] The number of nodes in the graph.
      * @param distanceMatrix[out] The distance matrix instance that will be filled by this function.
      */
-    void parseDistances(ifstream & input, const unsigned int nodes, DistanceMatrix & distanceMatrix);
+    void parseDistances(ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix);
 
     string inputFile;
 };

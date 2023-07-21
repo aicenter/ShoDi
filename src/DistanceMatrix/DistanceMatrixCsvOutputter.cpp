@@ -10,7 +10,7 @@
 #include "constants.h"
 #include "CLI/ProgressBar.hpp"
 
-void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
+void DistanceMatrixCsvOutputter::store(Distance_matrix_travel_time_provider &dm, const string &path) {
     printf("Storing the distance matrix.\n");
     ofstream output;
     output.open(path + ".csv");
@@ -18,11 +18,12 @@ void DistanceMatrixCsvOutputter::store(DistanceMatrix &dm, const string &path) {
         printf("Couldn't open file '%s'!", (path + ".csv").c_str());
     }
 
-    const vector<dist_t> &distances = dm.getRawData();
+    const auto& distances = dm.getRawData();
     const auto nodesCnt = dm.nodes();
 
     ProgressBar progress(nodesCnt);
-    for(size_t i = 0; i < distances.size(); i++) {
+    auto size = static_cast<size_t>(nodesCnt) * nodesCnt;
+    for(size_t i = 0; i < size; i++) {
         output << distances[i];
 
         if ((i + 1) % nodesCnt == 0) {

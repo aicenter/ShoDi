@@ -13,7 +13,7 @@ DistanceMatrixLoader::DistanceMatrixLoader(string inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-DistanceMatrix * DistanceMatrixLoader::loadDistanceMatrix() {
+Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadDistanceMatrix() {
     ifstream input;
     input.open(this->inputFile, ios::binary);
     if( ! input.is_open() ) {
@@ -23,7 +23,7 @@ DistanceMatrix * DistanceMatrixLoader::loadDistanceMatrix() {
     unsigned int nodes;
     parseHeader(input, nodes);
 
-    DistanceMatrix * distanceMatrix = new DistanceMatrix(nodes);
+    Distance_matrix_travel_time_provider * distanceMatrix = new Distance_matrix_travel_time_provider(nodes);
 
     parseDistances(input, nodes, *distanceMatrix);
 
@@ -48,7 +48,7 @@ void DistanceMatrixLoader::parseHeader(ifstream & input, unsigned int & nodes) {
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixLoader::parseDistances(ifstream & input, const unsigned int nodes, DistanceMatrix & distanceMatrix) {
+void DistanceMatrixLoader::parseDistances(ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix) {
     unsigned int distance;
     for(unsigned int i = 0; i < nodes; i++) {
         for(unsigned int j = 0; j < nodes; j++) {

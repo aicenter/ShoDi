@@ -10,7 +10,7 @@
 #define SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H
 
 #include "../GraphBuilding/Loaders/GraphLoader.h"
-#include "DistanceMatrix.h"
+#include "Distance_matrix_travel_time_provider.h"
 
 /**
  * This class can compute a full distance matrix for a given Graph. Meaning all
@@ -23,45 +23,59 @@
  * enough for small graphs especially since the road graphs are usually very
  * sparse.
  */
-template <typename T> class DistanceMatrixComputor {
+template<typename T>
+class DistanceMatrixComputor {
 public:
-  typedef T GraphType;
+    typedef T GraphType;
 
-  /**
-   * This function will retrieve the graph data required for the
-   * distance matrix computation algorithm using a GraphLoader.
-   *
-   * @param graphLoader[in] instance of GraphLoader that will load the data
-   * for which we want to compute the distance matrix.
-   * @param[in] precisionLoss This parameter allows us to lose some precision
-   * of the weight values. Each loaded weight will be divided by this value
-   * before rounding.
-   */
-  virtual T loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) = 0;
+    /**
+     * This function will retrieve the graph data required for the
+     * distance matrix computation algorithm using a GraphLoader.
+     *
+     * @param graphLoader[in] instance of GraphLoader that will load the data
+     * for which we want to compute the distance matrix.
+     * @param[in] precisionLoss This parameter allows us to lose some precision
+     * of the weight values. Each loaded weight will be divided by this value
+     * before rounding.
+     */
+    virtual T loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) = 0;
 
-  /**
-   * This function will compute the full distance matrix for the graph data
-   * loaded using `DistanceMatrixComputor::loadGraph`. The computed distance
-   * matrix will be stored in the DistanceMatrixComputor instance, so that it
-   * can be used further.
-   *
-   * @param[in] graphData Graph data required for the distance matrix
-   * calculation
-   */
-  virtual void computeDistanceMatrix(const T &graphData) = 0;
+    /**
+     * This function will compute the full distance matrix for the graph data
+     * loaded using `DistanceMatrixComputor::loadGraph`. The computed distance
+     * matrix will be stored in the DistanceMatrixComputor instance, so that it
+     * can be used further.
+     *
+     * @param[in] graphData Graph data required for the distance matrix
+     * calculation
+     */
+    virtual void computeDistanceMatrix(const T &graphData) = 0;
 
-  /**
-   * Allows us to get a DistanceMatrix instance immediately from the
-   * DistanceMatrixComputor without the need to first save it into a file and
-   * then load it. This gives you an instance of the DistanceMatrix class that
-   * can immediately be used to answer queries.
-   *
-   * @return An instance of the DistanceMatrix class that can be used to answer
-   * queries.
-   */
-  virtual DistanceMatrix *getDistanceMatrixInstance() = 0;
+    /**
+     * Allows us to get a DistanceMatrix instance immediately from the
+     * DistanceMatrixComputor without the need to first save it into a file and
+     * then load it. This gives you an instance of the DistanceMatrix class that
+     * can immediately be used to answer queries.
+     *
+     * @return An instance of the DistanceMatrix class that can be used to answer
+     * queries.
+     */
+    virtual Distance_matrix_travel_time_provider *getDistanceMatrixInstance() = 0;
 
-  virtual ~DistanceMatrixComputor() = default;
+    virtual ~DistanceMatrixComputor() = default;
+
+    Distance_matrix_travel_time_provider *compute_and_get_distance_matrix(GraphLoader &graphLoader, unsigned int precisionLoss) {
+        T graphData = loadGraph(graphLoader, precisionLoss);
+        computeDistanceMatrix(graphData);
+        return getDistanceMatrixInstance();
+    }
+
+    Distance_matrix_travel_time_provider *compute_and_get_distance_matrix(GraphLoader &graphLoader) {
+        return compute_and_get_distance_matrix(graphLoader, 1);
+    }
+protected:
+    std::unique_ptr<dist_t[]> distanceTable;
+    unsigned int size;
 };
 
 #endif // SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H

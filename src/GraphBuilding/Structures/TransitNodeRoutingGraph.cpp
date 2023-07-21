@@ -76,7 +76,7 @@ void TransitNodeRoutingGraph::addBackwardSearchSpaceNode(unsigned int sourceNode
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::accessNodesTest(DistanceMatrix & dm) {
+void TransitNodeRoutingGraph::accessNodesTest(Distance_matrix_travel_time_provider & dm) {
     unsigned int allAccessNodes = 0;
     unsigned int invalidDistanceNodes = 0;
 

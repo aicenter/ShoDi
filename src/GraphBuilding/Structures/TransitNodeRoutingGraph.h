@@ -9,7 +9,7 @@
 
 #include "FlagsGraph.h"
 #include "../../TNR/Structures/AccessNodeData.h"
-#include "../../DistanceMatrix/DistanceMatrix.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 /**
  * A Transit Node Routing data-structure. This basically contains all data required for the TNR queries. For non-local
@@ -140,7 +140,7 @@ public:
      *
      * @param dm[in] A full distance matrix containing distance for all pairs of nodes in the graph.
      */
-    void accessNodesTest(DistanceMatrix & dm);
+    void accessNodesTest(Distance_matrix_travel_time_provider & dm);
 
 protected:
     vector < vector < AccessNodeData > > forwardAccessNodes;

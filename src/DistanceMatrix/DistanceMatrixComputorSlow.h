@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_DISTANCEMATRIXCOMPUTOR_H
 
 #include "../GraphBuilding/Structures/Graph.h"
-#include "DistanceMatrix.h"
+#include "Distance_matrix_travel_time_provider.h"
 #include "DistanceMatrixComputor.h"
 #include <cstddef>
 
@@ -16,7 +16,7 @@ using namespace std;
 class DistanceMatrixComputorSlow : public DistanceMatrixComputor<Graph> {
 public:
 
-    DistanceMatrix * getDistanceMatrixInstance() override;
+    Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
 
     Graph loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) override;
 
@@ -49,8 +49,6 @@ private:
      * @param useReversedGraph
      */
     void fillDistanceMatrixRow(unsigned int rowID, const Graph & graph, bool useReversedGraph = false);
-
-    vector<dist_t> distanceTable;
 };
 
 

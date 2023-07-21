@@ -23,9 +23,9 @@ typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
 class CsvGraphLoader : public GraphLoader {
 private:
     DefaultCSVReader reader;
-    string inputFile;
+    std::string inputFile;
 public:
-    CsvGraphLoader(string inputFile);
+    explicit CsvGraphLoader(std::string inputFile);
 
     void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
 

@@ -11,7 +11,7 @@
 #include "Structures/AccessNodeData.h"
 #include "../GraphBuilding/Structures/FlagsGraph.h"
 #include "../GraphBuilding/Loaders/XenGraphLoader.h"
-#include "../DistanceMatrix/DistanceMatrix.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 
 using namespace std;
@@ -226,7 +226,7 @@ protected:
             vector < unsigned int > & forwardSearchSpace,
             unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph,
-            DistanceMatrix & dm);
+            Distance_matrix_travel_time_provider & dm);
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. The process consists of first finding
@@ -249,7 +249,7 @@ protected:
             vector < unsigned int > & backwardSearchSpace,
             unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph & graph,
-            DistanceMatrix & dm);
+            Distance_matrix_travel_time_provider & dm);
 
 };
 

@@ -138,7 +138,7 @@ void createDM(
     dmComputor.computeDistanceMatrix(graphData);
     timer.finish();
 
-    DistanceMatrix * dm = dmComputor.getDistanceMatrixInstance();
+    Distance_matrix_travel_time_provider * dm = dmComputor.getDistanceMatrixInstance();
     DistanceMatrixXdmOutputter outputter;
     outputter.store(*dm, outputFilePath);
 
@@ -235,7 +235,7 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Prague/Prague.xdm");
-    DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
@@ -341,7 +341,7 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Berlin/Berlin.xdm");
-    DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Berlin/Berlin100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;
@@ -447,7 +447,7 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xdm");
-    DistanceMatrix * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia100000randomQueries.txt");
     vector<pair<unsigned int, unsigned int>> querySet;

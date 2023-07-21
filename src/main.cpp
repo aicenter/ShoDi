@@ -15,7 +15,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <string>
 #include <tuple>
-#include "DistanceMatrix/DistanceMatrix.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 #include "GraphBuilding/Loaders/DIMACSLoader.h"
 #include "GraphBuilding/Loaders/GraphLoader.h"
 #include "GraphBuilding/Loaders/TNRGLoader.h"
@@ -323,7 +323,7 @@ void createTNRAF(
 }
 
 template<typename ComputorType>
-DistanceMatrix *computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss, string timerName) {
+Distance_matrix_travel_time_provider* computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss, string timerName) {
     ComputorType computor;
     auto graph = computor.loadGraph(graphLoader, precisionLoss);
 
@@ -344,10 +344,10 @@ void createDM(
         GraphLoader &graphLoader,
         char *outputFilePath,
         unsigned int precisionLoss) {
-    std::function<DistanceMatrix* (GraphLoader &, unsigned int, string)> computor;
+    std::function<Distance_matrix_travel_time_provider* (GraphLoader &, unsigned int, string)> computor;
 
     std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
-    std::unique_ptr<DistanceMatrix> dm{nullptr};
+    std::unique_ptr<Distance_matrix_travel_time_provider> dm{nullptr};
 
     if (strcmp(preprocessingMode, "slow") == 0) {
         computor = computeDistanceMatrix<DistanceMatrixComputorSlow>;
@@ -367,7 +367,7 @@ void createDM(
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    dm = std::unique_ptr<DistanceMatrix> {computor(graphLoader, precisionLoss, "Distance Matrix preprocessing")};
+    dm = std::unique_ptr<Distance_matrix_travel_time_provider> {computor(graphLoader, precisionLoss, "Distance Matrix preprocessing")};
     outputter->store(*dm, outputFilePath);
 }
 
@@ -847,7 +847,7 @@ int main(int argc, char *argv[]) {
                         })),
                 make_tuple(string("dm"), string("Distance Matrix"), 8,
                     std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
+                      [](char** argv, GraphLoader& graphLoader, unsigned int precisionLoss) {
                         createDM(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
                         }))
             };
@@ -871,7 +871,7 @@ int main(int argc, char *argv[]) {
                     else
                         precisionLoss = (unsigned int) stoi(argv[expectedArgc]);
 
-                    GraphLoader *graphLoader = newGraphLoader(argv[3], argv[expectedArgc - 2]);
+                    GraphLoader* graphLoader = newGraphLoader(argv[3], argv[expectedArgc - 2]);
                     auto &func = get<3>(preprocessing);
                     func(argv, *graphLoader, precisionLoss);
                     delete graphLoader;

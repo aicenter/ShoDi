@@ -11,7 +11,7 @@
 #include "../TNR/TNRPreprocessor.h"
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "Structures/RegionsStructure.h"
-#include "../DistanceMatrix/DistanceMatrix.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 using namespace std;
 
@@ -270,7 +270,7 @@ protected:
      */
     static void initPowersOf2(vector<uint32_t> & powersOf2);
 
-    static DistanceMatrix * distanceMatrix;
+    static Distance_matrix_travel_time_provider * distanceMatrix;
 };
 
 

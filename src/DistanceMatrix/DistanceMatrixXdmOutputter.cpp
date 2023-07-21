@@ -9,7 +9,7 @@
 #include "DistanceMatrixXdmOutputter.h"
 #include "constants.h"
 
-void DistanceMatrixXdmOutputter::store(DistanceMatrix &dm, const string &path) {
+void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const string &path) {
     printf("Storing the distance matrix.\n");
     ofstream output;
     output.open(path + ".xdm", ios::binary);
