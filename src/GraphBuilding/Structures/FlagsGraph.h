@@ -63,6 +63,10 @@ public:
      */
     virtual ~FlagsGraph();
 
+    const std::vector<std::vector<QueryEdge>> &getNeighbours() const;
+
+    const std::vector<NodeData> &getNodesData() const;
+
     /**
      * Puts all edges currently present in the graph into one std::vector.
      *

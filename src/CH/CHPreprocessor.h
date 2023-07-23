@@ -29,8 +29,7 @@ public:
      *
      * @param graph[in, out] The input graph that will be preprocessed.
      */
-    static void preprocessForDDSG(
-            UpdateableGraph & graph);
+    static void preprocessForDDSG(UpdateableGraph & graph);
 
 private:
     /**
@@ -40,8 +39,7 @@ private:
      *
      * @param graph[in, out] The graph we are working with.
      */
-    static void reinsertShortcuts(
-            UpdateableGraph & graph);
+    static void reinsertShortcuts(UpdateableGraph & graph);
 
     /**
      * This function is used at the beginning of the preprocessing process. It simply computes the initial
@@ -51,8 +49,9 @@ private:
      * @param graph[in] The graph that will be used to initialize the queue.
      */
     static void initializePriorityQueue(
-            CHpriorityQueue & priorityQueue,
-            UpdateableGraph & graph);
+        CHpriorityQueue & priorityQueue,
+        UpdateableGraph & graph
+    );
 
     /**
      * This function actually contracts nodes. It simply contracts nodes one after each other until the priority
@@ -65,8 +64,9 @@ private:
      * @param graph[in, out] The graph we are working with.
      */
     static void contractNodesWithUnpackingData(
-            CHpriorityQueue & priorityQueue,
-            UpdateableGraph & graph);
+        CHpriorityQueue & priorityQueue,
+        UpdateableGraph & graph
+    );
 
     /**
      * Auxiliary function that adjust neighbours degrees when a node is contracted.

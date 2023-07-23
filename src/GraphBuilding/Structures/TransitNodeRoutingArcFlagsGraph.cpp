@@ -70,3 +70,17 @@ void TransitNodeRoutingArcFlagsGraph::resetBackwardInfo(const unsigned int node)
     nodesData[node].backwardSettled = false;
     nodesData[node].backwardReached = false;
 }
+
+const std::vector<std::vector<AccessNodeDataArcFlags>> &
+TransitNodeRoutingArcFlagsGraph::getForwardAccessNodes1() const {
+    return forwardAccessNodes;
+}
+
+const std::vector<std::vector<AccessNodeDataArcFlags>> &
+TransitNodeRoutingArcFlagsGraph::getBackwardAccessNodes1() const {
+    return backwardAccessNodes;
+}
+
+const std::vector<NodeDataRegions> &TransitNodeRoutingArcFlagsGraph::getNodesData1() const {
+    return nodesData;
+}

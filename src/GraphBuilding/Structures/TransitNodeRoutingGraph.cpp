@@ -93,3 +93,27 @@ void TransitNodeRoutingGraph::accessNodesTest(Distance_matrix_travel_time_provid
 
     printf("There are %u out of %u access nodes that have invalid distances. This means %lf %%.\n", invalidDistanceNodes, allAccessNodes, ((double) invalidDistanceNodes / allAccessNodes) * 100);
 }
+
+const std::vector<std::vector<AccessNodeData>> &TransitNodeRoutingGraph::getForwardAccessNodes() const {
+    return forwardAccessNodes;
+}
+
+const std::vector<std::vector<AccessNodeData>> &TransitNodeRoutingGraph::getBackwardAccessNodes() const {
+    return backwardAccessNodes;
+}
+
+const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph::getForwardSearchSpaces() const {
+    return forwardSearchSpaces;
+}
+
+const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph::getBackwardSearchSpaces() const {
+    return backwardSearchSpaces;
+}
+
+const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph::getTransitNodesDistanceTable() const {
+    return transitNodesDistanceTable;
+}
+
+const std::unordered_map<unsigned int, unsigned int> &TransitNodeRoutingGraph::getTransitNodeMapping() const {
+    return transitNodeMapping;
+}

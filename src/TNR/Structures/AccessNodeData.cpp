@@ -9,3 +9,8 @@
 AccessNodeData::AccessNodeData(unsigned int a, unsigned int b) : accessNodeID(a), distanceToNode(b) {
 
 }
+
+//bool AccessNodeData::operator==(const AccessNodeData &rhs) const {
+//    return accessNodeID == rhs.accessNodeID &&
+//           distanceToNode == rhs.distanceToNode;
+//}

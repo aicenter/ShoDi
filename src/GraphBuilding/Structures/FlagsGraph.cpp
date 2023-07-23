@@ -139,3 +139,11 @@ void FlagsGraph::resetForwardStall(const unsigned int node) {
 void FlagsGraph::resetBackwardStall(const unsigned int node) {
     nodesData[node].backwardStalled = false;
 }
+
+const std::vector<std::vector<QueryEdge>> &FlagsGraph::getNeighbours() const {
+    return neighbours;
+}
+
+const std::vector<NodeData> &FlagsGraph::getNodesData() const {
+    return nodesData;
+}

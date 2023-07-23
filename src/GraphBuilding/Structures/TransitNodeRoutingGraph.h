@@ -34,6 +34,19 @@ public:
      */
     ~TransitNodeRoutingGraph() override;
 
+
+    const std::vector<std::vector<AccessNodeData>> &getForwardAccessNodes() const;
+
+    const std::vector<std::vector<AccessNodeData>> &getBackwardAccessNodes() const;
+
+    const std::vector<std::vector<unsigned int>> &getForwardSearchSpaces() const;
+
+    const std::vector<std::vector<unsigned int>> &getBackwardSearchSpaces() const;
+
+    const std::vector<std::vector<unsigned int>> &getTransitNodesDistanceTable() const;
+
+    const std::unordered_map<unsigned int, unsigned int> &getTransitNodeMapping() const;
+
     /**
      * Determines whether the query is local or global. Global queries can be answered using the transit node set,
      * local queries must be answered using some fallback algorithm (Contraction Hierarchies are used here).

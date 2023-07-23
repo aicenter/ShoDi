@@ -24,6 +24,8 @@ public:
 
     unsigned int accessNodeID;
     unsigned int distanceToNode;
+
+    bool operator==(const AccessNodeData &rhs) const = default;
 };
 
 

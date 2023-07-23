@@ -34,12 +34,18 @@ public:
      */
     ~TransitNodeRoutingArcFlagsGraph() override;
 
-    /**
-     * Returns the data for some node.
-     *
-     * @param node[in] The node we are interested in.
-     * @return Reference to the data about the node.
-     */
+	const std::vector<std::vector<AccessNodeDataArcFlags>>& getForwardAccessNodes1() const;
+
+	const std::vector<std::vector<AccessNodeDataArcFlags>>& getBackwardAccessNodes1() const;
+
+	const std::vector<NodeDataRegions>& getNodesData1() const;
+
+	/**
+	 * Returns the data for some node.
+	 *
+	 * @param node[in] The node we are interested in.
+	 * @return Reference to the data about the node.
+	 */
     virtual NodeDataRegions & data(
             unsigned int node) override;
 

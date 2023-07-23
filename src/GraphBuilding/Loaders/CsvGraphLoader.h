@@ -27,6 +27,8 @@ private:
 public:
     explicit CsvGraphLoader(std::string inputFile);
 
+    using GraphLoader::loadGraph;
+
     void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
 
     unsigned int nodes() override;
