@@ -39,7 +39,7 @@ inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned in
         return std::numeric_limits<dist_t>::max();
     }
 
-    if (isnan(val)) {
+    if (std::isnan(val)) {
         return std::numeric_limits<dist_t>::max();
     }
 
