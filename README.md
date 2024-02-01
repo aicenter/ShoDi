@@ -83,7 +83,7 @@ From Source
  - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
 ### Building the project
-1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2`
+1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2 indicators`
 2. Create a `JAVA_HOME` system property with the abolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
 3. `mkdir build && cd build`
 4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
