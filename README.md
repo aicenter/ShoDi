@@ -375,10 +375,7 @@ The expected suffix for XenGraph files is `.xeng` although it is not enforced.
 
 ### DIMACS input format
 
-This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. 
-Example graphs in this format can therefore be downloaded from the website of the challenge:
-http://users.diag.uniroma1.it/challenge9/download.shtml . 
-The graph file is a plain text file and it looks as follows:
+This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. The graph file is a plain text file and it looks as follows:
 
 * Lines beginning with the character `c` can occur anywhere in the file. 
 Those lines are comment lines and are skipped during loading.
