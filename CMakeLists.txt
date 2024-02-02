@@ -35,7 +35,7 @@ find_package(Boost REQUIRED)
 #find_path(BOOST_CONFIG_INCLUDE_DIRS "/boost/config.hpp")
 #include_directories(${BOOST_CONFIG_INCLUDE_DIRS})
 find_path(BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS "boost/cast.hpp")
-include_directories(${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
+# include_directories(${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
 
 # Check boost header-only components
 if(NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
@@ -338,5 +338,6 @@ add_executable(test_runner
 
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
+target_include_directories(shortestPaths PRIVATE ${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
 
 gtest_discover_tests(test_runner)
