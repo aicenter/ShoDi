@@ -91,7 +91,7 @@ From Source
 
 There are also additional build targets such as `shortestPaths` (which is just
 the library, excluding the standalone executable), `doc` (the documentation:
-requires Doxygen to be installed), `tests` and `thesisTests`.
+requires Doxygen to be installed), `benchmark` and `thesisBenchmark`.
 
 Usage
 =====
