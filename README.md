@@ -83,7 +83,7 @@ From Source
  - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
 ### Building the project
-1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2`
+1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2 indicators`
 2. Create a `JAVA_HOME` system property with the abolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
 3. `mkdir build && cd build`
 4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
@@ -91,7 +91,7 @@ From Source
 
 There are also additional build targets such as `shortestPaths` (which is just
 the library, excluding the standalone executable), `doc` (the documentation:
-requires Doxygen to be installed), `tests` and `thesisTests`.
+requires Doxygen to be installed), `benchmark` and `thesisBenchmark`.
 
 Usage
 =====
@@ -375,10 +375,7 @@ The expected suffix for XenGraph files is `.xeng` although it is not enforced.
 
 ### DIMACS input format
 
-This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. 
-Example graphs in this format can therefore be downloaded from the website of the challenge:
-http://users.diag.uniroma1.it/challenge9/download.shtml . 
-The graph file is a plain text file and it looks as follows:
+This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. The graph file is a plain text file and it looks as follows:
 
 * Lines beginning with the character `c` can occur anywhere in the file. 
 Those lines are comment lines and are skipped during loading.

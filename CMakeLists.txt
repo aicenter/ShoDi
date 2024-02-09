@@ -32,10 +32,6 @@ include_directories(${JNI_INCLUDE_DIRS})
 
 ## Boost
 find_package(Boost REQUIRED)
-#find_path(BOOST_CONFIG_INCLUDE_DIRS "/boost/config.hpp")
-#include_directories(${BOOST_CONFIG_INCLUDE_DIRS})
-#find_path(BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS "boost/cast.hpp")
-#include_directories(${BOOST_NUMERIC_CONVERSION_INCLUDE_DIRS})
 
 # Check boost header-only components
 if(NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
@@ -43,8 +39,7 @@ if(NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
 endif()
 
 ## CSV
-find_package(csv2 CONFIG REQUIRED)
-link_libraries(csv2::csv2)
+find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
 ## OpenMP
 find_package(OpenMP REQUIRED)
@@ -240,7 +235,7 @@ add_executable(shortestPathsPreprocessor
         src/main.cpp)
 target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
 
-add_executable(thesisTests
+add_executable(thesisBenchmark
         src/Benchmarking/TNRBenchmark.cpp
         src/Benchmarking/TNRBenchmark.h
         src/Benchmarking/CHBenchmark.h
@@ -258,10 +253,10 @@ add_executable(thesisTests
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/thesisTestScenarios.cpp)
-target_link_libraries(thesisTests shortestPaths)
+target_link_libraries(thesisBenchmark shortestPaths)
 
 
-add_executable(tests
+add_executable(benchmark
         src/Benchmarking/TNRBenchmark.cpp
         src/Benchmarking/TNRBenchmark.h
         src/Benchmarking/CHBenchmark.h
@@ -279,7 +274,7 @@ add_executable(tests
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/tests.cpp)
-target_link_libraries(tests shortestPaths)
+target_link_libraries(benchmark shortestPaths)
 
 
 # Testing
@@ -338,5 +333,7 @@ add_executable(test_runner
     test/tnraf_tests.cpp)
 
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
+target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 
 gtest_discover_tests(test_runner)
