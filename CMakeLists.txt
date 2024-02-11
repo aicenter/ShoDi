@@ -333,6 +333,15 @@ add_executable(test_runner
     test/tnraf_tests.cpp)
 
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+
+add_executable(func_test_runner
+        functest/common.cpp
+        functest/dm_test.cpp
+        )
+
+target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+add_dependencies(func_test_runner shortestPathsPreprocessor)
+
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 
