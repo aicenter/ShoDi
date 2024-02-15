@@ -21,7 +21,7 @@ void compare_dist_matrices(
 }
 
 TEST(dm_test, simple_test) {
-    CsvGraphLoader adj_loader("../data/test/adj.csv");
+    CsvGraphLoader adj_loader("test/adj.csv");
 
     DistanceMatrixComputorFast dm_computor;
     auto matrix = dm_computor.compute_and_get_distance_matrix(adj_loader);
@@ -30,7 +30,7 @@ TEST(dm_test, simple_test) {
     auto matrix_slow = dm_computor_slow.compute_and_get_distance_matrix(adj_loader);
 
     auto expected_matrix(
-            std::make_from_tuple<Distance_matrix_travel_time_provider>(CSV_reader().read_matrix("../data/test/dm.csv")));
+            std::make_from_tuple<Distance_matrix_travel_time_provider>(CSV_reader().read_matrix("test/dm.csv")));
 
     compare_dist_matrices(*matrix, *matrix_slow);
     compare_dist_matrices(*matrix, expected_matrix);
