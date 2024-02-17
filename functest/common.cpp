@@ -10,7 +10,7 @@
 #include <algorithm>
 
 void run_preprocessor(const char* args) {
-    std::string command = std::string("./shortestPathsPreprocessor create ") + args;
+    std::string command = std::string("shortestPathsPreprocessor create ") + args;
     std::system(command.c_str());
 }
 
