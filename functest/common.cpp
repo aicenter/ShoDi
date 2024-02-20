@@ -10,7 +10,11 @@
 #include <algorithm>
 
 void run_preprocessor(const char* args) {
+#ifdef _WIN32
+    std::string command = std::string("shortestPathsPreprocessor create ") + args;
+#else
     std::string command = std::string("./shortestPathsPreprocessor create ") + args;
+#endif
     std::system(command.c_str());
 }
 
