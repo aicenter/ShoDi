@@ -19,24 +19,22 @@ option(BUILD_DOC "Build documentation" ON)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wconversion -pedantic")
-endif()
+endif ()
 
 
 # DEPENDENCIES
-include_directories(src/)
 find_package(indicators CONFIG REQUIRED)
 
 ## Java
-find_package(JNI REQUIRED)
-include_directories(${JNI_INCLUDE_DIRS})
+find_package(JNI)
 
 ## Boost
 find_package(Boost REQUIRED)
 
 # Check boost header-only components
-if(NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
+if (NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
     message(FATAL_ERROR "Boost graph component not found. Search path: ${Boost_INCLUDE_DIRS}/boost/graph")
-endif()
+endif ()
 
 ## CSV
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
@@ -72,8 +70,8 @@ endif (DOXYGEN_FOUND)
 
 # Google Test
 FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/d66ce585109eed6d2d891b7ed7ab3ca96e854483.zip
+        googletest
+        URL https://github.com/google/googletest/archive/d66ce585109eed6d2d891b7ed7ab3ca96e854483.zip
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -209,11 +207,11 @@ add_library(shortestPaths SHARED
         src/CLI/ProgressBar.hpp
         src/DistanceMatrix/Distance_matrix_reader.cpp src/DistanceMatrix/Distance_matrix_reader.h)
 
-GENERATE_EXPORT_HEADER(shortestPaths
-        BASE_NAME shortestPaths
-        EXPORT_MACRO_NAME shortestPaths_EXPORTS
-        EXPORT_FILE_NAME shortestPaths_EXPORTS.h
-        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
+#GENERATE_EXPORT_HEADER(shortestPaths
+#        BASE_NAME shortestPaths
+#        EXPORT_MACRO_NAME shortestPaths_EXPORTS
+#        EXPORT_FILE_NAME shortestPaths_EXPORTS.h
+#        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
 
 add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRBenchmark.cpp
@@ -233,7 +231,7 @@ add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/main.cpp)
-target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
+#target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
 
 add_executable(thesisBenchmark
         src/Benchmarking/TNRBenchmark.cpp
@@ -352,5 +350,10 @@ add_custom_command(
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
+
+# include JNI dirs if found
+if (JNI_FOUND)
+    target_include_directories(shortestPaths PRIVATE ${JNI_INCLUDE_DIRS})
+endif ()
 
 gtest_discover_tests(test_runner)
