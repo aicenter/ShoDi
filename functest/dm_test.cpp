@@ -61,7 +61,7 @@ TEST(dm_test, csv_to_dm_csv_slow1) {
 
 TEST(dm_test, csv_to_dm_csv_slow2) {
     // slow with precision loss
-    run_preprocessor("dm csv csv slow functest/01_adj.csv csv_to_dm_slow2 2");
+    run_preprocessor("dm csv csv slow functest/02_adj.csv csv_to_dm_slow2 2");
     compare_files("functest/02_dm_div2.csv", "csv_to_dm_slow2.csv");
 }
 
