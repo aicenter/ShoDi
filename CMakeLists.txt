@@ -340,9 +340,13 @@ add_custom_command(
 
 add_executable(func_test_runner
         functest/common.cpp
-        functest/dm_test.cpp)
+        functest/dm_test.cpp
+        functest/ch_test.cpp
+        functest/tnr_test.cpp
+        functest/tnraf_test.cpp)
 
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(func_test_runner PUBLIC shortestPaths)
 add_dependencies(func_test_runner shortestPathsPreprocessor)
 
 add_custom_command(
