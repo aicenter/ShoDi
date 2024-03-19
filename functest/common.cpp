@@ -5,6 +5,8 @@
 #include "gtest/gtest.h"
 #include "common.h"
 #include "GraphBuilding/Loaders/DDSGLoader.h"
+#include "GraphBuilding/Loaders/TNRGLoader.h"
+#include "GraphBuilding/Loaders/TGAFLoader.h"
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -19,7 +21,10 @@ void run_preprocessor(const char* args) {
     std::system(command.c_str());
 }
 
-void compare_files(const std::string& p1, const std::string& p2) {
+void compare_files(
+    const std::string& p1,
+    const std::string& p2
+) {
     std::ifstream f1(p1, std::ifstream::binary|std::ifstream::ate);
     std::ifstream f2(p2, std::ifstream::binary|std::ifstream::ate);
 
@@ -40,7 +45,10 @@ void compare_files(const std::string& p1, const std::string& p2) {
         true);
 }
 
-void compare_ch_files(const std::string& computed_fname, const std::string& expected_fname) {
+void compare_ch_files(
+    const std::string& computed_fname,
+    const std::string& expected_fname
+) {
     DDSGLoader chLoader1 = DDSGLoader(computed_fname);
     FlagsGraph* loaded = chLoader1.loadFlagsGraph();
 
@@ -48,6 +56,32 @@ void compare_ch_files(const std::string& computed_fname, const std::string& expe
     FlagsGraph* expected = chLoader2.loadFlagsGraph();
 
     compare_flags_graphs(*loaded, *expected);
+}
+
+void compare_tnrg_files(
+    const std::string& computed_fname,
+    const std::string& expected_fname
+) {
+    TNRGLoader tnrloader1(computed_fname);
+    TransitNodeRoutingGraph* loaded = tnrloader1.loadTNRforDistanceQueries();
+
+    TNRGLoader tnrloader2(expected_fname);
+    TransitNodeRoutingGraph* expected = tnrloader2.loadTNRforDistanceQueries();
+
+    compare_tnr_graphs(*loaded, *expected);
+}
+
+void compare_tgaf_files(
+    const std::string& computed_fname,
+    const std::string& expected_fname
+) {
+    TGAFLoader tgafloader1(computed_fname);
+    TransitNodeRoutingArcFlagsGraph* loaded = tgafloader1.loadTNRAFforDistanceQueries();
+
+    TGAFLoader tgafloader2(expected_fname);
+    TransitNodeRoutingArcFlagsGraph* expected = tgafloader2.loadTNRAFforDistanceQueries();
+
+    compare_tnraf_graphs(*loaded, *expected);
 }
 
 void compare_flags_graphs(
@@ -83,4 +117,27 @@ void compare_flags_graphs(
             ASSERT_EQ(computed_neighbours[i][j].backward, expected_neighbours[i][j].backward);
         }
     }
+}
+
+void compare_tnr_graphs(
+    const TransitNodeRoutingGraph& computed,
+    const TransitNodeRoutingGraph& expected
+) {
+    compare_flags_graphs(computed, expected);
+
+    EXPECT_EQ(computed.getBackwardAccessNodes(), expected.getBackwardAccessNodes());
+    EXPECT_EQ(computed.getForwardAccessNodes(), expected.getForwardAccessNodes());
+    EXPECT_EQ(computed.getBackwardSearchSpaces(), expected.getBackwardSearchSpaces());
+    EXPECT_EQ(computed.getForwardSearchSpaces(), expected.getForwardSearchSpaces());
+}
+
+void compare_tnraf_graphs(
+    const TransitNodeRoutingArcFlagsGraph& computed,
+    const TransitNodeRoutingArcFlagsGraph& expected
+) {
+    compare_tnr_graphs(computed, expected);
+
+    EXPECT_EQ(computed.getForwardAccessNodes(), expected.getForwardAccessNodes());
+    EXPECT_EQ(computed.getBackwardAccessNodes(), expected.getBackwardAccessNodes());
+    EXPECT_EQ(computed.getNodesData(), expected.getNodesData());
 }
