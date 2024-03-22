@@ -4,9 +4,6 @@
 
 #include "gtest/gtest.h"
 #include "common.h"
-#include "GraphBuilding/Loaders/DDSGLoader.h"
-#include "GraphBuilding/Loaders/TNRGLoader.h"
-#include "GraphBuilding/Loaders/TGAFLoader.h"
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -35,45 +32,6 @@ void compare_txt_files(
     while (std::getline(f1, line1) && std::getline(f2, line2)) {
         EXPECT_EQ(line1, line2);
     }
-}
-
-void compare_ch_files(
-    const std::string& computed_fname,
-    const std::string& expected_fname
-) {
-    DDSGLoader chLoader1 = DDSGLoader(computed_fname);
-    FlagsGraph* loaded = chLoader1.loadFlagsGraph();
-
-    DDSGLoader chLoader2 = DDSGLoader(expected_fname);
-    FlagsGraph* expected = chLoader2.loadFlagsGraph();
-
-    compare_flags_graphs(*loaded, *expected);
-}
-
-void compare_tnrg_files(
-    const std::string& computed_fname,
-    const std::string& expected_fname
-) {
-    TNRGLoader tnrloader1(computed_fname);
-    TransitNodeRoutingGraph* loaded = tnrloader1.loadTNRforDistanceQueries();
-
-    TNRGLoader tnrloader2(expected_fname);
-    TransitNodeRoutingGraph* expected = tnrloader2.loadTNRforDistanceQueries();
-
-    compare_tnr_graphs(*loaded, *expected);
-}
-
-void compare_tgaf_files(
-    const std::string& computed_fname,
-    const std::string& expected_fname
-) {
-    TGAFLoader tgafloader1(computed_fname);
-    TransitNodeRoutingArcFlagsGraph* loaded = tgafloader1.loadTNRAFforDistanceQueries();
-
-    TGAFLoader tgafloader2(expected_fname);
-    TransitNodeRoutingArcFlagsGraph* expected = tgafloader2.loadTNRAFforDistanceQueries();
-
-    compare_tnraf_graphs(*loaded, *expected);
 }
 
 void compare_flags_graphs(
