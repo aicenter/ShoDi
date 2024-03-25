@@ -340,6 +340,7 @@ add_custom_command(
 
 add_executable(func_test_runner
         functest/common.cpp
+        functest/expected_graphs.cpp
         functest/dm_test.cpp
         functest/ch_test.cpp
         functest/tnr_test.cpp
