@@ -777,7 +777,7 @@ GraphLoader *newGraphLoader(char *inputType, char *inputFilePath) {
 int main(int argc, char *argv[]) {
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    if (argc < 5 || argc > 8) {
+    if (argc < 5 || argc > 9) {
         printUsageInfo(argv[0]);
         return 0;
     }

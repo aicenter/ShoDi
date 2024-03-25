@@ -22,10 +22,10 @@ void compare_tnraf_graphs(
 }
 
 TEST(tnraf_test, simple_test) {
-	std::filesystem::path adj_path("../data/test/adj.csv");
+	std::filesystem::path adj_path("test/adj.csv");
 	unsigned short region_count = 2;
 
-	UpdateableGraph ch_graph(compute_ch_from_adj(std::filesystem::path("../data/test/adj.csv")));
+	UpdateableGraph ch_graph(compute_ch_from_adj(std::filesystem::path("test/adj.csv")));
 	CsvGraphLoader adj_loader(adj_path.string());
 	Graph graph(adj_loader.nodes());
 	adj_loader.loadGraph(graph);
@@ -33,7 +33,7 @@ TEST(tnraf_test, simple_test) {
 	TGAFLoader loader_slow("tmp.tgaf");
 	auto* tnraf_graph_slow = loader_slow.loadTNRAFforDistanceQueries();
 
-	UpdateableGraph ch_graph_2(compute_ch_from_adj(std::filesystem::path("../data/test/adj.csv")));
+	UpdateableGraph ch_graph_2(compute_ch_from_adj(std::filesystem::path("test/adj.csv")));
 	CsvGraphLoader adj_loader_2(adj_path.string());
 	Graph graph_2(adj_loader_2.nodes());
 	adj_loader_2.loadGraph(graph_2);
@@ -43,7 +43,7 @@ TEST(tnraf_test, simple_test) {
 
 	compare_tnraf_graphs(*tnraf_graph_slow, *tnraf_graph_dm);
 
-	TGAFLoader loader_gt("../data/test/test_1_gt.tgaf");
+	TGAFLoader loader_gt("test/test_1_gt.tgaf");
 	auto* tnraf_graph_gt = loader_gt.loadTNRAFforDistanceQueries();
 
 	compare_tnraf_graphs(*tnraf_graph_slow, *tnraf_graph_gt);
