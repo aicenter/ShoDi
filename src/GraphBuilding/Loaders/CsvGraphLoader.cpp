@@ -23,7 +23,7 @@ CsvGraphLoader::CsvGraphLoader(std::string inputFile) : inputFile(inputFile) {
 }
 
 inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned int nodeTo, std::string inputFile,
-                             double precisionLoss) {
+                             unsigned int precisionLoss) {
     double val;
     try {
         val = stod(str);
@@ -49,7 +49,7 @@ inline dist_t parse_distance(std::string str, unsigned int nodeFrom, unsigned in
         return std::numeric_limits<dist_t>::max();
     }
 
-    return (dist_t) round(val / (double) precisionLoss);
+    return (dist_t) ((unsigned int) val / precisionLoss);
 }
 
 unsigned int CsvGraphLoader::nodes() {
@@ -74,7 +74,7 @@ void CsvGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
         for (const auto &cell: row) {
             std::string val;
             cell.read_value(val);
-            const dist_t dist = parse_distance(val, i, j, inputFile, (double) precisionLoss);
+            const dist_t dist = parse_distance(val, i, j, inputFile, precisionLoss);
             if (dist != max)
                 graph.addEdge(i, j, dist);
             ++j;
