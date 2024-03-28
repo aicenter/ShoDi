@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 #set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
 #  CACHE STRING "Vcpkg toolchain file")
 
-project(shortest_distances VERSION 0.0.0)
+project(shortest_distances VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,9 +12,10 @@ include(FetchContent) # for dependencies that should be downloaded and built fro
 include(GenerateExportHeader) # for the GENERATE_EXPORT_HEADER macro
 include(GoogleTest) # for the gtest_discover_tests macro
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+
 option(BUILD_DOC "Build documentation" ON)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
