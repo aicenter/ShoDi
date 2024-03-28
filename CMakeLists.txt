@@ -70,8 +70,8 @@ endif (DOXYGEN_FOUND)
 
 # Google Test
 FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/d66ce585109eed6d2d891b7ed7ab3ca96e854483.zip
+    googletest
+    URL https://github.com/google/googletest/archive/d66ce585109eed6d2d891b7ed7ab3ca96e854483.zip
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -214,23 +214,65 @@ add_library(shortestPaths SHARED
 #        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
 
 add_executable(shortestPathsPreprocessor
-        src/Benchmarking/TNRBenchmark.cpp
-        src/Benchmarking/TNRBenchmark.h
-        src/Benchmarking/CHBenchmark.h
-        src/Benchmarking/CHBenchmark.cpp
-        src/Benchmarking/DijkstraBenchmark.h
-        src/Benchmarking/DijkstraBenchmark.cpp
-        src/Benchmarking/CorrectnessValidator.h
-        src/Benchmarking/CorrectnessValidator.cpp
-        src/Benchmarking/DistanceCorrectnessValidator.h
-        src/Benchmarking/DistanceCorrectnessValidator.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.h
-        src/Benchmarking/PathCorrectnessValidator.cpp
-        src/Benchmarking/PathCorrectnessValidator.h
-        src/Benchmarking/TNRAFBenchmark.cpp
-        src/Benchmarking/TNRAFBenchmark.h
-        src/main.cpp)
+    src/main.cpp
+    src/Benchmarking/CHBenchmark.cpp
+    src/Benchmarking/CorrectnessValidator.cpp
+    src/Benchmarking/DijkstraBenchmark.cpp
+    src/Benchmarking/TNRAFBenchmark.cpp
+    src/Benchmarking/TNRBenchmark.cpp
+    src/CH/CHDistanceQueryManager.cpp
+    src/CH/CHDistanceQueryManagerWithMapping.cpp
+    src/CH/CHPreprocessor.cpp
+    src/CH/EdgeDifferenceManager.cpp
+    src/CH/Structures/CHNode.cpp
+    src/CH/Structures/CHpriorityQueue.cpp
+    src/CH/Structures/HopsDijkstraNode.cpp
+    src/CH/Structures/NodeData.cpp
+    src/CLI/ProgressBar.cpp
+    src/Dijkstra/BasicDijkstra.cpp
+    src/Dijkstra/DijkstraNode.cpp
+    src/DistanceMatrix/DistanceMatrixComputorFast.cpp
+    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+    src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
+    src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
+    src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+    src/DistanceMatrix/johnson.cpp
+    src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+    src/GraphBuilding/Loaders/DDSGLoader.cpp
+    src/GraphBuilding/Loaders/DIMACSLoader.cpp
+    src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
+    src/GraphBuilding/Loaders/TGAFLoader.cpp
+    src/GraphBuilding/Loaders/TNRGLoader.cpp
+    src/GraphBuilding/Loaders/TripsLoader.cpp
+    src/GraphBuilding/Loaders/XenGraphLoader.cpp
+    src/GraphBuilding/Structures/AdjMatrixGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+    src/GraphBuilding/Structures/Graph.cpp
+    src/GraphBuilding/Structures/OutputEdge.cpp
+    src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+    src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+    src/GraphBuilding/Structures/QueryEdge.cpp
+    src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+    src/GraphBuilding/Structures/ShortcutEdge.cpp
+    src/GraphBuilding/Structures/SimpleGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
+    src/GraphBuilding/Structures/UpdateableGraph.cpp
+    src/TNR/TNRDistanceQueryManager.cpp
+    src/TNR/TNRDistanceQueryManagerWithMapping.cpp
+    src/TNR/TNRPreprocessor.cpp
+    src/TNR/Structures/AccessNodeData.cpp
+    src/TNRAF/TNRAFDistanceQueryManager.cpp
+    src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
+    src/TNRAF/TNRAFPreprocessor.cpp
+    src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+    src/TNRAF/Structures/NodeDataRegions.cpp
+    src/TNRAF/Structures/RegionsStructure.cpp
+    src/Timer/Timer.cpp
+)
+target_include_directories(shortestPathsPreprocessor PRIVATE src) # to enable includes relative to project root
 #target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
 
 add_executable(thesisBenchmark
@@ -273,10 +315,6 @@ add_executable(benchmark
         src/Benchmarking/TNRAFBenchmark.h
         src/tests.cpp)
 target_link_libraries(benchmark shortestPaths)
-
-
-# Testing
-enable_testing()
 
 add_executable(test_runner
         src/CH/CHDistanceQueryManager.cpp
@@ -323,7 +361,6 @@ add_executable(test_runner
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/TNRAFPreprocessor.cpp
 
-
         test/ch_tests.cpp
         test/common.cpp
         test/dm_test.cpp
@@ -337,16 +374,48 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/test $<TARGET_FILE_DIR:func_test_runner>/test)
 
 add_executable(func_test_runner
-        functest/common.cpp
-        functest/expected_graphs.cpp
-        functest/dm_test.cpp
-        functest/ch_test.cpp
-        functest/tnr_test.cpp
-        functest/tnraf_test.cpp)
+    functest/ch_test.cpp
+    functest/common.cpp
+    functest/dm_test.cpp
+    functest/expected_graphs.cpp
+    functest/tnr_test.cpp
+    functest/tnraf_test.cpp
+    src/CH/CHDistanceQueryManager.cpp
+    src/CH/Structures/NodeData.cpp
+    src/Dijkstra/BasicDijkstra.cpp
+    src/Dijkstra/DijkstraNode.cpp
+    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+    src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+    src/GraphBuilding/Loaders/DDSGLoader.cpp
+    src/GraphBuilding/Loaders/TGAFLoader.cpp
+    src/GraphBuilding/Loaders/TNRGLoader.cpp
+    src/GraphBuilding/Loaders/XenGraphLoader.cpp
+    src/GraphBuilding/Structures/FlagsGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+    src/GraphBuilding/Structures/Graph.cpp
+    src/GraphBuilding/Structures/OutputEdge.cpp
+    src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+    src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+    src/GraphBuilding/Structures/QueryEdge.cpp
+    src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+    src/GraphBuilding/Structures/SimpleGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
+    src/GraphBuilding/Structures/UpdateableGraph.cpp
+    src/TNR/TNRPreprocessor.cpp
+    src/TNR/Structures/AccessNodeData.cpp
+    src/TNRAF/TNRAFPreprocessor.cpp
+    src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+    src/TNRAF/Structures/NodeDataRegions.cpp
+    src/TNRAF/Structures/RegionsStructure.cpp
+    src/Timer/Timer.cpp
+)
+target_include_directories(func_test_runner PRIVATE src) # to enable includes relative to project root
 
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
-add_dependencies(func_test_runner shortestPathsPreprocessor)
-target_link_libraries(func_test_runner PUBLIC shortestPaths)
+#add_dependencies(func_test_runner shortestPathsPreprocessor)
+#target_link_libraries(func_test_runner PUBLIC shortestPaths)
 
 add_custom_command(
         TARGET func_test_runner POST_BUILD
@@ -354,6 +423,7 @@ add_custom_command(
 
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 
 # include JNI dirs if found
@@ -361,4 +431,6 @@ if (JNI_FOUND)
     target_include_directories(shortestPaths PRIVATE ${JNI_INCLUDE_DIRS})
 endif ()
 
+# Testing
+enable_testing()
 gtest_discover_tests(test_runner)
