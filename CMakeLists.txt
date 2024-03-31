@@ -79,7 +79,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 
-# Targets
+# TARGETS
+
 add_library(shortestPaths SHARED
         src/constants.h
         src/API/CHDistanceQueryManagerAPI.cpp
@@ -273,8 +274,6 @@ add_executable(shortestPathsPreprocessor
     src/TNRAF/Structures/RegionsStructure.cpp
     src/Timer/Timer.cpp
 )
-target_include_directories(shortestPathsPreprocessor PRIVATE src) # to enable includes relative to project root
-#target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
 
 add_executable(thesisBenchmark
         src/Benchmarking/TNRBenchmark.cpp
@@ -294,8 +293,6 @@ add_executable(thesisBenchmark
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/thesisTestScenarios.cpp)
-target_link_libraries(thesisBenchmark shortestPaths)
-
 
 add_executable(benchmark
         src/Benchmarking/TNRBenchmark.cpp
@@ -315,7 +312,6 @@ add_executable(benchmark
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/tests.cpp)
-target_link_libraries(benchmark shortestPaths)
 
 add_executable(test_runner
         src/CH/CHDistanceQueryManager.cpp
@@ -368,12 +364,6 @@ add_executable(test_runner
         test/tnr_tests.cpp
         test/tnraf_tests.cpp)
 
-target_link_libraries(test_runner PRIVATE GTest::gtest_main)
-
-add_custom_command(
-        TARGET test_runner POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/test $<TARGET_FILE_DIR:func_test_runner>/test)
-
 add_executable(func_test_runner
     functest/ch_test.cpp
     functest/common.cpp
@@ -412,15 +402,12 @@ add_executable(func_test_runner
     src/TNRAF/Structures/RegionsStructure.cpp
     src/Timer/Timer.cpp
 )
-target_include_directories(func_test_runner PRIVATE src) # to enable includes relative to project root
 
-target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
-#add_dependencies(func_test_runner shortestPathsPreprocessor)
-#target_link_libraries(func_test_runner PUBLIC shortestPaths)
+# HEADER INCLUDE
 
-add_custom_command(
-        TARGET func_test_runner POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/functest $<TARGET_FILE_DIR:func_test_runner>/functest)
+# to enable includes relative to project root
+target_include_directories(shortestPathsPreprocessor PRIVATE src)
+target_include_directories(func_test_runner PRIVATE src)
 
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
@@ -432,6 +419,25 @@ if (JNI_FOUND)
     target_include_directories(shortestPaths PRIVATE ${JNI_INCLUDE_DIRS})
 endif ()
 
-# Testing
+# LINKING
+
+# old linking against lib: should be removed
+target_link_libraries(thesisBenchmark shortestPaths)
+target_link_libraries(benchmark shortestPaths)
+
+target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+
+
+# RESOURCES
+add_custom_command(
+        TARGET test_runner POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/test $<TARGET_FILE_DIR:func_test_runner>/test)
+add_custom_command(
+        TARGET func_test_runner POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/functest $<TARGET_FILE_DIR:func_test_runner>/functest)
+
+
+# TESTING
 enable_testing()
 gtest_discover_tests(test_runner)
