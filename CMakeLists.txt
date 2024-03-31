@@ -402,6 +402,8 @@ add_executable(func_test_runner
     src/TNRAF/Structures/RegionsStructure.cpp
     src/Timer/Timer.cpp
 )
+# functional tests depends on the main binary
+add_dependencies(func_test_runner shortestPathsPreprocessor)
 
 # HEADER INCLUDE
 
