@@ -42,6 +42,7 @@
 #include "DistanceMatrix/DistanceMatrixOutputter.h"
 #include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
 #include "DistanceMatrix/DistanceMatrixCsvOutputter.h"
+#include "DistanceMatrix/DistanceMatrixHdfOutputter.h"
 
 
 
@@ -318,6 +319,8 @@ void createDM(
         outputter = std::unique_ptr<DistanceMatrixXdmOutputter> { new DistanceMatrixXdmOutputter()};
     } else if (strcmp(outputType, "csv") == 0) {
         outputter = std::unique_ptr<DistanceMatrixCsvOutputter> { new DistanceMatrixCsvOutputter()};
+    } else if (strcmp(outputType, "hdf") == 0) {
+        outputter = std::unique_ptr<DistanceMatrixHdfOutputter>{ new DistanceMatrixHdfOutputter() };
     } else {
         throw input_error(std::string("Unknown output type '") + outputType +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);

@@ -41,6 +41,10 @@ endif()
 ## CSV
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
+## HDF5
+find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
+# include_directories(${HDF5_INCLUDE_DIRS})
+
 ## OpenMP
 find_package(OpenMP REQUIRED)
 if (OpenMP_CXX_FOUND)
@@ -205,9 +209,12 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/DistanceMatrixCsvOutputter.h
         src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
+        src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
+        src/DistanceMatrix/DistanceMatrixHdfOutputter.h
         src/CLI/ProgressBar.cpp
         src/CLI/ProgressBar.hpp
         src/DistanceMatrix/Distance_matrix_reader.cpp src/DistanceMatrix/Distance_matrix_reader.h)
+target_link_libraries(shortestPaths PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 GENERATE_EXPORT_HEADER(shortestPaths
         BASE_NAME shortestPaths
@@ -234,6 +241,7 @@ add_executable(shortestPathsPreprocessor
         src/Benchmarking/TNRAFBenchmark.h
         src/main.cpp)
 target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 add_executable(thesisBenchmark
         src/Benchmarking/TNRBenchmark.cpp
@@ -342,6 +350,7 @@ add_executable(func_test_runner
         functest/common.cpp
         functest/expected_graphs.cpp
         functest/dm_test.cpp
+        functest/dm_test_hdf.cpp
         functest/ch_test.cpp
         functest/tnr_test.cpp
         functest/tnraf_test.cpp)
@@ -349,6 +358,7 @@ add_executable(func_test_runner
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
 add_dependencies(func_test_runner shortestPathsPreprocessor)
 target_link_libraries(func_test_runner PUBLIC shortestPaths)
+target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 add_custom_command(
         TARGET func_test_runner POST_BUILD
