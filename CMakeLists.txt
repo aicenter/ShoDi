@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 #set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
 #  CACHE STRING "Vcpkg toolchain file")
 
-project(shortest_distances VERSION 0.0.0)
+project(shortest_distances VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,31 +12,30 @@ include(FetchContent) # for dependencies that should be downloaded and built fro
 include(GenerateExportHeader) # for the GENERATE_EXPORT_HEADER macro
 include(GoogleTest) # for the gtest_discover_tests macro
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+#set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+
 option(BUILD_DOC "Build documentation" ON)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wconversion -pedantic")
-endif()
+endif ()
 
 
 # DEPENDENCIES
-include_directories(src/)
 find_package(indicators CONFIG REQUIRED)
 
 ## Java
-find_package(JNI REQUIRED)
-include_directories(${JNI_INCLUDE_DIRS})
+find_package(JNI)
 
 ## Boost
 find_package(Boost REQUIRED)
 
 # Check boost header-only components
-if(NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
+if (NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
     message(FATAL_ERROR "Boost graph component not found. Search path: ${Boost_INCLUDE_DIRS}/boost/graph")
-endif()
+endif ()
 
 ## CSV
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
@@ -83,7 +82,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 
-# Targets
+# TARGETS
+
 add_library(shortestPaths SHARED
         src/constants.h
         src/API/CHDistanceQueryManagerAPI.cpp
@@ -215,32 +215,72 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/Distance_matrix_reader.cpp src/DistanceMatrix/Distance_matrix_reader.h)
 target_link_libraries(shortestPaths PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
-GENERATE_EXPORT_HEADER(shortestPaths
-        BASE_NAME shortestPaths
-        EXPORT_MACRO_NAME shortestPaths_EXPORTS
-        EXPORT_FILE_NAME shortestPaths_EXPORTS.h
-        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
+#GENERATE_EXPORT_HEADER(shortestPaths
+#        BASE_NAME shortestPaths
+#        EXPORT_MACRO_NAME shortestPaths_EXPORTS
+#        EXPORT_FILE_NAME shortestPaths_EXPORTS.h
+#        STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC)
 
 add_executable(shortestPathsPreprocessor
-        src/Benchmarking/TNRBenchmark.cpp
-        src/Benchmarking/TNRBenchmark.h
-        src/Benchmarking/CHBenchmark.h
-        src/Benchmarking/CHBenchmark.cpp
-        src/Benchmarking/DijkstraBenchmark.h
-        src/Benchmarking/DijkstraBenchmark.cpp
-        src/Benchmarking/CorrectnessValidator.h
-        src/Benchmarking/CorrectnessValidator.cpp
-        src/Benchmarking/DistanceCorrectnessValidator.h
-        src/Benchmarking/DistanceCorrectnessValidator.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.h
-        src/Benchmarking/PathCorrectnessValidator.cpp
-        src/Benchmarking/PathCorrectnessValidator.h
-        src/Benchmarking/TNRAFBenchmark.cpp
-        src/Benchmarking/TNRAFBenchmark.h
-        src/main.cpp)
-target_link_libraries(shortestPathsPreprocessor PUBLIC shortestPaths)
-target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+    src/main.cpp
+    src/Benchmarking/CHBenchmark.cpp
+    src/Benchmarking/CorrectnessValidator.cpp
+    src/Benchmarking/DijkstraBenchmark.cpp
+    src/Benchmarking/TNRAFBenchmark.cpp
+    src/Benchmarking/TNRBenchmark.cpp
+    src/CH/CHDistanceQueryManager.cpp
+    src/CH/CHDistanceQueryManagerWithMapping.cpp
+    src/CH/CHPreprocessor.cpp
+    src/CH/EdgeDifferenceManager.cpp
+    src/CH/Structures/CHNode.cpp
+    src/CH/Structures/CHpriorityQueue.cpp
+    src/CH/Structures/HopsDijkstraNode.cpp
+    src/CH/Structures/NodeData.cpp
+    src/CLI/ProgressBar.cpp
+    src/Dijkstra/BasicDijkstra.cpp
+    src/Dijkstra/DijkstraNode.cpp
+    src/DistanceMatrix/DistanceMatrixComputorFast.cpp
+    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+    src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
+    src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
+    src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
+    src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+    src/DistanceMatrix/johnson.cpp
+    src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+    src/GraphBuilding/Loaders/DDSGLoader.cpp
+    src/GraphBuilding/Loaders/DIMACSLoader.cpp
+    src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
+    src/GraphBuilding/Loaders/TGAFLoader.cpp
+    src/GraphBuilding/Loaders/TNRGLoader.cpp
+    src/GraphBuilding/Loaders/TripsLoader.cpp
+    src/GraphBuilding/Loaders/XenGraphLoader.cpp
+    src/GraphBuilding/Structures/AdjMatrixGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+    src/GraphBuilding/Structures/Graph.cpp
+    src/GraphBuilding/Structures/OutputEdge.cpp
+    src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+    src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+    src/GraphBuilding/Structures/QueryEdge.cpp
+    src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+    src/GraphBuilding/Structures/ShortcutEdge.cpp
+    src/GraphBuilding/Structures/SimpleGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
+    src/GraphBuilding/Structures/UpdateableGraph.cpp
+    src/TNR/TNRDistanceQueryManager.cpp
+    src/TNR/TNRDistanceQueryManagerWithMapping.cpp
+    src/TNR/TNRPreprocessor.cpp
+    src/TNR/Structures/AccessNodeData.cpp
+    src/TNRAF/TNRAFDistanceQueryManager.cpp
+    src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
+    src/TNRAF/TNRAFPreprocessor.cpp
+    src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+    src/TNRAF/Structures/NodeDataRegions.cpp
+    src/TNRAF/Structures/RegionsStructure.cpp
+    src/Timer/Timer.cpp
+)
 
 add_executable(thesisBenchmark
         src/Benchmarking/TNRBenchmark.cpp
@@ -260,8 +300,6 @@ add_executable(thesisBenchmark
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/thesisTestScenarios.cpp)
-target_link_libraries(thesisBenchmark shortestPaths)
-
 
 add_executable(benchmark
         src/Benchmarking/TNRBenchmark.cpp
@@ -281,11 +319,6 @@ add_executable(benchmark
         src/Benchmarking/TNRAFBenchmark.cpp
         src/Benchmarking/TNRAFBenchmark.h
         src/tests.cpp)
-target_link_libraries(benchmark shortestPaths)
-
-
-# Testing
-enable_testing()
 
 add_executable(test_runner
         src/CH/CHDistanceQueryManager.cpp
@@ -332,39 +365,94 @@ add_executable(test_runner
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/TNRAFPreprocessor.cpp
 
-
         test/ch_tests.cpp
         test/common.cpp
         test/dm_test.cpp
         test/tnr_tests.cpp
         test/tnraf_tests.cpp)
 
-target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+add_executable(func_test_runner
+    functest/ch_test.cpp
+    functest/common.cpp
+    functest/dm_test.cpp
+    functest/dm_test_hdf.cpp
+    functest/expected_graphs.cpp
+    functest/tnr_test.cpp
+    functest/tnraf_test.cpp
+    src/CH/CHDistanceQueryManager.cpp
+    src/CH/Structures/NodeData.cpp
+    src/Dijkstra/BasicDijkstra.cpp
+    src/Dijkstra/DijkstraNode.cpp
+    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+    src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
+    src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+    src/GraphBuilding/Loaders/DDSGLoader.cpp
+    src/GraphBuilding/Loaders/TGAFLoader.cpp
+    src/GraphBuilding/Loaders/TNRGLoader.cpp
+    src/GraphBuilding/Loaders/XenGraphLoader.cpp
+    src/GraphBuilding/Structures/FlagsGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+    src/GraphBuilding/Structures/Graph.cpp
+    src/GraphBuilding/Structures/OutputEdge.cpp
+    src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+    src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+    src/GraphBuilding/Structures/QueryEdge.cpp
+    src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+    src/GraphBuilding/Structures/SimpleGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
+    src/GraphBuilding/Structures/UpdateableGraph.cpp
+    src/TNR/TNRPreprocessor.cpp
+    src/TNR/Structures/AccessNodeData.cpp
+    src/TNRAF/TNRAFPreprocessor.cpp
+    src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+    src/TNRAF/Structures/NodeDataRegions.cpp
+    src/TNRAF/Structures/RegionsStructure.cpp
+    src/Timer/Timer.cpp
+)
+# functional tests depends on the main binary
+add_dependencies(func_test_runner shortestPathsPreprocessor)
 
+
+# HEADER INCLUDE
+
+# to enable includes relative to project root
+target_include_directories(shortestPathsPreprocessor PRIVATE src)
+target_include_directories(func_test_runner PRIVATE src)
+
+target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
+target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
+
+# include JNI dirs if found
+if (JNI_FOUND)
+    target_include_directories(shortestPaths PRIVATE ${JNI_INCLUDE_DIRS})
+endif ()
+
+
+# LINKING
+
+# old linking against lib: should be removed
+target_link_libraries(thesisBenchmark shortestPaths)
+target_link_libraries(benchmark shortestPaths)
+
+target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+
+
+# RESOURCES
 add_custom_command(
         TARGET test_runner POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/test $<TARGET_FILE_DIR:func_test_runner>/test)
-
-add_executable(func_test_runner
-        functest/common.cpp
-        functest/expected_graphs.cpp
-        functest/dm_test.cpp
-        functest/dm_test_hdf.cpp
-        functest/ch_test.cpp
-        functest/tnr_test.cpp
-        functest/tnraf_test.cpp)
-
-target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
-add_dependencies(func_test_runner shortestPathsPreprocessor)
-target_link_libraries(func_test_runner PUBLIC shortestPaths)
-target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
-
 add_custom_command(
         TARGET func_test_runner POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/functest $<TARGET_FILE_DIR:func_test_runner>/functest)
 
-target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
-target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
-target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 
+# TESTING
+enable_testing()
 gtest_discover_tests(test_runner)
