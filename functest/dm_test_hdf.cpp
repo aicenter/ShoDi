@@ -9,13 +9,7 @@
 
 void check_hdf(const std::string& computed, const std::string& expected) {
     H5::H5File* file;
-    try {
-        file = new H5::H5File(computed, H5F_ACC_RDONLY);
-    }
-    catch (const H5::FileIException& e) {
-        printf("Couldn't open file '%s'!", computed.c_str());
-        return;
-    }
+    file = new H5::H5File(computed, H5F_ACC_RDONLY);
 
     auto dataset = file->openDataSet("dm");
     auto dataspace = dataset.getSpace();
@@ -23,12 +17,6 @@ void check_hdf(const std::string& computed, const std::string& expected) {
     hsize_t dims[2];
     dataspace.getSimpleExtentDims(dims);
 
-    /*auto x = dataset.getDataType();
-    if (x == H5::PredType::STD_U64LE) {
-        std::cout << "u64le" << std::endl;
-    } else {
-        std::cout << "not u64le" << std::endl;
-    }*/
     size_t size = dims[0] * dims[1];
     dist_t* values_computed = new dist_t[size];
     auto values_expected = std::vector<std::string>();
@@ -56,7 +44,6 @@ void check_hdf(const std::string& computed, const std::string& expected) {
     EXPECT_EQ(size, values_expected.size());
 
     for (size_t j = 0; j < size; j++) {
-        // std::cout << values_computed[j] << " vs " << values_expected[j] << std::endl;
         EXPECT_EQ(std::to_string(values_computed[j]), values_expected[j]);
     }
 }
