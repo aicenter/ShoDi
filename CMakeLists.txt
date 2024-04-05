@@ -40,6 +40,9 @@ endif ()
 ## CSV
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
+## HDF5
+find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
+
 ## OpenMP
 find_package(OpenMP REQUIRED)
 if (OpenMP_CXX_FOUND)
@@ -205,9 +208,12 @@ add_library(shortestPaths SHARED
         src/DistanceMatrix/DistanceMatrixCsvOutputter.h
         src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
+        src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
+        src/DistanceMatrix/DistanceMatrixHdfOutputter.h
         src/CLI/ProgressBar.cpp
         src/CLI/ProgressBar.hpp
         src/DistanceMatrix/Distance_matrix_reader.cpp src/DistanceMatrix/Distance_matrix_reader.h)
+target_link_libraries(shortestPaths PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 #GENERATE_EXPORT_HEADER(shortestPaths
 #        BASE_NAME shortestPaths
@@ -236,6 +242,7 @@ add_executable(shortestPathsPreprocessor
     src/DistanceMatrix/DistanceMatrixComputorFast.cpp
     src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
     src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
+    src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
     src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
     src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
     src/DistanceMatrix/johnson.cpp
@@ -368,6 +375,7 @@ add_executable(func_test_runner
     functest/ch_test.cpp
     functest/common.cpp
     functest/dm_test.cpp
+    functest/dm_test_hdf.cpp
     functest/expected_graphs.cpp
     functest/tnr_test.cpp
     functest/tnraf_test.cpp
@@ -376,6 +384,7 @@ add_executable(func_test_runner
     src/Dijkstra/BasicDijkstra.cpp
     src/Dijkstra/DijkstraNode.cpp
     src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+    src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
     src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/TGAFLoader.cpp
@@ -405,6 +414,7 @@ add_executable(func_test_runner
 # functional tests depends on the main binary
 add_dependencies(func_test_runner shortestPathsPreprocessor)
 
+
 # HEADER INCLUDE
 
 # to enable includes relative to project root
@@ -421,6 +431,7 @@ if (JNI_FOUND)
     target_include_directories(shortestPaths PRIVATE ${JNI_INCLUDE_DIRS})
 endif ()
 
+
 # LINKING
 
 # old linking against lib: should be removed
@@ -429,6 +440,8 @@ target_link_libraries(benchmark shortestPaths)
 
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 
 # RESOURCES
