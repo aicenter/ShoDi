@@ -43,7 +43,6 @@ find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
 ## HDF5
 find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
-# include_directories(${HDF5_INCLUDE_DIRS})
 
 ## OpenMP
 find_package(OpenMP REQUIRED)

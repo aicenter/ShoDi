@@ -7,8 +7,6 @@
 
 #include <fstream>
 #include "DistanceMatrixHdfOutputter.h"
-#include "constants.h"
-#include "CLI/ProgressBar.hpp"
 #include <H5Cpp.h>
 
 void DistanceMatrixHdfOutputter::store(Distance_matrix_travel_time_provider& dm, const std::string& path) {
