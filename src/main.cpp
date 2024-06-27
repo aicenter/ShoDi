@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <cstring>
 #include <memory>
+#include <filesystem>
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/optional/optional_io.hpp>
@@ -826,11 +827,11 @@ int main(int argc, char *argv[]) {
             }
 
             if (!inputFormat) {
-                std::string extension = (*inputFile).substr((*inputFile).find_last_of('.')+1);
+                auto extension = std::filesystem::path(*inputFile).extension();
 
-                if (extension == "xeng") inputFormat.emplace("xengraph");
-                else if (extension == "gr") inputFormat.emplace("dimacs");
-                else if (extension == "csv") inputFormat.emplace("csv");
+                if (extension == ".xeng") inputFormat.emplace("xengraph");
+                else if (extension == ".gr") inputFormat.emplace("dimacs");
+                else if (extension == ".csv") inputFormat.emplace("csv");
                 else throw input_error("Unable to detect input file format. Please specify with '-f <format>'.");
             }
 
