@@ -12,7 +12,8 @@
 #include <cstring>
 #include <memory>
 #include <iostream>
-#include <boost/numeric/conversion/cast.hpp>
+#include <boost/program_options.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <string>
 #include <tuple>
 #include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
@@ -59,8 +60,9 @@ void printUsageInfo(
            "Please, see 'README.md' for a complete overview of use cases for this application.\n"
            "\n"
            "Some common examples of usage:\n"
-           "  '%s create tnraf xengraph dm 1000 input_graph.xeng output_file'\n"
-           "  '%s create ch xengraph input_graph.xeng output_file'\n", appName, appName);
+           "  '%s create -m tnraf -f xengraph -i input_graph.xeng -o output_file --preprocessing-mode dm --tnodes-cnt 1000'\n"
+           "  '%s create -m ch -f xengraph -i input_graph.xeng -o output_file'\n"
+           "  '%s benchmark -m tnraf --input-structure output_file.tgaf --query-set queries.txt'\n", appName, appName, appName);
 }
 
 constexpr auto INVALID_USAGE_INFO = "It seems that the given arguments do not match any use case for this application.\n"
@@ -79,7 +81,7 @@ constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the r
  */
 void createCH(
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
 
@@ -105,9 +107,9 @@ void createCH(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
 void createTNRFast(
-        char *transitNodeSetSize,
+        unsigned int transitNodeSetSize,
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (fast mode)");
 
@@ -121,7 +123,7 @@ void createTNRFast(
     graphLoader.loadGraph(graph, precisionLoss);
 
     timer.begin();
-    TNRPreprocessor::preprocessUsingCH(graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+    TNRPreprocessor::preprocessUsingCH(graph, outputFilePath, transitNodeSetSize);
     timer.finish();
 
     timer.printMeasuredTime();
@@ -136,9 +138,9 @@ void createTNRFast(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
 void createTNRSlow(
-        char *transitNodeSetSize,
+        unsigned int transitNodeSetSize,
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (slow mode)");
 
@@ -154,8 +156,7 @@ void createTNRSlow(
 
     timer.begin();
     TNRPreprocessor::preprocessUsingCHslower(
-        graph, *originalGraph, outputFilePath,
-        boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+        graph, *originalGraph, outputFilePath, transitNodeSetSize);
     timer.finish();
 
     delete originalGraph;
@@ -172,9 +173,9 @@ void createTNRSlow(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed TNR data structure.
  */
 void createTNRUsingDM(
-        char *transitNodeSetSize,
+        unsigned int transitNodeSetSize,
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (using distance matrix)");
 
@@ -190,8 +191,7 @@ void createTNRUsingDM(
 
     timer.begin();
     TNRPreprocessor::preprocessWithDMvalidation(
-        graph, *originalGraph, outputFilePath,
-        boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
+        graph, *originalGraph, outputFilePath, transitNodeSetSize);
     timer.finish();
 
     delete originalGraph;
@@ -210,16 +210,16 @@ void createTNRUsingDM(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
 void createTNR(
-        char *preprocessingMode,
-        char *transitNodeSetSize,
+        std::string preprocessingMode,
+        unsigned int transitNodeSetSize,
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
-    if (strcmp(preprocessingMode, "fast") == 0) {
+    if (preprocessingMode == "fast") {
         createTNRFast(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
-    } else if (strcmp(preprocessingMode, "slow") == 0) {
+    } else if (preprocessingMode == "slow") {
         createTNRSlow(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
-    } else if (strcmp(preprocessingMode, "dm") == 0) {
+    } else if (preprocessingMode == "dm") {
         createTNRUsingDM(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
@@ -238,16 +238,16 @@ void createTNR(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
 void createTNRAF(
-        char *preprocessingMode,
-        char *transitNodeSetSize,
+        const std::string preprocessingMode,
+        unsigned int transitNodeSetSize,
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
 	bool dm_mode;
-    if (strcmp(preprocessingMode, "slow") == 0) {
+    if (preprocessingMode == "slow") {
 //        createTNRAFSlow(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
 		dm_mode = false;
-    } else if (strcmp(preprocessingMode, "dm") == 0) {
+    } else if (preprocessingMode == "dm") {
 //        createTNRAFUsingDM(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
 		dm_mode = true;
     } else {
@@ -271,8 +271,7 @@ void createTNRAF(
 
 	timer.begin();
 	TNRAFPreprocessor::preprocessUsingCH(
-		graph, *originalGraph, outputFilePath,
-		boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)),
+		graph, *originalGraph, outputFilePath, transitNodeSetSize,
 		    num_regions, dm_mode);
 	timer.finish();
 
@@ -296,33 +295,33 @@ Distance_matrix_travel_time_provider* computeDistanceMatrix(GraphLoader &graphLo
 }
 
 void createDM(
-        char *outputType,
-        char *preprocessingMode,
+        std::string outputFormat,
+        std::string preprocessingMode,
         GraphLoader &graphLoader,
-        char *outputFilePath,
+        const std::string &outputFilePath,
         unsigned int precisionLoss) {
     std::function<Distance_matrix_travel_time_provider* (GraphLoader &, unsigned int, std::string)> computor;
 
     std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
     std::unique_ptr<Distance_matrix_travel_time_provider> dm{nullptr};
 
-    if (strcmp(preprocessingMode, "slow") == 0) {
+    if (preprocessingMode == "slow") {
         computor = computeDistanceMatrix<DistanceMatrixComputorSlow>;
-    } else if (strcmp(preprocessingMode, "fast") == 0) {
+    } else if (preprocessingMode == "fast") {
         computor = computeDistanceMatrix<DistanceMatrixComputorFast>;
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    if (strcmp(outputType, "xdm") == 0) {
+    if (outputFormat == "xdm") {
         outputter = std::unique_ptr<DistanceMatrixXdmOutputter> { new DistanceMatrixXdmOutputter()};
-    } else if (strcmp(outputType, "csv") == 0) {
+    } else if (outputFormat == "csv") {
         outputter = std::unique_ptr<DistanceMatrixCsvOutputter> { new DistanceMatrixCsvOutputter()};
-    } else if (strcmp(outputType, "hdf") == 0) {
+    } else if (outputFormat == "hdf") {
         outputter = std::unique_ptr<DistanceMatrixHdfOutputter>{ new DistanceMatrixHdfOutputter() };
     } else {
-        throw input_error(std::string("Unknown output type '") + outputType +
+        throw input_error(std::string("Unknown output type '") + outputFormat +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
@@ -346,8 +345,8 @@ void createDM(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkDijkstra(
-        char *inputFilePath,
-        char *queriesFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -397,9 +396,9 @@ void benchmarkDijkstra(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkDijkstraWithMapping(
-        char *inputFilePath,
-        char *queriesFilePath,
-        char *mappingFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
+        const std::string &mappingFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -449,8 +448,8 @@ void benchmarkDijkstraWithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkCH(
-        char *inputFilePath,
-        char *queriesFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -500,9 +499,9 @@ void benchmarkCH(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkCHwithMapping(
-        char *inputFilePath,
-        char *queriesFilePath,
-        char *mappingFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
+        const std::string &mappingFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -551,8 +550,8 @@ void benchmarkCHwithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNR(
-        char *inputFilePath,
-        char *queriesFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -602,9 +601,9 @@ void benchmarkTNR(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRwithMapping(
-        char *inputFilePath,
-        char *queriesFilePath,
-        char *mappingFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
+        const std::string &mappingFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -653,8 +652,8 @@ void benchmarkTNRwithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRAF(
-        char *inputFilePath,
-        char *queriesFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -705,9 +704,9 @@ void benchmarkTNRAF(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRAFwithMapping(
-        char *inputFilePath,
-        char *queriesFilePath,
-        char *mappingFilePath,
+        const std::string &inputFilePath,
+        const std::string &queriesFilePath,
+        const std::string &mappingFilePath,
         char *distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
@@ -743,15 +742,15 @@ void benchmarkTNRAFwithMapping(
 /**
  * TODO
  */
-GraphLoader *newGraphLoader(char *inputType, char *inputFilePath) {
-    if (strcmp(inputType, "xengraph") == 0) {
+GraphLoader *newGraphLoader(const std::string &inputFormat, const std::string &inputFilePath) {
+    if (inputFormat == "xengraph") {
         return new XenGraphLoader(inputFilePath);
-    } else if (strcmp(inputType, "dimacs") == 0) {
+    } else if (inputFormat == "dimacs") {
         return new DIMACSLoader(inputFilePath);
-    } else if (strcmp(inputType, "csv") == 0) {
+    } else if (inputFormat == "csv") {
         return new CsvGraphLoader(inputFilePath);
     } else {
-        throw input_error(std::string("Unknown input format '") + inputType + "'.\n" + INVALID_FORMAT_INFO);
+        throw input_error(std::string("Unknown input format '") + inputFormat + "'.\n" + INVALID_FORMAT_INFO);
     }
 }
 
@@ -780,117 +779,132 @@ GraphLoader *newGraphLoader(char *inputType, char *inputFilePath) {
 int main(int argc, char *argv[]) {
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    if (argc < 5 || argc > 9) {
+    boost::optional<std::string> command, method, inputFormat, inputFile, outputFormat, outputFile, preprocessingMode,
+    inputStructure, querySet, mappingFile;
+    boost::optional<unsigned int> tnodesCnt, precisionLoss;
+
+    // Declare the supported options.
+    boost::program_options::options_description allOptions("Allowed options");
+    allOptions.add_options()
+            ("help", "produce help message")
+            ("command", boost::program_options::value(&command))
+            ("method,m", boost::program_options::value(&method))
+            ("input-format,f", boost::program_options::value(&inputFormat))
+            ("input-file,i", boost::program_options::value(&inputFile))
+            ("output-format", boost::program_options::value(&outputFormat))
+            ("output-file,o", boost::program_options::value(&outputFile))
+            ("preprocessing-mode", boost::program_options::value(&preprocessingMode))
+            ("tnodes-cnt", boost::program_options::value(&tnodesCnt))
+            ("precision-loss", boost::program_options::value(&precisionLoss)->default_value(1))
+            ("input-structure", boost::program_options::value(&inputStructure))
+            ("query-set", boost::program_options::value(&querySet))
+            ("mapping-file", boost::program_options::value(&mappingFile));
+
+    boost::program_options::positional_options_description p;
+    p.add("command", 1);
+
+    boost::program_options::variables_map vm;
+    boost::program_options::store(
+            boost::program_options::command_line_parser(argc, argv).options(allOptions).positional(p).run(), vm);
+    boost::program_options::notify(vm);
+
+    if (!command) {
         printUsageInfo(argv[0]);
         return 0;
     }
 
     try {
-        // The user wants to create data structures using some method.
-        if (strcmp(argv[1], "create") == 0) {
-            const auto preprocessings = {
-                make_tuple(std::string("ch"), std::string("Contraction Hierarchies"), 6,
-                    std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
-                        createCH(graphLoader, argv[5], precisionLoss);
-                        })),
-                make_tuple(std::string("tnr"), std::string("Transit Node Routing"), 8,
-                    std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
-                        createTNR(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
-                        })),
-                make_tuple(std::string("tnraf"), std::string("Transit Node Routing with Arc Flags"), 8,
-                    std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
-                        createTNRAF(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
-                        })),
-                make_tuple(std::string("dm"), std::string("Distance Matrix"), 8,
-                    std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader& graphLoader, unsigned int precisionLoss) {
-                        createDM(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
-                        }))
+        if (*command == "create") {
+            if (vm.count("help")) {
+                printf("To create a data structure, please provide required commands for the Create command:\n"
+                       "-m <method>\n-f <input_format>\n-i <input_file>\n-o <output_file>\n");
+                return 0;
+            }
+
+            if (!method || !inputFile) {
+                throw input_error("Missing one or more required options (-m <method> / -i <input_file>) for the Create command.\n");
+            }
+
+            if (!inputFormat) {
+                std::string extension = (*inputFile).substr((*inputFile).find_last_of('.')+1);
+
+                if (extension == "xeng") inputFormat.emplace("xengraph");
+                else if (extension == "gr") inputFormat.emplace("dimacs");
+                else if (extension == "csv") inputFormat.emplace("csv");
+                else throw input_error("Unable to detect input file format. Please specify with '-f <format>'.");
+            }
+
+            if (!outputFile) {
+                outputFile.emplace("out");
+            }
+
+            GraphLoader *graphLoader = newGraphLoader(*inputFormat, *inputFile);
+
+            if (*method == "ch") {
+                createCH(*graphLoader, *outputFile, *precisionLoss);
+            } else if (*method == "tnr") {
+                if (!preprocessingMode || !tnodesCnt) {
+                    throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow/dm> / --tnodes-cnt <cnt>) for TNR creation.\n");
+                }
+                createTNR(*preprocessingMode, *tnodesCnt, *graphLoader, *outputFile, *precisionLoss);
+            } else if (*method == "tnraf") {
+                if (!preprocessingMode || !tnodesCnt) {
+                    throw input_error("Missing one or more required options (--preprocessing-mode <slow/dm> / --tnodes-cnt <cnt>) for TNRAF creation.\n");
+                }
+                createTNRAF(*preprocessingMode, *tnodesCnt, *graphLoader, *outputFile, *precisionLoss);
+            } else if (*method == "dm") {
+                if (!preprocessingMode || !outputFormat) {
+                    throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");
+                }
+                createDM(*outputFormat, *preprocessingMode, *graphLoader, *outputFile, *precisionLoss);
+            } else {
+                throw input_error("Invalid method name '" + *method + "'.\n");
+            }
+            delete graphLoader;
+
+        } else if (*command == "benchmark") {
+            if (vm.count("help")) {
+                printf("To run benchmarking, please provide required commands for the Benchmark command:\n"
+                       "-m <method>\n--input-structure\n--query-set\n");
+                return 0;
+            }
+
+            if (!method || !inputStructure || !querySet) {
+                throw input_error("Missing one or more required options (-m <method> / --input-structure <path to structure file> / --query-set <path to query set file>) for the Benchmark command.\n");
+            }
+
+            std::unordered_map<std::string, std::function<void(std::string, std::string, std::string, char*, bool)>> benchmarkMapFunctions = {
+                    {"dijkstra", benchmarkDijkstraWithMapping},
+                    {"ch", benchmarkCHwithMapping},
+                    {"tnr", benchmarkTNRwithMapping},
+                    {"tnraf", benchmarkTNRAFwithMapping},
             };
 
-            bool found = false;
-            for(auto &preprocessing : preprocessings) {
-                auto &name = get<0>(preprocessing);
-                if (name.compare(argv[2]) == 0) {
-                    auto expectedArgc = get<2>(preprocessing);
-
-                    if (argc != expectedArgc && argc != expectedArgc + 1) {
-                        throw input_error(std::string("Invalid amount of arguments for ")
-                                + get<1>(preprocessing)
-                                + " preprocessing.\n"
-                                + INVALID_FORMAT_INFO);
-                    }
-
-                    unsigned int precisionLoss;
-                    if (argc == expectedArgc)
-                        precisionLoss = 1;
-                    else
-                        precisionLoss = (unsigned int) std::stoi(argv[expectedArgc]);
-
-                    GraphLoader* graphLoader = newGraphLoader(argv[3], argv[expectedArgc - 2]);
-                    auto &func = get<3>(preprocessing);
-                    func(argv, *graphLoader, precisionLoss);
-                    delete graphLoader;
-
-                    found = true;
-                    break;
-                }
-            }
-
-            if(!found) {
-                throw input_error(INVALID_USAGE_INFO);
-            }
-        }
-        else if (strcmp(argv[1], "benchmark") == 0) {
-            const auto benchmarks = {
-                    make_tuple(std::string("dijkstra"), benchmarkDijkstra, benchmarkDijkstraWithMapping),
-                    make_tuple(std::string("ch"), benchmarkCH, benchmarkCHwithMapping),
-                    make_tuple(std::string("tnr"), benchmarkTNR, benchmarkTNRwithMapping),
-                    make_tuple(std::string("tnraf"), benchmarkTNRAF, benchmarkTNRAFwithMapping),
+            std::unordered_map<std::string, std::function<void(std::string, std::string, char*, bool)>> benchmarkFunctions = {
+                    {"dijkstra", benchmarkDijkstra},
+                    {"ch", benchmarkCH},
+                    {"tnr", benchmarkTNR},
+                    {"tnraf", benchmarkTNRAF},
             };
 
-            bool found = false;
-            for (auto &benchmark : benchmarks) {
-                auto &name = get<0>(benchmark);
-
-                if (name.compare(argv[2]) == 0) {
-                    if (strcmp(argv[3], "nomapping") == 0) {
-                        auto &func = get<1>(benchmark);
-                        if (argc == 7) {
-                            func(argv[4], argv[5], argv[6], true);
-                        } else if (argc == 6) {
-                            func(argv[4], argv[5], nullptr, false);
-                        } else {
-                            throw input_error(
-                                    std::string("Invalid amount of arguments for") + name + " benchmarking.\n" +
-                                    INVALID_FORMAT_INFO);
-                        }
-                    } else if (strcmp(argv[3], "mapping") == 0) {
-                        auto &func = get<2>(benchmark);
-                        if (argc == 8) {
-                            func(argv[4], argv[5], argv[6], argv[7], true);
-                        } else if (argc == 7) {
-                            func(argv[4], argv[5], argv[6], nullptr, false);
-                        } else {
-                            throw input_error(
-                                    std::string("Invalid amount of arguments for") + name + " benchmarking.\n" +
-                                    INVALID_FORMAT_INFO);
-                        }
-                    } else {
-                        throw input_error(std::string("Option '") + argv[3] + "' does not make sense for benchmarking.\n" +
-                                          "Either 'mapping' or 'nomapping' is expected.\n" + INVALID_FORMAT_INFO);
-                    }
-
-                    found = true;
-                    break;
-                }
+            if (!benchmarkFunctions.contains(*method)) {
+                throw input_error("Invalid method '" + *method + "' for the Benchmark command.\n");
             }
 
-            if (!found) {
-                throw input_error(INVALID_USAGE_INFO);
+            if (mappingFile) {
+                auto func = benchmarkMapFunctions.at(*method);
+                if (outputFile) {
+                    func(*inputStructure, *querySet, *mappingFile, reinterpret_cast<char *>(*outputFile->c_str()), true);
+                } else {
+                    func(*inputStructure, *querySet, *mappingFile, nullptr, false);
+                }
+            } else {
+                auto func = benchmarkFunctions.at(*method);
+                if (outputFile) {
+                    func(*inputStructure, *querySet, reinterpret_cast<char *>(*outputFile->c_str()), true);
+                } else {
+                    func(*inputStructure, *querySet, nullptr, false);
+                }
             }
         } else {
             throw input_error(INVALID_USAGE_INFO);

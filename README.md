@@ -83,8 +83,8 @@ From Source
  - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
 ### Building the project
-1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion p-ranav-csv2 indicators`
-2. Create a `JAVA_HOME` system property with the abolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
+1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion boost-program-options p-ranav-csv2 indicators "hdf5[cpp]"`
+2. Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
 3. `mkdir build && cd build`
 4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
 5. `cmake --build . --target shortestPathsPreprocessor --config Release`
@@ -116,7 +116,7 @@ The arguments following the first one are specific to each of the usages.
 General usage:
 
 ```
-create <method name> <method specific arg 1>  <method specific arg 2>...
+./shortestPathsPreprocessor create -m <method name> -f <input_format> -i <input_file> -o <output_file> [method specific arguments]
 ```
 
 #### Graph Preprocessing using Contraction Hierarchies
@@ -124,7 +124,7 @@ create <method name> <method specific arg 1>  <method specific arg 2>...
 To preprocess a graph using Contraction Hierarchies, call the preprocessor with the following arguments:
 
 ```
-create ch <input_format> <input_file> <output_file> [<precision_loss>]
+create -m ch -f <input_format> -i <input_file> -o <output_file> [--precision-loss <precision_loss>]
 ```
 
 where:
@@ -139,7 +139,7 @@ Each loaded weight will be divided by this value before rounding. (default: 1)
 ##### Example Usage
 
 ```
-create ch xengraph my_graph.xeng my_graph
+./shortestPathsPreprocessor create -m ch -f xengraph -i my_graph.xeng -o my_graph
 ```
 
 #### Graph Preprocessing for Transit Node Routing
@@ -147,18 +147,18 @@ create ch xengraph my_graph.xeng my_graph
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create tnr <input_format> <preprocessing_mode> <tnodes_cnt> <input_file> <output_file> [<precision_loss>]
+create -m tnr -f <input_format> -i <input_file> -o <output_file> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `csv`
+ * `input_file` is path to the input file (including file extension)
+ * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added
+   automatically)
  * `preprocessing_mode` is one of `fast`, `slow`, `dm`
  * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the 
 	number of nodes in the graph)
- * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added 
-	automatically)
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
@@ -170,7 +170,7 @@ resulting data structure will be significantly lower.
 The modes `slow` and `dm` will produce exactly the same result, but the `dm` mode uses distance matrix to
 speed up the precomputation and therefore, it is faster than the `slow` mode, but it requires a lot of memory. 
 
-##### Transite node count
+##### Transit node count
 The fifth argument determines the size of the transit nodes set. 
 It must be an integer between 1 and the number of nodes in the graph. 
 Less transit nodes usually mean lower memory requirements, but also worse query times. 
@@ -180,7 +180,7 @@ requirements and performance.
 ##### Example Usage
 
 ```
-create tnr xengraph dm 1000 my_graph.xeng my_graph
+./shortestPathsPreprocessor create -m tnr -f xengraph -i my_graph.xeng -o my_graph --preprocessing-mode dm --tnodes-cnt 1000
 ```
 
 #### Graph Preprocessing for Transit Node Routing with Arc Flags
@@ -188,18 +188,18 @@ create tnr xengraph dm 1000 my_graph.xeng my_graph
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create tnraf <input_format> <preprocessing_mode> <tnodes_cnt> <input_file> <output_file> [<precision_loss>]
+create -m tnraf -f <input_format> -i <input_file> -o <output_file> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `csv`
+ * `input_file` is path to the input file (including file extension)
+ * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added
+   automatically)
  * `preprocessing_mode` is one of `slow`, `dm` (for more info, see [Preprocessing Mode](#preprocessing-mode))
  * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the numbr 
 	of nodes in the graph)
- * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added 
-	automatically)
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
@@ -207,7 +207,7 @@ Each loaded weight will be divided by this value before rounding. (default: 1)
 ##### Example Usage
 
 ```
-create tnraf xengraph dm 1000 my_graph.xeng my_graph
+./shortestPathsPreprocessor create -m tnraf -f xengraph -i my_graph.xeng -o my_graph --preprocessing-mode dm --tnodes-cnt 1000
 ```
 
 #### Generation of Distance Matrix
@@ -215,17 +215,17 @@ create tnraf xengraph dm 1000 my_graph.xeng my_graph
 To generate the distance matrix of a graph, call the preprocessor with the following arguments:
 
 ```
-create dm <input_format> <output_format> <preprocessing_mode> <input_file> <output_file> [<precision_loss>]
+create -m dm -f <input_format> -i <input_file> -o <output_file> --preprocessing-mode <preprocessing_mode> --output-format <output_format> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `csv`
- * `output_format` is one of `xdm`, `csv`
- * `preprocessing_mode` is one of `slow`, `fast`
  * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on 
-	`output_format` will be added automatically)
+ * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on
+   `output_format` will be added automatically)
+ * `preprocessing_mode` is one of `slow`, `fast`
+ * `output_format` is one of `xdm`, `csv`, `hdf`
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
@@ -237,7 +237,7 @@ larger memory usage.
 ##### Example Usage
 
 ```
-create dm csv csv fast my_graph.csv my_graph
+./shortestPathsPreprocessor -m dm -f csv -i my_graph.csv -o my_graph --preprocessing-mode fast --output-format csv
 ```
 
 
@@ -254,29 +254,10 @@ to answer one query in milliseconds.
 Additionally, you can specify an output file, where the computed distances will be stored. 
 Those distances can then be used for verification of the correctness of the more complex methods.
 
-#### Benchmark Without ID Mapping
-
-To benchmark without mapping, call the preprocessor with the following arguments:
+To benchmark (with or without mapping), call the preprocessor with the following arguments:
 
 ```
-benchmark <method> nomapping <input_data_structure> <query_set> [output_file]
-```
-
-where:
-
-* `method` is one of `dijkstra`, `ch`, `tnr`, `tnraf` - the method being benchmarked
-* `input_data_structure` is path to the data structure preprocessed using the preprocessor for the selected `method` 
-	(generated using the preprocessor as described in the previous section)
-* `query_set` is path to the query set (file format described in the [File Formats](#inputoutput-file-formats) 
-	section below)
-* `output_file` (optional) is path to the output file for the computed distances
-
-#### Benchmark With ID Mapping
-
-To benchmark with mapping, call the preprocessor with the following arguments:
-
-```bash
-./shortestPathsPreprocessor benchmark [method] mapping [input_data_structure] [query_set] [mapping_file] [output_file?]
+ benchmark -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [--output-file <output_file>]
 ```
 
 where:
@@ -286,7 +267,7 @@ where:
 `method`. For dijkstra, use a XenGraph file.
 `input_data_structure` argument. 
 * `query_set` is path to the query set (file format described in the File Formats section below)
-* `mapping_file` is path to the mapping file (file format described in the File Formats section below), which will be 
+* `mapping_file` (optional) is path to the mapping file (file format described in the File Formats section below), which will be 
 	used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
 * `output_file` (optional) is path to the output file for the computed distances
 
