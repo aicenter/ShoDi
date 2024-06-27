@@ -16,7 +16,7 @@ TEST(ch_test, from_xengraph1) {
 }
 
 TEST(ch_test, from_xengraph2) {
-    run_preprocessor("-m ch -f xengraph -i functest/02_xengraph.xeng -o from_xengraph2 --precision-loss 100");
+    run_preprocessor("-m ch -i functest/02_xengraph.xeng -o from_xengraph2 --precision-loss 100");
     FlagsGraph* loaded = DDSGLoader("from_xengraph2.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02_div100();
     compare_flags_graphs(*loaded, *expected);
@@ -32,7 +32,7 @@ TEST(ch_test, from_csv1) {
 }
 
 TEST(ch_test, from_csv2) {
-    run_preprocessor("-m ch -f csv -i functest/02_adj.csv -o from_csv2 --precision-loss 100");
+    run_preprocessor("-m ch -i functest/02_adj.csv -o from_csv2 --precision-loss 100");
     FlagsGraph* loaded = DDSGLoader("from_csv2.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02_div100();
     compare_flags_graphs(*loaded, *expected);
@@ -48,7 +48,7 @@ TEST(ch_test, from_dimacs1) {
 }
 
 TEST(ch_test, from_dimacs2) {
-    run_preprocessor("--method ch --input-format dimacs --input-file functest/02_dimacs.gr --output-file from_dimacs2 --precision-loss 100");
+    run_preprocessor("--method ch --input-file functest/02_dimacs.gr --output-file from_dimacs2 --precision-loss 100");
     FlagsGraph* loaded = DDSGLoader("from_dimacs2.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02_div100();
     compare_flags_graphs(*loaded, *expected);
