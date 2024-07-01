@@ -442,6 +442,7 @@ target_link_libraries(benchmark shortestPaths)
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 
