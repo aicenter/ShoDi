@@ -30,7 +30,7 @@ find_package(indicators CONFIG REQUIRED)
 find_package(JNI)
 
 ## Boost
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS program_options REQUIRED)
 
 # Check boost header-only components
 if (NOT EXISTS ${Boost_INCLUDE_DIRS}/boost/graph)
@@ -422,6 +422,7 @@ target_include_directories(shortestPathsPreprocessor PRIVATE src)
 target_include_directories(func_test_runner PRIVATE src)
 
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
+target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
@@ -440,7 +441,8 @@ target_link_libraries(benchmark shortestPaths)
 
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
-target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
 
