@@ -81,8 +81,8 @@ constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the r
  * @param outputFilePath[in] Contains the desired output file path for the precomputed CH data structure.
  */
 void createCH(
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
 
@@ -109,8 +109,8 @@ void createCH(
  */
 void createTNRFast(
         unsigned int transitNodeSetSize,
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (fast mode)");
 
@@ -140,14 +140,14 @@ void createTNRFast(
  */
 void createTNRSlow(
         unsigned int transitNodeSetSize,
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (slow mode)");
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
-    Graph *originalGraph = graph.createCopy();
+    Graph* originalGraph = graph.createCopy();
 
     timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
@@ -175,14 +175,14 @@ void createTNRSlow(
  */
 void createTNRUsingDM(
         unsigned int transitNodeSetSize,
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
     Timer timer("Transit Node Routing preprocessing (using distance matrix)");
 
     UpdateableGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, precisionLoss);
-    Graph *originalGraph = graph.createCopy();
+    Graph* originalGraph = graph.createCopy();
 
     timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
@@ -213,8 +213,8 @@ void createTNRUsingDM(
 void createTNR(
         std::string preprocessingMode,
         unsigned int transitNodeSetSize,
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
     if (preprocessingMode == "fast") {
         createTNRFast(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
@@ -239,10 +239,10 @@ void createTNR(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
 void createTNRAF(
-        const std::string preprocessingMode,
+        const std::string& preprocessingMode,
         unsigned int transitNodeSetSize,
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
 	bool dm_mode;
     if (preprocessingMode == "slow") {
@@ -260,7 +260,7 @@ void createTNRAF(
 
 	UpdateableGraph graph(graphLoader.nodes());
 	graphLoader.loadGraph(graph, precisionLoss);
-	Graph *originalGraph = graph.createCopy();
+	Graph* originalGraph = graph.createCopy();
 
 	timer.begin();
 	CHPreprocessor::preprocessForDDSG(graph);
@@ -296,12 +296,12 @@ Distance_matrix_travel_time_provider* computeDistanceMatrix(GraphLoader &graphLo
 }
 
 void createDM(
-        std::string outputFormat,
-        std::string preprocessingMode,
-        GraphLoader &graphLoader,
-        const std::string &outputFilePath,
+        const std::string& outputFormat,
+        const std::string& preprocessingMode,
+        GraphLoader& graphLoader,
+        const std::string& outputFilePath,
         unsigned int precisionLoss) {
-    std::function<Distance_matrix_travel_time_provider* (GraphLoader &, unsigned int, std::string)> computor;
+    std::function<Distance_matrix_travel_time_provider* (GraphLoader&, unsigned int, std::string)> computor;
 
     std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
     std::unique_ptr<Distance_matrix_travel_time_provider> dm{nullptr};
@@ -346,9 +346,9 @@ void createDM(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkDijkstra(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
@@ -397,10 +397,10 @@ void benchmarkDijkstra(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkDijkstraWithMapping(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        const std::string &mappingFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
@@ -449,16 +449,16 @@ void benchmarkDijkstraWithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkCH(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader(inputFilePath);
-    FlagsGraph *ch = chLoader.loadFlagsGraph();
+    FlagsGraph* ch = chLoader.loadFlagsGraph();
 
     std::vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::benchmark(trips, *ch, chDistances);
@@ -500,17 +500,17 @@ void benchmarkCH(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkCHwithMapping(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        const std::string &mappingFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader(inputFilePath);
-    FlagsGraph *ch = chLoader.loadFlagsGraph();
+    FlagsGraph* ch = chLoader.loadFlagsGraph();
 
     std::vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::benchmarkUsingMapping(trips, *ch, chDistances, mappingFilePath);
@@ -551,16 +551,16 @@ void benchmarkCHwithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNR(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     TNRGLoader tnrLoader = TNRGLoader(inputFilePath);
-    TransitNodeRoutingGraph *tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     std::vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::benchmark(trips, *tnrGraph, tnrDistances);
@@ -602,17 +602,17 @@ void benchmarkTNR(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRwithMapping(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        const std::string &mappingFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     TNRGLoader tnrLoader = TNRGLoader(inputFilePath);
-    TransitNodeRoutingGraph *tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     std::vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::benchmarkWithMapping(trips, *tnrGraph, tnrDistances, mappingFilePath);
@@ -653,16 +653,16 @@ void benchmarkTNRwithMapping(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRAF(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
     TGAFLoader tnrafLoader = TGAFLoader(inputFilePath);
-    TransitNodeRoutingArcFlagsGraph *tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+    TransitNodeRoutingArcFlagsGraph* tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     std::vector<unsigned int> tnrafDistances(trips.size());
     double tnrafTime = TNRAFBenchmark::benchmark(trips, *tnrafGraph, tnrafDistances);
@@ -705,17 +705,17 @@ void benchmarkTNRAF(
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
  */
 void benchmarkTNRAFwithMapping(
-        const std::string &inputFilePath,
-        const std::string &queriesFilePath,
-        const std::string &mappingFilePath,
-        char *distancesOutputPath = nullptr,
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        char* distancesOutputPath = nullptr,
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
     tripsLoader.loadLongLongTrips(trips);
 
     TGAFLoader tnrafLoader = TGAFLoader(inputFilePath);
-    TransitNodeRoutingArcFlagsGraph *tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+    TransitNodeRoutingArcFlagsGraph* tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     std::vector<unsigned int> tnrafDistances(trips.size());
     double tnrafTime = TNRAFBenchmark::benchmarkWithMapping(trips, *tnrafGraph, tnrafDistances, mappingFilePath);
@@ -743,7 +743,7 @@ void benchmarkTNRAFwithMapping(
 /**
  * TODO
  */
-GraphLoader *newGraphLoader(const std::string &inputFormat, const std::string &inputFilePath) {
+GraphLoader *newGraphLoader(const std::string& inputFormat, const std::string& inputFilePath) {
     if (inputFormat == "xengraph") {
         return new XenGraphLoader(inputFilePath);
     } else if (inputFormat == "dimacs") {
@@ -777,7 +777,7 @@ GraphLoader *newGraphLoader(const std::string &inputFormat, const std::string &i
  *
  * <br> _Author: Michal Cvach_
  */
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     setvbuf(stdout, NULL, _IONBF, 0);
 
     boost::optional<std::string> command, method, inputFormat, inputFile, outputFormat, outputFile, preprocessingMode,
@@ -839,7 +839,7 @@ int main(int argc, char *argv[]) {
                 outputFile.emplace("out");
             }
 
-            GraphLoader *graphLoader = newGraphLoader(*inputFormat, *inputFile);
+            GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputFile);
 
             if (*method == "ch") {
                 createCH(*graphLoader, *outputFile, *precisionLoss);
@@ -911,15 +911,15 @@ int main(int argc, char *argv[]) {
             throw input_error(INVALID_USAGE_INFO);
         }
     }
-    catch (input_error &e) {
+    catch (input_error& e) {
         std::cout << "Input Error: " << e.what();
         return 1;
     }
-    catch (not_implemented_error &e) {
+    catch (not_implemented_error& e) {
         std::cout << "Not Implemented Error: " << e.what();
         return 1;
     }
-    catch (const std::exception &e) {
+    catch (const std::exception& e) {
         std::cout << "Error: " << e.what();
         return 1;
     }
