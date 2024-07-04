@@ -18,7 +18,7 @@ public:
 
     Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
 
-    Graph loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) override;
+    Graph loadGraph(GraphLoader &graphLoader, int scaling_factor) override;
 
     /**
      * this function will compute the full distance matrix for the given graph.

@@ -36,10 +36,10 @@ private:
      * @param input[in] The input stream corresponding to the input file.
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
-     * @param[in] precisionLoss This parameter allows us to lose some precision
+     * @param[in] scaling_factor This parameter allows us to lose some precision
      * of the weight values. Each loaded weight will be divided by this value before rounding.
      */
-    void parseEdges(BaseGraph & graph, unsigned int precisionLoss);
+    void parseEdges(BaseGraph & graph, int scaling_factor);
 
     void parseAmounts();
 
@@ -60,7 +60,7 @@ public:
      */
     void loadNodesMapping(std::unordered_map<long long unsigned int, unsigned int> & mapping);
 
-    void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
+    void loadGraph(BaseGraph &graph, int scaling_factor) override;
 
     unsigned int nodes() override;
 

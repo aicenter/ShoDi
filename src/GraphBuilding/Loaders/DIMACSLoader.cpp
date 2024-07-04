@@ -50,14 +50,14 @@ size_t DIMACSLoader::edges() {
 }
 
 
-void DIMACSLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
+void DIMACSLoader::loadGraph(BaseGraph &graph, int scaling_factor) {
   parseAmounts();
 
   if (graph.handlesDuplicateEdges()) {
-    parseEdges(input, graph, edgesAmount, precisionLoss);
+    parseEdges(input, graph, edgesAmount, scaling_factor);
   } else {
     SimpleGraph sg(nodesAmount);
-    parseEdges(input, graph, edgesAmount, precisionLoss);
+    parseEdges(input, graph, edgesAmount, scaling_factor);
 
     for (unsigned int i = 0; i < nodesAmount; i++) {
       for (auto &p : sg.edges(i)) {
@@ -104,7 +104,7 @@ void DIMACSLoader::processGraphProblemLine(std::string &buffer, unsigned int &no
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(std::ifstream &input, BaseGraph &graph, size_t edges, unsigned int precisionLoss) {
+void DIMACSLoader::parseEdges(std::ifstream &input, BaseGraph &graph, size_t edges, int scaling_factor) {
   size_t loadededgescnt = 0;
   while (loadededgescnt < edges) {
     std::string buffer;
@@ -114,7 +114,7 @@ void DIMACSLoader::parseEdges(std::ifstream &input, BaseGraph &graph, size_t edg
       dist_t weight;
       getEdge(buffer, from, to, weight);
 
-      weight /= precisionLoss;
+      weight /= scaling_factor;
 
       if (from != to) {
         graph.addEdge(from, to, weight);

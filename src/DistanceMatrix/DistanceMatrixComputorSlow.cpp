@@ -99,9 +99,9 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
 }
 
 //______________________________________________________________________________________________________________________
-Graph DistanceMatrixComputorSlow::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
+Graph DistanceMatrixComputorSlow::loadGraph(GraphLoader &graphLoader, int scaling_factor) {
     Graph graph(graphLoader.nodes());
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
     return graph;
 }
 

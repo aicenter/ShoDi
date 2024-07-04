@@ -80,17 +80,17 @@ constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the r
 void createCH(
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
     Timer timer("Contraction Hierarchies from DIMACS preprocessing");
 
     UpdateableGraph graph(graphLoader.nodes());
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
 
     timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
     timer.finish();
 
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
     graph.flushInDdsgFormat(outputFilePath);
 
     timer.printMeasuredTime();
@@ -108,17 +108,17 @@ void createTNRFast(
         char *transitNodeSetSize,
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
     Timer timer("Transit Node Routing preprocessing (fast mode)");
 
     UpdateableGraph graph(graphLoader.nodes());
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
 
     timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
     timer.finish();
 
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
 
     timer.begin();
     TNRPreprocessor::preprocessUsingCH(graph, outputFilePath, boost::numeric_cast<unsigned int>(atol(transitNodeSetSize)));
@@ -139,18 +139,18 @@ void createTNRSlow(
         char *transitNodeSetSize,
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
     Timer timer("Transit Node Routing preprocessing (slow mode)");
 
     UpdateableGraph graph(graphLoader.nodes());
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
     Graph *originalGraph = graph.createCopy();
 
     timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
     timer.finish();
 
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
 
     timer.begin();
     TNRPreprocessor::preprocessUsingCHslower(
@@ -175,18 +175,18 @@ void createTNRUsingDM(
         char *transitNodeSetSize,
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
     Timer timer("Transit Node Routing preprocessing (using distance matrix)");
 
     UpdateableGraph graph(graphLoader.nodes());
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
     Graph *originalGraph = graph.createCopy();
 
     timer.begin();
     CHPreprocessor::preprocessForDDSG(graph);
     timer.finish();
 
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
 
     timer.begin();
     TNRPreprocessor::preprocessWithDMvalidation(
@@ -214,13 +214,13 @@ void createTNR(
         char *transitNodeSetSize,
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
     if (strcmp(preprocessingMode, "fast") == 0) {
-        createTNRFast(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
+        createTNRFast(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
     } else if (strcmp(preprocessingMode, "slow") == 0) {
-        createTNRSlow(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
+        createTNRSlow(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
     } else if (strcmp(preprocessingMode, "dm") == 0) {
-        createTNRUsingDM(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
+        createTNRUsingDM(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Transit Node Routing preprocessing.\n" + INVALID_FORMAT_INFO);
@@ -242,13 +242,13 @@ void createTNRAF(
         char *transitNodeSetSize,
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
 	bool dm_mode;
     if (strcmp(preprocessingMode, "slow") == 0) {
-//        createTNRAFSlow(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
+//        createTNRAFSlow(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
 		dm_mode = false;
     } else if (strcmp(preprocessingMode, "dm") == 0) {
-//        createTNRAFUsingDM(transitNodeSetSize, graphLoader, outputFilePath, precisionLoss);
+//        createTNRAFUsingDM(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
 		dm_mode = true;
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
@@ -258,14 +258,14 @@ void createTNRAF(
 	Timer timer("Transit Node Routing with Arc Flags preprocessing");
 
 	UpdateableGraph graph(graphLoader.nodes());
-	graphLoader.loadGraph(graph, precisionLoss);
+	graphLoader.loadGraph(graph, scaling_factor);
 	Graph *originalGraph = graph.createCopy();
 
 	timer.begin();
 	CHPreprocessor::preprocessForDDSG(graph);
 	timer.finish();
 
-	graphLoader.loadGraph(graph, precisionLoss);
+	graphLoader.loadGraph(graph, scaling_factor);
 
 	auto num_regions = std::min(graph.nodes(), 32u);
 
@@ -280,9 +280,9 @@ void createTNRAF(
 }
 
 template<typename ComputorType>
-Distance_matrix_travel_time_provider* computeDistanceMatrix(GraphLoader &graphLoader, unsigned int precisionLoss, std::string timerName) {
+Distance_matrix_travel_time_provider* computeDistanceMatrix(GraphLoader &graphLoader, int scaling_factor, std::string timerName) {
     ComputorType computor;
-    auto graph = computor.loadGraph(graphLoader, precisionLoss);
+    auto graph = computor.loadGraph(graphLoader, scaling_factor);
 
     Timer timer(timerName);
 
@@ -300,7 +300,7 @@ void createDM(
         char *preprocessingMode,
         GraphLoader &graphLoader,
         char *outputFilePath,
-        unsigned int precisionLoss) {
+        int scaling_factor) {
     std::function<Distance_matrix_travel_time_provider* (GraphLoader &, unsigned int, std::string)> computor;
 
     std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
@@ -326,7 +326,7 @@ void createDM(
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    dm = std::unique_ptr<Distance_matrix_travel_time_provider> {computor(graphLoader, precisionLoss, "Distance Matrix preprocessing")};
+    dm = std::unique_ptr<Distance_matrix_travel_time_provider> {computor(graphLoader, scaling_factor, "Distance Matrix preprocessing")};
     outputter->store(*dm, outputFilePath);
 }
 
@@ -791,23 +791,23 @@ int main(int argc, char *argv[]) {
             const auto preprocessings = {
                 make_tuple(std::string("ch"), std::string("Contraction Hierarchies"), 6,
                     std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
-                        createCH(graphLoader, argv[5], precisionLoss);
+                      [](char** argv, GraphLoader &graphLoader, int scaling_factor) {
+                        createCH(graphLoader, argv[5], scaling_factor);
                         })),
                 make_tuple(std::string("tnr"), std::string("Transit Node Routing"), 8,
                     std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
-                        createTNR(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
+                      [](char** argv, GraphLoader &graphLoader, int scaling_factor) {
+                        createTNR(argv[4], argv[5], graphLoader, argv[7], scaling_factor);
                         })),
                 make_tuple(std::string("tnraf"), std::string("Transit Node Routing with Arc Flags"), 8,
                     std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader &graphLoader, unsigned int precisionLoss) {
-                        createTNRAF(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
+                      [](char** argv, GraphLoader &graphLoader, int scaling_factor) {
+                        createTNRAF(argv[4], argv[5], graphLoader, argv[7], scaling_factor);
                         })),
                 make_tuple(std::string("dm"), std::string("Distance Matrix"), 8,
                     std::function<void (char**, GraphLoader&, unsigned int)>(
-                      [](char** argv, GraphLoader& graphLoader, unsigned int precisionLoss) {
-                        createDM(argv[4], argv[5], graphLoader, argv[7], precisionLoss);
+                      [](char** argv, GraphLoader& graphLoader, int scaling_factor) {
+                        createDM(argv[4], argv[5], graphLoader, argv[7], scaling_factor);
                         }))
             };
 
@@ -824,15 +824,15 @@ int main(int argc, char *argv[]) {
                                 + INVALID_FORMAT_INFO);
                     }
 
-                    unsigned int precisionLoss;
+                    int scaling_factor;
                     if (argc == expectedArgc)
-                        precisionLoss = 1;
+                        scaling_factor = 1;
                     else
-                        precisionLoss = (unsigned int) std::stoi(argv[expectedArgc]);
+                        scaling_factor = (unsigned int) std::stoi(argv[expectedArgc]);
 
                     GraphLoader* graphLoader = newGraphLoader(argv[3], argv[expectedArgc - 2]);
                     auto &func = get<3>(preprocessing);
-                    func(argv, *graphLoader, precisionLoss);
+                    func(argv, *graphLoader, scaling_factor);
                     delete graphLoader;
 
                     found = true;

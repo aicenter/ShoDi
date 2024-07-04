@@ -20,7 +20,7 @@ dist_t parse_distance(
 	const std::string& str, 
 	unsigned int nodeFrom, 
 	unsigned int nodeTo, const std::string& inputFile, 
-	double precisionLoss) {
+	double scaling_factor) {
 	double val;
 	try {
 		val = crack_atof(str.c_str(), str.c_str() + str.size());
@@ -43,7 +43,7 @@ dist_t parse_distance(
 		return std::numeric_limits<dist_t>::max();
 	}
 
-	return static_cast<dist_t>(round(val / (double)precisionLoss));
+	return static_cast<dist_t>(round(val / (double)scaling_factor));
 }
 
 std::pair<std::unique_ptr<dist_t[]>, unsigned> CSV_reader::read_matrix(const std::string& dm_filepath) {

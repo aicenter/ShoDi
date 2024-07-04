@@ -29,7 +29,7 @@ public:
 
     using GraphLoader::loadGraph;
 
-    void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
+    void loadGraph(BaseGraph &graph, int scaling_factor) override;
 
     unsigned int nodes() override;
 

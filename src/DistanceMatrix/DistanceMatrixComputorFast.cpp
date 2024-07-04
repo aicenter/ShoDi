@@ -17,9 +17,9 @@ void DistanceMatrixComputorFast::computeDistanceMatrix(const std::vector<dist_t>
     johnson::johnson_parallel(graph, distanceTable.get());
 }
 
-std::vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) {
+std::vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoader, int scaling_factor) {
     AdjMatrixGraph graph(graphLoader.nodes());
-    graphLoader.loadGraph(graph, precisionLoss);
+    graphLoader.loadGraph(graph, scaling_factor);
 
     return graph.matrix();
 }

@@ -34,11 +34,11 @@ public:
      *
      * @param graphLoader[in] instance of GraphLoader that will load the data
      * for which we want to compute the distance matrix.
-     * @param[in] precisionLoss This parameter allows us to lose some precision
+     * @param[in] scaling_factor This parameter allows us to lose some precision
      * of the weight values. Each loaded weight will be divided by this value
      * before rounding.
      */
-    virtual T loadGraph(GraphLoader &graphLoader, unsigned int precisionLoss) = 0;
+    virtual T loadGraph(GraphLoader &graphLoader, int scaling_factor) = 0;
 
     /**
      * This function will compute the full distance matrix for the graph data
@@ -64,8 +64,8 @@ public:
 
     virtual ~DistanceMatrixComputor() = default;
 
-    Distance_matrix_travel_time_provider *compute_and_get_distance_matrix(GraphLoader &graphLoader, unsigned int precisionLoss) {
-        T graphData = loadGraph(graphLoader, precisionLoss);
+    Distance_matrix_travel_time_provider *compute_and_get_distance_matrix(GraphLoader &graphLoader, int scaling_factor) {
+        T graphData = loadGraph(graphLoader, scaling_factor);
         computeDistanceMatrix(graphData);
         return getDistanceMatrixInstance();
     }

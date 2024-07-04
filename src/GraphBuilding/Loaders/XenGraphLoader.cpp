@@ -59,12 +59,12 @@ size_t XenGraphLoader::edges() {
   return edgesAmount;
 }
 
-void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
+void XenGraphLoader::parseEdges(BaseGraph &graph, int scaling_factor) {
   unsigned int from, to, oneWayFlag, weight;
   for (size_t i = 0; i < edgesAmount; i++) {
     input >> from >> to >> weight >> oneWayFlag;
 
-    weight /= precisionLoss;
+    weight /= scaling_factor;
 
     if (from != to) {
       if (oneWayFlag == 1) {
@@ -77,14 +77,14 @@ void XenGraphLoader::parseEdges(BaseGraph &graph, unsigned int precisionLoss) {
   }
 }
 
-void XenGraphLoader::loadGraph(BaseGraph &graph, unsigned int precisionLoss) {
+void XenGraphLoader::loadGraph(BaseGraph &graph, int scaling_factor) {
   parseAmounts();
 
   if (graph.handlesDuplicateEdges()) {
-    parseEdges(graph, precisionLoss);
+    parseEdges(graph, scaling_factor);
   } else {
     SimpleGraph sg(nodesAmount);
-    parseEdges(sg, precisionLoss);
+    parseEdges(sg, scaling_factor);
 
     for (unsigned int i = 0; i < nodesAmount; i++) {
       for (auto &p : sg.edges(i)) {

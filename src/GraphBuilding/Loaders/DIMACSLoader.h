@@ -50,10 +50,10 @@ private:
      * @param input[in] The input stream corresponding to the input file.
      * @param graph[in, out] The graph instance that the edges will be inserted into.
      * @param edges[in] The number of edges that need to be loaded.
-     * @param[in] precisionLoss This parameter allows us to lose some precision
+     * @param[in] scaling_factor This parameter allows us to lose some precision
      * of the weight values. Each loaded weight will be divided by this value before rounding.
      */
-    void parseEdges(std::ifstream & input, BaseGraph & graph, size_t edges, unsigned int precisionLoss);
+    void parseEdges(std::ifstream & input, BaseGraph & graph, size_t edges, int scaling_factor);
 
     /**
      * Auxiliary function that extracts the number of nodes and the number of edges from the problem line.
@@ -86,7 +86,7 @@ public:
 
     size_t edges();
 
-    void loadGraph(BaseGraph &graph, unsigned int precisionLoss) override;
+    void loadGraph(BaseGraph &graph, int scaling_factor) override;
 
     ~DIMACSLoader() override = default;
 };
