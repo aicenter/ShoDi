@@ -106,7 +106,7 @@ Let us now assume that you have a directed weighted graph in one of the supporte
 (see [Input/Output File Formats](#inputoutput-file-formats)).
 In addition, a `Python` script is available for conversion of `GeoJSON` data to one of the supported formats.
 
-The command line interface requires you to use specific arguments in the correct order. 
+The command line interface requires you to use specific arguments. 
 The first argument determines whether you want to preprocess a graph file or benchmark a preprocessed graph using 
 some method.
 The arguments following the first one are specific to each of the usages.
@@ -129,7 +129,7 @@ create -m ch -f <input_format> -i <input_file> -o <output_file> [--precision-los
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `csv`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the `.ch` extension will be added automatically)
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
@@ -152,7 +152,7 @@ create -m tnr -f <input_format> -i <input_file> -o <output_file> --preprocessing
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `csv`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added
    automatically)
@@ -193,7 +193,7 @@ create -m tnraf -f <input_format> -i <input_file> -o <output_file> --preprocessi
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `csv`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added
    automatically)
@@ -220,7 +220,7 @@ create -m dm -f <input_format> -i <input_file> -o <output_file> --preprocessing-
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `csv`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`
  * `input_file` is path to the input file (including file extension)
  * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on
    `output_format` will be added automatically)
@@ -374,11 +374,11 @@ from `t` to `s`, both with the same weight.
 
 The expected suffix for DIMACS graph files is `.gr` although it is not enforced.
 
-### CSV input format
+### Adjacency Matrix (ADJ) input format
 
 One of the three input formats that can be used to describe the input graph for the preprocessing.
 
-A CSV file represents an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix) of a graph.
+A CSV file that represents an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix) of a graph.
 
 * The file is expected to not have a header.
 * The file must have its amount of rows equal to its amount of columns.

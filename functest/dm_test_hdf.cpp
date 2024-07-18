@@ -100,26 +100,26 @@ TEST(dm_hdf_test, from_dimacs_fast2) {
 
 
 
-TEST(dm_hdf_test, from_csv_slow1) {
+TEST(dm_hdf_test, from_adj_slow1) {
     // slow without precision loss
-    run_preprocessor("--method dm --input-format csv --output-format hdf --preprocessing-mode slow --input-file functest/01_adj.csv --output-file from_csv_slow1");
-    check_hdf("from_csv_slow1.hdf5", "functest/01_dm.csv");
+    run_preprocessor("--method dm --input-format adj --output-format hdf --preprocessing-mode slow --input-file functest/01_adj.csv --output-file from_adj_slow1");
+    check_hdf("from_adj_slow1.hdf5", "functest/01_dm.csv");
 }
 
-TEST(dm_hdf_test, from_csv_slow2) {
+TEST(dm_hdf_test, from_adj_slow2) {
     // slow with precision loss
-    run_preprocessor("--method dm --output-format hdf --preprocessing-mode slow --input-file functest/02_adj.csv --output-file from_csv_slow2 --precision-loss 100");
-    check_hdf("from_csv_slow2.hdf5", "functest/02_dm_div100.csv");
+    run_preprocessor("--method dm --input-format adj --output-format hdf --preprocessing-mode slow --input-file functest/02_adj.csv --output-file from_adj_slow2 --precision-loss 100");
+    check_hdf("from_adj_slow2.hdf5", "functest/02_dm_div100.csv");
 }
 
-TEST(dm_hdf_test, from_csv_fast1) {
+TEST(dm_hdf_test, from_adj_fast1) {
     // fast without precision loss
-    run_preprocessor("--method dm --input-format csv --output-format hdf --preprocessing-mode fast --input-file functest/02_adj.csv --output-file from_csv_fast1");
-    check_hdf("from_csv_fast1.hdf5", "functest/02_dm.csv");
+    run_preprocessor("--method dm --input-format adj --output-format hdf --preprocessing-mode fast --input-file functest/02_adj.csv --output-file from_adj_fast1");
+    check_hdf("from_adj_fast1.hdf5", "functest/02_dm.csv");
 }
 
-TEST(dm_hdf_test, from_csv_fast2) {
+TEST(dm_hdf_test, from_adj_fast2) {
     // fast with precision loss
-    run_preprocessor("--method dm --input-format csv --output-format hdf --preprocessing-mode fast --input-file functest/02_adj.csv --output-file from_csv_fast2 --precision-loss 100");
-    check_hdf("from_csv_fast2.hdf5", "functest/02_dm_div100.csv");
+    run_preprocessor("--method dm --input-format adj --output-format hdf --preprocessing-mode fast --input-file functest/02_adj.csv --output-file from_adj_fast2 --precision-loss 100");
+    check_hdf("from_adj_fast2.hdf5", "functest/02_dm_div100.csv");
 }

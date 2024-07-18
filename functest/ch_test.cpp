@@ -24,16 +24,16 @@ TEST(ch_test, from_xengraph2) {
 
 
 
-TEST(ch_test, from_csv1) {
-    run_preprocessor("-m ch -f csv -i functest/02_adj.csv -o from_csv1");
-    FlagsGraph* loaded = DDSGLoader("from_csv1.ch").loadFlagsGraph();
+TEST(ch_test, from_adj1) {
+    run_preprocessor("-m ch -f adj -i functest/02_adj.csv -o from_adj1");
+    FlagsGraph* loaded = DDSGLoader("from_adj1.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02();
     compare_flags_graphs(*loaded, *expected);
 }
 
-TEST(ch_test, from_csv2) {
-    run_preprocessor("-m ch -i functest/02_adj.csv -o from_csv2 --precision-loss 100");
-    FlagsGraph* loaded = DDSGLoader("from_csv2.ch").loadFlagsGraph();
+TEST(ch_test, from_adj2) {
+    run_preprocessor("-m ch --input-format adj -i functest/02_adj.csv -o from_adj2 --precision-loss 100");
+    FlagsGraph* loaded = DDSGLoader("from_adj2.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02_div100();
     compare_flags_graphs(*loaded, *expected);
 }

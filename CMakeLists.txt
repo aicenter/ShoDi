@@ -195,8 +195,8 @@ add_library(shortestPaths SHARED
         src/TNRAF/Structures/RegionsStructure.cpp
         src/TNRAF/Structures/RegionsStructure.h
         src/GraphBuilding/Loaders/GraphLoader.h
-        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
-        src/GraphBuilding/Loaders/CsvGraphLoader.h
+        src/GraphBuilding/Loaders/AdjGraphLoader.cpp
+        src/GraphBuilding/Loaders/AdjGraphLoader.h
         src/Error/Error.h
         src/DistanceMatrix/johnson.cpp
         src/DistanceMatrix/johnson.hpp
@@ -246,7 +246,7 @@ add_executable(shortestPathsPreprocessor
     src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
     src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
     src/DistanceMatrix/johnson.cpp
-    src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+    src/GraphBuilding/Loaders/AdjGraphLoader.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/DIMACSLoader.cpp
     src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
@@ -337,7 +337,7 @@ add_executable(test_runner
         src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
         src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
         src/DistanceMatrix/johnson.cpp
-        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+        src/GraphBuilding/Loaders/AdjGraphLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/TGAFLoader.cpp
         src/GraphBuilding/Loaders/TNRGLoader.cpp

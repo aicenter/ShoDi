@@ -1,11 +1,11 @@
 /******************************************************************************
- * File:             CsvGraphLoader.cpp
+ * File:             AdjGraphLoader.cpp
  *
  * Author:           Jan Neumann (neumaja5@fel.cvut.cz)
  * Created:          07/27/20
  *****************************************************************************/
 
-#include "CsvGraphLoader.h"
+#include "AdjGraphLoader.h"
 #include "CLI/ProgressBar.hpp"
 #include "GraphBuilding/Structures/Graph.h"
 #include "GraphBuilding/Structures/UpdateableGraph.h"
@@ -15,7 +15,7 @@
 #include <iostream>
 
 
-CsvGraphLoader::CsvGraphLoader(std::string inputFile) : inputFile(inputFile) {
+AdjGraphLoader::AdjGraphLoader(std::string inputFile) : inputFile(inputFile) {
 	if (!reader.mmap(inputFile)) {
 		throw std::runtime_error(std::string("Error reading file ") + this->inputFile + " using mmap.\n");
 	}
@@ -55,11 +55,11 @@ inline dist_t parse_distance(
     return (dist_t) std::floor(val / (double)scaling_factor);
 }
 
-unsigned int CsvGraphLoader::nodes() {
+unsigned int AdjGraphLoader::nodes() {
 	return boost::numeric_cast<unsigned int>(reader.cols());
 }
 
-void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
+void AdjGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 	const unsigned int size = nodes();
 
 	if (size != reader.rows())

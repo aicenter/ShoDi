@@ -53,23 +53,23 @@ TEST(tnraf_test, from_dimacs3) {
 
 
 
-TEST(tnraf_test, from_csv1) {
-    run_preprocessor("--method tnraf --input-format csv --preprocessing-mode slow --tnodes-cnt 1 --input-file functest/01_adj.csv --output-file from_csv1");
-    TransitNodeRoutingArcFlagsGraph* loaded = TGAFLoader("from_csv1.tgaf").loadTNRAFforDistanceQueries();
+TEST(tnraf_test, from_adj1) {
+    run_preprocessor("--method tnraf --input-format adj --preprocessing-mode slow --tnodes-cnt 1 --input-file functest/01_adj.csv --output-file from_adj1");
+    TransitNodeRoutingArcFlagsGraph* loaded = TGAFLoader("from_adj1.tgaf").loadTNRAFforDistanceQueries();
     TransitNodeRoutingArcFlagsGraph* expected = build_tnraf_graph_01_1();
     compare_tnraf_graphs(*loaded, *expected);
 }
 
-TEST(tnraf_test, from_csv2) {
-    run_preprocessor("--method tnraf --input-format csv --preprocessing-mode dm --tnodes-cnt 3 --input-file functest/01_adj.csv --output-file from_csv2");
-    TransitNodeRoutingArcFlagsGraph* loaded = TGAFLoader("from_csv2.tgaf").loadTNRAFforDistanceQueries();
+TEST(tnraf_test, from_adj2) {
+    run_preprocessor("--method tnraf --input-format adj --preprocessing-mode dm --tnodes-cnt 3 --input-file functest/01_adj.csv --output-file from_adj2");
+    TransitNodeRoutingArcFlagsGraph* loaded = TGAFLoader("from_adj2.tgaf").loadTNRAFforDistanceQueries();
     TransitNodeRoutingArcFlagsGraph* expected = build_tnraf_graph_01_3();
     compare_tnraf_graphs(*loaded, *expected);
 }
 
-TEST(tnraf_test, from_csv3) {
-    run_preprocessor("-m tnraf --preprocessing-mode dm --tnodes-cnt 3 --input-file functest/02_adj.csv --output-file from_csv3 --precision-loss 100");
-    TransitNodeRoutingArcFlagsGraph* loaded = TGAFLoader("from_csv3.tgaf").loadTNRAFforDistanceQueries();
+TEST(tnraf_test, from_adj3) {
+    run_preprocessor("-m tnraf --preprocessing-mode dm --input-format adj --tnodes-cnt 3 --input-file functest/02_adj.csv --output-file from_adj3 --precision-loss 100");
+    TransitNodeRoutingArcFlagsGraph* loaded = TGAFLoader("from_adj3.tgaf").loadTNRAFforDistanceQueries();
     TransitNodeRoutingArcFlagsGraph* expected = build_tnraf_graph_02_3_div100();
     compare_tnraf_graphs(*loaded, *expected);
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
-* File:             CsvGraphLoader.h
+* File:             AdjGraphLoader.h
 *
 * Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
 * Created:          07/27/20 
@@ -20,12 +20,12 @@ typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
                      csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
     DefaultCSVReader;
 
-class CsvGraphLoader : public GraphLoader {
+class AdjGraphLoader : public GraphLoader {
 private:
     DefaultCSVReader reader;
     std::string inputFile;
 public:
-    explicit CsvGraphLoader(std::string inputFile);
+    explicit AdjGraphLoader(std::string inputFile);
 
     using GraphLoader::loadGraph;
 
@@ -33,7 +33,7 @@ public:
 
     unsigned int nodes() override;
 
-    ~CsvGraphLoader() override = default;
+    ~AdjGraphLoader() override = default;
 
 };
 

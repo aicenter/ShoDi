@@ -37,7 +37,7 @@
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "Benchmarking/DijkstraBenchmark.h"
 #include "Error/Error.h"
-#include "GraphBuilding/Loaders/CsvGraphLoader.h"
+#include "GraphBuilding/Loaders/AdjGraphLoader.h"
 #include "DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "DistanceMatrix/johnson.hpp"
 #include "DistanceMatrix/DistanceMatrixComputorFast.h"
@@ -748,8 +748,8 @@ GraphLoader *newGraphLoader(const std::string& inputFormat, const std::string& i
         return new XenGraphLoader(inputFilePath);
     } else if (inputFormat == "dimacs") {
         return new DIMACSLoader(inputFilePath);
-    } else if (inputFormat == "csv") {
-        return new CsvGraphLoader(inputFilePath);
+    } else if (inputFormat == "adj") {
+        return new AdjGraphLoader(inputFilePath);
     } else {
         throw input_error(std::string("Unknown input format '") + inputFormat + "'.\n" + INVALID_FORMAT_INFO);
     }
@@ -831,7 +831,6 @@ int main(int argc, char* argv[]) {
 
                 if (extension == ".xeng") inputFormat.emplace("xengraph");
                 else if (extension == ".gr") inputFormat.emplace("dimacs");
-                else if (extension == ".csv") inputFormat.emplace("csv");
                 else throw input_error("Unable to detect input file format. Please specify with '-f <format>'.");
             }
 
