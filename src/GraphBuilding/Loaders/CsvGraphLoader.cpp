@@ -22,7 +22,7 @@ CsvGraphLoader::CsvGraphLoader(std::string inputFile) : inputFile(inputFile) {
 }
 
 inline dist_t parse_distance(
-	std::string str, unsigned int nodeFrom, unsigned int nodeTo, std::string inputFile, double multiplier
+	std::string str, unsigned int nodeFrom, unsigned int nodeTo, std::string inputFile, int scaling_factor
 ) {
 	double val;
 	try {
@@ -52,7 +52,7 @@ inline dist_t parse_distance(
 		return std::numeric_limits<dist_t>::max();
 	}
 
-	return (dist_t) std::round(val * multiplier);
+    return (dist_t) std::floor(val / (double)scaling_factor);
 }
 
 unsigned int CsvGraphLoader::nodes() {
@@ -72,13 +72,13 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 	ProgressBar progress(size, "Loading CSV file:");
 
 	unsigned int i = 0;
-	const double multiplier = std::pow(10, scaling_factor);
+	//const double multiplier = std::pow(10, scaling_factor);
 	for (const auto& row: reader) {
 		unsigned int j = 0;
 		for (const auto& cell: row) {
 			std::string val;
 			cell.read_value(val);
-			const dist_t dist = parse_distance(val, i, j, inputFile, multiplier);
+			const dist_t dist = parse_distance(val, i, j, inputFile, scaling_factor);
 			if (dist != max)
 				graph.addEdge(i, j, dist);
 			++j;
