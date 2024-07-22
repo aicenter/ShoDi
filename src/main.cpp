@@ -38,6 +38,7 @@
 #include "Benchmarking/DijkstraBenchmark.h"
 #include "Error/Error.h"
 #include "GraphBuilding/Loaders/AdjGraphLoader.h"
+#include "GraphBuilding/Loaders/CsvGraphLoader.h"
 #include "DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "DistanceMatrix/johnson.hpp"
 #include "DistanceMatrix/DistanceMatrixComputorFast.h"
@@ -750,6 +751,8 @@ GraphLoader *newGraphLoader(const std::string& inputFormat, const std::string& i
         return new DIMACSLoader(inputFilePath);
     } else if (inputFormat == "adj") {
         return new AdjGraphLoader(inputFilePath);
+    } else if (inputFormat == "csv") {
+        return new CsvGraphLoader(inputFilePath);
     } else {
         throw input_error(std::string("Unknown input format '") + inputFormat + "'.\n" + INVALID_FORMAT_INFO);
     }
@@ -780,7 +783,7 @@ GraphLoader *newGraphLoader(const std::string& inputFormat, const std::string& i
 int main(int argc, char* argv[]) {
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    boost::optional<std::string> command, method, inputFormat, inputFile, outputFormat, outputFile, preprocessingMode,
+    boost::optional<std::string> command, method, inputFormat, inputPath, outputFormat, outputPath, preprocessingMode,
     inputStructure, querySet, mappingFile;
     boost::optional<unsigned int> tnodesCnt, precisionLoss;
 
@@ -791,9 +794,9 @@ int main(int argc, char* argv[]) {
             ("command", boost::program_options::value(&command))
             ("method,m", boost::program_options::value(&method))
             ("input-format,f", boost::program_options::value(&inputFormat))
-            ("input-file,i", boost::program_options::value(&inputFile))
+            ("input-path,i", boost::program_options::value(&inputPath))
             ("output-format", boost::program_options::value(&outputFormat))
-            ("output-file,o", boost::program_options::value(&outputFile))
+            ("output-path,o", boost::program_options::value(&outputPath))
             ("preprocessing-mode", boost::program_options::value(&preprocessingMode))
             ("tnodes-cnt", boost::program_options::value(&tnodesCnt))
             ("precision-loss", boost::program_options::value(&precisionLoss)->default_value(1))
@@ -822,41 +825,43 @@ int main(int argc, char* argv[]) {
                 return 0;
             }
 
-            if (!method || !inputFile) {
+            if (!method || !inputPath) {
                 throw input_error("Missing one or more required options (-m <method> / -i <input_file>) for the Create command.\n");
             }
 
             if (!inputFormat) {
-                auto extension = std::filesystem::path(*inputFile).extension();
+                auto extension = std::filesystem::path(*inputPath).extension();
 
                 if (extension == ".xeng") inputFormat.emplace("xengraph");
                 else if (extension == ".gr") inputFormat.emplace("dimacs");
+                else if (extension == ".csv") inputFormat.emplace("adj");
+                else if (extension == "") inputFormat.emplace("csv");
                 else throw input_error("Unable to detect input file format. Please specify with '-f <format>'.");
             }
 
-            if (!outputFile) {
-                outputFile.emplace("out");
+            if (!outputPath) {
+                outputPath.emplace("out");
             }
 
-            GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputFile);
+            GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputPath);
 
             if (*method == "ch") {
-                createCH(*graphLoader, *outputFile, *precisionLoss);
+                createCH(*graphLoader, *outputPath, *precisionLoss);
             } else if (*method == "tnr") {
                 if (!preprocessingMode || !tnodesCnt) {
                     throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow/dm> / --tnodes-cnt <cnt>) for TNR creation.\n");
                 }
-                createTNR(*preprocessingMode, *tnodesCnt, *graphLoader, *outputFile, *precisionLoss);
+                createTNR(*preprocessingMode, *tnodesCnt, *graphLoader, *outputPath, *precisionLoss);
             } else if (*method == "tnraf") {
                 if (!preprocessingMode || !tnodesCnt) {
                     throw input_error("Missing one or more required options (--preprocessing-mode <slow/dm> / --tnodes-cnt <cnt>) for TNRAF creation.\n");
                 }
-                createTNRAF(*preprocessingMode, *tnodesCnt, *graphLoader, *outputFile, *precisionLoss);
+                createTNRAF(*preprocessingMode, *tnodesCnt, *graphLoader, *outputPath, *precisionLoss);
             } else if (*method == "dm") {
                 if (!preprocessingMode || !outputFormat) {
                     throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");
                 }
-                createDM(*outputFormat, *preprocessingMode, *graphLoader, *outputFile, *precisionLoss);
+                createDM(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, *precisionLoss);
             } else {
                 throw input_error("Invalid method name '" + *method + "'.\n");
             }
@@ -893,15 +898,15 @@ int main(int argc, char* argv[]) {
 
             if (mappingFile) {
                 auto func = benchmarkMapFunctions.at(*method);
-                if (outputFile) {
-                    func(*inputStructure, *querySet, *mappingFile, reinterpret_cast<char *>(*outputFile->c_str()), true);
+                if (outputPath) {
+                    func(*inputStructure, *querySet, *mappingFile, reinterpret_cast<char *>(*outputPath->c_str()), true);
                 } else {
                     func(*inputStructure, *querySet, *mappingFile, nullptr, false);
                 }
             } else {
                 auto func = benchmarkFunctions.at(*method);
-                if (outputFile) {
-                    func(*inputStructure, *querySet, reinterpret_cast<char *>(*outputFile->c_str()), true);
+                if (outputPath) {
+                    func(*inputStructure, *querySet, reinterpret_cast<char *>(*outputPath->c_str()), true);
                 } else {
                     func(*inputStructure, *querySet, nullptr, false);
                 }

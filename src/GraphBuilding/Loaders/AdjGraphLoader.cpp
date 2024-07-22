@@ -8,21 +8,20 @@
 #include "AdjGraphLoader.h"
 #include "CLI/ProgressBar.hpp"
 #include "GraphBuilding/Structures/Graph.h"
-#include "GraphBuilding/Structures/UpdateableGraph.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <limits>
 #include <stdexcept>
 #include <iostream>
 
 
-AdjGraphLoader::AdjGraphLoader(std::string inputFile) : inputFile(inputFile) {
+AdjGraphLoader::AdjGraphLoader(const std::string& inputFile) : inputFile(inputFile) {
 	if (!reader.mmap(inputFile)) {
 		throw std::runtime_error(std::string("Error reading file ") + this->inputFile + " using mmap.\n");
 	}
 }
 
 inline dist_t parse_distance(
-	std::string str, unsigned int nodeFrom, unsigned int nodeTo, std::string inputFile, int scaling_factor
+	const std::string& str, unsigned int nodeFrom, unsigned int nodeTo, const std::string& inputFile, int scaling_factor
 ) {
 	double val;
 	try {
@@ -52,7 +51,7 @@ inline dist_t parse_distance(
 		return std::numeric_limits<dist_t>::max();
 	}
 
-    return (dist_t) std::floor(val / (double)scaling_factor);
+    return (dist_t) std::floor(val / scaling_factor);
 }
 
 unsigned int AdjGraphLoader::nodes() {

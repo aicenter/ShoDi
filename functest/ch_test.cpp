@@ -40,15 +40,31 @@ TEST(ch_test, from_adj2) {
 
 
 
+TEST(ch_test, from_csv1) {
+    run_preprocessor("-m ch -i functest/01_csv -o from_csv1");
+    FlagsGraph* loaded = DDSGLoader("from_csv1.ch").loadFlagsGraph();
+    FlagsGraph* expected = build_flags_graph_01();
+    compare_flags_graphs(*loaded, *expected);
+}
+
+TEST(ch_test, from_csv2) {
+    run_preprocessor("-m ch --input-format csv -i functest/02_csv -o from_csv2 --precision-loss 100");
+    FlagsGraph* loaded = DDSGLoader("from_csv2.ch").loadFlagsGraph();
+    FlagsGraph* expected = build_flags_graph_02_div100();
+    compare_flags_graphs(*loaded, *expected);
+}
+
+
+
 TEST(ch_test, from_dimacs1) {
-    run_preprocessor("--method ch --input-format dimacs --input-file functest/02_dimacs.gr --output-file from_dimacs1");
+    run_preprocessor("--method ch --input-format dimacs --input-path functest/02_dimacs.gr -o from_dimacs1");
     FlagsGraph* loaded = DDSGLoader("from_dimacs1.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02();
     compare_flags_graphs(*loaded, *expected);
 }
 
 TEST(ch_test, from_dimacs2) {
-    run_preprocessor("--method ch --input-file functest/02_dimacs.gr --output-file from_dimacs2 --precision-loss 100");
+    run_preprocessor("--method ch --input-path functest/02_dimacs.gr --output-path from_dimacs2 --precision-loss 100");
     FlagsGraph* loaded = DDSGLoader("from_dimacs2.ch").loadFlagsGraph();
     FlagsGraph* expected = build_flags_graph_02_div100();
     compare_flags_graphs(*loaded, *expected);

@@ -116,7 +116,7 @@ The arguments following the first one are specific to each of the usages.
 General usage:
 
 ```
-./shortestPathsPreprocessor create -m <method name> -f <input_format> -i <input_file> -o <output_file> [method specific arguments]
+./shortestPathsPreprocessor create -m <method name> -f <input_format> -i <input_path> -o <output_path> [method specific arguments]
 ```
 
 #### Graph Preprocessing using Contraction Hierarchies
@@ -124,14 +124,14 @@ General usage:
 To preprocess a graph using Contraction Hierarchies, call the preprocessor with the following arguments:
 
 ```
-create -m ch -f <input_format> -i <input_file> -o <output_file> [--precision-loss <precision_loss>]
+create -m ch -f <input_format> -i <input_path> -o <output_path> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `adj`
- * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.ch` extension will be added automatically)
+ * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
+ * `output_path` is path to the output file (*excluding* file extension - the `.ch` extension will be added automatically)
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
@@ -147,14 +147,14 @@ Each loaded weight will be divided by this value before rounding. (default: 1)
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create -m tnr -f <input_format> -i <input_file> -o <output_file> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
+create -m tnr -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `adj`
- * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added
+ * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
+ * `output_path` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added
    automatically)
  * `preprocessing_mode` is one of `fast`, `slow`, `dm`
  * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the 
@@ -171,7 +171,7 @@ The modes `slow` and `dm` will produce exactly the same result, but the `dm` mod
 speed up the precomputation and therefore, it is faster than the `slow` mode, but it requires a lot of memory. 
 
 ##### Transit node count
-The fifth argument determines the size of the transit nodes set. 
+This argument determines the size of the transit nodes set. 
 It must be an integer between 1 and the number of nodes in the graph. 
 Less transit nodes usually mean lower memory requirements, but also worse query times. 
 By choosing the appropriate size of the transit node set, you can find a great balance between memory
@@ -188,14 +188,14 @@ requirements and performance.
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create -m tnraf -f <input_format> -i <input_file> -o <output_file> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
+create -m tnraf -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `adj`
- * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added
+ * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
+ * `output_path` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added
    automatically)
  * `preprocessing_mode` is one of `slow`, `dm` (for more info, see [Preprocessing Mode](#preprocessing-mode))
  * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the numbr 
@@ -215,14 +215,14 @@ Each loaded weight will be divided by this value before rounding. (default: 1)
 To generate the distance matrix of a graph, call the preprocessor with the following arguments:
 
 ```
-create -m dm -f <input_format> -i <input_file> -o <output_file> --preprocessing-mode <preprocessing_mode> --output-format <output_format> [--precision-loss <precision_loss>]
+create -m dm -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --output-format <output_format> [--precision-loss <precision_loss>]
 ```
 
 where:
 
  * `input_format` is one of `xengraph`, `dimacs`, `adj`
- * `input_file` is path to the input file (including file extension)
- * `output_file` is path to the output file (*excluding* file extension - the appropriate extension based on
+ * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
+ * `output_path` is path to the output file (*excluding* file extension - the appropriate extension based on
    `output_format` will be added automatically)
  * `preprocessing_mode` is one of `slow`, `fast`
  * `output_format` is one of `xdm`, `csv`, `hdf`
@@ -257,7 +257,7 @@ Those distances can then be used for verification of the correctness of the more
 To benchmark (with or without mapping), call the preprocessor with the following arguments:
 
 ```
- benchmark -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [--output-file <output_file>]
+ benchmark -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [-o <output_path>]
 ```
 
 where:
@@ -269,13 +269,13 @@ where:
 * `query_set` is path to the query set (file format described in the File Formats section below)
 * `mapping_file` (optional) is path to the mapping file (file format described in the File Formats section below), which will be 
 	used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
-* `output_file` (optional) is path to the output file for the computed distances
+* `output_path` (optional) is path to the output file for the computed distances
 
 #### Computed Distances
 
-If you provide the `output_file` argument, the application will output a plain text file that will contain the 
-name of the query set file used for the benchmark on the first line, and then on each following line, the result of one
-queries. 
+If you provide the `output_path` argument, the application will output a plain text file that will contain the 
+name of the query set file used for the benchmark on the first line, and then on each following line, the result of each
+query. 
 You can use these files to validate that various methods return the same results.
 
 
@@ -339,7 +339,7 @@ file formats used by the library.
 
 ### XenGraph Input Format
 
-Probably the simplier format for directed weighted graphs. Graphs are represented as plain text files in this format. 
+Probably the simplest format for directed weighted graphs. Graphs are represented as plain text files in this format. 
 The graph file looks as follows:
 
 * It begins with a line `XGI n e` where `XGI` is a fixed string which serves as a magic constant. `n` and `e` 
@@ -384,6 +384,18 @@ A CSV file that represents an [adjacency matrix](https://en.wikipedia.org/wiki/A
 * The file must have its amount of rows equal to its amount of columns.
 * Each value on row `i` and column `j` represents the weight of a *directed* edge from node `i` to node `j`.
 * Weights are expected to be valid *positive* integers, or `nan` for where there is no edge joining the nodes.
+
+### CSV input format
+
+A pair of files named `nodes.csv` and `edges.csv` located in the same directory.
+
+* Path to the directory containing these files must be specified in the `input_path` argument.
+* `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
+(for A* benchmarking) columns `x` (longitude) and `y` (latitude).
+* `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `length` (edge weight, non-negative integer or floating point number).
+* In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
+and `v`, we must provide two lines, one for an edge from `u` to `v` and one for an edge from `v` to `u`, both with the same weight.
+* Values must be separated by a Tab character (`\t`).
 
 
 ### The Query Set Input Format

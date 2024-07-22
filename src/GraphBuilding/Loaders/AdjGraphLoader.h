@@ -5,8 +5,8 @@
 * Created:          07/27/20 
 *****************************************************************************/
 
-#ifndef SHORTEST_PATHS_CSVGRAPHLOADER_H
-#define SHORTEST_PATHS_CSVGRAPHLOADER_H
+#ifndef SHORTEST_PATHS_ADJGRAPHLOADER_H
+#define SHORTEST_PATHS_ADJGRAPHLOADER_H
 
 
 #include "GraphLoader.h"
@@ -18,14 +18,14 @@
 typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
                      csv2::first_row_is_header<false>,
                      csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
-    DefaultCSVReader;
+    DefaultADJReader;
 
 class AdjGraphLoader : public GraphLoader {
 private:
-    DefaultCSVReader reader;
+    DefaultADJReader reader;
     std::string inputFile;
 public:
-    explicit AdjGraphLoader(std::string inputFile);
+    explicit AdjGraphLoader(const std::string& inputFile);
 
     using GraphLoader::loadGraph;
 
@@ -38,4 +38,4 @@ public:
 };
 
 
-#endif //SHORTEST_PATHS_CSVGRAPHLOADER_H
+#endif //SHORTEST_PATHS_ADJGRAPHLOADER_H

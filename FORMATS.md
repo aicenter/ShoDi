@@ -31,7 +31,7 @@ This input format was used during the 9th DIMACS Implementation Challenge on sho
 
 The expected suffix for DIMACS graph files is `.gr` although it is not enforced.
 
-### CSV input format
+### Adjacency Matrix (ADJ) input format
 
 One of the three input formats that can be used to describe the input graph for the preprocessing.
 
@@ -41,6 +41,18 @@ A CSV file represents an [adjacency matrix](https://en.wikipedia.org/wiki/Adjace
 * The file must have its amount of rows equal to its amount of columns.
 * Each value on row `i` and column `j` represents the weight of a *directed* edge from node `i` to node `j`.
 * Weights are expected to be valid *positive* integers, or `nan` for where there is no directed edge joining the nodes.
+
+### CSV input format
+
+A pair of files named `nodes.csv` and `edges.csv` located in the same directory.
+
+* Path to the directory containing these files must be specified in the `input_path` argument.
+* `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
+  (for A* benchmarking) columns `x` (longitude) and `y` (latitude).
+* `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `length` (edge weight, non-negative integer or floating point number).
+* In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
+  and `v`, we must provide two lines, one for an edge from `u` to `v` and one for an edge from `v` to `u`, both with the same weight.
+* Values must be separated by a Tab character (`\t`).
 
 
 ### Query set input format

@@ -197,6 +197,8 @@ add_library(shortestPaths SHARED
         src/GraphBuilding/Loaders/GraphLoader.h
         src/GraphBuilding/Loaders/AdjGraphLoader.cpp
         src/GraphBuilding/Loaders/AdjGraphLoader.h
+        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+        src/GraphBuilding/Loaders/CsvGraphLoader.h
         src/Error/Error.h
         src/DistanceMatrix/johnson.cpp
         src/DistanceMatrix/johnson.hpp
@@ -247,6 +249,7 @@ add_executable(shortestPathsPreprocessor
     src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
     src/DistanceMatrix/johnson.cpp
     src/GraphBuilding/Loaders/AdjGraphLoader.cpp
+    src/GraphBuilding/Loaders/CsvGraphLoader.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/DIMACSLoader.cpp
     src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
