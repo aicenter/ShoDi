@@ -84,20 +84,25 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 	for (const auto& row: edgeReader) {
 		unsigned int j = 0;
         unsigned int from, to;
+		std::string dist_val;
         dist_t dist;
+
 		for (const auto& cell: row) {
 			std::string val;
 			cell.read_value(val);
 
             if (j == from_col) from = boost::numeric_cast<unsigned int>(std::stoul(val));
             else if (j == to_col) to = boost::numeric_cast<unsigned int>(std::stoul(val));
-            else if (j == dist_col) dist = parse_distance(val, from, to, scaling_factor);
+            else if (j == dist_col) dist_val = val;
             ++j;
 		}
 
+		++progress;
+		if (j == 0) continue; // empty row
+
+		dist = parse_distance(dist_val, from, to, scaling_factor);
+
         if (dist != max)
             graph.addEdge(from, to, dist);
-
-		++progress;
 	}
 }
