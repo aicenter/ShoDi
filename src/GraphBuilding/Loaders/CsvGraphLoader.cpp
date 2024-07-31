@@ -6,8 +6,8 @@
  *****************************************************************************/
 
 #include "CsvGraphLoader.h"
-#include "CLI/ProgressBar.hpp"
-#include "GraphBuilding/Structures/Graph.h"
+#include "../../CLI/ProgressBar.hpp"
+#include "../Structures/Graph.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <limits>
 #include <stdexcept>
@@ -83,7 +83,7 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 
 	for (const auto& row: edgeReader) {
 		unsigned int j = 0;
-        unsigned int from, to;
+        unsigned int from = 0, to = 0;
 		std::string dist_val;
         dist_t dist;
 
@@ -105,4 +105,42 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
         if (dist != max)
             graph.addEdge(from, to, dist);
 	}
+}
+
+void CsvGraphLoader::loadLocations(std::vector<std::pair<double, double>>& locations) {
+    size_t id_col = 0, x_col = 0, y_col = 0;
+    auto header = nodeReader.header();
+    size_t c = 0;
+    for (const auto& cell : header) {
+        std::string column_name;
+        cell.read_value(column_name);
+        if (column_name == "id") {
+            id_col = c;
+        } else if (column_name == "x") {
+            x_col = c;
+        } else if (column_name == "y") {
+            y_col = c;
+        }
+        ++c;
+    }
+
+    for (const auto& row: nodeReader) {
+        unsigned int j = 0;
+        unsigned int id = 0;
+        double x = 0.0, y = 0.0;
+
+        for (const auto& cell: row) {
+            std::string val;
+            cell.read_value(val);
+
+            if (j == id_col) id = boost::numeric_cast<unsigned int>(std::stoul(val));
+            else if (j == x_col) x = stod(val);
+            else if (j == y_col) y = stod(val);
+            ++j;
+        }
+
+        if (j == 0) continue; // empty row
+
+        locations[id] = {x, y};
+    }
 }

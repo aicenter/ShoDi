@@ -7,8 +7,8 @@
 
 #include <fstream>
 #include "DistanceMatrixCsvOutputter.h"
-#include "constants.h"
-#include "CLI/ProgressBar.hpp"
+#include "../constants.h"
+#include "../CLI/ProgressBar.hpp"
 
 void DistanceMatrixCsvOutputter::store(Distance_matrix_travel_time_provider &dm, const std::string &path) {
     printf("Storing the distance matrix.\n");

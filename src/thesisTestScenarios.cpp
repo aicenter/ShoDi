@@ -11,17 +11,20 @@
 #include "GraphBuilding/Loaders/DistanceMatrixLoader.h"
 #include "GraphBuilding/Loaders/TripsLoader.h"
 #include "Benchmarking/DijkstraBenchmark.h"
+#include "Benchmarking/AstarBenchmark.h"
 #include "Benchmarking/CHBenchmark.h"
 #include "Benchmarking/TNRBenchmark.h"
 #include "Benchmarking/TNRAFBenchmark.h"
 #include "Benchmarking/DistanceMatrixBenchmark.h"
 #include "Benchmarking/CorrectnessValidator.h"
+#include "Benchmarking/LocationTransformer.h"
 #include "CH/CHPreprocessor.h"
 #include "GraphBuilding/Structures/UpdateableGraph.h"
 #include "Timer/Timer.h"
 #include "TNR/TNRPreprocessor.h"
 #include "TNRAF/TNRAFPreprocessor.h"
 #include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
+#include "GraphBuilding/Loaders/CsvGraphLoader.h"
 #include <boost/numeric/conversion/cast.hpp>
 
 /*
@@ -181,6 +184,18 @@ void computeStructuresForAllMethodsSouthwestBohemia(char const * inputFilePath =
     createTNR(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
     createTNRAF(inputFilePath, 7000, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes");
     createDM(inputFilePath, "../thesisTestsData/SouthwestBohemia/SouthwestBohemia");
+}
+
+/**
+ * Auxiliary function that precomputes all the data structures used for the third benchmark (graph of Washington DC).
+ *
+ * @param inputFilePath[in] The path to the graph of Washington DC in the XenGraph format.
+ */
+void computeStructuresForAllMethodsDC(char const * inputFilePath = "../thesisTestsData/DC/DC.xeng") {
+    createTNR(inputFilePath, 2000, "../thesisTestsData/DC/DC2000tnodes");
+    createCH(inputFilePath, "../thesisTestsData/DC/DC");
+    createTNRAF(inputFilePath, 2000, "../thesisTestsData/DC/DC2000tnodes");
+    createDM(inputFilePath, "../thesisTestsData/DC/DC");
 }
 
 /**
@@ -532,6 +547,127 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
 }
 
 /**
+ * Compares the five methods on the graph of SouthwestBohemia using a query set containing 100 000 random queries.
+ * The results of this benchmark are reported in section 7.2.3 of the thesis.
+ *
+ * @param runs[in] The number of times the benchmark should be repeated. The average values are returned at the end.
+ * More runs should provide more accurate values.
+ */
+void compareAllMethodsOnDC(unsigned int runs = 20) {
+    XenGraphLoader dijkstraGraphLoader("../thesisTestsData/DC/DC.xeng");
+    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
+    dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
+
+    CsvGraphLoader csvGraphLoader = CsvGraphLoader("../thesisTestsData/DC");
+    auto gpsLocations = std::vector<std::pair<double, double>>(csvGraphLoader.nodes());
+    auto projectedLocations = std::vector<std::pair<double, double>>();
+    csvGraphLoader.loadLocations(gpsLocations);
+    LocationTransformer::transformLocations(gpsLocations, projectedLocations);
+
+    DDSGLoader chLoader = DDSGLoader("../thesisTestsData/DC/DC.ch");
+    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+
+    TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/DC/DC2000tnodes.tnrg");
+    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+
+    TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/DC/DC2000tnodes.tgaf");
+    TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
+
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/DC/DC.xdm");
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
+
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/DC/1000queries.txt");
+    std::vector<std::pair<unsigned int, unsigned int>> querySet;
+    querySetLoader.loadTrips(querySet);
+    unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
+
+    double cummulativeDijkstraTime = 0;
+    double cummulativeAstarTime = 0;
+    double cummulativeCHTime = 0;
+    double cummulativeTNRTime = 0;
+    double cummulativeTNRAFTime = 0;
+    double cummulativeDMTime = 0;
+
+    bool validResults = true;
+
+    for(unsigned int i = 0; i < runs; ++i) {
+        printf("\r%u runs completed.", i);
+
+        std::vector<unsigned int> dijkstraDistances(queriesCnt);
+        std::vector<unsigned int> aStarDistances(queriesCnt);
+        std::vector<unsigned int> chDistances(queriesCnt);
+        std::vector<unsigned int> tnrDistances(queriesCnt);
+        std::vector<unsigned int> tnrafDistances(queriesCnt);
+        std::vector<unsigned int> dmDistances(queriesCnt);
+
+        cummulativeDijkstraTime += DijkstraBenchmark::benchmark(querySet, dijkstraGraph, dijkstraDistances);
+        cummulativeAstarTime += AstarBenchmark::benchmark(querySet, dijkstraGraph, projectedLocations, aStarDistances);
+        cummulativeCHTime += CHBenchmark::benchmark(querySet, *chGraph, chDistances);
+        cummulativeTNRTime += TNRBenchmark::benchmark(querySet, *tnrGraph, tnrDistances);
+        cummulativeTNRAFTime += TNRAFBenchmark::benchmark(querySet, *tnrafGraph, tnrafDistances);
+        cummulativeDMTime += DistanceMatrixBenchmark::benchmark(querySet, *dm, dmDistances);
+
+        if(CorrectnessValidator::validate(dijkstraDistances, aStarDistances) == false ||
+            CorrectnessValidator::validate(dijkstraDistances, chDistances) == false ||
+            CorrectnessValidator::validate(dijkstraDistances, tnrDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, tnrafDistances) == false ||
+           CorrectnessValidator::validate(dijkstraDistances, dmDistances) == false) {
+            printf("Oops! Something went wrong!\n"
+                   "Some values were incorrect during the benchmark runs.\n"
+                   "Stopping the benchmark, no times will be reported.\n");
+            validResults = false;
+            break;
+        }
+    }
+
+    printf("\r%u runs completed.\n", runs);
+
+    if(validResults) {
+        printf("Reporting benchmark results using %u queries with %u runs.\n", queriesCnt, runs);
+
+        printf("Dijkstra's Algorithm: average time to process the whole query set in seconds: %f\n", cummulativeDijkstraTime / runs);
+        printf("Astar: average time to process the whole query set in seconds: %f\n", cummulativeAstarTime / runs);
+        printf("Contraction Hierarchies: average time to process the whole query set in seconds: %f\n", cummulativeCHTime / runs);
+        printf("Transit Node Routing: average time to process the whole query set in seconds: %f\n", cummulativeTNRTime / runs);
+        printf("Transit Node Routing with Arc Flags: average time to process the whole query set in seconds: %f\n", cummulativeTNRAFTime / runs);
+        printf("Distance Matrix: average time to process the whole query set in seconds: %f\n", cummulativeDMTime / runs);
+
+        printf("Dijkstra's Algorithm: average time to process one query in milliseconds: %f\n", cummulativeDijkstraTime / (runs * queriesCnt * 0.001) );
+        printf("Astar: average time to process one query in milliseconds: %f\n", cummulativeAstarTime / (runs * queriesCnt * 0.001));
+        printf("Contraction Hierarchies: average time to process one query in milliseconds: %f\n", cummulativeCHTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing: average time to process one query in milliseconds: %f\n", cummulativeTNRTime / (runs * queriesCnt * 0.001));
+        printf("Transit Node Routing with Arc Flags: average time to process one query in milliseconds: %f\n", cummulativeTNRAFTime / (runs * queriesCnt * 0.001));
+        printf("Distance Matrix: average time to process one query in milliseconds: %f\n", cummulativeDMTime / (runs * queriesCnt * 0.001));
+
+        printf("\nA* was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeAstarTime);
+
+        printf("\nContraction Hierarchies were:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeCHTime);
+
+        printf("\nTransit Node Routing was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeTNRTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeTNRTime);
+
+        printf("\nTransit Node Routing with Arc Flags was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeTNRAFTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeTNRAFTime);
+        printf("  %f times faster than Transit Node Routing.\n", cummulativeTNRTime/cummulativeTNRAFTime);
+
+        printf("\nDistance Matrix was:\n");
+        printf("  %f times faster than Dijkstra's algorithm.\n", cummulativeDijkstraTime/cummulativeDMTime);
+        printf("  %f times faster than Contraction Hierarchies.\n", cummulativeCHTime/cummulativeDMTime);
+        printf("  %f times faster than Transit Node Routing.\n", cummulativeTNRTime/cummulativeDMTime);
+        printf("  %f times faster than Transit Node Routing with Arc Flags.\n", cummulativeTNRAFTime/cummulativeDMTime);
+    }
+
+    delete chGraph;
+    delete tnrGraph;
+    delete tnrafGraph;
+    delete dm;
+}
+
+/**
  * Compares Transit Node Routing with 6 different transit node-set sizes on the graph of Prague using a query
  * set containing 100 000 random queries.
  * The results of this benchmark are reported in section 7.2.4 of the thesis.
@@ -748,6 +884,9 @@ int main() {
 
     compareTNRwithVariousTransitNodeSetSizes(20);
     compareTNRAFwithVariousTransitNodeSetSizes(20);
+
+//    computeStructuresForAllMethodsDC("../thesisTestsData/DC/DC.xeng");
+//    compareAllMethodsOnDC(20);
 
     return 0;
 }

@@ -14,7 +14,7 @@
 #include "OutputEdge.h"
 #include "OutputShortcutEdge.h"
 #include "Graph.h"
-#include "constants.h"
+#include "../../constants.h"
 
 #include "BaseGraph.h"
 

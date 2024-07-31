@@ -14,7 +14,7 @@
 #include <string>
 #include "DistanceMatrixComputorSlow.h"
 #include "../Dijkstra/DijkstraNode.h"
-#include "constants.h"
+#include "../constants.h"
 
 //______________________________________________________________________________________________________________________
 void DistanceMatrixComputorSlow::computeDistanceMatrix(const Graph& graph) {

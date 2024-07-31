@@ -6,7 +6,7 @@
  *****************************************************************************/
 
 #include "AdjMatrixGraph.h"
-#include "constants.h"
+#include "../../constants.h"
 #include <algorithm>
 #include <limits>
 #include <vector>

@@ -6,9 +6,9 @@
 #include "XenGraphLoader.h"
 #include "../../Error/Error.h"
 #include "../../Timer/Timer.h"
-#include "GraphBuilding/Structures/SimpleGraph.h"
-#include "GraphBuilding/Structures/UpdateableGraph.h"
-#include "constants.h"
+#include "../Structures/SimpleGraph.h"
+#include "../Structures/UpdateableGraph.h"
+#include "../../constants.h"
 #include <climits>
 #include <fstream>
 #include <iostream>

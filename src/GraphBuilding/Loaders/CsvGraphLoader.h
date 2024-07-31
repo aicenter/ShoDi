@@ -36,6 +36,7 @@ public:
 
     ~CsvGraphLoader() override = default;
 
+    void loadLocations(std::vector<std::pair<double, double>> &locations);
 };
 
 

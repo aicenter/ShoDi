@@ -12,7 +12,7 @@
 #include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeData.h"
 #include "../Dijkstra/DijkstraNode.h"
-#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
+#include "../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 #include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "../Dijkstra/BasicDijkstra.h"
 

@@ -6,8 +6,8 @@
  *****************************************************************************/
 
 #include "AdjGraphLoader.h"
-#include "CLI/ProgressBar.hpp"
-#include "GraphBuilding/Structures/Graph.h"
+#include "../../CLI/ProgressBar.hpp"
+#include "../Structures/Graph.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <limits>
 #include <stdexcept>

@@ -7,7 +7,7 @@
 #include <climits>
 #include <fstream>
 #include <boost/numeric/conversion/cast.hpp>
-#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
+#include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "TNRAFPreprocessor.h"
 #include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeDataArcFlags.h"

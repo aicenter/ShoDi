@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_DISTANCEMATRIXLOADER_H
 
 #include <string>
-#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
+#include "../../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 
 

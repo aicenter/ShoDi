@@ -6,10 +6,10 @@
 #include "DIMACSLoader.h"
 #include "../../Error/Error.h"
 #include "../../Timer/Timer.h"
-#include "GraphBuilding/Structures/BaseGraph.h"
-#include "GraphBuilding/Structures/SimpleGraph.h"
-#include "GraphBuilding/Structures/UpdateableGraph.h"
-#include "constants.h"
+#include "../Structures/BaseGraph.h"
+#include "../Structures/SimpleGraph.h"
+#include "../Structures/UpdateableGraph.h"
+#include "../../constants.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <climits>
 #include <fstream>

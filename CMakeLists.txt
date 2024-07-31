@@ -43,6 +43,9 @@ find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 ## HDF5
 find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
 
+## PROJ
+find_package(PROJ CONFIG REQUIRED)
+
 ## OpenMP
 find_package(OpenMP REQUIRED)
 if (OpenMP_CXX_FOUND)
@@ -115,6 +118,10 @@ add_library(shortestPaths SHARED
         src/Dijkstra/BasicDijkstra.h
         src/Dijkstra/DijkstraNode.cpp
         src/Dijkstra/DijkstraNode.h
+        src/Astar/Astar.cpp
+        src/Astar/Astar.h
+        src/Astar/AstarNode.cpp
+        src/Astar/AstarNode.h
         src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
         src/DistanceMatrix/Distance_matrix_travel_time_provider.h
         src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
@@ -287,21 +294,70 @@ add_executable(shortestPathsPreprocessor
 
 add_executable(thesisBenchmark
         src/Benchmarking/TNRBenchmark.cpp
-        src/Benchmarking/TNRBenchmark.h
-        src/Benchmarking/CHBenchmark.h
         src/Benchmarking/CHBenchmark.cpp
-        src/Benchmarking/DijkstraBenchmark.h
         src/Benchmarking/DijkstraBenchmark.cpp
-        src/Benchmarking/CorrectnessValidator.h
+        src/Benchmarking/AstarBenchmark.cpp
         src/Benchmarking/CorrectnessValidator.cpp
-        src/Benchmarking/DistanceCorrectnessValidator.h
         src/Benchmarking/DistanceCorrectnessValidator.cpp
         src/Benchmarking/DistanceMatrixBenchmark.cpp
-        src/Benchmarking/DistanceMatrixBenchmark.h
+        src/Benchmarking/LocationTransformer.cpp
         src/Benchmarking/PathCorrectnessValidator.cpp
-        src/Benchmarking/PathCorrectnessValidator.h
         src/Benchmarking/TNRAFBenchmark.cpp
-        src/Benchmarking/TNRAFBenchmark.h
+        src/CH/Structures/CHNode.cpp
+        src/CH/Structures/CHpriorityQueue.cpp
+        src/CH/EdgeDifferenceManager.cpp
+        src/CH/Structures/HopsDijkstraNode.cpp
+        src/CH/Structures/NodeData.cpp
+        src/CH/CHDistanceQueryManager.cpp
+        src/CH/CHDistanceQueryManagerWithMapping.cpp
+        src/CH/CHPathQueryManager.cpp
+        src/CH/CHPreprocessor.cpp
+        src/Dijkstra/BasicDijkstra.cpp
+        src/Dijkstra/DijkstraNode.cpp
+        src/Astar/Astar.cpp
+        src/Astar/AstarNode.cpp
+        src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
+        src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
+        src/GraphBuilding/Loaders/DDSGLoader.cpp
+        src/GraphBuilding/Loaders/DIMACSLoader.cpp
+        src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
+        src/GraphBuilding/Loaders/XenGraphLoader.cpp
+        src/GraphBuilding/Loaders/TripsLoader.cpp
+        src/GraphBuilding/Loaders/TNRGLoader.cpp
+        src/GraphBuilding/Loaders/TGAFLoader.cpp
+        src/GraphBuilding/Structures/FlagsGraph.cpp
+        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+        src/GraphBuilding/Structures/Graph.cpp
+        src/GraphBuilding/Structures/AdjMatrixGraph.cpp
+        src/GraphBuilding/Structures/OutputEdge.cpp
+        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+        src/GraphBuilding/Structures/QueryEdge.cpp
+        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+        src/GraphBuilding/Structures/ShortcutEdge.cpp
+        src/GraphBuilding/Structures/SimpleGraph.cpp
+        src/GraphBuilding/Structures/UpdateableGraph.cpp
+        src/GraphBuilding/Structures/SimpleEdge.cpp
+        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
+        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
+        src/TNR/TNRPreprocessor.cpp
+        src/TNR/Structures/AccessNodeData.cpp
+        src/TNR/TNRDistanceQueryManager.cpp
+        src/TNR/TNRDistanceQueryManagerWithMapping.cpp
+        src/Timer/Timer.cpp
+        src/TNR/TNRPathQueryManager.cpp
+        src/TNRAF/TNRAFPreprocessor.cpp
+        src/TNRAF/TNRAFPathQueryManager.cpp
+        src/TNRAF/TNRAFDistanceQueryManager.cpp
+        src/TNRAF/TNRAFDistanceQueryManagerWithMapping.cpp
+        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+        src/TNRAF/Structures/RegionsStructure.cpp
+        src/TNRAF/Structures/NodeDataRegions.cpp
+        src/TNRAF/Structures/RegionsStructure.cpp
+        src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+        src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
+        src/CLI/ProgressBar.cpp
         src/thesisTestScenarios.cpp)
 
 add_executable(benchmark
@@ -429,6 +485,7 @@ target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIR
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(thesisBenchmark PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 
 # include JNI dirs if found
 if (JNI_FOUND)
@@ -439,7 +496,6 @@ endif ()
 # LINKING
 
 # old linking against lib: should be removed
-target_link_libraries(thesisBenchmark shortestPaths)
 target_link_libraries(benchmark shortestPaths)
 
 target_link_libraries(test_runner PRIVATE GTest::gtest_main)
@@ -447,6 +503,7 @@ target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+target_link_libraries(thesisBenchmark PRIVATE PROJ::proj)
 
 
 # RESOURCES

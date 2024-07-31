@@ -10,7 +10,7 @@
 #include <vector>
 #include "BaseGraph.h"
 #include "SimpleGraph.h"
-#include "constants.h"
+#include "../../constants.h"
 
 
 /**
