@@ -576,7 +576,7 @@ void compareAllMethodsOnDC(unsigned int runs = 20) {
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/DC/DC.xdm");
     Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
 
-    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/DC/1000queries.txt");
+    TripsLoader querySetLoader = TripsLoader("../thesisTestsData/DC/DC1000randomQueries.txt");
     std::vector<std::pair<unsigned int, unsigned int>> querySet;
     querySetLoader.loadTrips(querySet);
     unsigned int queriesCnt = boost::numeric_cast<unsigned int>(querySet.size());
