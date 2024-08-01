@@ -9,6 +9,7 @@
 #include "../Timer/Timer.h"
 #include "AstarBenchmark.h"
 #include "../GraphBuilding/Loaders/CsvGraphLoader.h"
+#include "../GraphBuilding/Loaders/XenGraphLoader.h"
 
 //______________________________________________________________________________________________________________________
 double AstarBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, const Graph & graph, const std::vector<std::pair<double, double>>& locations, std::vector < unsigned int > & distances) {
@@ -24,16 +25,16 @@ double AstarBenchmark::benchmark(const std::vector < std::pair< unsigned int, un
 }
 
 //______________________________________________________________________________________________________________________
-double AstarBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, const Graph & graph, std::vector < unsigned int > & distances, std::string mappingFilePath) {
-    //XenGraphLoader mappingLoader(mappingFilePath);
-    //std::unordered_map<long long unsigned int, unsigned int> mapping;
-    //mappingLoader.loadNodesMapping(mapping);
+double AstarBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, const Graph & graph, const std::vector<std::pair<double, double>>& locations, std::vector < unsigned int > & distances, std::string mappingFilePath) {
+    XenGraphLoader mappingLoader(mappingFilePath);
+    std::unordered_map<long long unsigned int, unsigned int> mapping;
+    mappingLoader.loadNodesMapping(mapping);
 
     Timer aStarTimer("Astar trips benchmark");
     aStarTimer.begin();
 
     for(size_t i = 0; i < trips.size(); i++) {
-        // distances[i] = Astar::run(mapping.at(trips.at(i).first), mapping.at(trips.at(i).second), graph);
+        distances[i] = Astar::run(mapping.at(trips.at(i).first), mapping.at(trips.at(i).second), graph, locations);
     }
 
     aStarTimer.finish();

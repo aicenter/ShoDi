@@ -36,6 +36,8 @@
 #include "GraphBuilding/Loaders/DistanceMatrixLoader.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "Benchmarking/DijkstraBenchmark.h"
+#include "Benchmarking/AstarBenchmark.h"
+#include "Benchmarking/LocationTransformer.h"
 #include "Error/Error.h"
 #include "GraphBuilding/Loaders/AdjGraphLoader.h"
 #include "GraphBuilding/Loaders/CsvGraphLoader.h"
@@ -381,6 +383,59 @@ void benchmarkDijkstra(
 }
 
 /**
+ * Benchmarks the A* algorithm implementation using a given graph in the CSV input format and a given
+ * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
+ *
+ * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
+ * XenGraph input format.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ */
+void benchmarkAstar(
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        char* distancesOutputPath = nullptr,
+        bool outputDistances = false) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    std::vector<std::pair<unsigned int, unsigned int> > trips;
+    tripsLoader.loadTrips(trips);
+
+    CsvGraphLoader csvGraphLoader = CsvGraphLoader(inputFilePath);
+    Graph aStarGraph(csvGraphLoader.nodes());
+    csvGraphLoader.loadGraph(aStarGraph, 1);
+    auto gpsLocations = std::vector<std::pair<double, double>>(csvGraphLoader.nodes());
+    auto projectedLocations = std::vector<std::pair<double, double>>();
+    csvGraphLoader.loadLocations(gpsLocations);
+    LocationTransformer::transformLocations(gpsLocations, projectedLocations);
+
+    std::vector<unsigned int> aStarDistances(trips.size());
+    double aStarTime = AstarBenchmark::benchmark(trips, aStarGraph, projectedLocations, aStarDistances);
+
+    std::cout << "Run " << trips.size() << " queries using A* algorithm in " << aStarTime << " seconds." << std::endl;
+    std::cout << "That means " << (aStarTime / (double) trips.size()) * 1000 << " ms per query." << std::endl;
+
+    if (outputDistances) {
+        std::cout << "Now outputting distances to '" << distancesOutputPath << "'." << std::endl;
+
+        std::ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << std::endl;
+        for (size_t i = 0; i < trips.size(); ++i) {
+            output << aStarDistances[i] << std::endl;
+        }
+
+        output.close();
+    }
+}
+
+/**
  * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
  * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
  * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
@@ -429,6 +484,65 @@ void benchmarkDijkstraWithMapping(
         output << queriesFilePath << std::endl;
         for (size_t i = 0; i < trips.size(); ++i) {
             output << dijkstraDistances[i] << std::endl;
+        }
+
+        output.close();
+    }
+}
+
+/**
+ * Benchmarks the A* algorithm implementation using a given graph in the CSV input format and a given
+ * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
+ *
+ * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
+ * XenGraph input format.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
+ * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ */
+void benchmarkAstarWithMapping(
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        char* distancesOutputPath = nullptr,
+        bool outputDistances = false) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
+    tripsLoader.loadLongLongTrips(trips);
+
+    CsvGraphLoader csvGraphLoader = CsvGraphLoader(inputFilePath);
+    Graph aStarGraph(csvGraphLoader.nodes());
+    csvGraphLoader.loadGraph(aStarGraph, 1);
+    auto gpsLocations = std::vector<std::pair<double, double>>(csvGraphLoader.nodes());
+    auto projectedLocations = std::vector<std::pair<double, double>>();
+    csvGraphLoader.loadLocations(gpsLocations);
+    LocationTransformer::transformLocations(gpsLocations, projectedLocations);
+
+    std::vector<unsigned int> aStarDistances(trips.size());
+    double aStarTime = AstarBenchmark::benchmarkUsingMapping(trips, aStarGraph, projectedLocations,
+                                                             aStarDistances, mappingFilePath);
+
+    std::cout << "Run " << trips.size() << " queries using A* algorithm in " << aStarTime << " seconds" << std::endl;
+    std::cout << "using '" << mappingFilePath << "' as mapping." << std::endl;
+    std::cout << "That means " << (aStarTime / (double) trips.size()) * 1000 << " ms per query." << std::endl;
+
+
+    if (outputDistances) {
+        std::cout << "Now outputting distances to '" << distancesOutputPath << "'." << std::endl;
+
+        std::ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << std::endl;
+        for (size_t i = 0; i < trips.size(); ++i) {
+            output << aStarDistances[i] << std::endl;
         }
 
         output.close();
@@ -880,6 +994,7 @@ int main(int argc, char* argv[]) {
 
             std::unordered_map<std::string, std::function<void(std::string, std::string, std::string, char*, bool)>> benchmarkMapFunctions = {
                     {"dijkstra", benchmarkDijkstraWithMapping},
+                    {"astar", benchmarkAstarWithMapping},
                     {"ch", benchmarkCHwithMapping},
                     {"tnr", benchmarkTNRwithMapping},
                     {"tnraf", benchmarkTNRAFwithMapping},
@@ -887,6 +1002,7 @@ int main(int argc, char* argv[]) {
 
             std::unordered_map<std::string, std::function<void(std::string, std::string, char*, bool)>> benchmarkFunctions = {
                     {"dijkstra", benchmarkDijkstra},
+                    {"astar", benchmarkAstar},
                     {"ch", benchmarkCH},
                     {"tnr", benchmarkTNR},
                     {"tnraf", benchmarkTNRAF},

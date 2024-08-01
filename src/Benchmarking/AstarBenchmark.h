@@ -49,6 +49,7 @@ public:
     static double benchmarkUsingMapping(
             const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips,
             const Graph & graph,
+            const std::vector<std::pair<double, double>>& locations,
             std::vector < unsigned int > & distances,
             std::string mappingFilePath);
 };

@@ -235,6 +235,8 @@ add_executable(shortestPathsPreprocessor
     src/Benchmarking/CHBenchmark.cpp
     src/Benchmarking/CorrectnessValidator.cpp
     src/Benchmarking/DijkstraBenchmark.cpp
+    src/Benchmarking/AstarBenchmark.cpp
+    src/Benchmarking/LocationTransformer.cpp
     src/Benchmarking/TNRAFBenchmark.cpp
     src/Benchmarking/TNRBenchmark.cpp
     src/CH/CHDistanceQueryManager.cpp
@@ -248,6 +250,8 @@ add_executable(shortestPathsPreprocessor
     src/CLI/ProgressBar.cpp
     src/Dijkstra/BasicDijkstra.cpp
     src/Dijkstra/DijkstraNode.cpp
+    src/Astar/Astar.cpp
+    src/Astar/AstarNode.cpp
     src/DistanceMatrix/DistanceMatrixComputorFast.cpp
     src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
     src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
@@ -504,6 +508,7 @@ target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(thesisBenchmark PRIVATE PROJ::proj)
+target_link_libraries(shortestPathsPreprocessor PRIVATE PROJ::proj)
 
 
 # RESOURCES
