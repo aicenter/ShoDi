@@ -83,7 +83,7 @@ From Source
  - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
 ### Building the project
-1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion boost-program-options p-ranav-csv2 indicators "hdf5[cpp]"`
+1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion boost-program-options p-ranav-csv2 indicators "hdf5[cpp]" proj`
 2. Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
 3. `mkdir build && cd build`
 4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
@@ -262,14 +262,23 @@ To benchmark (with or without mapping), call the preprocessor with the following
 
 where:
 
-* `method` is one of `dijkstra`, `ch`, `tnr`, `tnraf` - the method being benchmarked
+* `method` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf` - the method being benchmarked
 * `input_data_structure` is path to the data structure preprocessed using the preprocessor *for the selected* 
-`method`. For dijkstra, use a XenGraph file.
+`method`. For dijkstra, use a XenGraph file. For Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv`)
 `input_data_structure` argument. 
 * `query_set` is path to the query set (file format described in the File Formats section below)
 * `mapping_file` (optional) is path to the mapping file (file format described in the File Formats section below), which will be 
 	used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
 * `output_path` (optional) is path to the output file for the computed distances
+
+#### A* Benchmarking
+
+Having the [PROJ](https://proj.org) utility installed is required for A* benchmarking. Path to PROJ directory needs to
+be provided in an environment variable `PROJ_DATA`, eg. like this:
+```
+PROJ_DATA=/usr/share/proj ./shortestPathsPreprocessor benchmark -m astar [options]
+```
+You can also copy the `proj.db` file into the working directory instead.
 
 #### Computed Distances
 
