@@ -192,8 +192,8 @@ void computeStructuresForAllMethodsSouthwestBohemia(char const * inputFilePath =
  * @param inputFilePath[in] The path to the graph of Washington DC in the XenGraph format.
  */
 void computeStructuresForAllMethodsDC(char const * inputFilePath = "../thesisTestsData/DC/DC.xeng") {
-    createTNR(inputFilePath, 2000, "../thesisTestsData/DC/DC2000tnodes");
     createCH(inputFilePath, "../thesisTestsData/DC/DC");
+    createTNR(inputFilePath, 2000, "../thesisTestsData/DC/DC2000tnodes");
     createTNRAF(inputFilePath, 2000, "../thesisTestsData/DC/DC2000tnodes");
     createDM(inputFilePath, "../thesisTestsData/DC/DC");
 }
@@ -241,10 +241,10 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Prague/Prague.ch");
-    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+    FlagsGraph<NodeData>* chGraph = chLoader.loadFlagsGraph();
 
     TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/Prague/Prague2000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/Prague/Prague2000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
@@ -347,10 +347,10 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/Berlin/Berlin.ch");
-    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+    FlagsGraph<NodeData>* chGraph = chLoader.loadFlagsGraph();
 
     TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/Berlin/Berlin5000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/Berlin/Berlin5000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
@@ -453,10 +453,10 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.ch");
-    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+    FlagsGraph<NodeData>* chGraph = chLoader.loadFlagsGraph();
 
     TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia7000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
@@ -565,10 +565,10 @@ void compareAllMethodsOnDC(unsigned int runs = 20) {
     LocationTransformer::transformLocations(gpsLocations, projectedLocations);
 
     DDSGLoader chLoader = DDSGLoader("../thesisTestsData/DC/DC.ch");
-    FlagsGraph * chGraph = chLoader.loadFlagsGraph();
+    FlagsGraph<NodeData>* chGraph = chLoader.loadFlagsGraph();
 
     TNRGLoader tnrLoader = TNRGLoader("../thesisTestsData/DC/DC2000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     TGAFLoader tnrafLoader = TGAFLoader("../thesisTestsData/DC/DC2000tnodes.tgaf");
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
@@ -677,22 +677,22 @@ void compareAllMethodsOnDC(unsigned int runs = 20) {
  */
 void compareTNRwithVariousTransitNodeSetSizes(unsigned int runs = 20) {
     TNRGLoader tnr200Loader = TNRGLoader("../thesisTestsData/Prague/Prague200tnodes.tnrg");
-    TransitNodeRoutingGraph * tnr200Graph = tnr200Loader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnr200Graph = tnr200Loader.loadTNRforDistanceQueries();
 
     TNRGLoader tnr500Loader = TNRGLoader("../thesisTestsData/Prague/Prague500tnodes.tnrg");
-    TransitNodeRoutingGraph * tnr500Graph = tnr500Loader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnr500Graph = tnr500Loader.loadTNRforDistanceQueries();
 
     TNRGLoader tnr1000Loader = TNRGLoader("../thesisTestsData/Prague/Prague1000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnr1000Graph = tnr1000Loader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnr1000Graph = tnr1000Loader.loadTNRforDistanceQueries();
 
     TNRGLoader tnr2000Loader = TNRGLoader("../thesisTestsData/Prague/Prague2000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnr2000Graph = tnr2000Loader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnr2000Graph = tnr2000Loader.loadTNRforDistanceQueries();
 
     TNRGLoader tnr5000Loader = TNRGLoader("../thesisTestsData/Prague/Prague5000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnr5000Graph = tnr5000Loader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnr5000Graph = tnr5000Loader.loadTNRforDistanceQueries();
 
     TNRGLoader tnr10000Loader = TNRGLoader("../thesisTestsData/Prague/Prague10000tnodes.tnrg");
-    TransitNodeRoutingGraph * tnr10000Graph = tnr10000Loader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnr10000Graph = tnr10000Loader.loadTNRforDistanceQueries();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     std::vector<std::pair<unsigned int, unsigned int>> querySet;

@@ -5,8 +5,8 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <climits>
-#include "TNR/Structures/AccessNodeData.h"
-#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
+#include "../../TNR/Structures/AccessNodeData.h"
+#include "../../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 //______________________________________________________________________________________________________________________
 template<class T> TransitNodeRoutingGraph<T>::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph<T>(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, std::vector<unsigned int>(transitNodesAmount)) {
