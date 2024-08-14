@@ -1,7 +1,7 @@
 #include "expected_graphs.h"
 
-FlagsGraph* build_flags_graph_01() {
-    FlagsGraph* g = new FlagsGraph(4);
+FlagsGraph<NodeData>* build_flags_graph_01() {
+    FlagsGraph<NodeData>* g = new FlagsGraph(4);
 
     g->data(0).rank = 2;
     g->data(1).rank = 3;
@@ -17,8 +17,8 @@ FlagsGraph* build_flags_graph_01() {
     return g;
 }
 
-FlagsGraph* build_flags_graph_02() {
-    FlagsGraph* g = new FlagsGraph(4);
+FlagsGraph<NodeData>* build_flags_graph_02() {
+    FlagsGraph<NodeData>* g = new FlagsGraph(4);
 
     g->data(0).rank = 1;
     g->data(1).rank = 4;
@@ -36,8 +36,8 @@ FlagsGraph* build_flags_graph_02() {
     return g;
 }
 
-FlagsGraph* build_flags_graph_02_div100() {
-    FlagsGraph* g = new FlagsGraph(4);
+FlagsGraph<NodeData>* build_flags_graph_02_div100() {
+    FlagsGraph<NodeData>* g = new FlagsGraph(4);
 
     g->data(0).rank = 1;
     g->data(1).rank = 4;
@@ -55,8 +55,8 @@ FlagsGraph* build_flags_graph_02_div100() {
     return g;
 }
 
-TransitNodeRoutingGraph* build_tnr_graph_01_1() {
-    TransitNodeRoutingGraph* g = new TransitNodeRoutingGraph(4, 1);
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_01_1() {
+    TransitNodeRoutingGraph<NodeData>* g = new TransitNodeRoutingGraph(4, 1);
 
     g->addEdge(0, 1, 1, true, false);
     g->addEdge(0, 3, 3, false, true);
@@ -94,8 +94,8 @@ TransitNodeRoutingGraph* build_tnr_graph_01_1() {
     return g;
 }
 
-TransitNodeRoutingGraph* build_tnr_graph_01_2() {
-    TransitNodeRoutingGraph* g = new TransitNodeRoutingGraph(4, 2);
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_01_2() {
+    TransitNodeRoutingGraph<NodeData>* g = new TransitNodeRoutingGraph(4, 2);
 
     g->addEdge(0, 1, 1, true, false);
     g->addEdge(0, 3, 3, false, true);
@@ -134,8 +134,8 @@ TransitNodeRoutingGraph* build_tnr_graph_01_2() {
     return g;
 }
 
-TransitNodeRoutingGraph* build_tnr_graph_01_3() {
-    TransitNodeRoutingGraph* g = new TransitNodeRoutingGraph(4, 3);
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_01_3() {
+    TransitNodeRoutingGraph<NodeData>* g = new TransitNodeRoutingGraph(4, 3);
 
     g->addEdge(0, 1, 1, true, false);
     g->addEdge(0, 3, 3, false, true);
@@ -177,8 +177,8 @@ TransitNodeRoutingGraph* build_tnr_graph_01_3() {
     return g;
 }
 
-TransitNodeRoutingGraph* build_tnr_graph_02_2_div100() {
-    TransitNodeRoutingGraph* g = new TransitNodeRoutingGraph(4, 2);
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_02_2_div100() {
+    TransitNodeRoutingGraph<NodeData>* g = new TransitNodeRoutingGraph(4, 2);
 
     g->addEdge(0, 1, 6683, true, false);
     g->addEdge(0, 1, 6723, false, true);

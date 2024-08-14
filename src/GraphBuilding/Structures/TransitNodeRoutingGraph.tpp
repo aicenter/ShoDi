@@ -5,18 +5,19 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <climits>
-#include "TransitNodeRoutingGraph.h"
+#include "TNR/Structures/AccessNodeData.h"
+#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, std::vector<unsigned int>(transitNodesAmount)) {
+template<class T> TransitNodeRoutingGraph<T>::TransitNodeRoutingGraph(unsigned int nodes, unsigned int transitNodesAmount) : FlagsGraph<T>(nodes), forwardAccessNodes(nodes), backwardAccessNodes(nodes), forwardSearchSpaces(nodes), backwardSearchSpaces(nodes), transitNodesDistanceTable(transitNodesAmount, std::vector<unsigned int>(transitNodesAmount)) {
 
 }
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingGraph::~TransitNodeRoutingGraph() = default;
+template<class T> TransitNodeRoutingGraph<T>::~TransitNodeRoutingGraph() = default;
 
 //______________________________________________________________________________________________________________________
-bool TransitNodeRoutingGraph::isLocalQuery(unsigned int start, unsigned int goal) {
+template<class T> bool TransitNodeRoutingGraph<T>::isLocalQuery(unsigned int start, unsigned int goal) {
     for(size_t k = 0; k < forwardSearchSpaces[start].size(); k++) {
         for(size_t m = 0; m < backwardSearchSpaces[goal].size(); m++) {
             if(forwardSearchSpaces[start][k] == backwardSearchSpaces[goal][m]) {
@@ -28,7 +29,7 @@ bool TransitNodeRoutingGraph::isLocalQuery(unsigned int start, unsigned int goal
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int start, unsigned int goal) {
+template<class T> unsigned int TransitNodeRoutingGraph<T>::findTNRDistance(unsigned int start, unsigned int goal) {
     unsigned int shortestDistance = UINT_MAX;
 
     for(size_t i = 0; i < forwardAccessNodes[start].size(); i++) {
@@ -46,37 +47,37 @@ unsigned int TransitNodeRoutingGraph::findTNRDistance(unsigned int start, unsign
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::addMappingPair(unsigned int realID, unsigned int transitNodesID) {
+template<class T> void TransitNodeRoutingGraph<T>::addMappingPair(unsigned int realID, unsigned int transitNodesID) {
     transitNodeMapping.insert(std::make_pair(realID, transitNodesID));
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::setDistanceTableValue(unsigned int i, unsigned int j, unsigned int value) {
+template<class T> void TransitNodeRoutingGraph<T>::setDistanceTableValue(unsigned int i, unsigned int j, unsigned int value) {
     transitNodesDistanceTable[i][j] = value;
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance) {
+template<class T> void TransitNodeRoutingGraph<T>::addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance) {
     forwardAccessNodes[node].push_back(AccessNodeData(accessNodeID, accessNodeDistance));
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance) {
+template<class T> void TransitNodeRoutingGraph<T>::addBackwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance) {
     backwardAccessNodes[node].push_back(AccessNodeData(accessNodeID, accessNodeDistance));
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
+template<class T> void TransitNodeRoutingGraph<T>::addForwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
     forwardSearchSpaces[sourceNode].push_back(searchSpaceNode);
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
+template<class T> void TransitNodeRoutingGraph<T>::addBackwardSearchSpaceNode(unsigned int sourceNode, unsigned int searchSpaceNode) {
     backwardSearchSpaces[sourceNode].push_back(searchSpaceNode);
 }
 
 //______________________________________________________________________________________________________________________
-void TransitNodeRoutingGraph::accessNodesTest(Distance_matrix_travel_time_provider & dm) {
+template<class T> void TransitNodeRoutingGraph<T>::accessNodesTest(Distance_matrix_travel_time_provider & dm) {
     unsigned int allAccessNodes = 0;
     unsigned int invalidDistanceNodes = 0;
 
@@ -94,26 +95,26 @@ void TransitNodeRoutingGraph::accessNodesTest(Distance_matrix_travel_time_provid
     printf("There are %u out of %u access nodes that have invalid distances. This means %lf %%.\n", invalidDistanceNodes, allAccessNodes, ((double) invalidDistanceNodes / allAccessNodes) * 100);
 }
 
-const std::vector<std::vector<AccessNodeData>> &TransitNodeRoutingGraph::getForwardAccessNodes() const {
+template<class T> const std::vector<std::vector<AccessNodeData>> &TransitNodeRoutingGraph<T>::getForwardAccessNodes() const {
     return forwardAccessNodes;
 }
 
-const std::vector<std::vector<AccessNodeData>> &TransitNodeRoutingGraph::getBackwardAccessNodes() const {
+template<class T> const std::vector<std::vector<AccessNodeData>> &TransitNodeRoutingGraph<T>::getBackwardAccessNodes() const {
     return backwardAccessNodes;
 }
 
-const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph::getForwardSearchSpaces() const {
+template<class T> const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph<T>::getForwardSearchSpaces() const {
     return forwardSearchSpaces;
 }
 
-const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph::getBackwardSearchSpaces() const {
+template<class T> const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph<T>::getBackwardSearchSpaces() const {
     return backwardSearchSpaces;
 }
 
-const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph::getTransitNodesDistanceTable() const {
+template<class T> const std::vector<std::vector<unsigned int>> &TransitNodeRoutingGraph<T>::getTransitNodesDistanceTable() const {
     return transitNodesDistanceTable;
 }
 
-const std::unordered_map<unsigned int, unsigned int> &TransitNodeRoutingGraph::getTransitNodeMapping() const {
+template<class T> const std::unordered_map<unsigned int, unsigned int> &TransitNodeRoutingGraph<T>::getTransitNodeMapping() const {
     return transitNodeMapping;
 }

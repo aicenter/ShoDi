@@ -9,7 +9,7 @@
 #include "../CH/CHDistanceQueryManagerWithMapping.h"
 
 //______________________________________________________________________________________________________________________
-double CHBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, FlagsGraph & graph, std::vector < unsigned int > & distances) {
+double CHBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, FlagsGraph<NodeData>& graph, std::vector < unsigned int > & distances) {
     CHDistanceQueryManager queryManager(graph);
 
     Timer chTimer("Contraction hierarchies trips benchmark");
@@ -24,7 +24,7 @@ double CHBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsig
 }
 
 //______________________________________________________________________________________________________________________
-double CHBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, FlagsGraph & graph, std::vector < unsigned int > & distances, std::string mappingFilePath) {
+double CHBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, FlagsGraph<NodeData>& graph, std::vector < unsigned int > & distances, std::string mappingFilePath) {
     CHDistanceQueryManagerWithMapping queryManager(graph, mappingFilePath);
 
     Timer chTimer("Contraction hierarchies trips benchmark with mapping");

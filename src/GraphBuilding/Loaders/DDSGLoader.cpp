@@ -13,7 +13,7 @@ DDSGLoader::DDSGLoader(std::string inputFile) : inputFile(inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-FlagsGraph * DDSGLoader::loadFlagsGraph() {
+FlagsGraph<NodeData>* DDSGLoader::loadFlagsGraph() {
     std::ifstream input;
     input.open(inputFile, std::ios::binary);
 
@@ -30,7 +30,7 @@ FlagsGraph * DDSGLoader::loadFlagsGraph() {
 
     unsigned int nodes, edges, shortcutEdges;
     loadCnts(input, nodes, edges, shortcutEdges);
-    FlagsGraph * graph = new FlagsGraph(nodes);
+    FlagsGraph<NodeData>* graph = new FlagsGraph(nodes);
 
     loadRanks(input, nodes, *graph);
     loadOriginalEdges(input, edges, *graph);
@@ -80,7 +80,7 @@ FlagsGraphWithUnpackingData * DDSGLoader::loadFlagsGraphWithUnpackingData() {
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadRanks(std::ifstream & input, unsigned int nodes, FlagsGraph & graph) {
+void DDSGLoader::loadRanks(std::ifstream & input, unsigned int nodes, FlagsGraph<NodeData>& graph) {
     for(unsigned int i = 0; i < nodes; i++) {
         unsigned int rank;
         input.read((char*)&rank, sizeof(rank));
@@ -98,7 +98,7 @@ void DDSGLoader::loadRanks(std::ifstream & input, unsigned int nodes, FlagsGraph
 }
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadOriginalEdges(std::ifstream & input, unsigned int edges, FlagsGraph & graph) {
+void DDSGLoader::loadOriginalEdges(std::ifstream & input, unsigned int edges, FlagsGraph<NodeData>& graph) {
     for(unsigned int i = 0; i < edges; i++) {
         unsigned int from, to, weight, flags;
         input.read((char*)&from, sizeof(from));
@@ -151,7 +151,7 @@ void DDSGLoader::loadOriginalEdges(std::ifstream & input, unsigned int edges, Fl
 
 
 //______________________________________________________________________________________________________________________
-void DDSGLoader::loadShortcutEdges(std::ifstream & input, unsigned int shortcutEdges, FlagsGraph & graph) {
+void DDSGLoader::loadShortcutEdges(std::ifstream & input, unsigned int shortcutEdges, FlagsGraph<NodeData>& graph) {
     for(unsigned int i = 0; i < shortcutEdges; i++) {
         unsigned int from, to, weight, flags, middleNode;
         input.read((char*)&from, sizeof(from));

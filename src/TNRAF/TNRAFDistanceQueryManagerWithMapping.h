@@ -26,7 +26,7 @@ public:
      * in the data structure.
      */
     TNRAFDistanceQueryManagerWithMapping(
-            TransitNodeRoutingArcFlagsGraph & g,
+            TransitNodeRoutingArcFlagsGraph& g,
             std::string mappingFilepath);
 
     /**

@@ -5,16 +5,15 @@
 
 #include <climits>
 #include <boost/numeric/conversion/cast.hpp>
-#include "FlagsGraph.h"
 
 //______________________________________________________________________________________________________________________
-FlagsGraph::FlagsGraph(unsigned int n) {
+template<class T> FlagsGraph<T>::FlagsGraph(unsigned int n) {
     neighbours.resize(n);
     nodesData.resize(n);
 }
 
 //______________________________________________________________________________________________________________________
-FlagsGraph::FlagsGraph(UpdateableGraph & g) {
+template<class T> FlagsGraph<T>::FlagsGraph(UpdateableGraph & g) {
     auto nodesCnt = g.nodes();
     neighbours.resize(nodesCnt);
     nodesData.resize(nodesCnt);
@@ -32,10 +31,10 @@ FlagsGraph::FlagsGraph(UpdateableGraph & g) {
 }
 
 //______________________________________________________________________________________________________________________
-FlagsGraph::~FlagsGraph() = default;
+template<class T> FlagsGraph<T>::~FlagsGraph() = default;
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::getEdgesForFlushing(std::vector < std::pair< unsigned int, QueryEdge > > & allEdges) {
+template<class T> void FlagsGraph<T>::getEdgesForFlushing(std::vector < std::pair< unsigned int, QueryEdge > > & allEdges) {
     const unsigned int nbs = boost::numeric_cast<unsigned int>(neighbours.size());
     for(unsigned int i = 0; i < nbs; i++) {
         const unsigned int nbs2 = boost::numeric_cast<unsigned int>(neighbours[i].size());
@@ -46,7 +45,7 @@ void FlagsGraph::getEdgesForFlushing(std::vector < std::pair< unsigned int, Quer
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::processOriginalEdges(std::vector < OutputEdge > & edges) {
+template<class T> void FlagsGraph<T>::processOriginalEdges(std::vector < OutputEdge > & edges) {
     for(size_t i = 0; i < edges.size(); i++) {
         unsigned int from, to, weight, flags;
         from = edges[i].sourceNode;
@@ -71,7 +70,7 @@ void FlagsGraph::processOriginalEdges(std::vector < OutputEdge > & edges) {
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::processShortcuts( std::vector < OutputShortcutEdge > & shortcuts) {
+template<class T> void FlagsGraph<T>::processShortcuts( std::vector < OutputShortcutEdge > & shortcuts) {
     for(size_t i = 0; i < shortcuts.size(); i++) {
         unsigned int from, to, weight, flags;
         from = shortcuts[i].sourceNode;
@@ -96,27 +95,27 @@ void FlagsGraph::processShortcuts( std::vector < OutputShortcutEdge > & shortcut
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw) {
+template<class T> void FlagsGraph<T>::addEdge(unsigned int from, unsigned int to, unsigned int weight, bool fw, bool bw) {
     neighbours.at(from).push_back(QueryEdge(to, weight, fw, bw));
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int FlagsGraph::nodes() const {
+template<class T> unsigned int FlagsGraph<T>::nodes() const {
     return boost::numeric_cast<unsigned int>(neighbours.size());
 }
 
 //______________________________________________________________________________________________________________________
-const std::vector< QueryEdge > & FlagsGraph::nextNodes(const unsigned int x)const {
+template<class T> const std::vector< QueryEdge > & FlagsGraph<T>::nextNodes(const unsigned int x)const {
     return neighbours.at(x);
 }
 
 //______________________________________________________________________________________________________________________
-NodeData & FlagsGraph::data(unsigned int node) {
+template<class T> T& FlagsGraph<T>::data(unsigned int node) {
     return nodesData[node];
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::resetForwardInfo(const unsigned int node) {
+template<class T> void FlagsGraph<T>::resetForwardInfo(const unsigned int node) {
     nodesData[node].forwardDist = UINT_MAX;
     nodesData[node].forwardSettled = false;
     nodesData[node].forwardReached = false;
@@ -124,26 +123,26 @@ void FlagsGraph::resetForwardInfo(const unsigned int node) {
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::resetBackwardInfo(const unsigned int node) {
+template<class T> void FlagsGraph<T>::resetBackwardInfo(const unsigned int node) {
     nodesData[node].backwardDist = UINT_MAX;
     nodesData[node].backwardSettled = false;
     nodesData[node].backwardReached = false;
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::resetForwardStall(const unsigned int node) {
+template<class T> void FlagsGraph<T>::resetForwardStall(const unsigned int node) {
     nodesData[node].forwardStalled = false;
 }
 
 //______________________________________________________________________________________________________________________
-void FlagsGraph::resetBackwardStall(const unsigned int node) {
+template<class T> void FlagsGraph<T>::resetBackwardStall(const unsigned int node) {
     nodesData[node].backwardStalled = false;
 }
 
-const std::vector<std::vector<QueryEdge>> &FlagsGraph::getNeighbours() const {
+template<class T> const std::vector<std::vector<QueryEdge>>& FlagsGraph<T>::getNeighbours() const {
     return neighbours;
 }
 
-const std::vector<NodeData> &FlagsGraph::getNodesData() const {
+template<class T> const std::vector<T> &FlagsGraph<T>::getNodesData() const {
     return nodesData;
 }

@@ -7,6 +7,13 @@ project(shortest_distances VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (MSVC)
+    add_compile_options("/W4")
+else ()
+    add_compile_options("-Wall" "-Wextra")
+    # "-Werror"
+endif ()
+
 # cmake modules
 include(FetchContent) # for dependencies that should be downloaded and built from source
 include(GenerateExportHeader) # for the GENERATE_EXPORT_HEADER macro
@@ -106,7 +113,7 @@ add_library(shortestPaths SHARED
         src/CH/Structures/HopsDijkstraNode.h
         src/CH/Structures/NodeData.cpp
         src/CH/Structures/NodeData.h
-        src/CH/CHDistanceQueryManager.cpp
+        src/CH/CHDistanceQueryManager.tpp
         src/CH/CHDistanceQueryManager.h
         src/CH/CHDistanceQueryManagerWithMapping.cpp
         src/CH/CHDistanceQueryManagerWithMapping.h
@@ -136,11 +143,10 @@ add_library(shortestPaths SHARED
         src/GraphBuilding/Loaders/XenGraphLoader.h
         src/GraphBuilding/Loaders/TripsLoader.cpp
         src/GraphBuilding/Loaders/TripsLoader.h
-        src/GraphBuilding/Loaders/TNRGLoader.cpp
+        src/GraphBuilding/Loaders/TNRGLoader.tpp
         src/GraphBuilding/Loaders/TNRGLoader.h
         src/GraphBuilding/Loaders/TGAFLoader.cpp
         src/GraphBuilding/Loaders/TGAFLoader.h
-        src/GraphBuilding/Structures/FlagsGraph.cpp
         src/GraphBuilding/Structures/FlagsGraph.h
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.h
@@ -167,7 +173,6 @@ add_library(shortestPaths SHARED
         src/GraphBuilding/Structures/UpdateableGraph.h
         src/GraphBuilding/Structures/SimpleEdge.cpp
         src/GraphBuilding/Structures/SimpleEdge.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
         src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
         src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
         src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.h
@@ -239,7 +244,7 @@ add_executable(shortestPathsPreprocessor
     src/Benchmarking/LocationTransformer.cpp
     src/Benchmarking/TNRAFBenchmark.cpp
     src/Benchmarking/TNRBenchmark.cpp
-    src/CH/CHDistanceQueryManager.cpp
+    src/CH/CHDistanceQueryManager.tpp
     src/CH/CHDistanceQueryManagerWithMapping.cpp
     src/CH/CHPreprocessor.cpp
     src/CH/EdgeDifferenceManager.cpp
@@ -265,11 +270,11 @@ add_executable(shortestPathsPreprocessor
     src/GraphBuilding/Loaders/DIMACSLoader.cpp
     src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
     src/GraphBuilding/Loaders/TGAFLoader.cpp
-    src/GraphBuilding/Loaders/TNRGLoader.cpp
+    src/GraphBuilding/Loaders/TNRGLoader.tpp
     src/GraphBuilding/Loaders/TripsLoader.cpp
     src/GraphBuilding/Loaders/XenGraphLoader.cpp
     src/GraphBuilding/Structures/AdjMatrixGraph.cpp
-    src/GraphBuilding/Structures/FlagsGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraph.h
     src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
     src/GraphBuilding/Structures/Graph.cpp
     src/GraphBuilding/Structures/OutputEdge.cpp
@@ -280,7 +285,7 @@ add_executable(shortestPathsPreprocessor
     src/GraphBuilding/Structures/ShortcutEdge.cpp
     src/GraphBuilding/Structures/SimpleGraph.cpp
     src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-    src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
     src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
     src/GraphBuilding/Structures/UpdateableGraph.cpp
     src/TNR/TNRDistanceQueryManager.cpp
@@ -312,7 +317,7 @@ add_executable(thesisBenchmark
         src/CH/EdgeDifferenceManager.cpp
         src/CH/Structures/HopsDijkstraNode.cpp
         src/CH/Structures/NodeData.cpp
-        src/CH/CHDistanceQueryManager.cpp
+        src/CH/CHDistanceQueryManager.tpp
         src/CH/CHDistanceQueryManagerWithMapping.cpp
         src/CH/CHPathQueryManager.cpp
         src/CH/CHPreprocessor.cpp
@@ -327,9 +332,9 @@ add_executable(thesisBenchmark
         src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
         src/GraphBuilding/Loaders/XenGraphLoader.cpp
         src/GraphBuilding/Loaders/TripsLoader.cpp
-        src/GraphBuilding/Loaders/TNRGLoader.cpp
+        src/GraphBuilding/Loaders/TNRGLoader.tpp
         src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Structures/FlagsGraph.cpp
+        src/GraphBuilding/Structures/FlagsGraph.h
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
         src/GraphBuilding/Structures/Graph.cpp
         src/GraphBuilding/Structures/AdjMatrixGraph.cpp
@@ -342,7 +347,7 @@ add_executable(thesisBenchmark
         src/GraphBuilding/Structures/SimpleGraph.cpp
         src/GraphBuilding/Structures/UpdateableGraph.cpp
         src/GraphBuilding/Structures/SimpleEdge.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+        src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
         src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
         src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
         src/TNR/TNRPreprocessor.cpp
@@ -384,7 +389,7 @@ add_executable(benchmark
         src/tests.cpp)
 
 add_executable(test_runner
-        src/CH/CHDistanceQueryManager.cpp
+        src/CH/CHDistanceQueryManager.tpp
         src/CH/CHPreprocessor.cpp
         src/CH/EdgeDifferenceManager.cpp
         src/CH/Structures/CHNode.cpp
@@ -403,9 +408,9 @@ add_executable(test_runner
         src/GraphBuilding/Loaders/AdjGraphLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Loaders/TNRGLoader.cpp
+        src/GraphBuilding/Loaders/TNRGLoader.tpp
         src/GraphBuilding/Structures/AdjMatrixGraph.cpp
-        src/GraphBuilding/Structures/FlagsGraph.cpp
+        src/GraphBuilding/Structures/FlagsGraph.h
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
         src/GraphBuilding/Structures/Graph.cpp
         src/GraphBuilding/Structures/OutputEdge.cpp
@@ -416,7 +421,7 @@ add_executable(test_runner
         src/GraphBuilding/Structures/ShortcutEdge.cpp
         src/GraphBuilding/Structures/SimpleGraph.cpp
         src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+        src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
         src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
         src/GraphBuilding/Structures/UpdateableGraph.cpp
         src/progress_bar.h
@@ -442,7 +447,7 @@ add_executable(func_test_runner
     functest/expected_graphs.cpp
     functest/tnr_test.cpp
     functest/tnraf_test.cpp
-    src/CH/CHDistanceQueryManager.cpp
+    src/CH/CHDistanceQueryManager.tpp
     src/CH/Structures/NodeData.cpp
     src/Dijkstra/BasicDijkstra.cpp
     src/Dijkstra/DijkstraNode.cpp
@@ -451,9 +456,9 @@ add_executable(func_test_runner
     src/DistanceMatrix/Distance_matrix_travel_time_provider.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/TGAFLoader.cpp
-    src/GraphBuilding/Loaders/TNRGLoader.cpp
+    src/GraphBuilding/Loaders/TNRGLoader.tpp
     src/GraphBuilding/Loaders/XenGraphLoader.cpp
-    src/GraphBuilding/Structures/FlagsGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraph.h
     src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
     src/GraphBuilding/Structures/Graph.cpp
     src/GraphBuilding/Structures/OutputEdge.cpp
@@ -463,7 +468,7 @@ add_executable(func_test_runner
     src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
     src/GraphBuilding/Structures/SimpleGraph.cpp
     src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-    src/GraphBuilding/Structures/TransitNodeRoutingGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
     src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
     src/GraphBuilding/Structures/UpdateableGraph.cpp
     src/TNR/TNRPreprocessor.cpp

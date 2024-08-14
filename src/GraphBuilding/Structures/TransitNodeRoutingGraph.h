@@ -17,7 +17,8 @@
  * locality filter data. For local queries, Contraction Hierarchies are used, so this structure is built on top of
  * FlagsGraph which alone can be used for the Contraction Hierarchies query algorithm.
  */
-class TransitNodeRoutingGraph : public FlagsGraph {
+template <class T = NodeData>
+class TransitNodeRoutingGraph: public FlagsGraph<T> {
 public:
     /**
      * A simple constructor.
@@ -32,7 +33,7 @@ public:
     /**
      * Explicit destructor to avoid undefined behavior.
      */
-    ~TransitNodeRoutingGraph() override;
+    ~TransitNodeRoutingGraph();
 
 
     const std::vector<std::vector<AccessNodeData>> &getForwardAccessNodes() const;
@@ -164,5 +165,6 @@ protected:
     std::unordered_map< unsigned int, unsigned int > transitNodeMapping;
 };
 
+#include "TransitNodeRoutingGraph.tpp"
 
 #endif //CONTRACTION_HIERARCHIES_TRANSITNODEROUTINGGRAPH_H

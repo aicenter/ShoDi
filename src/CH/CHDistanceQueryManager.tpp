@@ -4,16 +4,15 @@
 //
 
 #include <climits>
-#include "CHDistanceQueryManager.h"
 #include "../Dijkstra/DijkstraNode.h"
 
 //______________________________________________________________________________________________________________________
-CHDistanceQueryManager::CHDistanceQueryManager(FlagsGraph & g) : graph(g) {
+template<class T> CHDistanceQueryManager<T>::CHDistanceQueryManager(FlagsGraph<T>& g) : graph(g) {
 
 }
 
 //______________________________________________________________________________________________________________________
-unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, const unsigned int goal) {
+template<class T> unsigned int CHDistanceQueryManager<T>::findDistance(const unsigned int start, const unsigned int goal) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight);};
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
@@ -172,7 +171,7 @@ unsigned int CHDistanceQueryManager::findDistance(const unsigned int start, cons
 }
 
 //______________________________________________________________________________________________________________________
-void CHDistanceQueryManager::prepareStructuresForNextQuery() {
+template<class T> void CHDistanceQueryManager<T>::prepareStructuresForNextQuery() {
     for(size_t i = 0; i < forwardChanged.size(); i++) {
         graph.resetForwardInfo(forwardChanged[i]);
     }

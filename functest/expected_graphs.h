@@ -9,19 +9,19 @@
 #include "GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h"
 #include "TNRAF/TNRAFPreprocessor.h"
 
-FlagsGraph* build_flags_graph_01();
+FlagsGraph<NodeData>* build_flags_graph_01();
 
-FlagsGraph* build_flags_graph_02();
+FlagsGraph<NodeData>* build_flags_graph_02();
 
-FlagsGraph* build_flags_graph_02_div100();
+FlagsGraph<NodeData>* build_flags_graph_02_div100();
 
-TransitNodeRoutingGraph* build_tnr_graph_01_1();
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_01_1();
 
-TransitNodeRoutingGraph* build_tnr_graph_01_2();
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_01_2();
 
-TransitNodeRoutingGraph* build_tnr_graph_01_3();
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_01_3();
 
-TransitNodeRoutingGraph* build_tnr_graph_02_2_div100();
+TransitNodeRoutingGraph<NodeData>* build_tnr_graph_02_2_div100();
 
 TransitNodeRoutingArcFlagsGraph* build_tnraf_graph_01_1();
 

@@ -17,6 +17,7 @@
  * This class is responsible for the Contraction Hierarchies 'distance' queries - when we only require the 'distance'
  * between two points and do not care about the actual path.
  */
+template <class T = NodeData>
 class CHDistanceQueryManager {
 public:
     /**
@@ -24,7 +25,7 @@ public:
      *
      * @param g[in] The FlagsGraph instance we will be using to answer shortest distance queries.
      */
-    CHDistanceQueryManager(FlagsGraph & g);
+    CHDistanceQueryManager(FlagsGraph<T>& g);
 
     /**
      * We use the query algorithm that was described in the "Contraction Hierarchies: Faster and Simpler Hierarchical
@@ -48,12 +49,14 @@ protected:
      */
     void prepareStructuresForNextQuery();
 
-    FlagsGraph & graph;
+    FlagsGraph<T>& graph;
     unsigned int upperbound;
     std::vector<unsigned int> forwardChanged;
     std::vector<unsigned int> backwardChanged;
     std::vector<unsigned int> forwardStallChanged;
     std::vector<unsigned int> backwardStallChanged;
 };
+
+#include "CHDistanceQueryManager.tpp"
 
 #endif //TRANSIT_NODE_ROUTING_CHFLAGSGRAPHQUERYMANAGER_H

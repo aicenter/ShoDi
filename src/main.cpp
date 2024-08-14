@@ -573,7 +573,7 @@ void benchmarkCH(
     tripsLoader.loadTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader(inputFilePath);
-    FlagsGraph* ch = chLoader.loadFlagsGraph();
+    FlagsGraph<NodeData>* ch = chLoader.loadFlagsGraph();
 
     std::vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::benchmark(trips, *ch, chDistances);
@@ -625,7 +625,7 @@ void benchmarkCHwithMapping(
     tripsLoader.loadLongLongTrips(trips);
 
     DDSGLoader chLoader = DDSGLoader(inputFilePath);
-    FlagsGraph* ch = chLoader.loadFlagsGraph();
+    FlagsGraph<NodeData>* ch = chLoader.loadFlagsGraph();
 
     std::vector<unsigned int> chDistances(trips.size());
     double chTime = CHBenchmark::benchmarkUsingMapping(trips, *ch, chDistances, mappingFilePath);
@@ -675,7 +675,7 @@ void benchmarkTNR(
     tripsLoader.loadTrips(trips);
 
     TNRGLoader tnrLoader = TNRGLoader(inputFilePath);
-    TransitNodeRoutingGraph* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     std::vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::benchmark(trips, *tnrGraph, tnrDistances);
@@ -727,7 +727,7 @@ void benchmarkTNRwithMapping(
     tripsLoader.loadLongLongTrips(trips);
 
     TNRGLoader tnrLoader = TNRGLoader(inputFilePath);
-    TransitNodeRoutingGraph* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* tnrGraph = tnrLoader.loadTNRforDistanceQueries();
 
     std::vector<unsigned int> tnrDistances(trips.size());
     double tnrTime = TNRBenchmark::benchmarkWithMapping(trips, *tnrGraph, tnrDistances, mappingFilePath);

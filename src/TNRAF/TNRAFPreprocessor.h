@@ -12,7 +12,7 @@
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "Structures/RegionsStructure.h"
 #include "../DistanceMatrix/Distance_matrix_travel_time_provider.h"
-
+#include "TNRAF/Structures/NodeDataRegions.h"
 
 
 /**
@@ -148,7 +148,7 @@ protected:
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph & graph,
+            FlagsGraph<NodeDataRegions>& graph,
             Graph & originalGraph,
             RegionsStructure & regions,
             bool useDistanceMatrix);
@@ -175,7 +175,7 @@ protected:
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph & graph, Graph & originalGraph,
+            FlagsGraph<NodeDataRegions>& graph, Graph & originalGraph,
             RegionsStructure & regions,
             bool useDistanceMatrix);
 

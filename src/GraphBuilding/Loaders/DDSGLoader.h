@@ -67,7 +67,7 @@ private:
     void loadRanks(
             std::ifstream & input,
             unsigned int nodes,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Loads the ranks for all nodes in the graph.
@@ -91,7 +91,7 @@ private:
     void loadOriginalEdges(
             std::ifstream & input,
             unsigned int edges,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Loads the original edges and inserts them into the graph.
@@ -115,7 +115,7 @@ private:
     void loadShortcutEdges(
             std::ifstream & input,
             unsigned int shortcutEdges,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Loads the shortcut edges and inserts them into the graph.
@@ -144,7 +144,7 @@ public:
      * @return A FlagsGraph class instance that can be used to answer distance queries using the Contraction Hierarchies
      * query algorithm.
      */
-    FlagsGraph * loadFlagsGraph();
+    FlagsGraph<NodeData>* loadFlagsGraph();
 
     /**
      * This function reads the input file and puts all the Contraction Hierarchies data

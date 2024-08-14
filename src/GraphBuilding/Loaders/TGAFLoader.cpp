@@ -16,7 +16,7 @@ TGAFLoader::TGAFLoader(std::string inputFile) : TNRGLoader(inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
+TransitNodeRoutingArcFlagsGraph* TGAFLoader::loadTNRAFforDistanceQueries() {
     std::ifstream input;
     input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
@@ -26,9 +26,9 @@ TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
     unsigned int nodes, edges, tnodesAmount, regionsCnt;
     parseFirstLine(input, nodes, edges, tnodesAmount, regionsCnt);
 
-    TransitNodeRoutingArcFlagsGraph * graph = new TransitNodeRoutingArcFlagsGraph(nodes, tnodesAmount);
+    TransitNodeRoutingArcFlagsGraph* graph = new TransitNodeRoutingArcFlagsGraph(nodes, tnodesAmount);
     parseEdgesForDistanceQueries(input, *graph, edges);
-    parseRanks(input, graph, nodes);
+    parseRanks(input, *graph, nodes);
     parseRegions(input, *graph, nodes);
     parseTransitNodesMapping(input, *graph, tnodesAmount);
     parseTransitNodesDistanceTable(input, *graph, tnodesAmount);
@@ -41,7 +41,7 @@ TransitNodeRoutingArcFlagsGraph * TGAFLoader::loadTNRAFforDistanceQueries() {
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseFirstLine(std::ifstream & input, unsigned int & nodes, unsigned int & edges, unsigned int & tnodesAmount, unsigned int & regionsCnt) {
+void TGAFLoader::parseFirstLine(std::ifstream& input, unsigned int& nodes, unsigned int& edges, unsigned int& tnodesAmount, unsigned int& regionsCnt) {
     char c1, c2, c3, c4;
     input.read (&c1, sizeof(c1));
     input.read (&c2, sizeof(c2));
@@ -61,16 +61,16 @@ void TGAFLoader::parseFirstLine(std::ifstream & input, unsigned int & nodes, uns
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseRanks(std::ifstream & input, TransitNodeRoutingArcFlagsGraph * graph, unsigned int nodes) {
+void TGAFLoader::parseRanks(std::ifstream& input, TransitNodeRoutingArcFlagsGraph& graph, unsigned int nodes) {
     unsigned int rank;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &rank, sizeof(rank));
-        graph->data(i).rank = rank;
+        graph.data(i).rank = rank;
     }
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseRegions(std::ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes) {
+void TGAFLoader::parseRegions(std::ifstream& input, TransitNodeRoutingArcFlagsGraph& graph, unsigned int nodes) {
     unsigned int region;
     for(unsigned int i = 0; i < nodes; i++) {
         input.read ((char*) &region, sizeof(region));
@@ -79,7 +79,7 @@ void TGAFLoader::parseRegions(std::ifstream & input, TransitNodeRoutingArcFlagsG
 }
 
 //______________________________________________________________________________________________________________________
-void TGAFLoader::parseAccessNodes(std::ifstream & input, TransitNodeRoutingArcFlagsGraph & graph, unsigned int nodes, unsigned int regionsCnt) {
+void TGAFLoader::parseAccessNodes(std::ifstream& input, TransitNodeRoutingArcFlagsGraph& graph, unsigned int nodes, unsigned int regionsCnt) {
     unsigned int forwardNodes, backwardNodes, nodeID, nodeDistance;
     uint32_t regionFlags;
 

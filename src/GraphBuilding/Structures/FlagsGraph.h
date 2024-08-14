@@ -22,10 +22,11 @@
  * going from lower ranked nodes to higher ranked nodes in the query algorithm anyway. We store additional flags
  * "forward" and "backward" with each edge to determine in which direction the edge should be expanded.
  */
+template <class T = NodeData>
 class FlagsGraph {
 protected:
     std::vector<std::vector<QueryEdge> > neighbours;
-    std::vector<NodeData> nodesData;
+    std::vector<T> nodesData;
 
     /**
      * Auxiliary function used to load original edges into the FlagsGraph.
@@ -65,7 +66,7 @@ public:
 
     const std::vector<std::vector<QueryEdge>> &getNeighbours() const;
 
-    const std::vector<NodeData> &getNodesData() const;
+    const std::vector<T> &getNodesData() const;
 
     /**
      * Puts all edges currently present in the graph into one std::vector.
@@ -110,7 +111,7 @@ public:
      * @param node[in] The node we are interested in.
      * @return Reference to the data about the node.
      */
-    virtual NodeData &data(unsigned int node);
+    T &data(unsigned int node);
 
     /**
      * Auxiliary function used to reset some data that could be changed during queries to their initial state so that
@@ -141,5 +142,6 @@ public:
     virtual void resetBackwardStall(const unsigned int node);
 };
 
+#include "FlagsGraph.tpp"
 
 #endif //TRANSIT_NODE_ROUTING_FLAGSGRAPH_H

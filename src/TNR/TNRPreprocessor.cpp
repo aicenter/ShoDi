@@ -318,7 +318,7 @@ void TNRPreprocessor::outputGraph(std::string outputPath, UpdateableGraph &graph
 void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                              std::vector<unsigned int> &forwardSearchSpace,
                                              std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                             FlagsGraph &graph) {
+                                             FlagsGraph<NodeData>& graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -373,7 +373,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<Ac
 void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                              std::vector<unsigned int> &forwardSearchSpace,
                                              std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                             std::vector<unsigned int> &distsFromNode, FlagsGraph &graph) {
+                                             std::vector<unsigned int> &distsFromNode, FlagsGraph<NodeData>& graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -440,7 +440,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<Ac
 void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                              std::vector<unsigned int> &forwardSearchSpace,
                                              std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                             FlagsGraph &graph, Distance_matrix_travel_time_provider &dm) {
+                                             FlagsGraph<NodeData>& graph, Distance_matrix_travel_time_provider &dm) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -508,7 +508,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<Ac
 void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                               std::vector<unsigned int> &backwardSearchSpace,
                                               std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                              FlagsGraph &graph) {
+                                              FlagsGraph<NodeData>& graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -563,7 +563,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<A
 void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                               std::vector<unsigned int> &backwardSearchSpace,
                                               std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                              std::vector<unsigned int> &distsFromNode, FlagsGraph &graph) {
+                                              std::vector<unsigned int> &distsFromNode, FlagsGraph<NodeData>& graph) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -631,7 +631,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<A
 void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                               std::vector<unsigned int> &backwardSearchSpace,
                                               std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                              FlagsGraph &graph, Distance_matrix_travel_time_provider &dm) {
+                                              FlagsGraph<NodeData>& graph, Distance_matrix_travel_time_provider &dm) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);

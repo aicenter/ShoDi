@@ -29,7 +29,7 @@ public:
      * @param mappingFilepath[in] The path to the file that contains the mapping from original indices to indices
      * in the data structure.
      */
-    CHDistanceQueryManagerWithMapping(FlagsGraph & g, std::string mappingFilepath);
+    CHDistanceQueryManagerWithMapping(FlagsGraph<NodeData>& g, std::string mappingFilepath);
 
     /**
      * Used to find the shortest distance from start to goal where start and goal are the original indices.
@@ -42,7 +42,7 @@ public:
     unsigned int findDistance(const long long unsigned int start, const long long unsigned int goal);
 
 private:
-    CHDistanceQueryManager qm;
+    CHDistanceQueryManager<NodeData> qm;
     std::unordered_map<long long unsigned int, unsigned int> mapping;
 };
 
