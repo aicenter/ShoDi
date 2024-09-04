@@ -262,9 +262,9 @@ To benchmark (with or without mapping), call the preprocessor with the following
 
 where:
 
-* `method` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf` - the method being benchmarked
+* `method` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf`, `dm` - the method being benchmarked
 * `input_data_structure` is path to the data structure preprocessed using the preprocessor *for the selected* 
-`method`. For dijkstra, use a XenGraph file. For Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv`)
+`method`. For dijkstra and Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv`)
 `input_data_structure` argument. 
 * `query_set` is path to the query set (file format described in the File Formats section below)
 * `mapping_file` (optional) is path to the mapping file (file format described in the File Formats section below), which will be 

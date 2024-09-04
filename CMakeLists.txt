@@ -244,6 +244,8 @@ add_executable(shortestPathsPreprocessor
     src/Benchmarking/LocationTransformer.cpp
     src/Benchmarking/TNRAFBenchmark.cpp
     src/Benchmarking/TNRBenchmark.cpp
+    src/Benchmarking/DistanceMatrixBenchmark.cpp
+    src/Benchmarking/memory.cpp
     src/CH/CHDistanceQueryManager.tpp
     src/CH/CHDistanceQueryManagerWithMapping.cpp
     src/CH/CHPreprocessor.cpp

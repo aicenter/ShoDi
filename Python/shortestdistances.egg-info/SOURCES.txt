@@ -1,0 +1,9 @@
+README.md
+setup.py
+shortestdistances/__init__.py
+shortestdistances/inout.py
+shortestdistances.egg-info/PKG-INFO
+shortestdistances.egg-info/SOURCES.txt
+shortestdistances.egg-info/dependency_links.txt
+shortestdistances.egg-info/requires.txt
+shortestdistances.egg-info/top_level.txt

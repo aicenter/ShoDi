@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: shortestdistances
+Version: 0.0.0
+Summary: This project implements multiple methods for shortest distance computation in directed weighted graphs that leverage preprocessing of the graph to provide fast shortest distance queries.
+Author: Michal Cvach
+Author-email: 
+License: GNU GPLv3
+Requires-Python: >=3.8
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: plotly
+Requires-Dist: kaleido
+Requires-Dist: geojson
+Requires-Dist: argparse

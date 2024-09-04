@@ -33,6 +33,8 @@
 #include "Benchmarking/CorrectnessValidator.h"
 #include "Benchmarking/TNRBenchmark.h"
 #include "Benchmarking/TNRAFBenchmark.h"
+#include "Benchmarking/DistanceMatrixBenchmark.h"
+#include "Benchmarking/memory.h"
 #include "GraphBuilding/Loaders/DistanceMatrixLoader.h"
 #include "GraphBuilding/Loaders/TGAFLoader.h"
 #include "Benchmarking/DijkstraBenchmark.h"
@@ -347,19 +349,20 @@ void createDM(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkDijkstra(
+double benchmarkDijkstra(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
     tripsLoader.loadTrips(trips);
 
-    XenGraphLoader dijkstraGraphLoader(inputFilePath);
-    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
-    dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
+    CsvGraphLoader csvGraphLoader = CsvGraphLoader(inputFilePath);
+    Graph dijkstraGraph(csvGraphLoader.nodes());
+    csvGraphLoader.loadGraph(dijkstraGraph, 1);
 
     std::vector<unsigned int> dijkstraDistances(trips.size());
     double dijkstraTime = DijkstraBenchmark::benchmark(trips, dijkstraGraph, dijkstraDistances);
@@ -380,6 +383,64 @@ void benchmarkDijkstra(
 
         output.close();
     }
+    return dijkstraTime;
+}
+
+/**
+ * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
+ * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
+ * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
+ * where all the computed distances will be output. Those distances can then be for example compared with distances
+ * computed by some other method to ensure correctness.
+ *
+ * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
+ * XenGraph input format.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
+ * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
+ */
+double benchmarkDijkstraWithMapping(
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        const std::string& distancesOutputPath = "",
+        bool outputDistances = false) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
+    tripsLoader.loadLongLongTrips(trips);
+
+    CsvGraphLoader csvGraphLoader = CsvGraphLoader(inputFilePath);
+    Graph dijkstraGraph(csvGraphLoader.nodes());
+    csvGraphLoader.loadGraph(dijkstraGraph, 1);
+
+    std::vector<unsigned int> dijkstraDistances(trips.size());
+    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, dijkstraGraph, dijkstraDistances,
+                                                                   mappingFilePath);
+
+    std::cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds" << std::endl;
+    std::cout << "using '" << mappingFilePath << "' as mapping." << std::endl;
+    std::cout << "That means " << (dijkstraTime / (double) trips.size()) * 1000 << " ms per query." << std::endl;
+
+
+    if (outputDistances) {
+        std::cout << "Now outputting distances to '" << distancesOutputPath << "'." << std::endl;
+
+        std::ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << std::endl;
+        for (size_t i = 0; i < trips.size(); ++i) {
+            output << dijkstraDistances[i] << std::endl;
+        }
+
+        output.close();
+    }
+    return dijkstraTime;
 }
 
 /**
@@ -396,11 +457,12 @@ void benchmarkDijkstra(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkAstar(
+double benchmarkAstar(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
@@ -433,61 +495,7 @@ void benchmarkAstar(
 
         output.close();
     }
-}
-
-/**
- * Benchmarks the basic Dijkstra's algorithm implementation using a given graph in the XenGraph input format and a given
- * set of queries. Prints out the sum of the time required by all the queries in seconds and the average time
- * needed for one query in milliseconds. Additionally, the caller can specify an optional output file path,
- * where all the computed distances will be output. Those distances can then be for example compared with distances
- * computed by some other method to ensure correctness.
- *
- * @param inputFilePath[in] Path to the graph file that will be used for the benchmark. The input file must be in the
- * XenGraph input format.
- * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
- * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
- * used internally in the data structure and the query algorithm.
- * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
- * to use them for example for verification purposes.
- * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
- * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
- */
-void benchmarkDijkstraWithMapping(
-        const std::string& inputFilePath,
-        const std::string& queriesFilePath,
-        const std::string& mappingFilePath,
-        char* distancesOutputPath = nullptr,
-        bool outputDistances = false) {
-    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
-    std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
-    tripsLoader.loadLongLongTrips(trips);
-
-    XenGraphLoader dijkstraGraphLoader(inputFilePath);
-    Graph dijkstraGraph(dijkstraGraphLoader.nodes());
-    dijkstraGraphLoader.loadGraph(dijkstraGraph, 1);
-
-    std::vector<unsigned int> dijkstraDistances(trips.size());
-    double dijkstraTime = DijkstraBenchmark::benchmarkUsingMapping(trips, dijkstraGraph, dijkstraDistances,
-                                                                   mappingFilePath);
-
-    std::cout << "Run " << trips.size() << " queries using Dijkstra's algorithm in " << dijkstraTime << " seconds" << std::endl;
-    std::cout << "using '" << mappingFilePath << "' as mapping." << std::endl;
-    std::cout << "That means " << (dijkstraTime / (double) trips.size()) * 1000 << " ms per query." << std::endl;
-
-
-    if (outputDistances) {
-        std::cout << "Now outputting distances to '" << distancesOutputPath << "'." << std::endl;
-
-        std::ofstream output;
-        output.open(distancesOutputPath);
-
-        output << queriesFilePath << std::endl;
-        for (size_t i = 0; i < trips.size(); ++i) {
-            output << dijkstraDistances[i] << std::endl;
-        }
-
-        output.close();
-    }
+    return aStarTime;
 }
 
 /**
@@ -506,12 +514,13 @@ void benchmarkDijkstraWithMapping(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkAstarWithMapping(
+double benchmarkAstarWithMapping(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
         const std::string& mappingFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
@@ -547,6 +556,7 @@ void benchmarkAstarWithMapping(
 
         output.close();
     }
+    return aStarTime;
 }
 
 /**
@@ -562,11 +572,12 @@ void benchmarkAstarWithMapping(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkCH(
+double benchmarkCH(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
@@ -596,6 +607,7 @@ void benchmarkCH(
 
         output.close();
     }
+    return chTime;
 }
 
 /**
@@ -613,12 +625,13 @@ void benchmarkCH(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkCHwithMapping(
+double benchmarkCHwithMapping(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
         const std::string& mappingFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
@@ -649,6 +662,7 @@ void benchmarkCHwithMapping(
 
         output.close();
     }
+    return chTime;
 }
 
 /**
@@ -664,11 +678,12 @@ void benchmarkCHwithMapping(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkTNR(
+double benchmarkTNR(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
@@ -698,6 +713,7 @@ void benchmarkTNR(
 
         output.close();
     }
+    return tnrTime;
 }
 
 /**
@@ -715,12 +731,13 @@ void benchmarkTNR(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkTNRwithMapping(
+double benchmarkTNRwithMapping(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
         const std::string& mappingFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
@@ -750,6 +767,7 @@ void benchmarkTNRwithMapping(
 
         output.close();
     }
+    return tnrTime;
 }
 
 /**
@@ -766,11 +784,12 @@ void benchmarkTNRwithMapping(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkTNRAF(
+double benchmarkTNRAF(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<unsigned int, unsigned int> > trips;
@@ -800,6 +819,7 @@ void benchmarkTNRAF(
 
         output.close();
     }
+    return tnrafTime;
 }
 
 /**
@@ -818,12 +838,13 @@ void benchmarkTNRAF(
  * to use them for example for verification purposes.
  * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
  * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
  */
-void benchmarkTNRAFwithMapping(
+double benchmarkTNRAFwithMapping(
         const std::string& inputFilePath,
         const std::string& queriesFilePath,
         const std::string& mappingFilePath,
-        char* distancesOutputPath = nullptr,
+        const std::string& distancesOutputPath = "",
         bool outputDistances = false) {
     TripsLoader tripsLoader = TripsLoader(queriesFilePath);
     std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
@@ -853,6 +874,112 @@ void benchmarkTNRAFwithMapping(
 
         output.close();
     }
+    return tnrafTime;
+}
+
+/**
+ * Benchmarks the Distance Matrix method using a given precomputed data structure and a given set of queries.
+ * Prints out the sum of the time required by all the queries in seconds and the average time needed for one query
+ * in milliseconds. Additionally, the caller can specify an optional output file path, where all the computed
+ * distances will be output. Those distances can then be for example * compared with distances computed by some
+ * other method to ensure correctness.
+ *
+ * @param inputFilePath[in] Path to the file containing the precomputed distance matrix.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
+ */
+double benchmarkDM(
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& distancesOutputPath = "",
+        bool outputDistances = false) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    std::vector<std::pair<unsigned int, unsigned int> > trips;
+    tripsLoader.loadTrips(trips);
+
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
+    Distance_matrix_travel_time_provider* dm = dmLoader.loadDistanceMatrix();
+
+    std::vector<unsigned int> dmDistances(trips.size());
+    double dmTime = DistanceMatrixBenchmark::benchmark(trips, *dm, dmDistances);
+
+    delete dm;
+
+    std::cout << "Run " << trips.size() << " queries using Distance Matrix in " << dmTime << " seconds." << std::endl;
+    std::cout << "That means " << (dmTime / (double) trips.size()) * 1000 << " ms per query." << std::endl;
+
+    if (outputDistances) {
+        std::cout << "Now outputting distances to '" << distancesOutputPath << "'." << std::endl;
+
+        std::ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << std::endl;
+        for(size_t i = 0; i < trips.size(); ++i) {
+            output << dmDistances[i] << std::endl;
+        }
+
+        output.close();
+    }
+    return dmTime;
+}
+
+/**
+ * Benchmarks the Distance Matrix method using a given precomputed data structure, a given set of queries and a given
+ * mapping. Prints out the sum of the time required by all the queries in seconds and the average time needed for one
+ * query in milliseconds. Additionally, the caller can specify an optional output file path, where all the computed
+ * distances will be output. Those distances can then be for example compared with distances computed by some other
+ * method to ensure correctness.
+ *
+ * @param inputFilePath[in] Path to the file containing the precomputed distance matrix.
+ * @param queriesFilePath[in] Path to the file containing the queries used for the benchmark.
+ * @param mappingFilePath[in] Path to the file containing the mapping from original IDs (used in the queries) to IDs
+ * used internally in the data structure and the query algorithm.
+ * @param distancesOutputPath[in] Optional path where the computed distances can be output if the caller wants
+ * to use them for example for verification purposes.
+ * @param outputDistances[in] Specifies whether the computed distances should be output into a plain text file or not.
+ * If the parameter is set to 'true', distances are output into a file, otherwise they are not.
+ * @return Total time in seconds.
+ */
+double benchmarkDMwithMapping(
+        const std::string& inputFilePath,
+        const std::string& queriesFilePath,
+        const std::string& mappingFilePath,
+        const std::string& distancesOutputPath = "",
+        bool outputDistances = false) {
+    TripsLoader tripsLoader = TripsLoader(queriesFilePath);
+    std::vector<std::pair<long long unsigned int, long long unsigned int> > trips;
+    tripsLoader.loadLongLongTrips(trips);
+
+    DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
+    Distance_matrix_travel_time_provider* dm = dmLoader.loadDistanceMatrix();
+
+    std::vector<unsigned int> dmDistances(trips.size());
+    double dmTime = DistanceMatrixBenchmark::benchmarkUsingMapping(trips, *dm, dmDistances, mappingFilePath);
+
+    delete dm;
+
+    std::cout << "Run " << trips.size() << " queries using Distance Matrix in " << dmTime << " seconds." << std::endl;
+    std::cout << "That means " << (dmTime / (double) trips.size()) * 1000 << " ms per query." << std::endl;
+
+    if (outputDistances) {
+        std::cout << "Now outputting distances to '" << distancesOutputPath << "'." << std::endl;
+
+        std::ofstream output;
+        output.open(distancesOutputPath);
+
+        output << queriesFilePath << std::endl;
+        for(size_t i = 0; i < trips.size(); ++i) {
+            output << dmDistances[i] << std::endl;
+        }
+
+        output.close();
+    }
+    return dmTime;
 }
 
 /**
@@ -992,41 +1119,55 @@ int main(int argc, char* argv[]) {
                 throw input_error("Missing one or more required options (-m <method> / --input-structure <path to structure file> / --query-set <path to query set file>) for the Benchmark command.\n");
             }
 
-            std::unordered_map<std::string, std::function<void(std::string, std::string, std::string, char*, bool)>> benchmarkMapFunctions = {
+            std::unordered_map<std::string, std::function<double(std::string, std::string, std::string, std::string, bool)>> benchmarkMapFunctions = {
                     {"dijkstra", benchmarkDijkstraWithMapping},
                     {"astar", benchmarkAstarWithMapping},
                     {"ch", benchmarkCHwithMapping},
                     {"tnr", benchmarkTNRwithMapping},
                     {"tnraf", benchmarkTNRAFwithMapping},
+                    {"dm", benchmarkDMwithMapping},
             };
 
-            std::unordered_map<std::string, std::function<void(std::string, std::string, char*, bool)>> benchmarkFunctions = {
+            std::unordered_map<std::string, std::function<double(std::string, std::string, std::string, bool)>> benchmarkFunctions = {
                     {"dijkstra", benchmarkDijkstra},
                     {"astar", benchmarkAstar},
                     {"ch", benchmarkCH},
                     {"tnr", benchmarkTNR},
                     {"tnraf", benchmarkTNRAF},
+                    {"dm", benchmarkDM},
             };
 
             if (!benchmarkFunctions.contains(*method)) {
                 throw input_error("Invalid method '" + *method + "' for the Benchmark command.\n");
             }
 
+            auto mem = Memory();
+            mem.init();
+
+            double totalTime;
             if (mappingFile) {
                 auto func = benchmarkMapFunctions.at(*method);
                 if (outputPath) {
-                    func(*inputStructure, *querySet, *mappingFile, reinterpret_cast<char *>(*outputPath->c_str()), true);
+                    totalTime = func(*inputStructure, *querySet, *mappingFile, *outputPath, true);
                 } else {
-                    func(*inputStructure, *querySet, *mappingFile, nullptr, false);
+                    totalTime = func(*inputStructure, *querySet, *mappingFile, "", false);
                 }
             } else {
                 auto func = benchmarkFunctions.at(*method);
                 if (outputPath) {
-                    func(*inputStructure, *querySet, reinterpret_cast<char *>(*outputPath->c_str()), true);
+                    totalTime = func(*inputStructure, *querySet, *outputPath, true);
                 } else {
-                    func(*inputStructure, *querySet, nullptr, false);
+                    totalTime = func(*inputStructure, *querySet, "", false);
                 }
             }
+
+            std::ofstream output;
+            output.open("benchmark.txt");
+            output << totalTime << std::endl;
+            output << mem.get_max_memory_usage() << std::endl;
+            std::cout << "get_max_memory_usage: " << mem.get_max_memory_usage() << std::endl;
+            output.close();
+
         } else {
             throw input_error(INVALID_USAGE_INFO);
         }
