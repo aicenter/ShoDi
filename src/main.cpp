@@ -902,7 +902,7 @@ double benchmarkDM(
     tripsLoader.loadTrips(trips);
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
-    Distance_matrix_travel_time_provider* dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider* dm = dmLoader.loadHDF();
 
     std::vector<unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::benchmark(trips, *dm, dmDistances);
@@ -956,7 +956,7 @@ double benchmarkDMwithMapping(
     tripsLoader.loadLongLongTrips(trips);
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
-    Distance_matrix_travel_time_provider* dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider* dm = dmLoader.loadXDM();
 
     std::vector<unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::benchmarkUsingMapping(trips, *dm, dmDistances, mappingFilePath);
@@ -1165,7 +1165,6 @@ int main(int argc, char* argv[]) {
             output.open("benchmark.txt");
             output << totalTime << std::endl;
             output << mem.get_max_memory_usage() << std::endl;
-            std::cout << "get_max_memory_usage: " << mem.get_max_memory_usage() << std::endl;
             output.close();
 
         } else {

@@ -24,16 +24,16 @@ void DistanceMatrixHdfOutputter::store(Distance_matrix_travel_time_provider& dm,
 
     H5::DataType datatype;
     if (max_dist < UINT8_MAX) {
-        datatype = H5::PredType::STD_U8LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U8LE);
     }
     else if (max_dist < UINT16_MAX) {
-        datatype = H5::PredType::STD_U16LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U16LE);
     }
     else if (max_dist < UINT32_MAX) {
-        datatype = H5::PredType::STD_U32LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U32LE);
     }
     else {
-        datatype = H5::PredType::STD_U64LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U64LE);
     }
 
     try {

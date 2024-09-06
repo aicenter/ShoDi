@@ -6,6 +6,9 @@
 #include <fstream>
 #include "DistanceMatrixLoader.h"
 #include "../../Timer/Timer.h"
+#include <H5Cpp.h>
+#include <iostream> // TODO smazat
+#include <boost/numeric/conversion/cast.hpp>
 
 //______________________________________________________________________________________________________________________
 DistanceMatrixLoader::DistanceMatrixLoader(std::string inputFile) {
@@ -13,7 +16,7 @@ DistanceMatrixLoader::DistanceMatrixLoader(std::string inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadDistanceMatrix() {
+Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
     std::ifstream input;
     input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
@@ -29,6 +32,36 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadDistanceMatrix(
 
     input.close();
 
+    return distanceMatrix;
+}
+
+//______________________________________________________________________________________________________________________
+Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadHDF() {
+    H5::H5File file{this->inputFile, H5F_ACC_RDONLY};
+    H5::DataSet dataset = file.openDataSet("dm");
+    auto t = dataset.getDataType();
+    H5::DataSpace space = dataset.getSpace();
+
+    hsize_t dimsf[2];
+    space.getSimpleExtentDims(dimsf, nullptr);
+    const auto nodes = dimsf[0];
+
+    auto values = new int[nodes*nodes];
+    dataset.read(values, H5::PredType::NATIVE_INT);
+
+    auto* distanceMatrix = new Distance_matrix_travel_time_provider(boost::numeric_cast<unsigned int>(nodes));
+
+    for(size_t i = 0; i < nodes; i++) {
+        for (size_t j = 0; j < nodes; j++) {
+            //std::cout << "distance from " << i << " to " << j << " is " << values[i*nodes + j] << std::endl;
+            distanceMatrix->setDistance(
+                boost::numeric_cast<unsigned int>(i),
+                boost::numeric_cast<unsigned int>(j),
+                values[i*nodes + j]);
+        }
+    }
+
+    delete [] values;
     return distanceMatrix;
 }
 

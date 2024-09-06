@@ -250,7 +250,7 @@ void compareAllMethodsOnPrague(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Prague/Prague.xdm");
-    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadXDM();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Prague/Prague100000randomQueries.txt");
     std::vector<std::pair<unsigned int, unsigned int>> querySet;
@@ -356,7 +356,7 @@ void compareAllMethodsOnBerlin(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/Berlin/Berlin.xdm");
-    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadXDM();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/Berlin/Berlin100000randomQueries.txt");
     std::vector<std::pair<unsigned int, unsigned int>> querySet;
@@ -462,7 +462,7 @@ void compareAllMethodsOnSouthwestBohemia(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia.xdm");
-    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadXDM();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/SouthwestBohemia/SouthwestBohemia100000randomQueries.txt");
     std::vector<std::pair<unsigned int, unsigned int>> querySet;
@@ -574,7 +574,7 @@ void compareAllMethodsOnDC(unsigned int runs = 20) {
     TransitNodeRoutingArcFlagsGraph * tnrafGraph = tnrafLoader.loadTNRAFforDistanceQueries();
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader("../thesisTestsData/DC/DC.xdm");
-    Distance_matrix_travel_time_provider * dm = dmLoader.loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * dm = dmLoader.loadXDM();
 
     TripsLoader querySetLoader = TripsLoader("../thesisTestsData/DC/DC1000randomQueries.txt");
     std::vector<std::pair<unsigned int, unsigned int>> querySet;
