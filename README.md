@@ -401,7 +401,7 @@ A pair of files named `nodes.csv` and `edges.csv` located in the same directory.
 * Path to the directory containing these files must be specified in the `input_path` argument.
 * `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
 (for A* benchmarking) columns `x` (longitude) and `y` (latitude).
-* `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `length` (edge weight, non-negative integer or floating point number).
+* `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `cost` (edge weight, non-negative integer or floating point number).
 * In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
 and `v`, we must provide two lines, one for an edge from `u` to `v` and one for an edge from `v` to `u`, both with the same weight.
 * Values must be separated by a Tab character (`\t`).

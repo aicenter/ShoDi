@@ -65,7 +65,7 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 	const dist_t max = std::numeric_limits<dist_t>::max();
 	ProgressBar progress(edgeReader.rows(), "Loading CSV file:");
 
-    size_t from_col = 0, to_col = 0, dist_col = 0;
+    size_t from_col = SIZE_MAX, to_col = SIZE_MAX, cost_col = SIZE_MAX;
     auto header = edgeReader.header();
     size_t c = 0;
     for (const auto& cell : header) {
@@ -75,16 +75,20 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
             from_col = c;
         } else if (column_name == "v") {
             to_col = c;
-        } else if (column_name == "length") {
-            dist_col = c;
+        } else if (column_name == "cost") {
+            cost_col = c;
         }
         ++c;
     }
 
+	if (from_col == SIZE_MAX || to_col == SIZE_MAX || cost_col == SIZE_MAX) {
+		throw std::runtime_error("the 'edges.csv' file does not contain all columns 'u', 'v' and 'cost'.");
+	}
+
 	for (const auto& row: edgeReader) {
 		unsigned int j = 0;
         unsigned int from = 0, to = 0;
-		std::string dist_val;
+		std::string cost_val;
         dist_t dist;
 
 		for (const auto& cell: row) {
@@ -93,14 +97,14 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 
             if (j == from_col) from = boost::numeric_cast<unsigned int>(std::stoul(val));
             else if (j == to_col) to = boost::numeric_cast<unsigned int>(std::stoul(val));
-            else if (j == dist_col) dist_val = val;
+            else if (j == cost_col) cost_val = val;
             ++j;
 		}
 
 		++progress;
 		if (j == 0) continue; // empty row
 
-		dist = parse_distance(dist_val, from, to, scaling_factor);
+		dist = parse_distance(cost_val, from, to, scaling_factor);
 
         if (dist != max)
             graph.addEdge(from, to, dist);
