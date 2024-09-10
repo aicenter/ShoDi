@@ -14,7 +14,7 @@
 double Astar::heuristic(std::pair<double, double> node_location, std::pair<double, double> goal_location) {
     auto dx = goal_location.first - node_location.first;
     auto dy = goal_location.second - node_location.second;
-    return sqrt(dx*dx + dy*dy);
+    return sqrt(dx*dx + dy*dy)*0.9;
 }
 
 //______________________________________________________________________________________________________________________
