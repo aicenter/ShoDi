@@ -5,7 +5,6 @@ INSTANCE = "DC"
 LONG_NAME = "Washington, D. C."
 
 df = pandas.read_csv(f"benchmark_{INSTANCE}.csv")
-print(df)
 
 fig = px.scatter(
     df, x="memory", y="time", text="label", labels="", log_x=True, log_y=True, template="simple_white",

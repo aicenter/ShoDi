@@ -66,5 +66,4 @@ df_data.append(["DM", mem, time])
 
 df = pandas.DataFrame(df_data, columns=["label", "memory", "time"])
 
-print(df)
 df.to_csv(f"benchmark_{INSTANCE}.csv")
