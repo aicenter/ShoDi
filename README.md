@@ -6,6 +6,9 @@ preprocessing of the graph to provide fast shortest distance queries.
 The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies),
 Transit Node Routing with Arc Flags (extension of Transit Node Routing) and Distance Matrix computation.
 
+![Memory/time comparison of various methods on the graph of Washington, D.C.](DC.png)
+![Memory/time comparison of various methods on the graph of Chicago](Chicago.png)
+
 The project is split into two major components. 
 One component is the **preprocessor** (an executable called `shortestPathsPreprocessor`) which takes an arbitrary 
 graph in a supported format (described later) and prepares the graph, creating structures for fast distance computation.

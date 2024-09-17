@@ -50,7 +50,7 @@ mem, time = run_benchmark("dijkstra", f"../thesisTestsData/{INSTANCE}", queries)
 df_data.append(["Dijkstra", mem, time])
 
 mem, time = run_benchmark("astar", f"../thesisTestsData/{INSTANCE}", queries)
-df_data.append(["Astar", mem, time])
+df_data.append(["A*", mem, time])
 
 mem, time = run_benchmark("ch", f"../thesisTestsData/{INSTANCE}/{INSTANCE}.ch", queries)
 df_data.append(["CH", mem, time])
