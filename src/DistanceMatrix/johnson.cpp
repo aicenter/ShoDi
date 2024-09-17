@@ -195,6 +195,15 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
     ++progress;
   }
 
+  for (size_t i = 0; i < V; i++) {
+    for (size_t j = 0; j < V; j++) {
+      if (output[i * V + j] == std::numeric_limits<dist_t>::max()) {
+        std::cerr << "Warning: could not find a path beetween nodes " << i << " and " << j
+        << ". The graph might have more than one component." << std::endl;
+      }
+    }
+  }
+
   delete[] h;
   free_graph(bf_graph);
 }

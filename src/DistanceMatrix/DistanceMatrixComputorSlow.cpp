@@ -93,7 +93,11 @@ void DistanceMatrixComputorSlow::fillDistanceMatrixRow(const unsigned int rowID,
     }
 
     for (size_t i = 0; i < (size_t) n; ++i) {
-      distanceTable[((size_t) rowID) * ((size_t) n) + ((size_t) i)] = distance[i];
+        distanceTable[((size_t) rowID) * ((size_t) n) + ((size_t) i)] = distance[i];
+        if (distance[i] == std::numeric_limits<dist_t>::max()) {
+            std::cerr << "Warning: could not find a path beetween nodes " << rowID << " and " << i
+            << ". The graph might have more than one component." << std::endl;
+        }
     }
     delete [] distance;
 }

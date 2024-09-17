@@ -6,6 +6,7 @@
 #include <climits>
 #include <queue>
 #include <cstdio>
+#include <iostream>
 #include "BasicDijkstra.h"
 #include "DijkstraNode.h"
 
@@ -46,6 +47,10 @@ unsigned int BasicDijkstra::run(const unsigned int start, const unsigned int goa
     }
 
     delete [] distance;
+
+    std::cerr << "Warning: returning an infinite distance between two nodes. The graph might have more "
+              << "than one component." << std::endl;
+
     return UINT_MAX;
 
 }
@@ -91,10 +96,11 @@ unsigned int BasicDijkstra::runWithPathOutput(const unsigned int start, const un
 
     printf("Did not find path from %u to %u.\n", start, goal);
     delete [] distance;
+
+    std::cerr << "Warning: returning an infinite distance between two nodes. The graph might have more "
+              << "than one component." << std::endl;
+
     return UINT_MAX;
-
-
-
 }
 
 //______________________________________________________________________________________________________________________
