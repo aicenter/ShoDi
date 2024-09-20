@@ -6,6 +6,7 @@
 *****************************************************************************/
 
 #include <fstream>
+#include <filesystem>
 #include "DistanceMatrixHdfOutputter.h"
 #include <H5Cpp.h>
 
@@ -23,17 +24,27 @@ void DistanceMatrixHdfOutputter::store(Distance_matrix_travel_time_provider& dm,
     }
 
     H5::DataType datatype;
+    unsigned int total_bytes;
     if (max_dist < UINT8_MAX) {
         datatype = static_cast<H5::DataType>(H5::PredType::STD_U8LE);
+        total_bytes = nodesCnt * nodesCnt;
     }
     else if (max_dist < UINT16_MAX) {
         datatype = static_cast<H5::DataType>(H5::PredType::STD_U16LE);
+        total_bytes = 2 * nodesCnt * nodesCnt;
     }
     else if (max_dist < UINT32_MAX) {
         datatype = static_cast<H5::DataType>(H5::PredType::STD_U32LE);
+        total_bytes = 4 * nodesCnt * nodesCnt;
     }
     else {
         datatype = static_cast<H5::DataType>(H5::PredType::STD_U64LE);
+        total_bytes = 8 * nodesCnt * nodesCnt;
+    }
+
+    std::filesystem::space_info si = std::filesystem::space(".");
+    if (total_bytes > si.available) {
+        throw std::runtime_error("Not enough free disk space." + std::to_string(total_bytes/1024) + "KiB required");
     }
 
     try {

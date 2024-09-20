@@ -6,19 +6,26 @@
 *****************************************************************************/
 
 #include <fstream>
+#include <filesystem>
 #include "DistanceMatrixXdmOutputter.h"
 #include "../constants.h"
 
 void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const std::string &path) {
+    const unsigned int nodesCnt = dm.nodes();
+    const auto& distances = dm.getRawData();
+
+    std::filesystem::space_info si = std::filesystem::space(".");
+    unsigned long long total_bytes = nodesCnt * nodesCnt * sizeof(dist_t);
+    if (total_bytes > si.available) {
+        throw std::runtime_error("Not enough free disk space." + std::to_string(total_bytes/1024) + "KiB required");
+    }
+
     printf("Storing the distance matrix.\n");
     std::ofstream output;
     output.open(path + ".xdm", std::ios::binary);
     if (!output.is_open()) {
         printf("Couldn't open file '%s'!", (path + ".xdm").c_str());
     }
-
-    const auto& distances = dm.getRawData();
-    const unsigned int nodesCnt = dm.nodes();
 
     char c1, c2, c3;
     c1 = 'X';
