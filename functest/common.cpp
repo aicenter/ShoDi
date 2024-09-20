@@ -18,10 +18,7 @@ void run_preprocessor(const char* args) {
     std::system(command.c_str());
 }
 
-void compare_txt_files(
-        const std::string& p1,
-        const std::string& p2
-) {
+void compare_txt_files(const std::string& p1, const std::string& p2) {
     std::ifstream f1(p1);
     std::ifstream f2(p2);
 
@@ -34,10 +31,7 @@ void compare_txt_files(
     }
 }
 
-void compare_tnraf_graphs(
-        const TransitNodeRoutingArcFlagsGraph& computed,
-        const TransitNodeRoutingArcFlagsGraph& expected
-) {
+void compare_tnraf_graphs(const TransitNodeRoutingArcFlagsGraph& computed, const TransitNodeRoutingArcFlagsGraph& expected) {
     compare_tnr_graphs(computed, expected);
 
     EXPECT_EQ(computed.getForwardAccessNodes(), expected.getForwardAccessNodes());

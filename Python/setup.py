@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
 	name='shortestdistances',
-	version='0.0.0',
+	version='0.1.0',
 	description='This project implements multiple methods for shortest distance '
     'computation in directed weighted graphs that leverage preprocessing of the '
     'graph to provide fast shortest distance queries.',
