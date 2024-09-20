@@ -15,8 +15,6 @@ graph in a supported format (described later) and prepares the graph, creating s
 Additionally, the preprocessor allows running a set of queries and benchmark the time required to answer them. 
 This way, the user can easily evaluate whether the performance is sufficient for their use case. 
 
-# Usage
-
 The second component is the **library** (a shared library called `libshortestPaths.so` in Linux 
 or `shortestPaths.dll` in Windows), which can load the structures prepared by the preprocessor to answer shortest 
 distance queries. 
@@ -81,13 +79,21 @@ From Source
 -----------
 
 ### Requirements
- - [vcpkg](https://github.com/microsoft/vcpkg) for dependency management.
  - [Java](https://java.com/en/download/): JNI is required for Java bindings.
  - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
 
+#### Required libraries
+- boost-config
+- boost-graph
+- boost-numeric-conversion
+- boost-program-options
+- p-ranav-csv2
+- indicators
+- hdf5[cpp]
+- proj at least 9.3
+
 ### Building the project
-1. Install `vcpkg` packages: `vcpkg install boost-config boost-graph boost-numeric-conversion boost-program-options p-ranav-csv2 indicators "hdf5[cpp]" proj`
-2. Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
+1. Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
 3. `mkdir build && cd build`
 4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
 5. `cmake --build . --target shortestPathsPreprocessor --config Release`
