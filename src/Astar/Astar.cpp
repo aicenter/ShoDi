@@ -6,6 +6,7 @@
 #include <climits>
 #include <queue>
 #include <cstdio>
+#include <iostream>
 #include <unordered_map>
 #include <cmath>
 #include "Astar.h"
@@ -84,6 +85,9 @@ unsigned int Astar::run(const unsigned int start,
     delete [] g_cost;
     delete [] f_cost;
     delete [] visited;
+
+    std::cerr << "Warning: returning an infinite distance between two nodes. The graph might have more "
+              << "than one component." << std::endl;
 
     return UINT_MAX;
 }

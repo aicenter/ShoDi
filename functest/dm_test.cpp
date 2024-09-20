@@ -29,6 +29,12 @@ TEST(dm_test, from_xengraph_fast2) {
     compare_txt_files("functest/02_dm_div100.csv", "from_xengraph_fast2.csv");
 }
 
+TEST(dm_test, from_xengraph_badgraph) {
+    // non single component graph
+    const std::string out = run_preprocessor("--method dm -f xengraph --output-format csv --preprocessing-mode fast -i functest/03_xengraph.xeng --output-path from_xengraph_badgraph");
+    ASSERT_EQ(out.find("could not find a path beetween nodes") == std::string::npos, false);
+}
+
 
 
 TEST(dm_test, from_dimacs_slow1) {
@@ -53,6 +59,12 @@ TEST(dm_test, from_dimacs_fast2) {
     // fast with precision loss
     run_preprocessor("-m dm --input-format dimacs --output-format csv --preprocessing-mode fast --input-path functest/02_dimacs.gr -o from_dimacs_fast2 --precision-loss 100");
     compare_txt_files("functest/02_dm_div100.csv", "from_dimacs_fast2.csv");
+}
+
+TEST(dm_test, from_dimacs_badgraph) {
+    // non single component graph
+    const std::string out = run_preprocessor("-m dm --output-format hdf --preprocessing-mode fast -i functest/03_dimacs.gr --output-path from_dimacs_badgraph");
+    ASSERT_EQ(out.find("could not find a path beetween nodes") == std::string::npos, false);
 }
 
 
@@ -81,6 +93,12 @@ TEST(dm_test, from_adj_fast2) {
     compare_txt_files("functest/02_dm_div100.csv", "from_adj_fast2.csv");
 }
 
+TEST(dm_test, from_adj_badgraph) {
+    // non single component graph
+    const std::string out = run_preprocessor("--method dm -f adj --output-format xdm --preprocessing-mode slow -i functest/03_adj.csv --output-path from_adj_badgraph");
+    ASSERT_EQ(out.find("could not find a path beetween nodes") == std::string::npos, false);
+}
+
 
 
 TEST(dm_test, from_csv_slow1) {
@@ -105,4 +123,10 @@ TEST(dm_test, from_csv_fast2) {
     // fast with precision loss
     run_preprocessor("-m dm --output-format csv --preprocessing-mode fast --input-path functest/02_csv -o from_csv_fast2 --precision-loss 100");
     compare_txt_files("functest/02_dm_div100.csv", "from_csv_fast2.csv");
+}
+
+TEST(dm_test, from_csv_badgraph) {
+    // non single component graph
+    const std::string out = run_preprocessor("--method dm -f csv --output-format csv --preprocessing-mode fast -i functest/03_csv --output-path from_csv_badgraph");
+    ASSERT_EQ(out.find("could not find a path beetween nodes") == std::string::npos, false);
 }

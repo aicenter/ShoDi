@@ -16,7 +16,7 @@
 #include "GraphBuilding/Structures/TransitNodeRoutingGraph.h"
 #include "GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.h"
 
-void run_preprocessor(const char* args);
+std::string run_preprocessor(const std::string& args);
 
 void compare_txt_files(const std::string& p1, const std::string& p2);
 
@@ -31,7 +31,6 @@ void compare_flags_graphs(
     const auto& expected_nodes_data = expected.getNodesData();
 
     for (size_t i = 0; i < computed_nodes_data.size(); ++i) {
-        std::cout << "i: " << i <<std::endl;
         ASSERT_EQ(computed_nodes_data[i].rank, expected_nodes_data[i].rank);
         ASSERT_EQ(computed_nodes_data[i].backwardDist, expected_nodes_data[i].backwardDist);
         ASSERT_EQ(computed_nodes_data[i].forwardDist, expected_nodes_data[i].forwardDist);
