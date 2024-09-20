@@ -68,11 +68,11 @@ void DIMACSLoader::loadGraph(BaseGraph &graph, int scaling_factor) {
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseGraphProblemLine(std::ifstream &input, unsigned int &nodes,
+void DIMACSLoader::parseGraphProblemLine(std::ifstream &inputStream, unsigned int &nodes,
                                          size_t &edges) {
   while (true) {
     std::string buffer;
-    getline(input, buffer);
+    getline(inputStream, buffer);
     if (buffer[0] == 'p') {
       processGraphProblemLine(buffer, nodes, edges);
       return;
@@ -104,11 +104,11 @@ void DIMACSLoader::processGraphProblemLine(std::string &buffer, unsigned int &no
 }
 
 //______________________________________________________________________________________________________________________
-void DIMACSLoader::parseEdges(std::ifstream &input, BaseGraph &graph, size_t edges, int scaling_factor) {
+void DIMACSLoader::parseEdges(std::ifstream &inputStream, BaseGraph &graph, size_t edges, int scaling_factor) {
   size_t loadededgescnt = 0;
   while (loadededgescnt < edges) {
     std::string buffer;
-    getline(input, buffer);
+    getline(inputStream, buffer);
     if (buffer[0] == 'a') {
       unsigned int from, to;
       dist_t weight;
