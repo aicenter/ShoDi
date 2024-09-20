@@ -19,7 +19,7 @@ void DistanceMatrixCsvOutputter::store(Distance_matrix_travel_time_provider &dm,
     for (size_t i = 0; i < static_cast<unsigned long long>(nodesCnt) * nodesCnt; i++) {
         max_dist = std::max(max_dist, distances[i]);
     }
-    unsigned long charsPerValue = std::to_string(max_dist).length();
+    size_t charsPerValue = std::to_string(max_dist).length();
     unsigned long long totalChars = nodesCnt * (nodesCnt*charsPerValue + nodesCnt + 2);
     std::filesystem::space_info si = std::filesystem::space(".");
     if (totalChars > si.available) {

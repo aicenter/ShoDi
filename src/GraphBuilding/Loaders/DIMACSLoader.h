@@ -31,7 +31,7 @@ private:
     std::ifstream input;
     bool amountsParsed;
     unsigned int nodesAmount;
-    size_t edgesAmount;
+    size_t edgesAmount = 0;
 
     void parseAmounts();
 
