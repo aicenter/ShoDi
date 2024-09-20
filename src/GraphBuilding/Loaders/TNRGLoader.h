@@ -15,23 +15,24 @@
  * Class used for loading the Transit Node Routing data-structure from a file.
  * I use a simple binary format for those files.
  */
+template <class T = TransitNodeRoutingGraph<NodeData>>
 class TNRGLoader {
 protected:
     /**
      * Auxiliary function that parses the header. The file should start with the std::string "TNRG" which is used as some
      * sort of a magic number  to check the integrity of the file. Then three unsigned ints should follow
      * denoting the number of nodes, the number of edges and the size of the transit node set.
-     *
+     *h
      * @param input[in] The input stream corresponding to the input file.
      * @param nodes[out] The number of nodes in the graph.
      * @param edges[out] The number of edges in the graph.
      * @param tnodesAmount[out] The size of the transit node set for the Transit Node Routing data-structure.
      */
     void parseFirstLine(
-            std::ifstream & input,
-            unsigned int & nodes,
-            unsigned int & edges,
-            unsigned int & tnodesAmount);
+            std::ifstream& input,
+            unsigned int& nodes,
+            unsigned int& edges,
+            unsigned int& tnodesAmount);
 
     /**
      * Parses edges and inserts them into the graph.
@@ -41,8 +42,8 @@ protected:
      * @param edges[in] The number of edges that need to be processed (loaded).
      */
     void parseEdgesForDistanceQueries(
-            std::ifstream & input,
-            TransitNodeRoutingGraph & graph,
+            std::ifstream& input,
+            T& graph,
             unsigned int edges);
 
     /**
@@ -65,8 +66,8 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load rank for each of the nodes).
      */
     void parseRanks(
-            std::ifstream & input,
-            TransitNodeRoutingGraph * graph,
+            std::ifstream& input,
+            T& graph,
             unsigned int nodes);
 
     /**
@@ -78,8 +79,8 @@ protected:
      * @param tnodesAmount[in] The size of the transit node set.
      */
     void parseTransitNodesMapping(
-            std::ifstream & input,
-            TransitNodeRoutingGraph & graph,
+            std::ifstream& input,
+            T& graph,
             unsigned int tnodesAmount);
 
     /**
@@ -90,8 +91,8 @@ protected:
      * @param tnodesAmount[in] The size of the transit node set.
      */
     void parseTransitNodesDistanceTable(
-            std::ifstream & input,
-            TransitNodeRoutingGraph & graph,
+            std::ifstream& input,
+            T& graph,
             unsigned int tnodesAmount);
 
     /**
@@ -103,8 +104,8 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need access nodes for each node in the graph).
      */
     void parseAccessNodes(
-            std::ifstream & input,
-            TransitNodeRoutingGraph & graph,
+            std::ifstream& input,
+            T& graph,
             unsigned int nodes);
 
     /**
@@ -116,8 +117,8 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need search spaces for each node in the graph).
      */
     void parseSearchSpaces(
-            std::ifstream & input,
-            TransitNodeRoutingGraph & graph,
+            std::ifstream& input,
+            T& graph,
             unsigned int nodes);
 
     /**
@@ -128,7 +129,7 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load rank for each of the nodes).
      */
     void parseRanks(
-            std::ifstream & input,
+            std::ifstream& input,
             TransitNodeRoutingGraphForPathQueries & graph,
             unsigned int nodes);
 
@@ -203,7 +204,7 @@ public:
      * @return An instance of the TransitNodeRoutingGraph class than can be used to answer queries using the
      * Transit Node Routing query algorithm.
      */
-    TransitNodeRoutingGraph * loadTNRforDistanceQueries();
+    TransitNodeRoutingGraph<NodeData>* loadTNRforDistanceQueries();
 
     /**
      * Can be used to load Transit Node Routing data structures from a file given to the loader during its
@@ -215,5 +216,6 @@ public:
     TransitNodeRoutingGraphForPathQueries * loadTNRforPathQueries();
 };
 
+#include "TNRGLoader.tpp"
 
 #endif //CONTRACTION_HIERARCHIES_TNRGLOADER_H

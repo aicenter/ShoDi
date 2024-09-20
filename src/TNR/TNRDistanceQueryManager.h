@@ -22,7 +22,7 @@ public:
      * @param graph[in] The Transit Node Routing data structure that will be used to answer queries.
      */
     TNRDistanceQueryManager(
-            TransitNodeRoutingGraph & graph);
+            TransitNodeRoutingGraph<NodeData>& graph);
 
     /**
      * Actually finds the distance between two targets. If start != goal, this function first invokes the locality
@@ -42,8 +42,8 @@ public:
             unsigned int goal);
 
 protected:
-    TransitNodeRoutingGraph & graph;
-    CHDistanceQueryManager fallbackCHmanager;
+    TransitNodeRoutingGraph<NodeData>& graph;
+    CHDistanceQueryManager<NodeData> fallbackCHmanager;
 };
 
 

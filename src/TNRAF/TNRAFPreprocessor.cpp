@@ -7,7 +7,7 @@
 #include <climits>
 #include <fstream>
 #include <boost/numeric/conversion/cast.hpp>
-#include "DistanceMatrix/DistanceMatrixComputorSlow.h"
+#include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "TNRAFPreprocessor.h"
 #include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeDataArcFlags.h"
@@ -30,7 +30,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
 	std::cout << "Computing transit nodes distance table" << std::endl;
-	FlagsGraph chGraph(graph);
+	FlagsGraph<NodeDataRegions> chGraph(graph);
 	CHDistanceQueryManager qm(chGraph);
 	std::vector<std::vector<unsigned int> > transitNodesDistanceTable(transitNodesAmount,
 																	  std::vector<unsigned int>(transitNodesAmount));
@@ -292,7 +292,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 	unsigned int source, std::vector<AccessNodeDataArcFlags> &accessNodes,
 	std::vector<unsigned int> &forwardSearchSpace,
 	std::unordered_map<unsigned int, unsigned int> &transitNodes,
-	FlagsGraph &graph, Graph &originalGraph, RegionsStructure &regions,
+	FlagsGraph<NodeDataRegions>& graph, Graph &originalGraph, RegionsStructure &regions,
 	bool useDistanceMatrix
 ) {
 	auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
@@ -423,7 +423,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 	unsigned int source, std::vector<AccessNodeDataArcFlags> &accessNodes,
 	std::vector<unsigned int> &backwardSearchSpace,
 	std::unordered_map<unsigned int, unsigned int> &transitNodes,
-	FlagsGraph &graph, Graph &originalGraph, RegionsStructure &regions,
+	FlagsGraph<NodeDataRegions>& graph, Graph &originalGraph, RegionsStructure &regions,
 	bool useDistanceMatrix
 ) {
 	auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };

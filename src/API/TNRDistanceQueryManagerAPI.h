@@ -46,7 +46,7 @@ public:
 
 private:
     TNRDistanceQueryManagerWithMapping * qm;
-    TransitNodeRoutingGraph * graph;
+    TransitNodeRoutingGraph<NodeData>* graph;
 };
 
 

@@ -26,7 +26,7 @@ public:
      * in the data structure.
      */
     TNRDistanceQueryManagerWithMapping(
-            TransitNodeRoutingGraph & g,
+            TransitNodeRoutingGraph<NodeData>& g,
             std::string mappingFilepath);
 
     /**

@@ -6,20 +6,13 @@
 #include <climits>
 #include <iostream>
 #include "TransitNodeRoutingArcFlagsGraph.h"
-#include "../../TNRAF/Structures/AccessNodeDataArcFlags.h"
 
 //______________________________________________________________________________________________________________________
-TransitNodeRoutingArcFlagsGraph::TransitNodeRoutingArcFlagsGraph(unsigned int nodes, unsigned int transitNodesAmount) : TransitNodeRoutingGraph(nodes, transitNodesAmount), forwardAccessNodes(nodes), backwardAccessNodes(nodes), nodesData(nodes) {
-
+TransitNodeRoutingArcFlagsGraph::TransitNodeRoutingArcFlagsGraph(unsigned int nodes, unsigned int transitNodesAmount) : TransitNodeRoutingGraph(nodes, transitNodesAmount), forwardAccessNodes(nodes), backwardAccessNodes(nodes) {
 }
 
 //______________________________________________________________________________________________________________________
 TransitNodeRoutingArcFlagsGraph::~TransitNodeRoutingArcFlagsGraph() = default;
-
-//______________________________________________________________________________________________________________________
-NodeDataRegions & TransitNodeRoutingArcFlagsGraph::data(unsigned int node) {
-    return nodesData[node];
-}
 
 //______________________________________________________________________________________________________________________
 void TransitNodeRoutingArcFlagsGraph::addForwardAccessNode(unsigned int node, unsigned int accessNodeID, unsigned int accessNodeDistance, unsigned int regionsCnt, uint32_t regionsFlags, std::vector<unsigned int> & powersOf2) {
@@ -79,8 +72,4 @@ TransitNodeRoutingArcFlagsGraph::getForwardAccessNodes1() const {
 const std::vector<std::vector<AccessNodeDataArcFlags>> &
 TransitNodeRoutingArcFlagsGraph::getBackwardAccessNodes1() const {
     return backwardAccessNodes;
-}
-
-const std::vector<NodeDataRegions> &TransitNodeRoutingArcFlagsGraph::getNodesData1() const {
-    return nodesData;
 }

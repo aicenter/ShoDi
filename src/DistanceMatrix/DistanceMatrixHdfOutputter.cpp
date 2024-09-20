@@ -1,7 +1,7 @@
 /******************************************************************************
 * File:             DistanceMatrixHdfOutputter.h
 *
-* Author:           Jan Horák (horakj31@fel.cvut.cz)
+* Author:           Jan Horak (horakj31@fel.cvut.cz)
 * Created:          03/26/24
 *****************************************************************************/
 
@@ -12,17 +12,9 @@
 void DistanceMatrixHdfOutputter::store(Distance_matrix_travel_time_provider& dm, const std::string& path) {
     printf("Storing the distance matrix.\n");
 
-     H5::H5File file;
-    try {
-        file = H5::H5File(path + ".hdf5", H5F_ACC_TRUNC);
-    } catch (const H5::FileIException& e) {
-        printf("Couldn't open file '%s'!", (path + ".hdf5").c_str());
-        return;
-    }
-
     const auto& distances = dm.getRawData();
     const auto nodesCnt = dm.nodes();
-    hsize_t dimsf[2] = { nodesCnt, nodesCnt };
+    hsize_t dimsf[] = { nodesCnt, nodesCnt };
     dist_t* values = distances.get();
 
     dist_t max_dist = 0;
@@ -32,23 +24,29 @@ void DistanceMatrixHdfOutputter::store(Distance_matrix_travel_time_provider& dm,
 
     H5::DataType datatype;
     if (max_dist < UINT8_MAX) {
-        datatype = H5::PredType::STD_U8LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U8LE);
     }
     else if (max_dist < UINT16_MAX) {
-        datatype = H5::PredType::STD_U16LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U16LE);
     }
     else if (max_dist < UINT32_MAX) {
-        datatype = H5::PredType::STD_U32LE;
-	}
-	else {
-		datatype = H5::PredType::STD_U64LE;
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U32LE);
+    }
+    else {
+        datatype = static_cast<H5::DataType>(H5::PredType::STD_U64LE);
     }
 
-    auto dataspace = H5::DataSpace(2, dimsf, nullptr);
-    H5::DataSet dataset(file.createDataSet("dm", datatype, dataspace));
-    dataset.write(values, H5::PredType::NATIVE_UINT);
+    try {
+        H5::H5File file = H5::H5File(path + ".hdf5", H5F_ACC_TRUNC);
 
-    dataset.close();
-    dataspace.close();
-    file.close();
+        auto dataspace = H5::DataSpace(2, dimsf, nullptr);
+        H5::DataSet dataset(file.createDataSet("dm", datatype, dataspace));
+        dataset.write(values, H5::PredType::NATIVE_UINT);
+
+        dataset.close();
+        dataspace.close();
+        file.close();
+    } catch (H5::FileIException&) {
+        printf("Couldn't open file '%s'!", (path + ".hdf5").c_str());
+    }
 }

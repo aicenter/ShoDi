@@ -6,7 +6,7 @@
 #ifndef TRANSIT_NODE_ROUTING_PREPROCESSINGEDGE_H
 #define TRANSIT_NODE_ROUTING_PREPROCESSINGEDGE_H
 
-#include "constants.h"
+#include "../../constants.h"
 
 /**
  * This structure represents one edge during the preprocessing phase. We have to keep track of whether the edge

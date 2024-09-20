@@ -11,7 +11,7 @@
 #include <map>
 #include "../Structures/Graph.h"
 #include "../Structures/UpdateableGraph.h"
-#include "GraphBuilding/Structures/BaseGraph.h"
+#include "../Structures/BaseGraph.h"
 #include "GraphLoader.h"
 
 

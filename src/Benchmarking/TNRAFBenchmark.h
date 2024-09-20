@@ -28,7 +28,7 @@ public:
      */
     static double benchmark(
             const std::vector < std::pair< unsigned int, unsigned int> > & trips,
-            TransitNodeRoutingArcFlagsGraph & graph,
+            TransitNodeRoutingArcFlagsGraph& graph,
             std::vector < unsigned int > & distances);
 
     /**
@@ -47,7 +47,7 @@ public:
      */
     static double benchmarkWithMapping(
             const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips,
-            TransitNodeRoutingArcFlagsGraph & graph,
+            TransitNodeRoutingArcFlagsGraph& graph,
             std::vector < unsigned int > & distances,
             std::string mappingFilePath);
 };

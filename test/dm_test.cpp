@@ -2,7 +2,7 @@
 // Created by david on 2023-07-19.
 //
 #include "gtest/gtest.h"
-#include "../src/GraphBuilding/Loaders/CsvGraphLoader.h"
+#include "../src/GraphBuilding/Loaders/AdjGraphLoader.h"
 #include "../src/GraphBuilding/Structures/AdjMatrixGraph.h"
 #include "DistanceMatrix/DistanceMatrixComputorFast.h"
 #include "DistanceMatrix/DistanceMatrixComputorSlow.h"
@@ -21,7 +21,7 @@ void compare_dist_matrices(
 }
 
 TEST(dm_test, simple_test) {
-    CsvGraphLoader adj_loader("test/adj.csv");
+    AdjGraphLoader adj_loader("test/adj.csv");
 
     DistanceMatrixComputorFast dm_computor;
     auto matrix = dm_computor.compute_and_get_distance_matrix(adj_loader);

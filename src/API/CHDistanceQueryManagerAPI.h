@@ -47,7 +47,7 @@ public:
 
 private:
     CHDistanceQueryManagerWithMapping * qm;
-    FlagsGraph * graph;
+    FlagsGraph<NodeData>* graph;
 };
 
 

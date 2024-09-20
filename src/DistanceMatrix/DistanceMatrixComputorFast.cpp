@@ -7,7 +7,7 @@
 
 
 #include "DistanceMatrixComputorFast.h"
-#include "GraphBuilding/Structures/AdjMatrixGraph.h"
+#include "../GraphBuilding/Structures/AdjMatrixGraph.h"
 #include "johnson.hpp"
 
 void DistanceMatrixComputorFast::computeDistanceMatrix(const std::vector<dist_t> &graphAdjMatrix) {

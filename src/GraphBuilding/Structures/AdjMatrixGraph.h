@@ -8,8 +8,8 @@
 #ifndef ADJMATRIXGRAPH_H_8R9FHUCS
 #define ADJMATRIXGRAPH_H_8R9FHUCS
 
-#include "GraphBuilding/Structures/BaseGraph.h"
-#include "constants.h"
+#include "BaseGraph.h"
+#include "../../constants.h"
 
 #include <vector>
 

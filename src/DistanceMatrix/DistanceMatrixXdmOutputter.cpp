@@ -7,7 +7,7 @@
 
 #include <fstream>
 #include "DistanceMatrixXdmOutputter.h"
-#include "constants.h"
+#include "../constants.h"
 
 void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const std::string &path) {
     printf("Storing the distance matrix.\n");

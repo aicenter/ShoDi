@@ -1,8 +1,8 @@
 /******************************************************************************
 * File:             CsvGraphLoader.h
 *
-* Author:           Jan Neumann (neumaja5@fel.cvut.cz)  
-* Created:          07/27/20 
+* Author:           Jan Horak (horakj31@fel.cvut.cz)
+* Created:          07/18/24
 *****************************************************************************/
 
 #ifndef SHORTEST_PATHS_CSVGRAPHLOADER_H
@@ -15,17 +15,18 @@
 #include <string>
 #include <csv2/reader.hpp>
 
-typedef csv2::Reader<csv2::delimiter<','>, csv2::quote_character<'"'>,
-                     csv2::first_row_is_header<false>,
+typedef csv2::Reader<csv2::delimiter<'\t'>, csv2::quote_character<'"'>,
+                     csv2::first_row_is_header<true>,
                      csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
     DefaultCSVReader;
 
 class CsvGraphLoader : public GraphLoader {
 private:
-    DefaultCSVReader reader;
-    std::string inputFile;
+    DefaultCSVReader nodeReader;
+    DefaultCSVReader edgeReader;
+    std::string inputPath;
 public:
-    explicit CsvGraphLoader(std::string inputFile);
+    explicit CsvGraphLoader(const std::string& inputPath);
 
     using GraphLoader::loadGraph;
 
@@ -35,6 +36,7 @@ public:
 
     ~CsvGraphLoader() override = default;
 
+    void loadLocations(std::vector<std::pair<double, double>> &locations);
 };
 
 

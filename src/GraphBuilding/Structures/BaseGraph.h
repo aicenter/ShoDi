@@ -8,7 +8,7 @@
 #ifndef BASEGRAPH_H_IQX7DWCB
 #define BASEGRAPH_H_IQX7DWCB
 
-#include "constants.h"
+#include "../../constants.h"
 
 /**
  * Base class for all Graph classes.

@@ -22,7 +22,7 @@ public:
      * @param graph[in] The Transit Node Routing with Arc Flags data structure that will be used to answer queries.
      */
     explicit TNRAFDistanceQueryManager(
-            TransitNodeRoutingArcFlagsGraph & graph);
+            TransitNodeRoutingArcFlagsGraph& graph);
 
     /**
      * Actually finds the distance between two targets. If start != goal, this function first invokes the locality
@@ -42,8 +42,8 @@ public:
             const unsigned int goal);
 
 private:
-    TransitNodeRoutingArcFlagsGraph & graph;
-    CHDistanceQueryManager fallbackCHmanager;
+    TransitNodeRoutingArcFlagsGraph& graph;
+    CHDistanceQueryManager<NodeDataRegions> fallbackCHmanager;
 };
 
 

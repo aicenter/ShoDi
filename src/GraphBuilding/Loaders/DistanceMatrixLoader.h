@@ -7,7 +7,7 @@
 #define CONTRACTION_HIERARCHIES_DISTANCEMATRIXLOADER_H
 
 #include <string>
-#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
+#include "../../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 
 
@@ -29,7 +29,15 @@ public:
      *
      * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.
      */
-    Distance_matrix_travel_time_provider * loadDistanceMatrix();
+    Distance_matrix_travel_time_provider * loadXDM();
+
+    /**
+    * TODO
+     * Loads the distance matrix from the file that was given to the loader during its initialization.
+     *
+     * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.
+     */
+    Distance_matrix_travel_time_provider * loadHDF();
 
 private:
     /**

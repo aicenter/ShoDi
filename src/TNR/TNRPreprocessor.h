@@ -11,7 +11,7 @@
 #include "Structures/AccessNodeData.h"
 #include "../GraphBuilding/Structures/FlagsGraph.h"
 #include "../GraphBuilding/Loaders/XenGraphLoader.h"
-#include "DistanceMatrix/Distance_matrix_travel_time_provider.h"
+#include "../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 
 
 
@@ -131,7 +131,7 @@ protected:
             std::vector < AccessNodeData> & accessNodes,
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. This is achieved using a simplified
@@ -153,7 +153,7 @@ protected:
             std::vector < AccessNodeData> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Auxiliary function that will find forward access nodes for a given node. The process consists of first finding
@@ -178,7 +178,7 @@ protected:
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             std::vector < unsigned int > & distsFromNode,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. The process consists of first finding
@@ -203,7 +203,7 @@ protected:
             std::vector < unsigned int > & backwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             std::vector < unsigned int > & distsFromNode,
-            FlagsGraph & graph);
+            FlagsGraph<NodeData>& graph);
 
     /**
      * Auxiliary function that will find forward access nodes for a given node. The process consists of first finding
@@ -225,7 +225,7 @@ protected:
             std::vector < AccessNodeData> & accessNodes,
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph & graph,
+            FlagsGraph<NodeData>& graph,
             Distance_matrix_travel_time_provider & dm);
 
     /**
@@ -248,7 +248,7 @@ protected:
             std::vector < AccessNodeData> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph & graph,
+            FlagsGraph<NodeData>& graph,
             Distance_matrix_travel_time_provider & dm);
 
 };

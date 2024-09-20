@@ -16,7 +16,7 @@
  * which can then be used to answer queries. Since the structures needed by Transit Node Routing with Arc Flags are very
  * similar to the structures needed by Transit Node Routing, some parts of 'TNRGLoader' are reused here.
  */
-class TGAFLoader : public TNRGLoader {
+class TGAFLoader : public TNRGLoader<TransitNodeRoutingArcFlagsGraph> {
 public:
     /**
      * A simple constructor.
@@ -33,7 +33,7 @@ public:
      * @return An instance of the 'TransitNodeRoutingArcFlagsGraph' that can be used to answer queries using the
      * Transit Node Routing with Arc Flags query algorithm.
      */
-    TransitNodeRoutingArcFlagsGraph * loadTNRAFforDistanceQueries();
+    TransitNodeRoutingArcFlagsGraph* loadTNRAFforDistanceQueries();
 
 protected:
     /**
@@ -49,11 +49,11 @@ protected:
      * @param regionsCnt[out] The number of regions used for the Arc Flags.
      */
     void parseFirstLine(
-            std::ifstream & input,
-            unsigned int & nodes,
-            unsigned int & edges,
-            unsigned int & tnodesAmount,
-            unsigned int & regionsCnt);
+            std::ifstream& input,
+            unsigned int& nodes,
+            unsigned int& edges,
+            unsigned int& tnodesAmount,
+            unsigned int& regionsCnt);
 
     /**
      * Parses ranks for all the nodes in the graph.
@@ -63,8 +63,8 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load rank for each of the nodes).
      */
     void parseRanks(
-            std::ifstream & input,
-            TransitNodeRoutingArcFlagsGraph * graph,
+            std::ifstream& input,
+            TransitNodeRoutingArcFlagsGraph& graph,
             unsigned int nodes);
 
     /**
@@ -75,8 +75,8 @@ protected:
      * @param nodes[in] The number of nodes in the graph (we need to load a region number for each of the nodes).
      */
     void parseRegions(
-            std::ifstream & input,
-            TransitNodeRoutingArcFlagsGraph & graph,
+            std::ifstream& input,
+            TransitNodeRoutingArcFlagsGraph& graph,
             unsigned int nodes);
 
     /**
@@ -89,8 +89,8 @@ protected:
      * @param regionsCnt[in] The number of regions used for the Arc Flags.
      */
     void parseAccessNodes(
-            std::ifstream & input,
-            TransitNodeRoutingArcFlagsGraph & graph,
+            std::ifstream& input,
+            TransitNodeRoutingArcFlagsGraph& graph,
             unsigned int nodes,
             unsigned int regionsCnt);
 };

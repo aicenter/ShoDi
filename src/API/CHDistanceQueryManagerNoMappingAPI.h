@@ -53,8 +53,8 @@ public:
     void clearStructures();
 
 private:
-    CHDistanceQueryManager * qm;
-    FlagsGraph * graph;
+    CHDistanceQueryManager<NodeData>* qm;
+    FlagsGraph<NodeData>* graph;
 };
 
 
