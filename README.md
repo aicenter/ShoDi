@@ -132,7 +132,7 @@ create -m ch -f <input_format> -i <input_path> -o <output_path> [--precision-los
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `adj`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`, `csv`
  * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
  * `output_path` is path to the output file (*excluding* file extension - the `.ch` extension will be added automatically)
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
@@ -155,7 +155,7 @@ create -m tnr -f <input_format> -i <input_path> -o <output_path> --preprocessing
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `adj`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`, `csv`
  * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
  * `output_path` is path to the output file (*excluding* file extension - the `.tnrg` extension will be added
    automatically)
@@ -196,7 +196,7 @@ create -m tnraf -f <input_format> -i <input_path> -o <output_path> --preprocessi
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `adj`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`, `csv`
  * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
  * `output_path` is path to the output file (*excluding* file extension - the `.tgaf` extension will be added
    automatically)
@@ -223,7 +223,7 @@ create -m dm -f <input_format> -i <input_path> -o <output_path> --preprocessing-
 
 where:
 
- * `input_format` is one of `xengraph`, `dimacs`, `adj`
+ * `input_format` is one of `xengraph`, `dimacs`, `adj`, `csv`
  * `input_path` is path to the input file (including file extension) or folder (for CSV input format)
  * `output_path` is path to the output file (*excluding* file extension - the appropriate extension based on
    `output_format` will be added automatically)
