@@ -8,7 +8,8 @@ Building the application and running the tests
 ----------------------------------------------
 
 To make the application running, you will need the `library` compiled for your architecture. 
-This means a file `libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows. 
+This means a file `libshortestPaths.so` in Linux or `shortestPaths.dll` in Windows.
+To run the `Java` application, first create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`.
 Compilation of this library is described in the [main readme](../README.md) of this project ([here](../README.md)).
 
 The `Java` application needs to be able to find the library. 

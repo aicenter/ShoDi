@@ -79,8 +79,8 @@ From Source
 -----------
 
 ### Requirements
- - [Java](https://java.com/en/download/): JNI is required for Java bindings.
- - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional).
+ - [Java](https://java.com/en/download/) (optional, JNI is required for Java bindings)
+ - [Doxygen](https://www.doxygen.nl/index.html) for documentation (optional)
 
 #### Required libraries
 - boost-config
@@ -93,10 +93,9 @@ From Source
 - proj at least 9.3
 
 ### Building the project
-1. Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
-3. `mkdir build && cd build`
-4. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
-5. `cmake --build . --target shortestPathsPreprocessor --config Release`
+1. `mkdir build && cd build`
+2. `cmake -DCMAKE_TOOLCHAIN_FILE="<vcpkg dir>/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release ..`
+3. `cmake --build . --target shortestPathsPreprocessor --config Release`
 
 There are also additional build targets such as `shortestPaths` (which is just
 the library, excluding the standalone executable), `doc` (the documentation:
@@ -339,6 +338,8 @@ A simple `Java` application that uses the library to answer queries can be found
 This application was used to test that the API is functional and everything works as intended. 
 You can however use this application as an example of how to use the library from `Java`. 
 You can consult the readme for this simple application [here](./javatests/README.md).
+
+Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C:\Program Files\Java\jdk-15.0.1`
 
 For more information about how to integrate this project with other programming languages, please consult 
 the [readme](./src/API/README.md) in the `src/API` subdirectory.
