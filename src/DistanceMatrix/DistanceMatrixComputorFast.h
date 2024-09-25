@@ -17,7 +17,7 @@
 class DistanceMatrixComputorFast : public DistanceMatrixComputor<std::vector<dist_t>> {
 public:
 
-    Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
+    Distance_matrix_travel_time_provider<dist_t>* getDistanceMatrixInstance() override;
 
     std::vector<dist_t> loadGraph(GraphLoader &graphLoader, int scaling_factor) override;
 

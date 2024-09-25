@@ -10,7 +10,7 @@
 #include "DistanceMatrixXdmOutputter.h"
 #include "../constants.h"
 
-void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const std::string &path) {
+void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string &path) {
     const unsigned int nodesCnt = dm.nodes();
     const auto& distances = dm.getRawData();
 

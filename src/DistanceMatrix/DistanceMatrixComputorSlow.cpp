@@ -106,7 +106,7 @@ Graph DistanceMatrixComputorSlow::loadGraph(GraphLoader &graphLoader, int scalin
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider * DistanceMatrixComputorSlow::getDistanceMatrixInstance() {
+Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixComputorSlow::getDistanceMatrixInstance() {
     auto* retval = new Distance_matrix_travel_time_provider(std::move(distanceTable), size);
     return retval;
 }

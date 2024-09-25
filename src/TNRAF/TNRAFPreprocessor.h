@@ -270,7 +270,7 @@ protected:
      */
     static void initPowersOf2(std::vector<uint32_t> & powersOf2);
 
-    static Distance_matrix_travel_time_provider * distanceMatrix;
+    static Distance_matrix_travel_time_provider<dist_t>* distanceMatrix;
 };
 
 

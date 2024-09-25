@@ -31,7 +31,7 @@ public:
      */
     static double benchmark(
             const std::vector < std::pair< unsigned int, unsigned int> > & trips,
-            Distance_matrix_travel_time_provider & matrix,
+            Distance_matrix_travel_time_provider<dist_t>& matrix,
             std::vector < dist_t > & distances);
     
     /**
@@ -50,7 +50,7 @@ public:
      */
     static double benchmarkUsingMapping(
             const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips,
-            Distance_matrix_travel_time_provider & matrix,
+            Distance_matrix_travel_time_provider<dist_t>& matrix,
             std::vector < dist_t > & distances,
             std::string mappingFilePath);
 };

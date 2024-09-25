@@ -13,14 +13,14 @@
 #include "Distance_matrix_travel_time_provider.h"
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider::Distance_matrix_travel_time_provider(const unsigned int nodes):
+template<class T> Distance_matrix_travel_time_provider<T>::Distance_matrix_travel_time_provider(const unsigned int nodes):
     nodesCnt(nodes),
     distances(std::make_unique<dist_t[]>(static_cast<size_t>(nodes) * nodes)) {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider::Distance_matrix_travel_time_provider(
-        std::unique_ptr<dist_t[]> distMatrix,
+template<class T> Distance_matrix_travel_time_provider<T>::Distance_matrix_travel_time_provider(
+        std::unique_ptr<T[]> distMatrix,
         const unsigned int size
 ):
     nodesCnt(size),
@@ -28,17 +28,17 @@ Distance_matrix_travel_time_provider::Distance_matrix_travel_time_provider(
 }
 
 //______________________________________________________________________________________________________________________
-dist_t Distance_matrix_travel_time_provider::findDistance(const unsigned int start, const unsigned int goal) const {
+template<class T> dist_t Distance_matrix_travel_time_provider<T>::findDistance(const unsigned int start, const unsigned int goal) const {
     return distances[((size_t) start) * ((size_t) nodesCnt) + ((size_t) goal)];
 }
 
 //______________________________________________________________________________________________________________________
-void Distance_matrix_travel_time_provider::setDistance(unsigned int source, unsigned int target, dist_t distance) {
+template<class T> void Distance_matrix_travel_time_provider<T>::setDistance(unsigned int source, unsigned int target, T distance) {
     distances[((size_t) source) * ((size_t) nodesCnt) + ((size_t) target)] = distance;
 }
 
 //______________________________________________________________________________________________________________________
-void Distance_matrix_travel_time_provider::printInfo() {
+template<class T> void Distance_matrix_travel_time_provider<T>::printInfo() {
     const dist_t max = std::numeric_limits<dist_t>::max();
     const dist_t half = max / 2;
     unsigned int halfCnt = 0;
@@ -61,10 +61,10 @@ void Distance_matrix_travel_time_provider::printInfo() {
         << (double) halfCnt / (double) optCount << " %." << std::endl;
 }
 
-const std::unique_ptr<dist_t[]> &Distance_matrix_travel_time_provider::getRawData() {
+template<class T> const std::unique_ptr<T[]> &Distance_matrix_travel_time_provider<T>::getRawData() {
     return distances;
 }
 
-unsigned int Distance_matrix_travel_time_provider::nodes() const {
+template<class T> unsigned int Distance_matrix_travel_time_provider<T>::nodes() const {
     return nodesCnt;
 }

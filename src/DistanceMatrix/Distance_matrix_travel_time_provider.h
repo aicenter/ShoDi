@@ -21,6 +21,7 @@
  * Matrix in memory at once, making it impossible to use it. Here, the Distance Matrix is used for comparison to get an
  * idea of how much slower the other methods are in comparison with the Distance Matrix approach.
  */
+template <class T>
 class Distance_matrix_travel_time_provider {
 public:
     /**
@@ -35,7 +36,7 @@ public:
      *
      * @param distMatrix[in] A 2D std::vector that will be used as the distance matrix.
      */
-    explicit Distance_matrix_travel_time_provider(std::unique_ptr<dist_t[]> distMatrix, unsigned int size);
+    explicit Distance_matrix_travel_time_provider(std::unique_ptr<T[]> distMatrix, unsigned int size);
 
     /**
      * This is basically a query algorithm. Each query is answered using a single table lookup,
@@ -54,13 +55,13 @@ public:
      * @param target[in] The column of the table we want to set the distance for.
      * @param distance[in] The value (distance) we wnat to put into the table.
      */
-    void setDistance(unsigned int source, unsigned int target, dist_t distance);
+    void setDistance(unsigned int source, unsigned int target, T distance);
 
     /**
      * Get the underlying data structure (a 1D array)
      * @return The underlying 1D array
      */
-    const std::unique_ptr<dist_t[]>& getRawData();
+    const std::unique_ptr<T[]>& getRawData();
 
     /**
      * Get nodes count
@@ -78,8 +79,9 @@ public:
 
 private:
     const unsigned int nodesCnt;
-    std::unique_ptr<dist_t[]> distances;
+    std::unique_ptr<T[]> distances;
 };
 
+#include "Distance_matrix_travel_time_provider.tpp"
 
 #endif //CONTRACTION_HIERARCHIES_DISTANCEMATRIX_H

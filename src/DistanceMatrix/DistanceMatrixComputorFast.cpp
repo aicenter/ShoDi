@@ -24,6 +24,6 @@ std::vector<dist_t> DistanceMatrixComputorFast::loadGraph(GraphLoader &graphLoad
     return graph.matrix();
 }
 
-Distance_matrix_travel_time_provider *DistanceMatrixComputorFast::getDistanceMatrixInstance() {
+Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixComputorFast::getDistanceMatrixInstance() {
     return new Distance_matrix_travel_time_provider(std::move(distanceTable), size);
 }

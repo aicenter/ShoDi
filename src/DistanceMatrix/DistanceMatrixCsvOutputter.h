@@ -17,7 +17,7 @@
  */
 class DistanceMatrixCsvOutputter : public DistanceMatrixOutputter {
 public:
-    void store(Distance_matrix_travel_time_provider &dm, const std::string &path) override;
+    void store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string &path) override;
 };
 
 

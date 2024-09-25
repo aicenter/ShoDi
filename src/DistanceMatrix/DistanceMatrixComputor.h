@@ -60,17 +60,17 @@ public:
      * @return An instance of the DistanceMatrix class that can be used to answer
      * queries.
      */
-    virtual Distance_matrix_travel_time_provider *getDistanceMatrixInstance() = 0;
+    virtual Distance_matrix_travel_time_provider<dist_t>* getDistanceMatrixInstance() = 0;
 
     virtual ~DistanceMatrixComputor() = default;
 
-    Distance_matrix_travel_time_provider *compute_and_get_distance_matrix(GraphLoader &graphLoader, int scaling_factor) {
+    Distance_matrix_travel_time_provider<dist_t>* compute_and_get_distance_matrix(GraphLoader &graphLoader, int scaling_factor) {
         T graphData = loadGraph(graphLoader, scaling_factor);
         computeDistanceMatrix(graphData);
         return getDistanceMatrixInstance();
     }
 
-    Distance_matrix_travel_time_provider *compute_and_get_distance_matrix(GraphLoader &graphLoader) {
+    Distance_matrix_travel_time_provider<dist_t>* compute_and_get_distance_matrix(GraphLoader &graphLoader) {
         return compute_and_get_distance_matrix(graphLoader, 1);
     }
 protected:

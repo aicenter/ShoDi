@@ -27,7 +27,7 @@ public:
  * @param dm[in] The distance matrix to store.
  * @param path[in] The desired output file path where the distance matrix should be output.
  */
-virtual void store(Distance_matrix_travel_time_provider &dm, const std::string &path) = 0;
+virtual void store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string &path) = 0;
 };
 
 

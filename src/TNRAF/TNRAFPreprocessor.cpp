@@ -14,7 +14,7 @@
 #include "../Dijkstra/DijkstraNode.h"
 #include "../Dijkstra/BasicDijkstra.h"
 
-Distance_matrix_travel_time_provider *TNRAFPreprocessor::distanceMatrix = NULL;
+Distance_matrix_travel_time_provider<dist_t>* TNRAFPreprocessor::distanceMatrix = NULL;
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(

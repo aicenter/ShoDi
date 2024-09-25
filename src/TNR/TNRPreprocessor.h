@@ -226,7 +226,7 @@ protected:
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph<NodeData>& graph,
-            Distance_matrix_travel_time_provider & dm);
+            Distance_matrix_travel_time_provider<dist_t>& dm);
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. The process consists of first finding
@@ -249,7 +249,7 @@ protected:
             std::vector < unsigned int > & backwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph<NodeData>& graph,
-            Distance_matrix_travel_time_provider & dm);
+            Distance_matrix_travel_time_provider<dist_t>& dm);
 
 };
 

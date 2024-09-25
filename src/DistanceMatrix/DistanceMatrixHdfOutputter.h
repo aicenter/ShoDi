@@ -1,7 +1,7 @@
 /******************************************************************************
 * File:             DistanceMatrixHdfOutputter.h
 *
-* Author:           Jan Horák (horakj31@fel.cvut.cz)  
+* Author:           Jan Horï¿½k (horakj31@fel.cvut.cz)  
 * Created:          03/26/24
 *****************************************************************************/
 
@@ -17,7 +17,7 @@
  */
 class DistanceMatrixHdfOutputter : public DistanceMatrixOutputter {
 public:
-    void store(Distance_matrix_travel_time_provider &dm, const std::string &path) override;
+    void store(Distance_matrix_travel_time_provider<dist_t>&dm, const std::string &path) override;
 };
 
 

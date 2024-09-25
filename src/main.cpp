@@ -285,7 +285,7 @@ void createTNRAF(
 }
 
 template<typename ComputorType>
-Distance_matrix_travel_time_provider* computeDistanceMatrix(GraphLoader &graphLoader, int scaling_factor, std::string timerName) {
+Distance_matrix_travel_time_provider<dist_t>* computeDistanceMatrix(GraphLoader &graphLoader, int scaling_factor, std::string timerName) {
     ComputorType computor;
     auto graph = computor.loadGraph(graphLoader, scaling_factor);
 
@@ -306,10 +306,10 @@ void createDM(
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
-    std::function<Distance_matrix_travel_time_provider* (GraphLoader&, unsigned int, std::string)> computor;
+    std::function<Distance_matrix_travel_time_provider<dist_t>* (GraphLoader&, unsigned int, std::string)> computor;
 
     std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
-    std::unique_ptr<Distance_matrix_travel_time_provider> dm{nullptr};
+    std::unique_ptr<Distance_matrix_travel_time_provider<dist_t>> dm{nullptr};
 
     if (preprocessingMode == "slow") {
         computor = computeDistanceMatrix<DistanceMatrixComputorSlow>;
@@ -331,7 +331,7 @@ void createDM(
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    dm = std::unique_ptr<Distance_matrix_travel_time_provider> {computor(graphLoader, scaling_factor, "Distance Matrix preprocessing")};
+    dm = std::unique_ptr<Distance_matrix_travel_time_provider<dist_t>> {computor(graphLoader, scaling_factor, "Distance Matrix preprocessing")};
     outputter->store(*dm, outputFilePath);
 }
 
@@ -902,7 +902,7 @@ double benchmarkDM(
     tripsLoader.loadTrips(trips);
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
-    Distance_matrix_travel_time_provider* dm = dmLoader.loadHDF();
+    Distance_matrix_travel_time_provider<dist_t>* dm = dmLoader.loadHDF();
 
     std::vector<unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::benchmark(trips, *dm, dmDistances);
@@ -956,7 +956,7 @@ double benchmarkDMwithMapping(
     tripsLoader.loadLongLongTrips(trips);
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
-    Distance_matrix_travel_time_provider* dm = dmLoader.loadXDM();
+    Distance_matrix_travel_time_provider<dist_t>* dm = dmLoader.loadXDM();
 
     std::vector<unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::benchmarkUsingMapping(trips, *dm, dmDistances, mappingFilePath);

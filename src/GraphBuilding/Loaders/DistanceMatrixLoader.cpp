@@ -16,7 +16,7 @@ DistanceMatrixLoader::DistanceMatrixLoader(std::string inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
+Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadXDM() {
     std::ifstream input;
     input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
@@ -26,7 +26,7 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
     unsigned int nodes;
     parseHeader(input, nodes);
 
-    Distance_matrix_travel_time_provider * distanceMatrix = new Distance_matrix_travel_time_provider(nodes);
+    Distance_matrix_travel_time_provider<dist_t>* distanceMatrix = new Distance_matrix_travel_time_provider<dist_t>(nodes);
 
     parseDistances(input, nodes, *distanceMatrix);
 
@@ -36,7 +36,7 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadHDF() {
+Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadHDF() {
     H5::H5File file{this->inputFile, H5F_ACC_RDONLY};
     H5::DataSet dataset = file.openDataSet("dm");
     auto t = dataset.getDataType();
@@ -49,7 +49,7 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadHDF() {
     auto values = new int[nodes*nodes];
     dataset.read(values, H5::PredType::NATIVE_INT);
 
-    auto* distanceMatrix = new Distance_matrix_travel_time_provider(boost::numeric_cast<unsigned int>(nodes));
+    auto* distanceMatrix = new Distance_matrix_travel_time_provider<dist_t>(boost::numeric_cast<unsigned int>(nodes));
 
     for(size_t i = 0; i < nodes; i++) {
         for (size_t j = 0; j < nodes; j++) {
@@ -81,7 +81,7 @@ void DistanceMatrixLoader::parseHeader(std::ifstream & input, unsigned int & nod
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixLoader::parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix) {
+void DistanceMatrixLoader::parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider<dist_t>& distanceMatrix) {
     unsigned int distance;
     for(unsigned int i = 0; i < nodes; i++) {
         for(unsigned int j = 0; j < nodes; j++) {

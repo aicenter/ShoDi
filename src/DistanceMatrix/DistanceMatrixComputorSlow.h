@@ -16,7 +16,7 @@
 class DistanceMatrixComputorSlow : public DistanceMatrixComputor<Graph> {
 public:
 
-    Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
+    Distance_matrix_travel_time_provider<dist_t>* getDistanceMatrixInstance() override;
 
     Graph loadGraph(GraphLoader &graphLoader, int scaling_factor) override;
 
