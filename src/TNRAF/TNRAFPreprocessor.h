@@ -54,6 +54,7 @@ public:
             std::string outputPath,
             unsigned int transitNodesAmount = 1000,
             unsigned int regionsCnt = 32,
+            unsigned int dmIntSize = 0,
             bool useDistanceMatrix = false);
 
     /**
@@ -270,7 +271,7 @@ protected:
      */
     static void initPowersOf2(std::vector<uint32_t> & powersOf2);
 
-    static Distance_matrix_travel_time_provider<dist_t>* distanceMatrix;
+    static DistanceMatrixInterface* distanceMatrix;
 };
 
 

@@ -15,10 +15,12 @@
  * Allows to store the distance matrix to disk in a CSV format. Comma is used as delimiter.
  * The distance matrix will be saved into a file specified by the path argument, suffix '.csv' is added automatically.
  */
-class DistanceMatrixCsvOutputter : public DistanceMatrixOutputter {
+template <class IntType>
+class DistanceMatrixCsvOutputter : public DistanceMatrixOutputter<IntType> {
 public:
-    void store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string &path) override;
+    void store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string &path) override;
 };
 
+#include "DistanceMatrixCsvOutputter.tpp"
 
 #endif //SHORTEST_PATHS_DISTANCEMATRIXCSVOUTPUTTER_H

@@ -10,7 +10,7 @@
 #define SHORTEST_PATHS_DISTANCEMATRIXCOMPUTOR_H
 
 #include "../GraphBuilding/Loaders/GraphLoader.h"
-#include "Distance_matrix_travel_time_provider.h"
+#include <memory>
 
 /**
  * This class can compute a full distance matrix for a given Graph. Meaning all
@@ -23,10 +23,10 @@
  * enough for small graphs especially since the road graphs are usually very
  * sparse.
  */
-template<typename T>
+template<typename IntType>
 class DistanceMatrixComputor {
 public:
-    typedef T GraphType;
+    //typedef T GraphType;
 
     /**
      * This function will retrieve the graph data required for the
@@ -38,7 +38,7 @@ public:
      * of the weight values. Each loaded weight will be divided by this value
      * before rounding.
      */
-    virtual T loadGraph(GraphLoader &graphLoader, int scaling_factor) = 0;
+    //virtual void loadGraph(GraphLoader &graphLoader, int scaling_factor) = 0;
 
     /**
      * This function will compute the full distance matrix for the graph data
@@ -49,7 +49,7 @@ public:
      * @param[in] graphData Graph data required for the distance matrix
      * calculation
      */
-    virtual void computeDistanceMatrix(const T &graphData) = 0;
+    //virtual void computeDistanceMatrix(const T &graphData) = 0;
 
     /**
      * Allows us to get a DistanceMatrix instance immediately from the
@@ -60,21 +60,19 @@ public:
      * @return An instance of the DistanceMatrix class that can be used to answer
      * queries.
      */
-    virtual Distance_matrix_travel_time_provider<dist_t>* getDistanceMatrixInstance() = 0;
+    std::unique_ptr<IntType[]> getDistanceMatrixInstance() {
+        return std::move(distanceTable);
+    }
 
     virtual ~DistanceMatrixComputor() = default;
 
-    Distance_matrix_travel_time_provider<dist_t>* compute_and_get_distance_matrix(GraphLoader &graphLoader, int scaling_factor) {
-        T graphData = loadGraph(graphLoader, scaling_factor);
-        computeDistanceMatrix(graphData);
-        return getDistanceMatrixInstance();
-    }
+    virtual std::unique_ptr<IntType[]> compute_and_get_distance_matrix(GraphLoader& graphLoader, int scaling_factor) = 0;
 
-    Distance_matrix_travel_time_provider<dist_t>* compute_and_get_distance_matrix(GraphLoader &graphLoader) {
+    /*Distance_matrix_travel_time_provider<IntType>* compute_and_get_distance_matrix(GraphLoader &graphLoader) {
         return compute_and_get_distance_matrix(graphLoader, 1);
-    }
+    }*/
 protected:
-    std::unique_ptr<dist_t[]> distanceTable;
+    std::unique_ptr<IntType[]> distanceTable;
     unsigned int size;
 };
 

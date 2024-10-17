@@ -129,7 +129,6 @@ add_library(shortestPaths SHARED
         src/Astar/Astar.h
         src/Astar/AstarNode.cpp
         src/Astar/AstarNode.h
-        src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
         src/DistanceMatrix/DistanceMatrixComputorSlow.h
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.h
@@ -210,17 +209,10 @@ add_library(shortestPaths SHARED
         src/GraphBuilding/Loaders/CsvGraphLoader.cpp
         src/GraphBuilding/Loaders/CsvGraphLoader.h
         src/Error/Error.h
-        src/DistanceMatrix/johnson.cpp
-        src/DistanceMatrix/johnson.hpp
-        src/DistanceMatrix/DistanceMatrixComputorFast.cpp
-        src/DistanceMatrix/DistanceMatrixComputorFast.h
         src/DistanceMatrix/DistanceMatrixComputor.h
         src/DistanceMatrix/DistanceMatrixOutputter.h
-        src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
         src/DistanceMatrix/DistanceMatrixCsvOutputter.h
-        src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
         src/DistanceMatrix/DistanceMatrixXdmOutputter.h
-        src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
         src/DistanceMatrix/DistanceMatrixHdfOutputter.h
         src/CLI/ProgressBar.cpp
         src/CLI/ProgressBar.hpp
@@ -257,12 +249,6 @@ add_executable(shortestPathsPreprocessor
     src/Dijkstra/DijkstraNode.cpp
     src/Astar/Astar.cpp
     src/Astar/AstarNode.cpp
-    src/DistanceMatrix/DistanceMatrixComputorFast.cpp
-    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
-    src/DistanceMatrix/DistanceMatrixCsvOutputter.cpp
-    src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
-    src/DistanceMatrix/DistanceMatrixXdmOutputter.cpp
-    src/DistanceMatrix/johnson.cpp
     src/GraphBuilding/Loaders/AdjGraphLoader.cpp
     src/GraphBuilding/Loaders/CsvGraphLoader.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
@@ -313,13 +299,9 @@ add_executable(test_runner
         src/Dijkstra/DijkstraNode.cpp
         src/DistanceMatrix/CSV_reader.h
         src/DistanceMatrix/CSV_reader.cpp
-        src/DistanceMatrix/DistanceMatrixComputorFast.cpp
-        src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
-        src/DistanceMatrix/johnson.cpp
         src/GraphBuilding/Loaders/AdjGraphLoader.cpp
         src/GraphBuilding/Loaders/DDSGLoader.cpp
         src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Loaders/TNRGLoader.tpp
         src/GraphBuilding/Structures/AdjMatrixGraph.cpp
         src/GraphBuilding/Structures/FlagsGraph.h
         src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
@@ -362,8 +344,6 @@ add_executable(func_test_runner
     src/CH/Structures/NodeData.cpp
     src/Dijkstra/BasicDijkstra.cpp
     src/Dijkstra/DijkstraNode.cpp
-    src/DistanceMatrix/DistanceMatrixComputorSlow.cpp
-    src/DistanceMatrix/DistanceMatrixHdfOutputter.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/TGAFLoader.cpp
     src/GraphBuilding/Loaders/TNRGLoader.tpp

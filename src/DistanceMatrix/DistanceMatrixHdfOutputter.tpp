@@ -7,18 +7,17 @@
 
 #include <fstream>
 #include <filesystem>
-#include "DistanceMatrixHdfOutputter.h"
 #include <H5Cpp.h>
 
-void DistanceMatrixHdfOutputter::store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string& path) {
+template <class IntType>void DistanceMatrixHdfOutputter<IntType>::store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string& path) {
     printf("Storing the distance matrix.\n");
 
     const auto& distances = dm.getRawData();
     const auto nodesCnt = dm.nodes();
     hsize_t dimsf[] = { nodesCnt, nodesCnt };
-    dist_t* values = distances.get();
+    IntType* values = distances.get();
 
-    dist_t max_dist = 0;
+    IntType max_dist = 0;
     for (size_t i = 0; i < static_cast<unsigned long long>(nodesCnt) * nodesCnt; i++) {
         max_dist = std::max(max_dist, values[i]);
     }

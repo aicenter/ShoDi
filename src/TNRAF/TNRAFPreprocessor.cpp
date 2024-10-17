@@ -14,7 +14,7 @@
 #include "../Dijkstra/DijkstraNode.h"
 #include "../Dijkstra/BasicDijkstra.h"
 
-Distance_matrix_travel_time_provider<dist_t>* TNRAFPreprocessor::distanceMatrix = NULL;
+DistanceMatrixInterface* TNRAFPreprocessor::distanceMatrix = NULL;
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(
@@ -23,6 +23,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	std::string outputPath,
 	unsigned int transitNodesAmount,
 	unsigned int regionsCnt,
+	unsigned int dmIntSize,
 	bool useDistanceMatrix
 ) {
 	std::cout << "Getting transit nodes" << std::endl;
@@ -38,9 +39,19 @@ void TNRAFPreprocessor::preprocessUsingCH(
 		std::cout
 			<< "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction."
 			<< std::endl;
-		DistanceMatrixComputorSlow dmComputor;
-		dmComputor.computeDistanceMatrix(originalGraph);
-		distanceMatrix = dmComputor.getDistanceMatrixInstance();
+		if (dmIntSize == 16) {
+			DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
+			dmComputor.computeDistanceMatrix(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		} else if (dmIntSize == 32) {
+			DistanceMatrixComputorSlow<uint_least32_t> dmComputor;
+			dmComputor.computeDistanceMatrix(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		} else {
+			DistanceMatrixComputorSlow<dist_t> dmComputor;
+			dmComputor.computeDistanceMatrix(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		}
 		std::cout << "Distance matrix computed." << std::endl;
 
 		fillTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount);
@@ -74,9 +85,20 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	if (useDistanceMatrix) {
 		std::cout << "Computing the auxiliary distance matrix for backward direction." << std::endl;
 		delete distanceMatrix;
-		DistanceMatrixComputorSlow dmComputor;
-		dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
-		distanceMatrix = dmComputor.getDistanceMatrixInstance();
+
+		if (dmIntSize == 16) {
+			DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
+			dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		} else if (dmIntSize == 32) {
+			DistanceMatrixComputorSlow<uint_least32_t> dmComputor;
+			dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		} else {
+			DistanceMatrixComputorSlow<dist_t> dmComputor;
+			dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		}
 		std::cout << "Distance matrix computed." << std::endl;
 	}
 
@@ -128,7 +150,7 @@ void TNRAFPreprocessor::computeTransitNodeDistanceTable(
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::fillTransitNodeDistanceTable(
 	std::vector<unsigned int> &transitNodes,
-	std::vector<std::vector<unsigned int>> &distanceTable,
+	std::vector<std::vector<dist_t>> &distanceTable,
 	unsigned int transitNodesCnt
 ) {
 	for (unsigned int i = 0; i < transitNodesCnt; i++) {

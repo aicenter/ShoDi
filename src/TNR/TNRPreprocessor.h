@@ -80,7 +80,8 @@ public:
             UpdateableGraph & graph,
             Graph & originalGraph,
             std::string outputPath,
-            unsigned int transitNodesAmount = 1000);
+            unsigned int transitNodesAmount = 1000,
+            unsigned int intSize = 0);
 
 protected:
     /**
@@ -226,7 +227,7 @@ protected:
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph<NodeData>& graph,
-            Distance_matrix_travel_time_provider<dist_t>& dm);
+            DistanceMatrixInterface& dm);
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. The process consists of first finding
@@ -244,12 +245,12 @@ protected:
      * @param dm[in] A full distance matrix containing pairwise distances between all pairs of nodes in the graph.
      */
     static void findBackwardAccessNodes(
-            unsigned int source,
-            std::vector < AccessNodeData> & accessNodes,
-            std::vector < unsigned int > & backwardSearchSpace,
-            std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph<NodeData>& graph,
-            Distance_matrix_travel_time_provider<dist_t>& dm);
+        unsigned int source,
+        std::vector<AccessNodeData> &accessNodes,
+        std::vector<unsigned int> &backwardSearchSpace,
+        std::unordered_map<unsigned int, unsigned int> &transitNodes,
+        FlagsGraph<NodeData> &graph,
+        DistanceMatrixInterface& dm);
 
 };
 

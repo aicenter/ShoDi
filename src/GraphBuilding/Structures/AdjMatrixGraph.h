@@ -14,7 +14,6 @@
 #include <vector>
 
 class AdjMatrixGraph : public BaseGraph {
-private:
   std::vector<dist_t> mtx;
   unsigned int nodesAmount;
 

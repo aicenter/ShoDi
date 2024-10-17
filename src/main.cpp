@@ -180,6 +180,7 @@ void createTNRSlow(
  */
 void createTNRUsingDM(
         unsigned int transitNodeSetSize,
+        unsigned int intSize,
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
@@ -196,8 +197,7 @@ void createTNRUsingDM(
     graphLoader.loadGraph(graph, scaling_factor);
 
     timer.begin();
-    TNRPreprocessor::preprocessWithDMvalidation(
-        graph, *originalGraph, outputFilePath, transitNodeSetSize);
+    TNRPreprocessor::preprocessWithDMvalidation(graph, *originalGraph, outputFilePath, transitNodeSetSize, intSize);
     timer.finish();
 
     delete originalGraph;
@@ -218,6 +218,7 @@ void createTNRUsingDM(
 void createTNR(
         std::string preprocessingMode,
         unsigned int transitNodeSetSize,
+        unsigned int dmIntSize,
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
@@ -226,7 +227,7 @@ void createTNR(
     } else if (preprocessingMode == "slow") {
         createTNRSlow(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
     } else if (preprocessingMode == "dm") {
-        createTNRUsingDM(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
+        createTNRUsingDM(transitNodeSetSize, dmIntSize, graphLoader, outputFilePath, scaling_factor);
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Transit Node Routing preprocessing.\n" + INVALID_FORMAT_INFO);
@@ -246,6 +247,7 @@ void createTNR(
 void createTNRAF(
         const std::string& preprocessingMode,
         unsigned int transitNodeSetSize,
+        unsigned int dmIntSize,
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
@@ -278,14 +280,14 @@ void createTNRAF(
 	timer.begin();
 	TNRAFPreprocessor::preprocessUsingCH(
 		graph, *originalGraph, outputFilePath, transitNodeSetSize,
-		    num_regions, dm_mode);
+		    num_regions, dmIntSize, dm_mode);
 	timer.finish();
 
 	timer.printMeasuredTime();
 }
 
-template<typename ComputorType>
-Distance_matrix_travel_time_provider<dist_t>* computeDistanceMatrix(GraphLoader &graphLoader, int scaling_factor, std::string timerName) {
+/*template<class ComputorType, class IntType>
+Distance_matrix_travel_time_provider<IntType>* computeDistanceMatrix(GraphLoader &graphLoader, int scaling_factor, std::string timerName) {
     ComputorType computor;
     auto graph = computor.loadGraph(graphLoader, scaling_factor);
 
@@ -298,40 +300,38 @@ Distance_matrix_travel_time_provider<dist_t>* computeDistanceMatrix(GraphLoader 
     timer.printMeasuredTime();
 
     return computor.getDistanceMatrixInstance();
-}
+}*/
 
+template<class IntType>
 void createDM(
         const std::string& outputFormat,
         const std::string& preprocessingMode,
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
-    std::function<Distance_matrix_travel_time_provider<dist_t>* (GraphLoader&, unsigned int, std::string)> computor;
-
-    std::unique_ptr<DistanceMatrixOutputter> outputter{nullptr};
-    std::unique_ptr<Distance_matrix_travel_time_provider<dist_t>> dm{nullptr};
+    std::unique_ptr<DistanceMatrixOutputter<IntType>> outputter{nullptr};
+    bool fast = false;
 
     if (preprocessingMode == "slow") {
-        computor = computeDistanceMatrix<DistanceMatrixComputorSlow>;
+        //dm.computeDistanceMatrix(false, graphLoader, scaling_factor, "Distance Matrix preprocessing");
     } else if (preprocessingMode == "fast") {
-        computor = computeDistanceMatrix<DistanceMatrixComputorFast>;
+        fast = true;
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
     if (outputFormat == "xdm") {
-        outputter = std::unique_ptr<DistanceMatrixXdmOutputter> { new DistanceMatrixXdmOutputter()};
+        outputter = std::unique_ptr<DistanceMatrixXdmOutputter<IntType>> { new DistanceMatrixXdmOutputter<IntType>()};
     } else if (outputFormat == "csv") {
-        outputter = std::unique_ptr<DistanceMatrixCsvOutputter> { new DistanceMatrixCsvOutputter()};
+        outputter = std::unique_ptr<DistanceMatrixCsvOutputter<IntType>> { new DistanceMatrixCsvOutputter<IntType>()};
     } else if (outputFormat == "hdf") {
-        outputter = std::unique_ptr<DistanceMatrixHdfOutputter>{ new DistanceMatrixHdfOutputter() };
+        outputter = std::unique_ptr<DistanceMatrixHdfOutputter<IntType>>{ new DistanceMatrixHdfOutputter<IntType>() };
     } else {
         throw input_error(std::string("Unknown output type '") + outputFormat +
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
-
-    dm = std::unique_ptr<Distance_matrix_travel_time_provider<dist_t>> {computor(graphLoader, scaling_factor, "Distance Matrix preprocessing")};
+    auto dm = std::make_unique<Distance_matrix_travel_time_provider<IntType>>(fast, graphLoader, scaling_factor);
     outputter->store(*dm, outputFilePath);
 }
 
@@ -902,7 +902,7 @@ double benchmarkDM(
     tripsLoader.loadTrips(trips);
 
     DistanceMatrixLoader dmLoader = DistanceMatrixLoader(inputFilePath);
-    Distance_matrix_travel_time_provider<dist_t>* dm = dmLoader.loadHDF();
+    DistanceMatrixInterface* dm = dmLoader.loadHDF();
 
     std::vector<unsigned int> dmDistances(trips.size());
     double dmTime = DistanceMatrixBenchmark::benchmark(trips, *dm, dmDistances);
@@ -1026,7 +1026,7 @@ int main(int argc, char* argv[]) {
 
     boost::optional<std::string> command, method, inputFormat, inputPath, outputFormat, outputPath, preprocessingMode,
     inputStructure, querySet, mappingFile;
-    boost::optional<unsigned int> tnodesCnt, precisionLoss;
+    boost::optional<unsigned int> tnodesCnt, dmIntSize, precisionLoss;
 
     // Declare the supported options.
     boost::program_options::options_description allOptions("Allowed options");
@@ -1039,6 +1039,7 @@ int main(int argc, char* argv[]) {
             ("output-format", boost::program_options::value(&outputFormat))
             ("output-path,o", boost::program_options::value(&outputPath))
             ("preprocessing-mode", boost::program_options::value(&preprocessingMode))
+            ("int-size", boost::program_options::value(&dmIntSize)->default_value(0))
             ("tnodes-cnt", boost::program_options::value(&tnodesCnt))
             ("precision-loss", boost::program_options::value(&precisionLoss)->default_value(1))
             ("input-structure", boost::program_options::value(&inputStructure))
@@ -1092,17 +1093,24 @@ int main(int argc, char* argv[]) {
                 if (!preprocessingMode || !tnodesCnt) {
                     throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow/dm> / --tnodes-cnt <cnt>) for TNR creation.\n");
                 }
-                createTNR(*preprocessingMode, *tnodesCnt, *graphLoader, *outputPath, *precisionLoss);
+                createTNR(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
             } else if (*method == "tnraf") {
                 if (!preprocessingMode || !tnodesCnt) {
                     throw input_error("Missing one or more required options (--preprocessing-mode <slow/dm> / --tnodes-cnt <cnt>) for TNRAF creation.\n");
                 }
-                createTNRAF(*preprocessingMode, *tnodesCnt, *graphLoader, *outputPath, *precisionLoss);
+                createTNRAF(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
             } else if (*method == "dm") {
                 if (!preprocessingMode || !outputFormat) {
                     throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");
                 }
-                createDM(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, *precisionLoss);
+
+                if (*dmIntSize == 16) {
+                    createDM<uint_least16_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+                } else if (*dmIntSize == 32) {
+                    createDM<uint_least32_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+                } else {
+                    createDM<dist_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+                }
             } else {
                 throw input_error("Invalid method name '" + *method + "'.\n");
             }

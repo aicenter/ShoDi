@@ -20,10 +20,12 @@
  * representing the actual distances for the matrix.
  *
  */
-class DistanceMatrixXdmOutputter : public DistanceMatrixOutputter {
+template <class IntType>
+class DistanceMatrixXdmOutputter : public DistanceMatrixOutputter<IntType> {
 public:
-    void store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string &path) override;
+    void store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string &path) override;
 };
 
+#include "DistanceMatrixXdmOutputter.tpp"
 
 #endif //SHORTEST_PATHS_DISTANCEMATRIXXDMOUTPUTTER_H

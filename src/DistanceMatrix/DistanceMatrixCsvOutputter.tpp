@@ -7,15 +7,14 @@
 
 #include <fstream>
 #include <filesystem>
-#include "DistanceMatrixCsvOutputter.h"
 #include "../constants.h"
 #include "../CLI/ProgressBar.hpp"
 
-void DistanceMatrixCsvOutputter::store(Distance_matrix_travel_time_provider<dist_t>& dm, const std::string &path) {
+template <class IntType> void DistanceMatrixCsvOutputter<IntType>::store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string &path) {
     const auto& distances = dm.getRawData();
     const auto nodesCnt = dm.nodes();
 
-    dist_t max_dist = 0;
+    IntType max_dist = 0;
     for (size_t i = 0; i < static_cast<unsigned long long>(nodesCnt) * nodesCnt; i++) {
         max_dist = std::max(max_dist, distances[i]);
     }

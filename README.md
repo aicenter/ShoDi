@@ -1,4 +1,4 @@
-Shortest Distances computation library in C++
+   Shortest Distances computation library in C++
 =============================================
 
 This project implements multiple methods for shortest distance computation in directed weighted graphs that leverage 
@@ -156,7 +156,7 @@ Each loaded weight will be divided by this value before rounding. (default: 1)
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create -m tnr -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
+create -m tnr -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--int-size <int_size>] [--precision-loss <precision_loss>]
 ```
 
 where:
@@ -168,6 +168,7 @@ where:
  * `preprocessing_mode` is one of `fast`, `slow`, `dm`
  * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the 
 	number of nodes in the graph)
+ * `int_size` (optional) is integer size to be used in the distance matrix during preprocessing (can be set to 16 or 32, default: native); effective only if `preprocessing mode` is set to `dm`
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
@@ -197,7 +198,7 @@ requirements and performance.
 To preprocess a graph for Transit Node Routing, call the preprocessor with the following arguments:
 
 ```
-create -m tnraf -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--precision-loss <precision_loss>]
+create -m tnraf -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --tnodes-cnt <tnodes_cnt> [--int-size <int_size>] [--precision-loss <precision_loss>]
 ```
 
 where:
@@ -209,6 +210,7 @@ where:
  * `preprocessing_mode` is one of `slow`, `dm` (for more info, see [Preprocessing Mode](#preprocessing-mode))
  * `tnodes_cnt` is a positive integer that determines the size of the transit nodes (less than or equal to the numbr 
 	of nodes in the graph)
+ * `int_size` (optional) is integer size to be used in the distance matrix during preprocessing (can be set to 16 or 32, default: native); effective only if `preprocessing mode` is set to `dm`
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
@@ -224,7 +226,7 @@ Each loaded weight will be divided by this value before rounding. (default: 1)
 To generate the distance matrix of a graph, call the preprocessor with the following arguments:
 
 ```
-create -m dm -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --output-format <output_format> [--precision-loss <precision_loss>]
+create -m dm -f <input_format> -i <input_path> -o <output_path> --preprocessing-mode <preprocessing_mode> --output-format <output_format> [--int-size <int_size>] [--precision-loss <precision_loss>]
 ```
 
 where:
@@ -235,6 +237,7 @@ where:
    `output_format` will be added automatically)
  * `preprocessing_mode` is one of `slow`, `fast`
  * `output_format` is one of `xdm`, `csv`, `hdf`
+ * `int_size` (optional) is integer size to be used in the distance matrix during preprocessing (can be set to 16 or 32, default: native)
  * `precision_loss` (optional) is a positive integer denoting how much weight precision to lose.
 Each loaded weight will be divided by this value before rounding. (default: 1)
 
