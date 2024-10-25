@@ -86,7 +86,16 @@ private:
     const unsigned int nodesCnt;
     std::unique_ptr<IntType[]> distances;
 
-    // TODO
+   /**
+    *
+    *
+    * @param fast[in] Specifies whether to use fast computing algorithm or not.
+    * @param graphLoader[in] instance of GraphLoader that will load the data for which we want to compute
+    * the distance matrix.
+    * @param scaling_factor[in] This parameter allows us to lose some precision
+    * of the weight values. Each loaded weight will be divided by this value before rounding.
+    * @param timerName[in] Name of the timer to be used for the computation
+    */
     void computeDistanceMatrix(bool fast, GraphLoader& graphLoader, int scaling_factor, const std::string& timerName);
 };
 

@@ -32,7 +32,6 @@ public:
     Distance_matrix_travel_time_provider<dist_t>* loadXDM();
 
     /**
-    * TODO
      * Loads the distance matrix from the file that was given to the loader during its initialization.
      *
      * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.

@@ -37,7 +37,7 @@ template <class IntType> void DistanceMatrixXdmOutputter<IntType>::store(Distanc
 
     for (unsigned int i = 0; i < nodesCnt; ++i)
         for (unsigned int j = 0; j < nodesCnt; ++j)
-            output.write((char *) &distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)], sizeof(dist_t));
+            output.write((char *) &distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)], sizeof(IntType));
 
     output.close();
 }

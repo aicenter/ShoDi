@@ -7,7 +7,6 @@
 #include "DistanceMatrixLoader.h"
 #include "../../Timer/Timer.h"
 #include <H5Cpp.h>
-#include <iostream> // TODO smazat
 #include <boost/numeric/conversion/cast.hpp>
 
 //______________________________________________________________________________________________________________________

@@ -7,7 +7,6 @@
 
 #include <fstream>
 #include <filesystem>
-#include "../constants.h"
 #include "../CLI/ProgressBar.hpp"
 
 template <class IntType> void DistanceMatrixCsvOutputter<IntType>::store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string &path) {

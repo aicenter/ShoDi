@@ -11,9 +11,6 @@
 #include <string>
 #include "Distance_matrix_travel_time_provider.h"
 
-
-
-
 /**
  * Allows to store the distance matrix to disk.
  */

@@ -19,7 +19,6 @@ template<class IntType> std::unique_ptr<IntType[]> DistanceMatrixComputorSlow<In
     Graph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, scaling_factor);
     computeDistanceMatrix(graph);
-    // return this->distanceTable;
     return this->getDistanceMatrixInstance();
 }
 

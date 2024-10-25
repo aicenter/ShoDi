@@ -5,7 +5,6 @@
 * Created:          03/26/24
 *****************************************************************************/
 
-#include <fstream>
 #include <filesystem>
 #include <H5Cpp.h>
 
@@ -51,7 +50,13 @@ template <class IntType>void DistanceMatrixHdfOutputter<IntType>::store(Distance
 
         auto dataspace = H5::DataSpace(2, dimsf, nullptr);
         H5::DataSet dataset(file.createDataSet("dm", datatype, dataspace));
-        dataset.write(values, H5::PredType::NATIVE_UINT);
+        if constexpr (std::is_same<IntType, uint_least16_t>::value) {
+            dataset.write(values, H5::PredType::NATIVE_UINT_LEAST16);
+        } else if constexpr (std::is_same<IntType, uint_least32_t>::value) {
+            dataset.write(values, H5::PredType::NATIVE_UINT_LEAST32);
+        } else {
+            dataset.write(values, H5::PredType::NATIVE_UINT);
+        }
 
         dataset.close();
         dataspace.close();

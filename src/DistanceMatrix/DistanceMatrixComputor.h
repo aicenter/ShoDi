@@ -26,31 +26,6 @@
 template<typename IntType>
 class DistanceMatrixComputor {
 public:
-    //typedef T GraphType;
-
-    /**
-     * This function will retrieve the graph data required for the
-     * distance matrix computation algorithm using a GraphLoader.
-     *
-     * @param graphLoader[in] instance of GraphLoader that will load the data
-     * for which we want to compute the distance matrix.
-     * @param[in] scaling_factor This parameter allows us to lose some precision
-     * of the weight values. Each loaded weight will be divided by this value
-     * before rounding.
-     */
-    //virtual void loadGraph(GraphLoader &graphLoader, int scaling_factor) = 0;
-
-    /**
-     * This function will compute the full distance matrix for the graph data
-     * loaded using `DistanceMatrixComputor::loadGraph`. The computed distance
-     * matrix will be stored in the DistanceMatrixComputor instance, so that it
-     * can be used further.
-     *
-     * @param[in] graphData Graph data required for the distance matrix
-     * calculation
-     */
-    //virtual void computeDistanceMatrix(const T &graphData) = 0;
-
     /**
      * Allows us to get a DistanceMatrix instance immediately from the
      * DistanceMatrixComputor without the need to first save it into a file and

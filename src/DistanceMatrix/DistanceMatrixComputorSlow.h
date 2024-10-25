@@ -15,8 +15,6 @@ template <class IntType>
 class DistanceMatrixComputorSlow : public DistanceMatrixComputor<IntType> {
 public:
 
-    // Distance_matrix_travel_time_provider<IntType>* getDistanceMatrixInstance();
-
     Graph loadGraph(GraphLoader& graphLoader, int scaling_factor);
 
     std::unique_ptr<IntType[]> compute_and_get_distance_matrix(GraphLoader& graphLoader, int scaling_factor) override;

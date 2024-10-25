@@ -12,7 +12,6 @@
 template<class IntType> std::unique_ptr<IntType[]> DistanceMatrixComputorFast<IntType>::compute_and_get_distance_matrix(GraphLoader& graphLoader, int scaling_factor) {
     std::vector<dist_t> graphData = loadGraph(graphLoader, scaling_factor);
     computeDistanceMatrix(graphData);
-    // return this->distanceTable;
     return this->getDistanceMatrixInstance();
 }
 
@@ -22,6 +21,7 @@ template<class IntType> void DistanceMatrixComputorFast<IntType>::computeDistanc
 
     this->size = static_cast<unsigned>(std::sqrt(graphAdjMatrix.size()));
     johnson::johnson_parallel(graph, this->distanceTable.get());
+    delete graph;
 }
 
 template<class IntType> std::vector<dist_t> DistanceMatrixComputorFast<IntType>::loadGraph(GraphLoader &graphLoader, int scaling_factor) {
@@ -30,7 +30,3 @@ template<class IntType> std::vector<dist_t> DistanceMatrixComputorFast<IntType>:
 
     return graph.matrix();
 }
-
-// template<class IntType> Distance_matrix_travel_time_provider<IntType>* DistanceMatrixComputorFast<IntType>::getDistanceMatrixInstance() {
-//     return new Distance_matrix_travel_time_provider<IntType>(std::move(this->distanceTable), this->size);
-// }

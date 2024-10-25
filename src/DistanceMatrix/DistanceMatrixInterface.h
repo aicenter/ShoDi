@@ -1,6 +1,8 @@
-//
-// Created by honza on 9/25/24.
-//
+/******************************************************************************
+* File:             DistanceMatrixInterface.h
+*
+* Author:           Jan Horak (horakj31@fel.cvut.cz)
+*****************************************************************************/
 
 #ifndef DISTANCEMATRIXINTERFACE_H
 #define DISTANCEMATRIXINTERFACE_H
