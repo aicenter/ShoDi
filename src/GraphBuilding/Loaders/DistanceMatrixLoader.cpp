@@ -35,10 +35,10 @@ Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadXDM() {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadHDF() {
+DistanceMatrixInterface* DistanceMatrixLoader::loadHDF() {
     H5::H5File file{this->inputFile, H5F_ACC_RDONLY};
     H5::DataSet dataset = file.openDataSet("dm");
-    auto t = dataset.getDataType();
+    H5T_class_t datatype = dataset.getDataType().getClass();
     H5::DataSpace space = dataset.getSpace();
 
     hsize_t dimsf[2];
@@ -46,14 +46,21 @@ Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadHDF() {
     const auto nodes = dimsf[0];
 
     auto values = new int[nodes*nodes];
-    dataset.read(values, H5::PredType::NATIVE_INT);
-
-    auto* distanceMatrix = new Distance_matrix_travel_time_provider<dist_t>(boost::numeric_cast<unsigned int>(nodes));
+    DistanceMatrixInterface* dm;
+    if (datatype == H5T_STD_U8LE || datatype == H5T_STD_U16LE) {
+        dm = new Distance_matrix_travel_time_provider<uint_least16_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(values, H5::PredType::NATIVE_UINT_LEAST16);
+    } else if (datatype == H5T_STD_U32LE) {
+        dm = new Distance_matrix_travel_time_provider<uint_least32_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(values, H5::PredType::NATIVE_UINT_LEAST32);
+    } else {
+        dm = new Distance_matrix_travel_time_provider<dist_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(values, H5::PredType::NATIVE_UINT);
+    }
 
     for(size_t i = 0; i < nodes; i++) {
         for (size_t j = 0; j < nodes; j++) {
-            //std::cout << "distance from " << i << " to " << j << " is " << values[i*nodes + j] << std::endl;
-            distanceMatrix->setDistance(
+            dm->setDistance(
                 boost::numeric_cast<unsigned int>(i),
                 boost::numeric_cast<unsigned int>(j),
                 values[i*nodes + j]);
@@ -61,7 +68,7 @@ Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadHDF() {
     }
 
     delete [] values;
-    return distanceMatrix;
+    return dm;
 }
 
 //______________________________________________________________________________________________________________________

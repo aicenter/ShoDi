@@ -60,7 +60,7 @@ public:
      * @param target[in] The column of the table we want to set the distance for.
      * @param distance[in] The value (distance) we wnat to put into the table.
      */
-    void setDistance(unsigned int source, unsigned int target, IntType distance);
+    void setDistance(unsigned int source, unsigned int target, dist_t distance) override;
 
     /**
      * Get the underlying data structure (a 1D array)

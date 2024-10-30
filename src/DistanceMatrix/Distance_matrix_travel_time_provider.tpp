@@ -18,7 +18,7 @@
 //______________________________________________________________________________________________________________________
 template<class IntType> Distance_matrix_travel_time_provider<IntType>::Distance_matrix_travel_time_provider(const unsigned int nodes):
     nodesCnt(nodes),
-    distances(std::make_unique<dist_t[]>(static_cast<size_t>(nodes) * nodes)) {
+    distances(std::make_unique<IntType                      []>(static_cast<size_t>(nodes) * nodes)) {
 }
 
 //______________________________________________________________________________________________________________________
@@ -43,8 +43,8 @@ template<class IntType> dist_t Distance_matrix_travel_time_provider<IntType>::fi
 }
 
 //______________________________________________________________________________________________________________________
-template<class IntType> void Distance_matrix_travel_time_provider<IntType>::setDistance(unsigned int source, unsigned int target, IntType distance) {
-    distances[((size_t) source) * ((size_t) nodesCnt) + ((size_t) target)] = distance;
+template<class IntType> void Distance_matrix_travel_time_provider<IntType>::setDistance(unsigned int source, unsigned int target, dist_t distance) {
+    distances[((size_t) source) * ((size_t) nodesCnt) + ((size_t) target)] = boost::numeric_cast<IntType>(distance);
 }
 
 

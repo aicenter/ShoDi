@@ -36,7 +36,7 @@ public:
      *
      * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.
      */
-    Distance_matrix_travel_time_provider<dist_t>* loadHDF();
+    DistanceMatrixInterface* loadHDF();
 
 private:
     /**
