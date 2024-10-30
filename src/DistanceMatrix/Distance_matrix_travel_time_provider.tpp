@@ -18,7 +18,7 @@
 //______________________________________________________________________________________________________________________
 template<class IntType> Distance_matrix_travel_time_provider<IntType>::Distance_matrix_travel_time_provider(const unsigned int nodes):
     nodesCnt(nodes),
-    distances(std::make_unique<IntType                      []>(static_cast<size_t>(nodes) * nodes)) {
+    distances(std::make_unique<IntType[]>(static_cast<size_t>(nodes) * nodes)) {
 }
 
 //______________________________________________________________________________________________________________________

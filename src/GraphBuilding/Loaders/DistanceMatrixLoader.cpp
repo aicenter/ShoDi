@@ -38,7 +38,8 @@ Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadXDM() {
 DistanceMatrixInterface* DistanceMatrixLoader::loadHDF() {
     H5::H5File file{this->inputFile, H5F_ACC_RDONLY};
     H5::DataSet dataset = file.openDataSet("dm");
-    H5T_class_t datatype = dataset.getDataType().getClass();
+    H5::IntType intType = dataset.getIntType();
+    auto size = intType.getSize();
     H5::DataSpace space = dataset.getSpace();
 
     hsize_t dimsf[2];
@@ -47,10 +48,10 @@ DistanceMatrixInterface* DistanceMatrixLoader::loadHDF() {
 
     auto values = new int[nodes*nodes];
     DistanceMatrixInterface* dm;
-    if (datatype == H5T_STD_U8LE || datatype == H5T_STD_U16LE) {
+    if (size <= 2) {
         dm = new Distance_matrix_travel_time_provider<uint_least16_t>(boost::numeric_cast<unsigned int>(nodes));
         dataset.read(values, H5::PredType::NATIVE_UINT_LEAST16);
-    } else if (datatype == H5T_STD_U32LE) {
+    } else if (size <= 4) {
         dm = new Distance_matrix_travel_time_provider<uint_least32_t>(boost::numeric_cast<unsigned int>(nodes));
         dataset.read(values, H5::PredType::NATIVE_UINT_LEAST32);
     } else {
