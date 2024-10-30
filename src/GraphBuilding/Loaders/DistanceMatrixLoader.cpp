@@ -34,18 +34,6 @@ Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadXDM() {
     return distanceMatrix;
 }
 
-template<class IntType>
-void fillMatrix(DistanceMatrixInterface* dm, IntType* values, size_t nodes) {
-    for(size_t i = 0; i < nodes; i++) {
-        for (size_t j = 0; j < nodes; j++) {
-            dm->setDistance(
-                boost::numeric_cast<unsigned int>(i),
-                boost::numeric_cast<unsigned int>(j),
-                values[i*nodes + j]);
-        }
-    }
-}
-
 //______________________________________________________________________________________________________________________
 DistanceMatrixInterface* DistanceMatrixLoader::loadHDF() {
     H5::H5File file{this->inputFile, H5F_ACC_RDONLY};
@@ -58,28 +46,19 @@ DistanceMatrixInterface* DistanceMatrixLoader::loadHDF() {
     space.getSimpleExtentDims(dimsf, nullptr);
     const auto nodes = dimsf[0];
 
-    DistanceMatrixInterface* dm;
     if (size <= 2) {
-        auto values = new uint_least16_t[nodes*nodes];
-        dm = new Distance_matrix_travel_time_provider<uint_least16_t>(boost::numeric_cast<unsigned int>(nodes));
-        dataset.read(values, H5::PredType::NATIVE_UINT_LEAST16);
-        fillMatrix(dm, values, nodes);
-        delete [] values;
+        auto dm = new Distance_matrix_travel_time_provider<uint_least16_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(dm->getRawData().get(), H5::PredType::NATIVE_UINT_LEAST16);
+        return dm;
     } else if (size <= 4) {
-        auto values = new uint_least32_t[nodes*nodes];
-        dm = new Distance_matrix_travel_time_provider<uint_least32_t>(boost::numeric_cast<unsigned int>(nodes));
-        dataset.read(values, H5::PredType::NATIVE_UINT_LEAST32);
-        fillMatrix(dm, values, nodes);
-        delete [] values;
+        auto dm = new Distance_matrix_travel_time_provider<uint_least32_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(dm->getRawData().get(), H5::PredType::NATIVE_UINT_LEAST32);
+        return dm;
     } else {
-        auto values = new dist_t[nodes*nodes];
-        dm = new Distance_matrix_travel_time_provider<dist_t>(boost::numeric_cast<unsigned int>(nodes));
-        dataset.read(values, H5::PredType::NATIVE_UINT);
-        fillMatrix(dm, values, nodes);
-        delete [] values;
+        auto dm = new Distance_matrix_travel_time_provider<dist_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(dm->getRawData().get(), H5::PredType::NATIVE_UINT);
+        return dm;
     }
-
-    return dm;
 }
 
 //______________________________________________________________________________________________________________________
