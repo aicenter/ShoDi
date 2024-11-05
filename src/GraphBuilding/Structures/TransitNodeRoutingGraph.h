@@ -154,7 +154,7 @@ public:
      *
      * @param dm[in] A full distance matrix containing distance for all pairs of nodes in the graph.
      */
-    void accessNodesTest(Distance_matrix_travel_time_provider & dm);
+    void accessNodesTest(Distance_matrix_travel_time_provider<dist_t>& dm);
 
 protected:
     std::vector < std::vector < AccessNodeData > > forwardAccessNodes;

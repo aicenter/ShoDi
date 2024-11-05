@@ -8,11 +8,10 @@
 #include <vector>
 
 #include "../CLI/ProgressBar.hpp"
-#include "johnson.hpp"
 
 using namespace johnson;
 
-graph_t *johnson::johnson_init(const std::vector<dist_t> &adj_matrix) {
+inline graph_t *johnson::johnson_init(const std::vector<dist_t> &adj_matrix) {
   const dist_t max = std::numeric_limits<dist_t>::max();
   size_t E = 0;
   for (size_t i = 0; i < adj_matrix.size(); i++) {
@@ -45,8 +44,8 @@ graph_t *johnson::johnson_init(const std::vector<dist_t> &adj_matrix) {
   return gr;
 }
 
-graph_t *johnson::johnson_init2(const unsigned int n, const double p,
-                                const unsigned long seed) {
+inline graph_t *johnson::johnson_init2(const unsigned int n, const double p,
+                                       const unsigned long seed) {
   static std::uniform_real_distribution<double> flip(0, 1);
   static std::uniform_int_distribution<unsigned int> choose_weight(1, 100);
 
@@ -94,7 +93,7 @@ graph_t *johnson::johnson_init2(const unsigned int n, const double p,
   return gr;
 }
 
-void johnson::free_graph(graph_t *g) {
+inline void johnson::free_graph(graph_t *g) {
   delete g;
 }
 
@@ -137,7 +136,7 @@ inline bool bellman_ford(graph_t *gr, dist_t *dist, size_t src) {
   return no_neg_cycle;
 }
 
-void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
+template<class IntType> void johnson::johnson_parallel(graph_t *gr, IntType *output) {
 
   size_t V = gr->V;
   const int V_uint = boost::numeric_cast<int>(V);
@@ -181,7 +180,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
     gr->weights[(size_t) e] += h[u] - h[v];
   }
 
-  Graph G(gr->edge_array.data(), gr->edge_array.data() + gr->E, gr->weights.data(), V);
+  JGraph G(gr->edge_array.data(), gr->edge_array.data() + gr->E, gr->weights.data(), V);
 
   ProgressBar progress(V);
 
@@ -190,7 +189,7 @@ void johnson::johnson_parallel(graph_t *gr, dist_t *output) {
     std::vector<dist_t> d(num_vertices(G));
     dijkstra_shortest_paths(G, (unsigned long)s, boost::distance_map(&d[0]));
     for (size_t v = 0; v < V; v++) {
-      output[((size_t)s) * V + v] = d[v] + h[v] - h[s];
+      output[((size_t)s) * V + v] = boost::numeric_cast<IntType>(d[v] + h[v] - h[s] );
     }
     ++progress;
   }

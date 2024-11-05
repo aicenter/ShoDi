@@ -7,7 +7,6 @@
 #include "DistanceMatrixLoader.h"
 #include "../../Timer/Timer.h"
 #include <H5Cpp.h>
-#include <iostream> // TODO smazat
 #include <boost/numeric/conversion/cast.hpp>
 
 //______________________________________________________________________________________________________________________
@@ -16,7 +15,7 @@ DistanceMatrixLoader::DistanceMatrixLoader(std::string inputFile) {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
+Distance_matrix_travel_time_provider<dist_t>* DistanceMatrixLoader::loadXDM() {
     std::ifstream input;
     input.open(this->inputFile, std::ios::binary);
     if( ! input.is_open() ) {
@@ -26,7 +25,7 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
     unsigned int nodes;
     parseHeader(input, nodes);
 
-    Distance_matrix_travel_time_provider * distanceMatrix = new Distance_matrix_travel_time_provider(nodes);
+    Distance_matrix_travel_time_provider<dist_t>* distanceMatrix = new Distance_matrix_travel_time_provider<dist_t>(nodes);
 
     parseDistances(input, nodes, *distanceMatrix);
 
@@ -36,33 +35,30 @@ Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadXDM() {
 }
 
 //______________________________________________________________________________________________________________________
-Distance_matrix_travel_time_provider * DistanceMatrixLoader::loadHDF() {
+DistanceMatrixInterface* DistanceMatrixLoader::loadHDF() {
     H5::H5File file{this->inputFile, H5F_ACC_RDONLY};
     H5::DataSet dataset = file.openDataSet("dm");
-    auto t = dataset.getDataType();
+    H5::IntType intType = dataset.getIntType();
+    auto size = intType.getSize();
     H5::DataSpace space = dataset.getSpace();
 
     hsize_t dimsf[2];
     space.getSimpleExtentDims(dimsf, nullptr);
     const auto nodes = dimsf[0];
 
-    auto values = new int[nodes*nodes];
-    dataset.read(values, H5::PredType::NATIVE_INT);
-
-    auto* distanceMatrix = new Distance_matrix_travel_time_provider(boost::numeric_cast<unsigned int>(nodes));
-
-    for(size_t i = 0; i < nodes; i++) {
-        for (size_t j = 0; j < nodes; j++) {
-            //std::cout << "distance from " << i << " to " << j << " is " << values[i*nodes + j] << std::endl;
-            distanceMatrix->setDistance(
-                boost::numeric_cast<unsigned int>(i),
-                boost::numeric_cast<unsigned int>(j),
-                values[i*nodes + j]);
-        }
+    if (size <= 2) {
+        auto dm = new Distance_matrix_travel_time_provider<uint_least16_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(dm->getRawData().get(), H5::PredType::NATIVE_UINT_LEAST16);
+        return dm;
+    } else if (size <= 4) {
+        auto dm = new Distance_matrix_travel_time_provider<uint_least32_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(dm->getRawData().get(), H5::PredType::NATIVE_UINT_LEAST32);
+        return dm;
+    } else {
+        auto dm = new Distance_matrix_travel_time_provider<dist_t>(boost::numeric_cast<unsigned int>(nodes));
+        dataset.read(dm->getRawData().get(), H5::PredType::NATIVE_UINT);
+        return dm;
     }
-
-    delete [] values;
-    return distanceMatrix;
 }
 
 //______________________________________________________________________________________________________________________
@@ -81,7 +77,7 @@ void DistanceMatrixLoader::parseHeader(std::ifstream & input, unsigned int & nod
 }
 
 //______________________________________________________________________________________________________________________
-void DistanceMatrixLoader::parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix) {
+void DistanceMatrixLoader::parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider<dist_t>& distanceMatrix) {
     unsigned int distance;
     for(unsigned int i = 0; i < nodes; i++) {
         for(unsigned int j = 0; j < nodes; j++) {

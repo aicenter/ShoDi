@@ -29,4 +29,4 @@ bool AdjMatrixGraph::addEdge(unsigned int from, unsigned int to,
 
 unsigned int AdjMatrixGraph::nodes() const { return nodesAmount; }
 
-std::vector<unsigned int> AdjMatrixGraph::matrix() { return std::move(mtx); }
+std::vector<dist_t> AdjMatrixGraph::matrix() { return std::move(mtx); }

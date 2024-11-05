@@ -7,18 +7,17 @@
 #define CONTRACTION_HIERARCHIES_DISTANCEMATRIXCOMPUTOR_H
 
 #include "../GraphBuilding/Structures/Graph.h"
-#include "Distance_matrix_travel_time_provider.h"
 #include "DistanceMatrixComputor.h"
 #include <cstddef>
 
 
-
-class DistanceMatrixComputorSlow : public DistanceMatrixComputor<Graph> {
+template <class IntType>
+class DistanceMatrixComputorSlow : public DistanceMatrixComputor<IntType> {
 public:
 
-    Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
+    Graph loadGraph(GraphLoader& graphLoader, int scaling_factor);
 
-    Graph loadGraph(GraphLoader &graphLoader, int scaling_factor) override;
+    std::unique_ptr<IntType[]> compute_and_get_distance_matrix(GraphLoader& graphLoader, int scaling_factor) override;
 
     /**
      * this function will compute the full distance matrix for the given graph.
@@ -27,7 +26,7 @@ public:
      *
      * @param graph[in] the graph for which we want to compute the distance matrix.
      */
-    void computeDistanceMatrix(const Graph & graph) override;
+    void computeDistanceMatrix(const Graph& graph);
 
     /**
      * This function will compute the full distance matrix for the given graph as if the directions for all the edges
@@ -36,7 +35,7 @@ public:
      * @param graph[in] The graph for which we want to compute the distance matrix. (The graph should be as normal,
      * not reversed, the 'reversion' is done inside this function.)
      */
-    void computeDistanceMatrixInReversedGraph(const Graph & graph);
+    void computeDistanceMatrixInReversedGraph(const Graph& graph);
 
 private:
     /**
@@ -48,8 +47,10 @@ private:
      * @param graph
      * @param useReversedGraph
      */
-    void fillDistanceMatrixRow(unsigned int rowID, const Graph & graph, bool useReversedGraph = false);
+    void fillDistanceMatrixRow(unsigned int rowID, const Graph& graph, bool useReversedGraph = false);
+
 };
 
+#include "DistanceMatrixComputorSlow.tpp"
 
 #endif //CONTRACTION_HIERARCHIES_DISTANCEMATRIXCOMPUTOR_H

@@ -133,18 +133,26 @@ void TNRPreprocessor::preprocessUsingCHslower(UpdateableGraph& graph, Graph& ori
 
 //______________________________________________________________________________________________________________________
 void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph &graph, Graph &originalGraph, std::string outputPath,
-                                                 unsigned int transitNodesAmount) {
+                                                 unsigned int transitNodesAmount, unsigned int intSize) {
     std::cout << "Getting transit nodes" << std::endl;
     std::vector<unsigned int> transitNodes(transitNodesAmount);
     graph.getNodesWithHighestRank(transitNodes, transitNodesAmount);
 
     FlagsGraph chGraph(graph);
 
-    Distance_matrix_travel_time_provider *distanceMatrix;
-    {
-        DistanceMatrixComputorSlow dmComputor;
+    DistanceMatrixInterface* distanceMatrix;
+    if (intSize == 16) {
+        DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
         dmComputor.computeDistanceMatrix(originalGraph);
-        distanceMatrix = dmComputor.getDistanceMatrixInstance();
+        distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+    } else if (intSize == 32) {
+        DistanceMatrixComputorSlow<uint_least32_t> dmComputor;
+        dmComputor.computeDistanceMatrix(originalGraph);
+        distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+    } else {
+        DistanceMatrixComputorSlow<dist_t> dmComputor;
+        dmComputor.computeDistanceMatrix(originalGraph);
+        distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
     }
 
     std::cout << "Computing transit nodes distance table" << std::endl;
@@ -152,7 +160,7 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph &graph, Graph &
                                                                       std::vector<unsigned int>(transitNodesAmount));
     for (unsigned int i = 0; i < transitNodesAmount; i++) {
         for (unsigned int j = 0; j < transitNodesAmount; j++) {
-            transitNodesDistanceTable[i][j] = distanceMatrix->findDistance(transitNodes[i], transitNodes[j]);
+                transitNodesDistanceTable[i][j] = distanceMatrix->findDistance(transitNodes[i], transitNodes[j]);
         }
     }
 
@@ -177,12 +185,21 @@ void TNRPreprocessor::preprocessWithDMvalidation(UpdateableGraph &graph, Graph &
 
     std::cout << "\rComputed forward acess nodes for all the nodes in the graph." << std::endl;
 
-    {
-        delete distanceMatrix;
-        DistanceMatrixComputorSlow dmComputor;
+    delete distanceMatrix;
+    if (intSize == 16) {
+        DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
         dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
-        distanceMatrix = dmComputor.getDistanceMatrixInstance();
+        distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+    } else if (intSize == 32) {
+        DistanceMatrixComputorSlow<uint_least32_t> dmComputor;
+        dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
+        distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+    } else {
+        DistanceMatrixComputorSlow<dist_t> dmComputor;
+        dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
+        distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
     }
+
     for (unsigned int i = 0; i < graph.nodes(); i++) {
         if (i % 100 == 0) {
             std::cout << "\rComputed backward access nodes for '" << i << "' nodes.";
@@ -440,7 +457,7 @@ void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<Ac
 void TNRPreprocessor::findForwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                              std::vector<unsigned int> &forwardSearchSpace,
                                              std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                             FlagsGraph<NodeData>& graph, Distance_matrix_travel_time_provider &dm) {
+                                             FlagsGraph<NodeData>& graph, DistanceMatrixInterface& dm) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);
@@ -631,7 +648,7 @@ void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<A
 void TNRPreprocessor::findBackwardAccessNodes(unsigned int source, std::vector<AccessNodeData> &accessNodes,
                                               std::vector<unsigned int> &backwardSearchSpace,
                                               std::unordered_map<unsigned int, unsigned int> &transitNodes,
-                                              FlagsGraph<NodeData>& graph, Distance_matrix_travel_time_provider &dm) {
+                                              FlagsGraph<NodeData>& graph, DistanceMatrixInterface& dm) {
     auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
     std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
     std::vector<unsigned int> distances(graph.nodes(), UINT_MAX);

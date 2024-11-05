@@ -8,7 +8,7 @@
 #include "../GraphBuilding/Loaders/XenGraphLoader.h"
 
 //______________________________________________________________________________________________________________________
-double DistanceMatrixBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, Distance_matrix_travel_time_provider & matrix, std::vector <dist_t> & distances) {
+double DistanceMatrixBenchmark::benchmark(const std::vector < std::pair< unsigned int, unsigned int> > & trips, DistanceMatrixInterface& matrix, std::vector <dist_t> & distances) {
     Timer dijkstraTimer("Distance Matrix trips benchmark");
     dijkstraTimer.begin();
 
@@ -21,7 +21,7 @@ double DistanceMatrixBenchmark::benchmark(const std::vector < std::pair< unsigne
 }
 
 //______________________________________________________________________________________________________________________
-double DistanceMatrixBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, Distance_matrix_travel_time_provider & matrix, std::vector <dist_t> & distances, std::string mappingFilePath) {
+double DistanceMatrixBenchmark::benchmarkUsingMapping(const std::vector < std::pair< long long unsigned int, long long unsigned int> > & trips, DistanceMatrixInterface& matrix, std::vector <dist_t> & distances, std::string mappingFilePath) {
     XenGraphLoader mappingLoader(mappingFilePath);
     std::unordered_map<long long unsigned int, unsigned int> mapping;
     mappingLoader.loadNodesMapping(mapping);

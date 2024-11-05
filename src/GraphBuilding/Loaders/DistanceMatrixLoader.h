@@ -29,15 +29,14 @@ public:
      *
      * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.
      */
-    Distance_matrix_travel_time_provider * loadXDM();
+    Distance_matrix_travel_time_provider<dist_t>* loadXDM();
 
     /**
-    * TODO
      * Loads the distance matrix from the file that was given to the loader during its initialization.
      *
      * @return An instance of the DistanceMatrix class filled with distances for all pairs of nodes.
      */
-    Distance_matrix_travel_time_provider * loadHDF();
+    DistanceMatrixInterface* loadHDF();
 
 private:
     /**
@@ -55,7 +54,7 @@ private:
      * @param nodes[in] The number of nodes in the graph.
      * @param distanceMatrix[out] The distance matrix instance that will be filled by this function.
      */
-    void parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider & distanceMatrix);
+    void parseDistances(std::ifstream & input, const unsigned int nodes, Distance_matrix_travel_time_provider<dist_t>& distanceMatrix);
 
     std::string inputFile;
 };

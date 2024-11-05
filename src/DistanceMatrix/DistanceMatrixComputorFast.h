@@ -13,16 +13,17 @@
 #include "DistanceMatrixComputor.h"
 
 
-
-class DistanceMatrixComputorFast : public DistanceMatrixComputor<std::vector<dist_t>> {
+template <class IntType>
+class DistanceMatrixComputorFast : public DistanceMatrixComputor<IntType> {
 public:
 
-    Distance_matrix_travel_time_provider * getDistanceMatrixInstance() override;
+    std::vector<dist_t> loadGraph(GraphLoader &graphLoader, int scaling_factor);
 
-    std::vector<dist_t> loadGraph(GraphLoader &graphLoader, int scaling_factor) override;
+    std::unique_ptr<IntType[]> compute_and_get_distance_matrix(GraphLoader& graphLoader, int scaling_factor) override;
 
-    void computeDistanceMatrix(const std::vector<dist_t> &graphData) override;
+    void computeDistanceMatrix(const std::vector<dist_t>& graphAdjMatrix);
 };
 
+#include "DistanceMatrixComputorFast.tpp"
 
 #endif //SHORTEST_PATHS_DISTANCEMATRIXCOMPUTORFAST_H

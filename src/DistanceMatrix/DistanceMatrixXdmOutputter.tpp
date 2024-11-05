@@ -7,10 +7,9 @@
 
 #include <fstream>
 #include <filesystem>
-#include "DistanceMatrixXdmOutputter.h"
 #include "../constants.h"
 
-void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm, const std::string &path) {
+template <class IntType> void DistanceMatrixXdmOutputter<IntType>::store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string &path) {
     const unsigned int nodesCnt = dm.nodes();
     const auto& distances = dm.getRawData();
 
@@ -38,7 +37,7 @@ void DistanceMatrixXdmOutputter::store(Distance_matrix_travel_time_provider &dm,
 
     for (unsigned int i = 0; i < nodesCnt; ++i)
         for (unsigned int j = 0; j < nodesCnt; ++j)
-            output.write((char *) &distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)], sizeof(distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)]));
+            output.write((char *) &distances[((size_t) i) * ((size_t) nodesCnt) + ((size_t) j)], sizeof(IntType));
 
     output.close();
 }
