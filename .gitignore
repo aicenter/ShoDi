@@ -2,11 +2,12 @@
 .vs
 .clangd/
 .vscode/
-build/
+build*/
 cmake-build-debug
 cmake-build-debug-wsl
 cmake-build-debug-visual-studio
 cmake-build-release
+*cppcheck-build-dir/
 vcpkg/
 compile_commands.json
 /javatests/target/

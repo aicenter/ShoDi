@@ -227,17 +227,7 @@ target_link_libraries(shortestPaths PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIE
 
 add_executable(shortestPathsPreprocessor
     src/main.cpp
-    src/Benchmarking/CHBenchmark.cpp
-    src/Benchmarking/CorrectnessValidator.cpp
-    src/Benchmarking/DijkstraBenchmark.cpp
-    src/Benchmarking/AstarBenchmark.cpp
-    src/Benchmarking/LocationTransformer.cpp
-    src/Benchmarking/TNRAFBenchmark.cpp
-    src/Benchmarking/TNRBenchmark.cpp
-    src/Benchmarking/DistanceMatrixBenchmark.cpp
     src/Benchmarking/memory.cpp
-    src/CH/CHDistanceQueryManager.tpp
-    src/CH/CHDistanceQueryManagerWithMapping.cpp
     src/CH/CHPreprocessor.cpp
     src/CH/EdgeDifferenceManager.cpp
     src/CH/Structures/CHNode.cpp
@@ -247,19 +237,11 @@ add_executable(shortestPathsPreprocessor
     src/CLI/ProgressBar.cpp
     src/Dijkstra/BasicDijkstra.cpp
     src/Dijkstra/DijkstraNode.cpp
-    src/Astar/Astar.cpp
-    src/Astar/AstarNode.cpp
     src/GraphBuilding/Loaders/AdjGraphLoader.cpp
     src/GraphBuilding/Loaders/CsvGraphLoader.cpp
-    src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/DIMACSLoader.cpp
-    src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
-    src/GraphBuilding/Loaders/TGAFLoader.cpp
-    src/GraphBuilding/Loaders/TNRGLoader.tpp
-    src/GraphBuilding/Loaders/TripsLoader.cpp
     src/GraphBuilding/Loaders/XenGraphLoader.cpp
     src/GraphBuilding/Structures/AdjMatrixGraph.cpp
-    src/GraphBuilding/Structures/FlagsGraph.h
     src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
     src/GraphBuilding/Structures/Graph.cpp
     src/GraphBuilding/Structures/OutputEdge.cpp
@@ -269,8 +251,50 @@ add_executable(shortestPathsPreprocessor
     src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
     src/GraphBuilding/Structures/ShortcutEdge.cpp
     src/GraphBuilding/Structures/SimpleGraph.cpp
+    src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
+    src/GraphBuilding/Structures/UpdateableGraph.cpp
+    src/TNR/TNRPreprocessor.cpp
+    src/TNR/Structures/AccessNodeData.cpp
+    src/TNRAF/TNRAFPreprocessor.cpp
+    src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
+    src/TNRAF/Structures/NodeDataRegions.cpp
+    src/TNRAF/Structures/RegionsStructure.cpp
+    src/Timer/Timer.cpp
+)
+
+add_executable(benchmark
+    src/benchmark_runner.cpp
+    src/Astar/Astar.cpp
+    src/Astar/AstarNode.cpp
+    src/Benchmarking/AstarBenchmark.cpp
+    src/Benchmarking/CHBenchmark.cpp
+    src/Benchmarking/DijkstraBenchmark.cpp
+    src/Benchmarking/DistanceMatrixBenchmark.cpp
+    src/Benchmarking/LocationTransformer.cpp
+    src/Benchmarking/TNRAFBenchmark.cpp
+    src/Benchmarking/TNRBenchmark.cpp
+    src/Benchmarking/memory.cpp
+    src/CH/CHDistanceQueryManagerWithMapping.cpp
+    src/CH/Structures/NodeData.cpp
+    src/CLI/ProgressBar.cpp
+    src/Dijkstra/BasicDijkstra.cpp
+    src/Dijkstra/DijkstraNode.cpp
+    src/GraphBuilding/Loaders/CsvGraphLoader.cpp
+    src/GraphBuilding/Loaders/DDSGLoader.cpp
+    src/GraphBuilding/Loaders/DistanceMatrixLoader.cpp
+    src/GraphBuilding/Loaders/TGAFLoader.cpp
+    src/GraphBuilding/Loaders/TripsLoader.cpp
+    src/GraphBuilding/Loaders/XenGraphLoader.cpp
+    src/GraphBuilding/Structures/AdjMatrixGraph.cpp
+    src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
+    src/GraphBuilding/Structures/Graph.cpp
+    src/GraphBuilding/Structures/OutputEdge.cpp
+    src/GraphBuilding/Structures/OutputShortcutEdge.cpp
+    src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
+    src/GraphBuilding/Structures/QueryEdge.cpp
+    src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
+    src/GraphBuilding/Structures/SimpleGraph.cpp
     src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-    src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
     src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
     src/GraphBuilding/Structures/UpdateableGraph.cpp
     src/TNR/TNRDistanceQueryManager.cpp
@@ -382,6 +406,7 @@ target_include_directories(func_test_runner PRIVATE src)
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(benchmark PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 
@@ -392,12 +417,16 @@ endif ()
 
 
 # LINKING
-target_link_libraries(test_runner PRIVATE GTest::gtest_main)
-target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
-target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
-target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE PROJ::proj)
+target_link_libraries(benchmark PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+target_link_libraries(benchmark PRIVATE ${Boost_LIBRARIES})
+target_link_libraries(benchmark PRIVATE PROJ::proj)
+target_link_libraries(test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
+target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+
 
 
 # RESOURCES
