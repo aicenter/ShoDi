@@ -184,52 +184,56 @@ Create a `JAVA_HOME` system property with the absolute path to the JDK, e.g., `C
 For more information about how to integrate this project with other programming languages, please consult the [readme](./src/API/README.md) in the `src/API` subdirectory.
 
 
-## Benchmarking
+# Testing
+The project contains two types of tests: 
+
+- **Unit tests** tests the correctness of functions (but the coverage is limited to a few functions). Target: `test_runner`
+- **Functional tests** tests the correctness of the whole application. Target: `func_test_runner`
+
+
+# Benchmarking
+The project has a `benchmark` target that can be used to benchmark the performance of the implemented methods.
+
 For benchmarking, you will need a set of queries which can either use IDs in the range from 0 to n-1 (where n is the number of the nodes in the graph) or you can use arbitrary integer node IDs.
 In the second case, you also need to provide a mapping file (see next section).
 The formats of the query set file and the mapping file are described in the
 [Input/Output File Formats](#inputoutput-file-formats) section below.
 
 During benchmarking, all of your queries are answered using a chosen method.
-Afterwards, the total time need to answer all the queries in seconds is printed alongside the average time needed
-to answer one query in milliseconds.
+Afterwards, the total time need to answer all the queries in seconds is printed alongside the average time needed to answer one query in milliseconds.
 Additionally, you can specify an output file, where the computed distances will be stored.
 Those distances can then be used for verification of the correctness of the more complex methods.
 
-To benchmark (with or without mapping), call the preprocessor with the following arguments:
+To benchmark (with or without mapping), call the benchmark with the following arguments:
 
 ```console
- benchmark -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [-o <output_path>]
+ -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [-o <output_path>]
 ```
 
 where:
-* `method` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf`, `dm` - the method being benchmarked
-* `input_data_structure` is path to the data structure preprocessed using the preprocessor *for the selected* 
-`method`. For dijkstra and Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv`)
-`input_data_structure` argument. 
-* `query_set` is path to the query set (file format described in the File Formats section below)
-* `mapping_file` (optional) is path to the mapping file (file format described in the File Formats section below), which will be 
-	used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
-* `output_path` (optional) is path to the output file for the computed distances
 
-### A* Benchmarking
+- `<method>` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf`, `dm` - the method being benchmarked
+- `<input_data_structure>` is path to the data structure preprocessed using the preprocessor *for the selected* `method`. For dijkstra and Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv` `input_data_structure` argument.
+- `<query_set>` is path to the query set (file format described in the File Formats section below)
+- `<mapping_file>` (optional) is path to the mapping file (file format described in the File Formats section below), which will be used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
+- `<output_path>` (optional) is path to the output file for the computed distances
 
+
+## A* Benchmarking
 Having the [PROJ](https://proj.org) utility installed is required for A* benchmarking. Path to PROJ directory needs to
 be provided in an environment variable `PROJ_DATA`, eg. like this:
-```
+```console
 PROJ_DATA=/usr/share/proj ./shortestPathsPreprocessor benchmark -m astar [options]
 ```
 You can also copy the `proj.db` file into the working directory instead.
 
-### Computed Distances
-
-If you provide the `output_path` argument, the application will output a plain text file that will contain the 
-name of the query set file used for the benchmark on the first line, and then on each following line, the result of each
-query. 
+## Computed Distances
+If you provide the `output_path` argument, the application will output a plain text file that will contain the name of the query set file used for the benchmark on the first line, and then on each following line, the result of each
+query.
 You can use these files to validate that various methods return the same results.
 
 
-## Input/Output File Formats
+# Input/Output File Formats
 In this part, we will describe all the input formats that can be used with the preprocessor application.
 The first three formats are input formats for directed weighted graphs that can be used as input for the creation of
 data structures for one of the methods or for the benchmarking of the dijkstra algorithm.
@@ -237,38 +241,34 @@ The other two formats are related only to benchmarking.
 
 If you need to get information about output file formats, please look [here](./FORMATS.md) for a description of all file formats used by the library.
 
-### XenGraph Input Format
+
+## XenGraph Input Format
 Probably the simplest format for directed weighted graphs. Graphs are represented as plain text files in this format. 
 The graph file looks as follows:
 
-* It begins with a line `XGI n e` where `XGI` is a fixed string which serves as a magic constant. `n` and `e` 
+- It begins with a line `XGI n e` where `XGI` is a fixed string which serves as a magic constant. `n` and `e`
 are positive integers denoting the number of nodes and edges, respectively.
-* After that, exactly `e` lines follow in the format `s t w f`, where each line represents one edge. Here, `s` 
-is the source node of the edge and `t` is the target node of the edge. Both these values must be in the range from 
-0 to `n`-1 (nodes are indexed from 0). `w` is the weight of the edge, in our case a positive integer. 
-`f` is a flag denoting whether the edge is a one way edge. It must be either 1 or 0. If `f` is equal to 1, 
-the edge is a one way edge and only an edge from `s` to `t` is added to the graph. If `f` is 0, we treat the edge as 
-a bidirectional edge and therefore two edges are added into the graph, an edge from `s` to `t` and an edge from `t` 
-to `s`, both with the weight `w`. 
+- After that, exactly `e` lines follow in the format `s t w f`, where each line represents one edge. Here:
+	- `s` is the source node of the edge and
+	- `t` is the target node of the edge. Both these values must be in the range from 0 to `n`-1 (nodes are indexed from 0).
+	- `w` is the weight of the edge, in our case a positive integer and
+	- `f` is a flag denoting whether the edge is a one way edge. It must be either 1 or 0. If `f` is equal to 1, the edge is a one way edge and only an edge from `s` to `t` is added to the graph. If `f` is 0, we treat the edge as a bidirectional edge and therefore two edges are added into the graph, an edge from `s` to `t` and an edge from `t` to `s`, both with the weight `w`.
 
 The expected suffix for XenGraph files is `.xeng` although it is not enforced.
 
 ### DIMACS input format
 This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. The graph file is a plain text file and it looks as follows:
 
-* Lines beginning with the character `c` can occur anywhere in the file. 
-Those lines are comment lines and are skipped during loading.
-* First line of the file not starting with the character `c` must be in the format `p sp n e`, where `p sp` is a 
-fixed string which serves as a magic constant, `n` is a positive integer denoting the number of nodes and `e` is 
-another positive integer denoting the number of edges.
-* After that, there must be exactly `e` lines of the format `a s t w`, where each line represents one edge. 
-Here, `a` is a fixed character constant indicating that the line describes one edge (as opposed to `c` representing
- a comment line), `s` is the source node of the edge and `t` is the target node of the edge. 
-In this format, nodes are indexed from 1, so both `s` and `t` must be in the range from 1 to `n` (Internally, 
-nodes are indexed from 0, so during loading, each node ID is automatically decremented). 
-In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge 
-between `s` and `t`, we must provide two lines, one for an edge from `s` to `t` and one for an edge 
-from `t` to `s`, both with the same weight.
+- Lines beginning with the character `c` can occur anywhere in the file. Those lines are comment lines and are skipped during loading.
+- First line of the file not starting with the character `c` must be in the format `p sp n e`, where:
+	- `p sp` is a fixed string which serves as a magic constant,
+	- `n` is a positive integer denoting the number of nodes, and
+	- `e` is another positive integer denoting the number of edges.
+- After that, there must be exactly `e` lines of the format `a s t w`, where each line represents one edge. Here:
+	- `a` is a fixed character constant indicating that the line describes one edge (as opposed to `c` representing  a comment line),
+	- `s` is the source node of the edge, and
+	- `t` is the target node of the edge. In this format, nodes are indexed from 1, so both `s` and `t` must be in the range from 1 to `n` (Internally, 
+nodes are indexed from 0, so during loading, each node ID is automatically decremented). In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `s` and `t`, we must provide two lines, one for an edge from `s` to `t` and one for an edge from `t` to `s`, both with the same weight.
 
 The expected suffix for DIMACS graph files is `.gr` although it is not enforced.
 
@@ -277,29 +277,28 @@ One of the three input formats that can be used to describe the input graph for 
 
 A CSV file that represents an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix) of a graph.
 
-* The file is expected to not have a header.
-* The file must have its amount of rows equal to its amount of columns.
-* Each value on row `i` and column `j` represents the weight of a *directed* edge from node `i` to node `j`.
-* Weights are expected to be valid *positive* integers, or `nan` for where there is no edge joining the nodes.
+- The file is expected to not have a header.
+- The file must have its amount of rows equal to its amount of columns.
+- Each value on row `i` and column `j` represents the weight of a *directed* edge from node `i` to node `j`.
+- Weights are expected to be valid *positive* integers, or `nan` for where there is no edge joining the nodes.
 
 ### CSV input format
 A pair of files named `nodes.csv` and `edges.csv` located in the same directory.
 
-* Path to the directory containing these files must be specified in the `input_path` argument.
-* `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
+- Path to the directory containing these files must be specified in the `input_path` argument.
+- `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
 (for A* benchmarking) columns `x` (longitude) and `y` (latitude).
-* `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `cost` (edge weight, non-negative integer or floating point number).
-* In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
+- `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `cost` (edge weight, non-negative integer or floating point number).
+- In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
 and `v`, we must provide two lines, one for an edge from `u` to `v` and one for an edge from `v` to `u`, both with the same weight.
-* Values must be separated by a Tab character (`\t`).
+- Values must be separated by a Tab character (`\t`).
 
 
 ### The Query Set Input Format
-For easier benchmarking, the user can provide a set of queries which will be used for the benchmark in a very simple 
-plain text format:
+For easier benchmarking, the user can provide a set of queries which will be used for the benchmark in a very simple plain text format:
 
-* The file begins with a line that contains only a single integer `cnt` denoting the number of queries.
-* The first line is followed by exactly `cnt` lines in the format `s g` each denoting one query. 
+- The file begins with a line that contains only a single integer `cnt` denoting the number of queries.
+- The first line is followed by exactly `cnt` lines in the format `s g` each denoting one query. 
 `s` and `g` are both positive integers. 
 When benchmarking without mapping, `s` and `g` must be in the range from 0 to `n`-1 where `n` is the number of 
 nodes in the graph. 
@@ -307,19 +306,19 @@ When benchmarking with mapping, `s` and `g` can be arbitrary positive integers a
 unsigned int datatype (usually 64 bit).
 
 ### The mapping file format
-If your application internally for some reason uses some node IDs that are not in the range from 0 to `n`-1 
-(where `n` is the number of nodes in the graph), you can use a mapping file that will allow the application to 
+If your application internally for some reason uses some node IDs that are not in the range from 0 to `n`-1
+(where `n` is the number of nodes in the graph), you can use a mapping file that will allow the application to
 transform node IDs from your application to IDs in the range from 0 to `n`-1. 
-Using those mapping files, you can let the C++ application do all the mapping work, so will not need to change the 
-IDs in your application. 
+Using those mapping files, you can let the C++ application do all the mapping work, so will not need to change the
+IDs in your application.
 The mapping file is a plain text file in the following format:
 
-* The file begins with a line `XID n` where `XID` is a fixed string which serves as a magic constant and `n` is the 
-amount of nodes in the graph. 
-* The first line is followed by exactly `n` lines each only containing one integer `i`. The `j`-th line represents 
-the original ID of the `(j-2)`-th node. So the second line contains the original ID of the node with the ID 0 in our 
-application. 
-The third line contains the original ID of the node with the ID 1, and so on up to the line `n+1` contains the 
+- The file begins with a line `XID n` where `XID` is a fixed string which serves as a magic constant and `n` is the
+amount of nodes in the graph.
+- The first line is followed by exactly `n` lines each only containing one integer `i`. The `j`-th line represents
+the original ID of the `(j-2)`-th node. So the second line contains the original ID of the node with the ID 0 in our
+application.
+The third line contains the original ID of the node with the ID 1, and so on up to the line `n+1` contains the
 original ID for the node with the ID `n-1` in our application.
 
 
