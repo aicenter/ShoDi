@@ -310,52 +310,6 @@ add_executable(benchmark
     src/Timer/Timer.cpp
 )
 
-add_executable(test_runner
-        src/CH/CHDistanceQueryManager.tpp
-        src/CH/CHPreprocessor.cpp
-        src/CH/EdgeDifferenceManager.cpp
-        src/CH/Structures/CHNode.cpp
-        src/CH/Structures/CHpriorityQueue.cpp
-        src/CH/Structures/HopsDijkstraNode.cpp
-        src/CH/Structures/NodeData.cpp
-        src/CLI/ProgressBar.cpp
-        src/Dijkstra/BasicDijkstra.cpp
-        src/Dijkstra/DijkstraNode.cpp
-        src/DistanceMatrix/CSV_reader.h
-        src/DistanceMatrix/CSV_reader.cpp
-        src/GraphBuilding/Loaders/AdjGraphLoader.cpp
-        src/GraphBuilding/Loaders/DDSGLoader.cpp
-        src/GraphBuilding/Loaders/TGAFLoader.cpp
-        src/GraphBuilding/Structures/AdjMatrixGraph.cpp
-        src/GraphBuilding/Structures/FlagsGraph.h
-        src/GraphBuilding/Structures/FlagsGraphWithUnpackingData.cpp
-        src/GraphBuilding/Structures/Graph.cpp
-        src/GraphBuilding/Structures/OutputEdge.cpp
-        src/GraphBuilding/Structures/OutputShortcutEdge.cpp
-        src/GraphBuilding/Structures/PreprocessingEdgeData.cpp
-        src/GraphBuilding/Structures/QueryEdge.cpp
-        src/GraphBuilding/Structures/QueryEdgeWithUnpackingData.cpp
-        src/GraphBuilding/Structures/ShortcutEdge.cpp
-        src/GraphBuilding/Structures/SimpleGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingArcFlagsGraph.cpp
-        src/GraphBuilding/Structures/TransitNodeRoutingGraph.h
-        src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
-        src/GraphBuilding/Structures/UpdateableGraph.cpp
-        src/progress_bar.h
-        src/Timer/Timer.cpp
-        src/TNR/Structures/AccessNodeData.cpp
-        src/TNR/TNRPreprocessor.cpp
-        src/TNRAF/Structures/AccessNodeDataArcFlags.cpp
-        src/TNRAF/Structures/NodeDataRegions.cpp
-        src/TNRAF/Structures/RegionsStructure.cpp
-        src/TNRAF/TNRAFPreprocessor.cpp
-
-        test/ch_tests.cpp
-        test/common.cpp
-        test/dm_test.cpp
-        test/tnr_tests.cpp
-        test/tnraf_tests.cpp)
-
 add_executable(func_test_runner
     functest/ch_test.cpp
     functest/common.cpp
@@ -408,7 +362,6 @@ target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIR
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(benchmark PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
-target_include_directories(test_runner PRIVATE ${Boost_INCLUDE_DIRS})
 
 # include JNI dirs if found
 if (JNI_FOUND)
@@ -423,7 +376,6 @@ target_link_libraries(shortestPathsPreprocessor PRIVATE PROJ::proj)
 target_link_libraries(benchmark PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(benchmark PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(benchmark PRIVATE PROJ::proj)
-target_link_libraries(test_runner PRIVATE GTest::gtest_main)
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
 
@@ -431,13 +383,9 @@ target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
 
 # RESOURCES
 add_custom_command(
-        TARGET test_runner POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/test $<TARGET_FILE_DIR:func_test_runner>/test)
-add_custom_command(
         TARGET func_test_runner POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data/functest $<TARGET_FILE_DIR:func_test_runner>/functest)
 
 
 # TESTING
 enable_testing()
-gtest_discover_tests(test_runner)

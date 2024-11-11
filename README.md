@@ -134,9 +134,10 @@ To generate a distance matrix, call the preprocessor with the method argument se
 
 Method specific arguments:
 
-- `--preprocessing mode` is one of `slow`, `fast`
-- `--output format` is one of `xdm`, `csv`, `hdf`
-- `--int size` (optional) is integer size to be used in the distance matrix during preprocessing (can be set to 16 or 32, default: native)
+- `--preprocessing-mode` is one of `slow`, `fast`
+- `--output-format` is one of `xdm`, `csv`, `hdf`
+- `--int-size` (optional) is integer size to be used in the distance matrix during preprocessing (can be set to 16 or 32, default: native).
+Note that this is not the output size (in case of a binary output format), the output integer size is set automatically based on the maximum distance in the graph.
 
 Example Usage:
 ```console
