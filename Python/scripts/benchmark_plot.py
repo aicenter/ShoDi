@@ -1,14 +1,14 @@
 import pandas
 import plotly.express as px
 
-INSTANCE = "DC"
-LONG_NAME = "Washington, D. C."
+INSTANCE = "Chicago"
+LONG_NAME = "Chicago (152,653 nodes)"
 
 df = pandas.read_csv(f"benchmark_{INSTANCE}.csv")
 
 fig = px.scatter(
     df, x="memory", y="time", text="label", labels="", log_x=True, log_y=True, template="simple_white",
-    title=f"Memory and time comparison of various methods on the graph of {LONG_NAME}")
+    title=f"""Memory and time comparison of various methods<br>on the graph of {LONG_NAME}""")
 
 fig.update_traces(marker=dict(size=10, color="powderblue", line=dict(width=2, color="DarkSlateGrey")))
 fig.update_xaxes(linecolor="black", mirror=True, title_text="Memory allocated by the program in MiB", tickformat = ".1r")
@@ -20,7 +20,7 @@ fig.update_layout(
     title={
         "x": 0.5,
         "xanchor": "center",
-        "y": 0.85,
+        "y": 0.9,
         "yanchor": "top"
     }
 )
