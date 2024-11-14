@@ -18,8 +18,6 @@
 
 void run_preprocessor(const char* args);
 
-void compare_txt_files(const std::string& p1, const std::string& p2);
-
 template<class T>
 void compare_flags_graphs(
         const FlagsGraph<T>& computed,

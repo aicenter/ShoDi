@@ -53,7 +53,7 @@ private:
      * @param[in] scaling_factor This parameter allows us to lose some precision
      * of the weight values. Each loaded weight will be divided by this value before rounding.
      */
-    void parseEdges(std::ifstream & input, BaseGraph & graph, size_t edges, int scaling_factor);
+	void parseEdges(BaseGraph& graph, int scaling_factor);
 
     /**
      * Auxiliary function that extracts the number of nodes and the number of edges from the problem line.

@@ -186,14 +186,22 @@ For more information about how to integrate this project with other programming 
 
 
 # Testing
-The project contains two types of tests: 
-
-- **Unit tests** tests the correctness of functions (but the coverage is limited to a few functions). Target: `test_runner`
-- **Functional tests** tests the correctness of the whole application. Target: `func_test_runner`
+The project contains **Functional tests** that tests the correctness of the whole application. Target: `func_test_runner`.
 
 
 # Benchmarking
-The project has a `benchmark` target that can be used to benchmark the performance of the implemented methods.
+The project has a `benchmark` target that can be used to benchmark the performance of the implemented methods. Genneral usage:
+```console
+./benchmark -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [-o <output_path>]
+```
+
+where:
+
+- `<method>` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf`, `dm` - the method being benchmarked
+- `<input_data_structure>` is path to the data structure preprocessed using the preprocessor *for the selected* `method`. For dijkstra and Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv` `input_data_structure` argument.
+- `<query_set>` is path to the query set (file format described in the File Formats section below)
+- `<mapping_file>` (optional) is path to the mapping file (file format described in the File Formats section below), which will be used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
+- `<output_path>` (optional) is path to the output file for the computed distances
 
 For benchmarking, you will need a set of queries which can either use IDs in the range from 0 to n-1 (where n is the number of the nodes in the graph) or you can use arbitrary integer node IDs.
 In the second case, you also need to provide a mapping file (see next section).
@@ -204,20 +212,6 @@ During benchmarking, all of your queries are answered using a chosen method.
 Afterwards, the total time need to answer all the queries in seconds is printed alongside the average time needed to answer one query in milliseconds.
 Additionally, you can specify an output file, where the computed distances will be stored.
 Those distances can then be used for verification of the correctness of the more complex methods.
-
-To benchmark (with or without mapping), call the benchmark with the following arguments:
-
-```console
- -m <method> --input-structure <input_data_structure> --query-set <query_set> [--mapping-file <mapping_file>] [-o <output_path>]
-```
-
-where:
-
-- `<method>` is one of `dijkstra`, `astar`, `ch`, `tnr`, `tnraf`, `dm` - the method being benchmarked
-- `<input_data_structure>` is path to the data structure preprocessed using the preprocessor *for the selected* `method`. For dijkstra and Astar, use the CSV format (path to folder that contains `nodes.csv` and `edges.csv` `input_data_structure` argument.
-- `<query_set>` is path to the query set (file format described in the File Formats section below)
-- `<mapping_file>` (optional) is path to the mapping file (file format described in the File Formats section below), which will be used to transform node IDs from the query set to the corresponding node IDs used by the query algorithms
-- `<output_path>` (optional) is path to the output file for the computed distances
 
 
 ## A* Benchmarking
@@ -261,10 +255,10 @@ The expected suffix for XenGraph files is `.xeng` although it is not enforced.
 This input format was used during the 9th DIMACS Implementation Challenge on shortest paths. The graph file is a plain text file and it looks as follows:
 
 - Lines beginning with the character `c` can occur anywhere in the file. Those lines are comment lines and are skipped during loading.
-- First line of the file not starting with the character `c` must be in the format `p sp n e`, where:
+- First line of the file not starting with the character `c` must be in the format `p sp <nodes> <edges>`, where:
 	- `p sp` is a fixed string which serves as a magic constant,
-	- `n` is a positive integer denoting the number of nodes, and
-	- `e` is another positive integer denoting the number of edges.
+	- `<nodes>` is a positive integer denoting the number of nodes, and
+	- `<edges>` is another positive integer denoting the number of edges.
 - After that, there must be exactly `e` lines of the format `a s t w`, where each line represents one edge. Here:
 	- `a` is a fixed character constant indicating that the line describes one edge (as opposed to `c` representing  a comment line),
 	- `s` is the source node of the edge, and

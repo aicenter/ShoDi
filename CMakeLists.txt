@@ -322,6 +322,7 @@ add_executable(func_test_runner
     src/CH/Structures/NodeData.cpp
     src/Dijkstra/BasicDijkstra.cpp
     src/Dijkstra/DijkstraNode.cpp
+    src/DistanceMatrix/CSV_reader.cpp
     src/GraphBuilding/Loaders/DDSGLoader.cpp
     src/GraphBuilding/Loaders/TGAFLoader.cpp
     src/GraphBuilding/Loaders/TNRGLoader.tpp
