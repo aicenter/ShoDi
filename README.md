@@ -1,4 +1,5 @@
-<!-- # Shortest Distances computation library in C++ -->
+![banner](banner2.jpeg)
+
 This project implements multiple methods for shortest distance computation in directed weighted graphs that leverage preprocessing of the graph to provide fast shortest distance queries.
 The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies), Transit Node Routing with Arc Flags (extension of Transit Node Routing) and Distance Matrix computation.
 Besides that, the API also contains standard algrithms for providing shortest distance queries without preprocessing the graph: Dijkstra and A*.
@@ -57,13 +58,15 @@ There are also additional build targets:
 - `func_test_runner`: for running functional tests
 
 # Usage
+To use the project, first build the desired data structures using the preprocessor and then use the library to answer queries.
+
+To test the usage, you can use the test data located in the `data/functest` directory.
 
 ## The Preprocessor
 The preprocessor has a simple **command line interface**.
 Let us now assume that you have a directed weighted graph in one of the supported formats (see [Input/Output File Formats](#inputoutput-file-formats)).
-The command line interface requires you to use specific arguments. 
-The first argument determines whether you want to preprocess a graph file or benchmark a preprocessed graph using 
-some method.
+The command line interface requires you to use specific arguments.
+The first argument determines whether you want to preprocess a graph file or benchmark a preprocessed graph using some method.
 The arguments following the first one are specific to each of the usages.
 
 General usage:
@@ -326,3 +329,9 @@ The steps required for the integration with a different language are briefly des
 
 # SiMoD
 If you want to use the library with SiMoD, you can consult the [Amod readme](./AMOD_README.md) for step-by-step instructions on how to accomplish this.
+
+
+# Authors
+Most of the code in this project was written as a part of the [master's thesis of Michal Cvach](https://dspace.cvut.cz/bitstream/handle/10467/87849/F3-DP-2020-Cvach-Michal-cvachmic_thesis.pdf).
+
+The code for the distance matrix computation was taken from the [APSP-in-parallel project](https://github.com/moorejs/APSP-in-parallel)
