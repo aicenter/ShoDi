@@ -25,14 +25,15 @@ import subprocess
 import pandas
 
 PREPROCESSOR_EXECUTABLE = "./shortestPathsPreprocessor"
+BENCHMARK_EXECUTABLE = "./benchmark"
 RUNS = 10
 INSTANCE = "DC"
 
 def compute_structures():
-    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "create", "-m", "ch", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}"])
-    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "create", "-m", "tnr", "--preprocessing-mode", "slow", "--tnodes-cnt", "5000", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes", "--int-size", "16"])
-    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "create", "-m", "tnraf", "--preprocessing-mode", "slow", "--tnodes-cnt", "5000", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes", "--int-size", "16"])
-    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "create", "-m", "dm", "--preprocessing-mode", "fast", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}", "--output-format", "hdf", "--int-size", "16"])
+    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "-m", "ch", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}"])
+    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "-m", "tnr", "--preprocessing-mode", "slow", "--tnodes-cnt", "5000", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes", "--int-size", "16"])
+    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "-m", "tnraf", "--preprocessing-mode", "slow", "--tnodes-cnt", "5000", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes", "--int-size", "16"])
+    process = subprocess.run([PREPROCESSOR_EXECUTABLE, "-m", "dm", "--preprocessing-mode", "fast", "-i", f"../thesisTestsData/{INSTANCE}", "-o", f"../thesisTestsData/{INSTANCE}/{INSTANCE}", "--output-format", "hdf", "--int-size", "16"])
     print("computing structures finished")
 
 
@@ -45,7 +46,7 @@ def run_benchmark(method, input_structure, queries_file):
     total_time = 0
     total_mem = 0
     for _ in range(RUNS):
-        command = [PREPROCESSOR_EXECUTABLE, "benchmark", "-m", method,
+        command = [BENCHMARK_EXECUTABLE_EXECUTABLE, "-m", method,
             "--query-set", queries_file,
             "--input-structure", input_structure,
             "--output-path", f"out_{method}.txt"]
