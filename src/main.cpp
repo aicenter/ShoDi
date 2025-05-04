@@ -356,102 +356,132 @@ GraphLoader *newGraphLoader(const std::string& inputFormat, const std::string& i
  * <br> _Author: Michal Cvach_
  */
 int main(int argc, char* argv[]) {
-    setvbuf(stdout, NULL, _IONBF, 0);
+	try {
+		setvbuf(stdout, NULL, _IONBF, 0);
 
-    boost::optional<std::string> method, inputFormat, inputPath, outputFormat, outputPath, preprocessingMode,
-    inputStructure, querySet, mappingFile;
-    boost::optional<unsigned int> tnodesCnt, dmIntSize, precisionLoss;
+		boost::optional<std::string> method, inputFormat, inputPath, outputFormat, outputPath, preprocessingMode,
+		inputStructure, querySet, mappingFile;
+		boost::optional<unsigned int> tnodesCnt, dmIntSize, precisionLoss;
 
-    // Declare the supported options.
-    boost::program_options::options_description allOptions("Allowed options");
-    allOptions.add_options()
-            ("help", "produce help message")
-            ("method,m", boost::program_options::value(&method))
-            ("input-format,f", boost::program_options::value(&inputFormat))
-            ("input-path,i", boost::program_options::value(&inputPath))
-            ("output-format", boost::program_options::value(&outputFormat))
-            ("output-path,o", boost::program_options::value(&outputPath))
-            ("preprocessing-mode", boost::program_options::value(&preprocessingMode))
-            ("int-size", boost::program_options::value(&dmIntSize)->default_value(0))
-            ("tnodes-cnt", boost::program_options::value(&tnodesCnt))
-            ("precision-loss", boost::program_options::value(&precisionLoss)->default_value(1))
-            ("input-structure", boost::program_options::value(&inputStructure))
-            ("query-set", boost::program_options::value(&querySet))
-            ("mapping-file", boost::program_options::value(&mappingFile));
+		// Declare the supported options.
+		boost::program_options::options_description allOptions("Allowed options");
+		allOptions.add_options()
+				("help", "produce help message")
+				("method,m", boost::program_options::value(&method))
+				("input-format,f", boost::program_options::value(&inputFormat))
+				("input-path,i", boost::program_options::value(&inputPath))
+				("output-format", boost::program_options::value(&outputFormat))
+				("output-path,o", boost::program_options::value(&outputPath))
+				("preprocessing-mode", boost::program_options::value(&preprocessingMode))
+				("int-size", boost::program_options::value(&dmIntSize)->default_value(0))
+				("tnodes-cnt", boost::program_options::value(&tnodesCnt))
+				("precision-loss", boost::program_options::value(&precisionLoss)->default_value(1))
+				("input-structure", boost::program_options::value(&inputStructure))
+				("query-set", boost::program_options::value(&querySet))
+				("mapping-file", boost::program_options::value(&mappingFile));
 
-    boost::program_options::variables_map vm;
-    boost::program_options::store(
-            boost::program_options::command_line_parser(argc, argv).options(allOptions).run(), vm);
-    boost::program_options::notify(vm);
+		boost::program_options::variables_map vm;
+		boost::program_options::store(
+				boost::program_options::command_line_parser(argc, argv).options(allOptions).run(), vm);
+		boost::program_options::notify(vm);
 
-    try {
-		if (vm.count("help")) {
-			printf("To create a data structure, please provide required commands for the Create command:\n"
-				   "-m <method>\n-f <input_format>\n-i <input_file>\n-o <output_file>\n");
-			return 0;
-		}
-
-		if (!method || !inputPath) {
-			throw input_error("Missing one or more required options (-m <method> / -i <input_file>) for the Create command.\n");
-		}
-
-		if (!inputFormat) {
-			auto extension = std::filesystem::path(*inputPath).extension();
-
-			if (extension == ".xeng") inputFormat.emplace("xengraph");
-			else if (extension == ".gr") inputFormat.emplace("dimacs");
-			else if (extension == ".csv") inputFormat.emplace("adj");
-			else if (extension == "") inputFormat.emplace("csv");
-			else throw input_error("Unable to detect input file format. Please specify with '-f <format>'.");
-		}
-
-		if (!outputPath) {
-			outputPath.emplace("out");
-		}
-
-		GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputPath);
-
-		if (*method == "ch") {
-			createCH(*graphLoader, *outputPath, *precisionLoss);
-		} else if (*method == "tnr") {
-			if (!preprocessingMode || !tnodesCnt) {
-				throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow/dm> / --tnodes-cnt <cnt>) for TNR creation.\n");
-			}
-			createTNR(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
-		} else if (*method == "tnraf") {
-			if (!preprocessingMode || !tnodesCnt) {
-				throw input_error("Missing one or more required options (--preprocessing-mode <slow/dm> / --tnodes-cnt <cnt>) for TNRAF creation.\n");
-			}
-			createTNRAF(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
-		} else if (*method == "dm") {
-			if (!preprocessingMode || !outputFormat) {
-				throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");
+		try {
+			if (vm.count("help")) {
+				printf("To create a data structure, please provide required commands for the Create command:\n"
+					   "-m <method>\n-f <input_format>\n-i <input_file>\n-o <output_file>\n");
+				return 0;
 			}
 
-			if (*dmIntSize == 16) {
-				createDM<uint_least16_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
-			} else if (*dmIntSize == 32) {
-				createDM<uint_least32_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+			if (!method || !inputPath) {
+				throw input_error("Missing one or more required options (-m <method> / -i <input_file>) for the Create command.\n");
+			}
+
+			if (!inputFormat) {
+				auto extension = std::filesystem::path(*inputPath).extension();
+
+				if (extension == ".xeng") inputFormat.emplace("xengraph");
+				else if (extension == ".gr") inputFormat.emplace("dimacs");
+				else if (extension == ".csv") inputFormat.emplace("adj");
+				else if (extension == "") inputFormat.emplace("csv");
+				else throw input_error("Unable to detect input file format. Please specify with '-f <format>'.");
+			}
+
+			if (!outputPath) {
+				outputPath.emplace("out");
+			}
+
+			GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputPath);
+
+			if (*method == "ch") {
+				createCH(*graphLoader, *outputPath, *precisionLoss);
+			} else if (*method == "tnr") {
+				if (!preprocessingMode || !tnodesCnt) {
+					throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow/dm> / --tnodes-cnt <cnt>) for TNR creation.\n");
+				}
+				createTNR(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
+			} else if (*method == "tnraf") {
+				if (!preprocessingMode || !tnodesCnt) {
+					throw input_error("Missing one or more required options (--preprocessing-mode <slow/dm> / --tnodes-cnt <cnt>) for TNRAF creation.\n");
+				}
+				createTNRAF(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
+			} else if (*method == "dm") {
+				if (!preprocessingMode || !outputFormat) {
+					throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");
+				}
+
+				if (*dmIntSize == 16) {
+					createDM<uint_least16_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+				} else if (*dmIntSize == 32) {
+					createDM<uint_least32_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+				} else {
+					createDM<dist_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+				}
 			} else {
-				createDM<dist_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
+				throw input_error("Invalid method name '" + *method + "'.\n");
 			}
-		} else {
-			throw input_error("Invalid method name '" + *method + "'.\n");
+			delete graphLoader;
 		}
-		delete graphLoader;
-    }
-    catch (input_error& e) {
-        std::cout << "Input Error: " << e.what();
-        return 1;
-    }
-    catch (not_implemented_error& e) {
-        std::cout << "Not Implemented Error: " << e.what();
-        return 1;
-    }
-    catch (const std::exception& e) {
-        std::cout << "Error: " << e.what();
-        return 1;
-    }
+		catch (input_error& e) {
+			std::cout << "Input Error: " << e.what();
+			return 1;
+		}
+		catch (not_implemented_error& e) {
+			std::cout << "Not Implemented Error: " << e.what();
+			return 1;
+		}
+		catch (const std::exception& e) {
+			std::cout << "Error: " << e.what();
+			return 1;
+		}
 
-    return 0;
+		return 0;
+	}
+	catch (...) {
+		const std::exception_ptr& eptr = std::current_exception();
+		if (!eptr) {
+			throw std::bad_exception();
+		}
+
+		/*char* message;*/
+		std::string message;
+		try {
+			std::rethrow_exception(eptr);
+		}
+		catch (const std::exception& e) {
+			message = e.what();
+		}
+		catch (const std::string& e) {
+			message = e;
+		}
+		catch (const char* e) {
+			message = e;
+		}
+		catch (...) {
+			message = "Unknown error";
+		}
+
+		std::cout << message;
+
+		return -1;
+	}
 }
