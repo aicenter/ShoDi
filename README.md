@@ -1,8 +1,15 @@
 ![banner](banner2.jpeg)
 
 This project implements multiple methods for shortest distance computation in directed weighted graphs that leverage preprocessing of the graph to provide fast shortest distance queries.
-The implemented methods are Contraction Hierarchies, Transit Node Routing (based on Contraction Hierarchies), Transit Node Routing with Arc Flags (extension of Transit Node Routing) and Distance Matrix computation.
+The implemented methods for shortest distance computation are:
+
+- Contraction Hierarchies,
+- Transit Node Routing (based on Contraction Hierarchies),
+- Transit Node Routing with Arc Flags (extension of Transit Node Routing), and
+- Distance Matrix.
+
 Besides that, the API also contains standard algrithms for providing shortest distance queries without preprocessing the graph: Dijkstra and A*.
+
 Below, you can see a comparison of the speed and memory requirements of the implemented methods on two real-world graphs.
 
 
@@ -56,6 +63,8 @@ There are also additional build targets:
 - `shortestPaths`: the library
 - `doc`: for generating Doxygen documentation (requires Doxygen to be installed)
 - `func_test_runner`: for running functional tests
+
+
 
 # Usage
 To use the project, first build the desired data structures using the preprocessor and then use the library to answer queries.
