@@ -53,7 +53,7 @@ def run_benchmark(method, input_structure, queries_file, reference_distances=Non
             "--input-structure", input_structure,
             "--output-path", out_file]
         process = subprocess.Popen(command, preexec_fn=os.setsid)
-        print(" ".join(command))
+        print(" ".join(command), flush=True)
         process.communicate()
 
         with open("benchmark.txt", "r") as f:
@@ -63,7 +63,8 @@ def run_benchmark(method, input_structure, queries_file, reference_distances=Non
         os.remove("benchmark.txt")
     
         with open(out_file, "r") as f:
-            out_values_set.add([int(_.strip()) for _ in f.readlines()[1:]])
+            out_values = tuple(int(_.strip()) for _ in f.readlines()[1:])
+            out_values_set.add(out_values)
         
         if len(out_values_set) > 1:
             print(f"WARNING: {method} returned different distances across multiple runs on the same query set!")
