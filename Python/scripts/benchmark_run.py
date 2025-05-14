@@ -37,19 +37,21 @@ def compute_structures():
     print("computing structures finished")
 
 
-# returns memory usage for the method in MiB and average time per query in microseconds
-def run_benchmark(method, input_structure, queries_file):
+# returns memory usage for the method in MiB, average time per query in microseconds and a list of computed distances
+def run_benchmark(method, input_structure, queries_file, reference_distances=None):
     with open(queries_file, "r") as file:
         # the first line of the file contains number of queries
         queries_count = int(file.readline())
 
     total_time = 0
     total_mem = 0
-    for _ in range(RUNS):
-        command = [BENCHMARK_EXECUTABLE_EXECUTABLE, "-m", method,
+    out_values_set = set()
+    for i in range(RUNS):
+        out_file = f"out_{method}.txt"
+        command = [BENCHMARK_EXECUTABLE, "-m", method,
             "--query-set", queries_file,
             "--input-structure", input_structure,
-            "--output-path", f"out_{method}.txt"]
+            "--output-path", out_file]
         process = subprocess.Popen(command, preexec_fn=os.setsid)
         print(" ".join(command))
         process.communicate()
@@ -60,31 +62,43 @@ def run_benchmark(method, input_structure, queries_file):
             total_mem += int(mem.strip())
         os.remove("benchmark.txt")
     
+        with open(out_file, "r") as f:
+            out_values_set.add([int(_.strip()) for _ in f.readlines()[1:]])
+        
+        if len(out_values_set) > 1:
+            print(f"WARNING: {method} returned different distances across multiple runs on the same query set!")
+    
     mem_mb = total_mem/(RUNS*1024)
     query_time_us = (total_time*1_000_000)/(RUNS*queries_count)
-    return mem_mb, query_time_us
+    out_values = list(out_values_set)[0]
+
+    if reference_distances is not None and out_values != reference_distances:
+        print(f"WARNING: {method} returned different distances than Dijkstra's algorithm!")
+
+    return mem_mb, query_time_us, out_values
 
 compute_structures()
 
 queries = f"../thesisTestsData/{INSTANCE}/{INSTANCE}100000randomQueries.txt"
 df_data = []
 
-mem, time = run_benchmark("dijkstra", f"../thesisTestsData/{INSTANCE}", queries)
+# keep Dijkstra-computed distances and compare with other methods to confirm that the results are identic
+mem, time, dijkstra_distances = run_benchmark("dijkstra", f"../thesisTestsData/{INSTANCE}", queries)
 df_data.append(["Dijkstra", mem, time])
 
-mem, time = run_benchmark("astar", f"../thesisTestsData/{INSTANCE}", queries)
+mem, time, distances = run_benchmark("astar", f"../thesisTestsData/{INSTANCE}", queries, dijkstra_distances)
 df_data.append(["A*", mem, time])
 
-mem, time = run_benchmark("ch", f"../thesisTestsData/{INSTANCE}/{INSTANCE}.ch", queries)
+mem, time, distances = run_benchmark("ch", f"../thesisTestsData/{INSTANCE}/{INSTANCE}.ch", queries, dijkstra_distances)
 df_data.append(["CH", mem, time])
 
-mem, time = run_benchmark("tnr", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes.tnrg", queries)
+mem, time, distances = run_benchmark("tnr", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes.tnrg", queries, dijkstra_distances)
 df_data.append(["TNR", mem, time])
 
-mem, time = run_benchmark("tnraf", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes.tgaf", queries)
+mem, time, distances = run_benchmark("tnraf", f"../thesisTestsData/{INSTANCE}/{INSTANCE}5000tnodes.tgaf", queries, dijkstra_distances)
 df_data.append(["TNRAF", mem, time])
 
-mem, time = run_benchmark("dm", f"../thesisTestsData/{INSTANCE}/{INSTANCE}.hdf5", queries)
+mem, time, distances = run_benchmark("dm", f"../thesisTestsData/{INSTANCE}/{INSTANCE}.hdf5", queries, dijkstra_distances)
 df_data.append(["DM", mem, time])
 
 df = pandas.DataFrame(df_data, columns=["label", "memory", "time"])
