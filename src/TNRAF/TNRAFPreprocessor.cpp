@@ -32,6 +32,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include "../DistanceMatrix/DistanceMatrixComputorSlow.h"
 #include "TNRAFPreprocessor.h"
+#include "TNRAFPreprocessingMode.h"
 #include "../CH/CHDistanceQueryManager.h"
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "../Dijkstra/DijkstraNode.h"
@@ -43,11 +44,11 @@ DistanceMatrixInterface* TNRAFPreprocessor::distanceMatrix = NULL;
 void TNRAFPreprocessor::preprocessUsingCH(
 	UpdateableGraph &graph,
 	Graph &originalGraph,
-	std::string outputPath,
+	const std::string & outputPath,
 	unsigned int transitNodesAmount,
 	unsigned int regionsCnt,
 	unsigned int dmIntSize,
-	bool useDistanceMatrix
+	TNRAFPreprocessingMode useDistanceMatrix
 ) {
 	std::cout << "Getting transit nodes" << std::endl;
 	std::vector<unsigned int> transitNodes(transitNodesAmount);
@@ -58,7 +59,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	CHDistanceQueryManager qm(chGraph);
 	std::vector<std::vector<unsigned int> > transitNodesDistanceTable(transitNodesAmount,
 																	  std::vector<unsigned int>(transitNodesAmount));
-	if (useDistanceMatrix) {
+	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 		std::cout
 			<< "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction."
 			<< std::endl;
@@ -105,7 +106,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 
 	std::cout << "\rComputed forward access nodes for all nodes in the graph." << std::endl;
 
-	if (useDistanceMatrix) {
+	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 		std::cout << "Computing the auxiliary distance matrix for backward direction." << std::endl;
 		delete distanceMatrix;
 
@@ -136,7 +137,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 
 	std::cout << "\rComputed backward access nodes for all nodes in the graph." << std::endl;
 
-	if (useDistanceMatrix) {
+	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 		delete distanceMatrix;
 		distanceMatrix = NULL;
 	}
@@ -338,7 +339,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 	std::vector<unsigned int> &forwardSearchSpace,
 	std::unordered_map<unsigned int, unsigned int> &transitNodes,
 	FlagsGraph<NodeDataRegions>& graph, Graph &originalGraph, RegionsStructure &regions,
-	bool useDistanceMatrix
+	TNRAFPreprocessingMode useDistanceMatrix
 ) {
 	auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
 	std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
@@ -392,12 +393,12 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 	}
 
 	std::vector<unsigned int> distancesFromNode;
-	if (!useDistanceMatrix) {
+	if (useDistanceMatrix != TNRAFPreprocessingMode::DM) {
 		distancesFromNode.resize(originalGraph.nodes());
 		BasicDijkstra::computeOneToAllDistances(source, originalGraph, distancesFromNode);
 	}
 	for (size_t i = 0; i < accessNodesSuperset.size(); i++) {
-		if (useDistanceMatrix) {
+		if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 			unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
 			unsigned int realDistance = distanceMatrix->findDistance(source, accessNode);
@@ -425,10 +426,10 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::computeForwardArcFlags(
 	unsigned int node, std::vector<AccessNodeDataArcFlags> &accessNodes,
-	Graph &originalGraph, RegionsStructure &regions, bool useDistanceMatrix,
+	Graph &originalGraph, RegionsStructure &regions, TNRAFPreprocessingMode useDistanceMatrix,
 	std::vector<unsigned int> &optionalDistancesFromNode
 ) {
-	if (useDistanceMatrix) {
+	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			unsigned int accessNode = accessNodes[i].accessNodeID;
 			unsigned int distanceToAccessNode = accessNodes[i].distanceToNode;
@@ -469,7 +470,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 	std::vector<unsigned int> &backwardSearchSpace,
 	std::unordered_map<unsigned int, unsigned int> &transitNodes,
 	FlagsGraph<NodeDataRegions>& graph, Graph &originalGraph, RegionsStructure &regions,
-	bool useDistanceMatrix
+	TNRAFPreprocessingMode useDistanceMatrix
 ) {
 	auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
 	std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> backwardQ(cmp);
@@ -523,12 +524,12 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 	}
 
 	std::vector<unsigned int> distancesFromNode;
-	if (!useDistanceMatrix) {
+	if (useDistanceMatrix != TNRAFPreprocessingMode::DM) {
 		distancesFromNode.resize(originalGraph.nodes());
 		BasicDijkstra::computeOneToAllDistancesInReversedGraph(source, originalGraph, distancesFromNode);
 	}
 	for (size_t i = 0; i < accessNodesSuperset.size(); i++) {
-		if (useDistanceMatrix) {
+		if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 			unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
 			unsigned int realDistance = distanceMatrix->findDistance(source, accessNode);
@@ -556,10 +557,10 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::computeBackwardArcFlags(
 	unsigned int node, std::vector<AccessNodeDataArcFlags> &accessNodes,
-	Graph &originalGraph, RegionsStructure &regions, bool useDistanceMatrix,
+	Graph &originalGraph, RegionsStructure &regions, TNRAFPreprocessingMode useDistanceMatrix,
 	std::vector<unsigned int> &optionalDistancesFromNode
 ) {
-	if (useDistanceMatrix) {
+	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			unsigned int accessNode = accessNodes[i].accessNodeID;
 			unsigned int distanceToAccessNode = accessNodes[i].distanceToNode;

@@ -36,7 +36,7 @@
 #include "Structures/RegionsStructure.h"
 #include "../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 #include "../TNRAF/Structures/NodeDataRegions.h"
-
+#include "TNRAFPreprocessingMode.h"
 
 /**
  * This class is responsible for creating a Transit Node Routing with Arc Flags data-structure based on a given
@@ -74,11 +74,11 @@ public:
     static void preprocessUsingCH(
             UpdateableGraph & graph,
             Graph & originalGraph,
-            std::string outputPath,
-            unsigned int transitNodesAmount = 1000,
-            unsigned int regionsCnt = 32,
-            unsigned int dmIntSize = 0,
-            bool useDistanceMatrix = false);
+            const std::string & outputFilenameprefix,
+            unsigned int transitNodesDesired,
+            unsigned int regionsCnt,
+            unsigned int dmIntSize,
+            TNRAFPreprocessingMode dm_mode);
 
     /**
      * Auxiliary function in order to make sure the powers of 2 are precomputed.
@@ -175,7 +175,7 @@ protected:
             FlagsGraph<NodeDataRegions>& graph,
             Graph & originalGraph,
             RegionsStructure & regions,
-            bool useDistanceMatrix);
+            TNRAFPreprocessingMode useDistanceMatrix);
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. The process consists of first finding
@@ -201,7 +201,7 @@ protected:
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph<NodeDataRegions>& graph, Graph & originalGraph,
             RegionsStructure & regions,
-            bool useDistanceMatrix);
+            TNRAFPreprocessingMode useDistanceMatrix);
 
     /**
      * Computes forward Arc Flags for a set of forward access nodes of a given node. This is done simply by comparing
@@ -226,7 +226,7 @@ protected:
             std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
             RegionsStructure & regions,
-            bool useDistanceMatrix,
+            TNRAFPreprocessingMode useDistanceMatrix,
             std::vector<unsigned int> & optionalDistancesFromNode);
 
     /**
@@ -248,7 +248,7 @@ protected:
             std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
             RegionsStructure & regions,
-            bool useDistanceMatrix,
+            TNRAFPreprocessingMode useDistanceMatrix,
             std::vector<unsigned int> & optionalDistancesFromNode);
 
     /**

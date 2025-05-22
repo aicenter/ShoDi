@@ -52,8 +52,7 @@
 #include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
 #include "DistanceMatrix/DistanceMatrixCsvOutputter.h"
 #include "DistanceMatrix/DistanceMatrixHdfOutputter.h"
-
-
+#include "TNRAF/TNRAFPreprocessingMode.h"
 
 constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the right format. If not sure,\n"
                                      "refer to 'README.md' for a complete overview of use cases for this application\n"
@@ -231,13 +230,15 @@ void createTNRAF(
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
-	bool dm_mode;
+	TNRAFPreprocessingMode mode;
     if (preprocessingMode == "slow") {
 //        createTNRAFSlow(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
-		dm_mode = false;
+		mode = TNRAFPreprocessingMode::SLOW;
     } else if (preprocessingMode == "dm") {
 //        createTNRAFUsingDM(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
-		dm_mode = true;
+		mode = TNRAFPreprocessingMode::DM;
+    } else if (preprocessingMode == "fast") {
+        mode = TNRAFPreprocessingMode::FAST;
     } else {
         throw input_error(std::string("Unknown preprocessing mode '") + preprocessingMode +
                           "' for Transit Node Routing with Arc Flags preprocessing.\n" + INVALID_FORMAT_INFO);
@@ -260,7 +261,7 @@ void createTNRAF(
 	timer.begin();
 	TNRAFPreprocessor::preprocessUsingCH(
 		graph, *originalGraph, outputFilePath, transitNodeSetSize,
-		    num_regions, dmIntSize, dm_mode);
+		    num_regions, dmIntSize, mode);
 	timer.finish();
 
 	timer.printMeasuredTime();
