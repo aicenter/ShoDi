@@ -48,7 +48,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	unsigned int transitNodesAmount,
 	unsigned int regionsCnt,
 	unsigned int dmIntSize,
-	TNRAFPreprocessingMode useDistanceMatrix
+	TNRAFPreprocessingMode mode
 ) {
 	std::cout << "Getting transit nodes" << std::endl;
 	std::vector<unsigned int> transitNodes(transitNodesAmount);
@@ -57,9 +57,10 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	std::cout << "Computing transit nodes distance table" << std::endl;
 	FlagsGraph<NodeDataRegions> chGraph(graph);
 	CHDistanceQueryManager qm(chGraph);
-	std::vector<std::vector<unsigned int> > transitNodesDistanceTable(transitNodesAmount,
-																	  std::vector<unsigned int>(transitNodesAmount));
-	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
+
+	// compute dm between transit nodes - this dm is computed in all modes
+	std::vector<std::vector<unsigned int> > transitNodesDistanceTable(transitNodesAmount,std::vector<unsigned int>(transitNodesAmount));
+	if (mode == TNRAFPreprocessingMode::DM) {
 		std::cout
 			<< "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction."
 			<< std::endl;
@@ -83,6 +84,11 @@ void TNRAFPreprocessor::preprocessUsingCH(
 		computeTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount, originalGraph);
 	}
 
+	// compute dm from all nodes to transit nodes - this dm is computed only for fast mode
+	if (mode == TNRAFPreprocessingMode::FAST) {
+
+	}
+
 	RegionsStructure regions(graph.nodes(), regionsCnt);
 	generateClustering(originalGraph, regions, regionsCnt);
 
@@ -101,12 +107,12 @@ void TNRAFPreprocessor::preprocessUsingCH(
 		}
 
 		findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph,
-							   originalGraph, regions, useDistanceMatrix);
+							   originalGraph, regions, mode);
 	}
 
 	std::cout << "\rComputed forward access nodes for all nodes in the graph." << std::endl;
 
-	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
+	if (mode == TNRAFPreprocessingMode::DM) {
 		std::cout << "Computing the auxiliary distance matrix for backward direction." << std::endl;
 		delete distanceMatrix;
 
@@ -132,12 +138,12 @@ void TNRAFPreprocessor::preprocessUsingCH(
 		}
 
 		findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph,
-								originalGraph, regions, useDistanceMatrix);
+								originalGraph, regions, mode);
 	}
 
 	std::cout << "\rComputed backward access nodes for all nodes in the graph." << std::endl;
 
-	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
+	if (mode == TNRAFPreprocessingMode::DM) {
 		delete distanceMatrix;
 		distanceMatrix = NULL;
 	}

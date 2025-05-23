@@ -9,13 +9,18 @@
 #include "../GraphBuilding/Structures/AdjMatrixGraph.h"
 #include "johnson.hpp"
 
-template<class IntType> std::unique_ptr<IntType[]> DistanceMatrixComputorFast<IntType>::compute_and_get_distance_matrix(GraphLoader& graphLoader, int scaling_factor) {
+template<class IntType>
+std::unique_ptr<IntType[]> DistanceMatrixComputorFast<IntType>::compute_and_get_distance_matrix(
+    GraphLoader& graphLoader,
+    int scaling_factor
+) {
     std::vector<dist_t> graphData = loadGraph(graphLoader, scaling_factor);
     computeDistanceMatrix(graphData);
     return this->getDistanceMatrixInstance();
 }
 
-template<class IntType> void DistanceMatrixComputorFast<IntType>::computeDistanceMatrix(const std::vector<dist_t> &graphAdjMatrix) {
+template<class IntType>
+void DistanceMatrixComputorFast<IntType>::computeDistanceMatrix(const std::vector<dist_t>& graphAdjMatrix) {
     auto* graph = johnson::johnson_init(graphAdjMatrix);
     this->distanceTable = std::make_unique<IntType[]>(graphAdjMatrix.size());
 
@@ -24,7 +29,8 @@ template<class IntType> void DistanceMatrixComputorFast<IntType>::computeDistanc
     delete graph;
 }
 
-template<class IntType> std::vector<dist_t> DistanceMatrixComputorFast<IntType>::loadGraph(GraphLoader &graphLoader, int scaling_factor) {
+template<class IntType>
+std::vector<dist_t> DistanceMatrixComputorFast<IntType>::loadGraph(GraphLoader& graphLoader, int scaling_factor) {
     AdjMatrixGraph graph(graphLoader.nodes());
     graphLoader.loadGraph(graph, scaling_factor);
 
