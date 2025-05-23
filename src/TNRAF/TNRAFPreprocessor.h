@@ -37,6 +37,12 @@
 #include "../DistanceMatrix/Distance_matrix_travel_time_provider.h"
 #include "../TNRAF/Structures/NodeDataRegions.h"
 #include "TNRAFPreprocessingMode.h"
+#include "../Dijkstra/BasicDijkstra.h"
+#include <boost/numeric/conversion/cast.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <memory>
 
 /**
  * This class is responsible for creating a Transit Node Routing with Arc Flags data-structure based on a given
@@ -215,7 +221,7 @@ protected:
      * @param accessNodes[in, out] The list of access nodes for which the flags need to be computed
      * @param originalGraph[in]
      * @param regions[in] The structure containing all the information about the regions for the Arc Flags.
-     * @param useDistanceMatrix[in]
+     * @param mode[in]
      * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The std::vector
      * contains distances from 'node' to all the other nodes in the graph. This is needed to set the Arc Flags
      * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
@@ -226,7 +232,7 @@ protected:
             std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
             RegionsStructure & regions,
-            TNRAFPreprocessingMode useDistanceMatrix,
+            TNRAFPreprocessingMode mode,
             std::vector<unsigned int> & optionalDistancesFromNode);
 
     /**
@@ -295,7 +301,56 @@ protected:
     static void initPowersOf2(std::vector<uint32_t> & powersOf2);
 
     static DistanceMatrixInterface* distanceMatrix;
+
+private:
+	// DistanceMatrixInterface* all_transit_dm = nullptr; // Old non-static version
+    static DistanceMatrixInterface* all_transit_dm; // Changed to static
+
+    template<typename DataType>
+    static DistanceMatrixInterface* createAndFillAllToTransitDM(
+        Graph &originalGraph,
+        const std::vector<unsigned int>& transitNodes,
+        unsigned int transitNodesAmount, // This is effectively the number of columns
+        const std::string& dataTypeForLog
+    ) {
+        unsigned int num_rows = originalGraph.nodes();
+        unsigned int num_cols = transitNodesAmount;
+
+        // 1. Create and populate the 2D matrix as before
+        std::vector<std::vector<DataType>>* temp_2d_matrix = new std::vector<std::vector<DataType>>(num_rows, std::vector<DataType>(num_cols));
+        std::vector<unsigned int> distances_from_one_transit_node(num_rows);
+
+        for (unsigned int c = 0; c < num_cols; ++c) { // Iterate by column (transit node index)
+            unsigned int transit_node_id = transitNodes[c];
+            BasicDijkstra::computeOneToAllDistancesInReversedGraph(transit_node_id, originalGraph, distances_from_one_transit_node);
+            for (unsigned int r = 0; r < num_rows; ++r) {
+                (*temp_2d_matrix)[r][c] = boost::numeric_cast<DataType>(distances_from_one_transit_node[r]);
+            }
+            if (c % 10 == 0 && num_cols > 10) {
+                 std::cout << "\rProcessed " << c << "/" << num_cols << " transit nodes for all-to-transit DM (" << dataTypeForLog << ").";
+            }
+        }
+        if (num_cols > 0) {
+             std::cout << "\rProcessed " << num_cols << "/" << num_cols << " transit nodes for all-to-transit DM (" << dataTypeForLog << ").";
+        }
+
+        // 2. Convert the 2D matrix to a 1D std::unique_ptr<DataType[]>
+        std::unique_ptr<DataType[]> one_d_array = std::make_unique<DataType[]>(static_cast<size_t>(num_rows) * num_cols);
+        for (unsigned int r = 0; r < num_rows; ++r) {
+            for (unsigned int c = 0; c < num_cols; ++c) {
+                one_d_array[static_cast<size_t>(r) * num_cols + c] = (*temp_2d_matrix)[r][c];
+            }
+        }
+
+        // 3. Clean up the temporary 2D matrix
+        delete temp_2d_matrix;
+
+        // 4. Create the provider using the 1D array
+        return new Distance_matrix_travel_time_provider<DataType>(std::move(one_d_array), num_rows, num_cols);
+    }
+
 };
 
 
 #endif //CONTRACTION_HIERARCHIES_TNRAFPREPROCESSOR_H
+

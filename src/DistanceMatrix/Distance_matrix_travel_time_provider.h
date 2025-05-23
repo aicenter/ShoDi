@@ -51,39 +51,73 @@ template <class IntType>
 class Distance_matrix_travel_time_provider : public DistanceMatrixInterface {
 public:
     /**
-     * A simple constructor.
+     * A simple constructor for a square empty matrix.
      *
-     * @param nodes[in] The number of nodes in the graph (also the number of rows and columns in the matrix).
+     * @param nodes[in] The number of nodes (rows and columns) in the square matrix.
      */
     explicit Distance_matrix_travel_time_provider(unsigned int nodes);
 
     /**
-     * A move constructor.
+     * A simple constructor for an empty matrix.
      *
-     * @param distMatrix[in] A 2D std::vector that will be used as the distance matrix.
+     * @param num_rows[in] The number of rows in the matrix.
+     * @param num_cols[in] The number of columns in the matrix.
+     */
+    explicit Distance_matrix_travel_time_provider(unsigned int num_rows, unsigned int num_cols);
+
+	/**
+	 * Constructor that takes a pre-filled 1D distance matrix (assumes square matrix from size).
+	 *
+	 * @param distMatrix[in] A 1D std::unique_ptr<IntType[]> representing the distances.
+	 * @param num_rows[in] The number of rows in the matrix.
+	 * @param num_cols[in] The number of columns in the matrix.
+	 */
+	explicit Distance_matrix_travel_time_provider(std::unique_ptr<IntType[]> distMatrix, unsigned int num_rows, unsigned int num_cols);
+
+    /**
+     * Constructor that takes a pre-filled 1D distance matrix (assumes square matrix from size).
+     *
+     * @param distMatrix[in] A 1D std::unique_ptr<IntType[]> representing the distances.
+     * @param size[in] The number of rows and columns (size x size matrix).
      */
     explicit Distance_matrix_travel_time_provider(std::unique_ptr<IntType[]> distMatrix, unsigned int size);
+
+    /**
+     * Constructor that takes a 2D std::vector of distances (e.g., from TNRAFPreprocessor)
+     * and converts it to the internal 1D representation.
+     * The transit_node_ids_for_columns vector is used to determine the number of columns.
+     *
+     * @param inputMatrix[in] Pointer to a 2D std::vector holding the distances.
+     *                        inputMatrix[row_idx][col_idx] is the distance.
+     * @param num_rows[in] The number of rows (typically total graph nodes).
+     * @param transit_node_ids_for_columns[in] Vector of original transit node IDs.
+     *                                         Its size determines the number of columns.
+     */
+    // explicit Distance_matrix_travel_time_provider(
+    //     std::vector<std::vector<IntType>>* inputMatrix,
+    //     unsigned int num_rows,
+    //     const std::vector<unsigned int>& transit_node_ids_for_columns);
+
 
     explicit Distance_matrix_travel_time_provider(bool fast, GraphLoader& graphLoader, int scaling_factor);
 
     /**
-     * This is basically a query algorithm. Each query is answered using a single table lookup,
-     * as we already have all the shortest distances precomputed in the matrix.
+     * This is basically a query algorithm.
      *
-     * @param start[in] The start node for the query.
-     * @param goal[in] The goal node for the query.
-     * @return Returns the shortest distance from start to goal or 'std::numeric_limits<dist_t>::max()' if goal is not reachable from start.
+     * @param start_row[in] The start row index for the query.
+     * @param goal_col[in] The goal column index for the query.
+     * @return Returns the shortest distance or 'std::numeric_limits<dist_t>::max()'.
      */
-    [[nodiscard]] dist_t findDistance(unsigned int start, unsigned int goal) const override;
+    [[nodiscard]] dist_t findDistance(unsigned int start_row, unsigned int goal_col) const override;
 
     /**
-     * Auxiliary function used during the initialization to set the distances.
+     * Auxiliary function used during initialization to set the distances.
      *
-     * @param source[in] The row of the matrix we want to set the distance for.
-     * @param target[in] The column of the table we want to set the distance for.
-     * @param distance[in] The value (distance) we wnat to put into the table.
+     * @param source_row[in] The row of the matrix.
+     * @param target_col[in] The column of the matrix.
+     * @param distance[in] The value (distance) to put into the table.
      */
-    void setDistance(unsigned int source, unsigned int target, dist_t distance) override;
+    void setDistance(unsigned int source_row, unsigned int target_col, dist_t distance) override;
 
     /**
      * Get the underlying data structure (a 1D array)
@@ -92,21 +126,32 @@ public:
     const std::unique_ptr<IntType[]>& getRawData();
 
     /**
-     * Get nodes count
-     * @return nodes count
+     * Get rows count
+     * @return rows count
+     */
+    [[nodiscard]] unsigned int getRows() const;
+
+    /**
+     * Get columns count
+     * @return columns count
+     */
+    [[nodiscard]] unsigned int getCols() const;
+
+    /**
+     * Returns the size of the matrix if it is square (rows == cols).
+     * Throws a std::runtime_error if the matrix is not square.
+     * @return The number of rows/columns if the matrix is square.
      */
     [[nodiscard]] unsigned int nodes() const;
 
     /**
-     * Prints some statistics about the distance matrix. Useful mainly during debugging, might be removed later.
-     * Checks how many values in the distance matrix are set to infinity (represented as 'std::numeric_limits<dist_t>::max()' in our case).
-     * Too many of such values are suspicious and might mean that for example the precision of the graph is too
-     * big and the values do not fit into unsigned int anymore.
+     * Prints some statistics about the distance matrix.
      */
     void printInfo();
 
 private:
-    const unsigned int nodesCnt;
+    const unsigned int rowsCnt;
+    const unsigned int colsCnt;
     std::unique_ptr<IntType[]> distances;
 
    /**

@@ -39,6 +39,7 @@
 #include "../Dijkstra/BasicDijkstra.h"
 
 DistanceMatrixInterface* TNRAFPreprocessor::distanceMatrix = NULL;
+DistanceMatrixInterface* TNRAFPreprocessor::all_transit_dm = nullptr;
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(
@@ -86,7 +87,16 @@ void TNRAFPreprocessor::preprocessUsingCH(
 
 	// compute dm from all nodes to transit nodes - this dm is computed only for fast mode
 	if (mode == TNRAFPreprocessingMode::FAST) {
+		std::cout << "Computing all-nodes to transit-nodes distance matrix (FAST mode)." << std::endl;
 
+		if (dmIntSize == 16) {
+			all_transit_dm = createAndFillAllToTransitDM<uint_least16_t>(originalGraph, transitNodes, transitNodesAmount, "16-bit");
+		} else if (dmIntSize == 32) {
+			all_transit_dm = createAndFillAllToTransitDM<uint_least32_t>(originalGraph, transitNodes, transitNodesAmount, "32-bit");
+		} else {
+			all_transit_dm = createAndFillAllToTransitDM<dist_t>(originalGraph, transitNodes, transitNodesAmount, "default-bit");
+		}
+		std::cout << "\nAll-nodes to transit-nodes distance matrix computed for " << transitNodesAmount << " transit nodes." << std::endl;
 	}
 
 	RegionsStructure regions(graph.nodes(), regionsCnt);
@@ -146,6 +156,12 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	if (mode == TNRAFPreprocessingMode::DM) {
 		delete distanceMatrix;
 		distanceMatrix = NULL;
+	}
+
+	// Cleanup for all_transit_dm
+	if (all_transit_dm != nullptr) {
+		delete all_transit_dm;
+		all_transit_dm = nullptr;
 	}
 
 	std::vector<std::pair<unsigned int, QueryEdge> > allEdges;
@@ -432,10 +448,10 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::computeForwardArcFlags(
 	unsigned int node, std::vector<AccessNodeDataArcFlags> &accessNodes,
-	Graph &originalGraph, RegionsStructure &regions, TNRAFPreprocessingMode useDistanceMatrix,
+	Graph &originalGraph, RegionsStructure &regions, TNRAFPreprocessingMode mode,
 	std::vector<unsigned int> &optionalDistancesFromNode
 ) {
-	if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
+	if (mode == TNRAFPreprocessingMode::DM) {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			unsigned int accessNode = accessNodes[i].accessNodeID;
 			unsigned int distanceToAccessNode = accessNodes[i].distanceToNode;
@@ -450,7 +466,26 @@ void TNRAFPreprocessor::computeForwardArcFlags(
 				}
 			}
 		}
-	} else {
+	}
+	else if (mode == TNRAFPreprocessingMode::FAST) {
+		// for (size_t i = 0; i < accessNodes.size(); i++) {
+		// 	std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
+		// 	unsigned int accessNode = accessNodes[i].accessNodeID;
+		// 	BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
+		// 	unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
+		// 	for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+		// 		std::vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
+		// 		for (size_t k = 0; k < nodesInRegion.size(); k++) {
+		// 			if (optionalDistancesFromNode[nodesInRegion[k]] ==
+		// 				distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
+		// 				accessNodes[i].regionFlags[j] = true;
+		// 				break;
+		// 				}
+		// 		}
+		// 	}
+		// }
+	}
+	else {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
 			unsigned int accessNode = accessNodes[i].accessNodeID;
@@ -581,7 +616,27 @@ void TNRAFPreprocessor::computeBackwardArcFlags(
 				}
 			}
 		}
-	} else {
+	}
+	else if (useDistanceMatrix == TNRAFPreprocessingMode::FAST) {
+		for (size_t i = 0; i < accessNodes.size(); i++) {
+			std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
+			unsigned int accessNode = accessNodes[i].accessNodeID;
+			BasicDijkstra::computeOneToAllDistancesInReversedGraph(accessNode, originalGraph,
+																   distancesFromAccessNode);
+			unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
+			for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+				std::vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
+				for (size_t k = 0; k < nodesInRegion.size(); k++) {
+					if (optionalDistancesFromNode[nodesInRegion[k]] ==
+						distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
+						accessNodes[i].regionFlags[j] = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+	else {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
 			unsigned int accessNode = accessNodes[i].accessNodeID;
