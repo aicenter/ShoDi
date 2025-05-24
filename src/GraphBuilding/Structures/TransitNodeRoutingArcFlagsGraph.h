@@ -40,7 +40,7 @@
  * in the graph, and for each access node we need to store its Arc Flags. The findTNRAFDistance function then utilises
  * those additional information to compute the shortest distance even quicker.
  */
-class TransitNodeRoutingArcFlagsGraph : public TransitNodeRoutingGraph<NodeDataRegions> {
+class TransitNodeRoutingArcFlagsGraph : public TransitNodeRoutingGraph<NodeDataRegions,AccessNodeDataArcFlags> {
 public:
     /**
      * A simple constructor.
@@ -56,10 +56,6 @@ public:
      * Explicit destructor to avoid undefined behavior.
      */
     ~TransitNodeRoutingArcFlagsGraph() override;
-
-	const std::vector<std::vector<AccessNodeDataArcFlags>>& getForwardAccessNodes1() const;
-
-	const std::vector<std::vector<AccessNodeDataArcFlags>>& getBackwardAccessNodes1() const;
 
     /**
      * Adds a forward access node to some node.
@@ -137,9 +133,6 @@ protected:
      */
     void resetBackwardInfo(
             const unsigned int node) override;
-
-    std::vector < std::vector < AccessNodeDataArcFlags > > forwardAccessNodes;
-    std::vector < std::vector < AccessNodeDataArcFlags > > backwardAccessNodes;
 };
 
 

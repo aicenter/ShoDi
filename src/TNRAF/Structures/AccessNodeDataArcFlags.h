@@ -49,10 +49,7 @@ public:
      * @param regionsCnt[in] The amount of regions in the graph (determines how big flag std::vector will be needed for
      * Arc Flags)
      */
-    AccessNodeDataArcFlags(
-            unsigned int a,
-            unsigned int b,
-            unsigned int regionsCnt);
+    AccessNodeDataArcFlags(unsigned int a, unsigned int b, unsigned int regionsCnt, unsigned short tnr_index);
 
     /**
      * Initializes the arc flags based on the regFlags input variable.
@@ -72,7 +69,15 @@ public:
             uint32_t regFlags,
             std::vector<unsigned int> & powersOf2);
 
-    std::vector<bool> regionFlags;
+
+
+	virtual bool operator==(const AccessNodeDataArcFlags &rhs) const = default;
+
+
+
+	std::vector<bool> regionFlags;
+
+	short tnr_index = -1; // Index of the TNR node in the TNR graph, -1 if not set
 };
 
 

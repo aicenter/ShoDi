@@ -249,6 +249,7 @@ target_link_libraries(shortestPaths PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIE
 
 add_executable(shortestPathsPreprocessor
 	src/main.cpp
+	src/memory.cpp
 	src/Benchmarking/memory.cpp
 	src/CH/CHPreprocessor.cpp
 	src/CH/EdgeDifferenceManager.cpp

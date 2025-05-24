@@ -30,15 +30,27 @@
 #include "AccessNodeDataArcFlags.h"
 
 //______________________________________________________________________________________________________________________
-AccessNodeDataArcFlags::AccessNodeDataArcFlags(unsigned int a, unsigned int b, unsigned int regionsCnt) : AccessNodeData(a, b), regionFlags(regionsCnt, false) {
-
+AccessNodeDataArcFlags::AccessNodeDataArcFlags(
+	unsigned int a,
+	unsigned int b,
+	unsigned int regionsCnt,
+	unsigned short tnr_index
+) :
+	AccessNodeData(a, b), regionFlags(regionsCnt, false), tnr_index(tnr_index) {
 }
 
 //______________________________________________________________________________________________________________________
-AccessNodeDataArcFlags::AccessNodeDataArcFlags(unsigned int a, unsigned int b, unsigned int regionsCnt, uint32_t regFlags, std::vector<unsigned int> & powersOf2) : AccessNodeData(a, b), regionFlags(regionsCnt, false) {
-    for(unsigned int i = 0; i < regionsCnt; i++) {
-        if (regFlags & powersOf2[i]) {
-            regionFlags[i] = true;
-        }
-    }
+AccessNodeDataArcFlags::AccessNodeDataArcFlags(
+	unsigned int a,
+	unsigned int b,
+	unsigned int regionsCnt,
+	uint32_t regFlags,
+	std::vector<unsigned int>& powersOf2
+) :
+	AccessNodeData(a, b), regionFlags(regionsCnt, false) {
+	for (unsigned int i = 0; i < regionsCnt; i++) {
+		if (regFlags & powersOf2[i]) {
+			regionFlags[i] = true;
+		}
+	}
 }

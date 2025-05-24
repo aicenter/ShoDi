@@ -40,7 +40,7 @@
  * locality filter data. For local queries, Contraction Hierarchies are used, so this structure is built on top of
  * FlagsGraph which alone can be used for the Contraction Hierarchies query algorithm.
  */
-template <class T = NodeData>
+template <class T = NodeData, class A = AccessNodeData>
 class TransitNodeRoutingGraph: public FlagsGraph<T> {
 public:
     /**
@@ -59,9 +59,9 @@ public:
     ~TransitNodeRoutingGraph();
 
 
-    const std::vector<std::vector<AccessNodeData>> &getForwardAccessNodes() const;
+    const std::vector<std::vector<A>> &getForwardAccessNodes() const;
 
-    const std::vector<std::vector<AccessNodeData>> &getBackwardAccessNodes() const;
+    const std::vector<std::vector<A>> &getBackwardAccessNodes() const;
 
     const std::vector<std::vector<unsigned int>> &getForwardSearchSpaces() const;
 
@@ -180,12 +180,12 @@ public:
     void accessNodesTest(Distance_matrix_travel_time_provider<dist_t>& dm);
 
 protected:
-    std::vector < std::vector < AccessNodeData > > forwardAccessNodes;
-    std::vector < std::vector < AccessNodeData > > backwardAccessNodes;
-    std::vector < std::vector < unsigned int > > forwardSearchSpaces;
-    std::vector < std::vector < unsigned int > > backwardSearchSpaces;
-    std::vector < std::vector < unsigned int > > transitNodesDistanceTable;
-    std::unordered_map< unsigned int, unsigned int > transitNodeMapping;
+    std::vector<std::vector<A>> forwardAccessNodes;
+    std::vector<std::vector<A>> backwardAccessNodes;
+    std::vector<std::vector<unsigned int>> forwardSearchSpaces;
+    std::vector<std::vector<unsigned int>> backwardSearchSpaces;
+    std::vector<std::vector<unsigned int>> transitNodesDistanceTable;
+    std::unordered_map<unsigned int, unsigned int> transitNodeMapping;
 };
 
 #include "TransitNodeRoutingGraph.tpp"

@@ -74,9 +74,9 @@ void compare_flags_graphs(
     }
 }
 
-template<class T> void compare_tnr_graphs(
-        const TransitNodeRoutingGraph<T>& computed,
-        const TransitNodeRoutingGraph<T>& expected
+template<class T, class A> void compare_tnr_graphs(
+        const TransitNodeRoutingGraph<T,A>& computed,
+        const TransitNodeRoutingGraph<T,A>& expected
 ) {
     compare_flags_graphs(computed, expected);
 

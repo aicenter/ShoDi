@@ -372,7 +372,7 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 
 	distances[source] = 0;
 
-	std::vector<AccessNodeData> accessNodesSuperset;
+	std::vector<AccessNodeDataArcFlags> accessNodesSuperset;
 
 	while (!forwardQ.empty()) {
 		unsigned int curNode = forwardQ.top().ID;
@@ -384,8 +384,10 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 		}
 
 		settled[curNode] = true;
-		if (transitNodes.count(curNode) == 1) {
-			accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+		if (transitNodes.contains(curNode)) {
+			accessNodesSuperset.push_back(
+				AccessNodeDataArcFlags(curNode, curLen, regions.getRegionsCnt(), transitNodes.at(curNode))
+			);
 		} else {
 			forwardSearchSpace.push_back(curNode);
 
@@ -425,18 +427,14 @@ void TNRAFPreprocessor::findForwardAccessNodes(
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
 			unsigned int realDistance = distanceMatrix->findDistance(source, accessNode);
 			if (realDistance == accessNodeDistance) {
-				accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID,
-															 accessNodesSuperset[i].distanceToNode,
-															 regions.getRegionsCnt()));
+				accessNodes.push_back(accessNodesSuperset[i]);
 			}
 		} else {
 			unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
 			unsigned int realDistance = distancesFromNode[accessNode];
 			if (realDistance == accessNodeDistance) {
-				accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID,
-															 accessNodesSuperset[i].distanceToNode,
-															 regions.getRegionsCnt()));
+				accessNodes.push_back(accessNodesSuperset[i]);
 			}
 		}
 	}
@@ -467,24 +465,24 @@ void TNRAFPreprocessor::computeForwardArcFlags(
 			}
 		}
 	}
-	else if (mode == TNRAFPreprocessingMode::FAST) {
-		// for (size_t i = 0; i < accessNodes.size(); i++) {
-		// 	std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
-		// 	unsigned int accessNode = accessNodes[i].accessNodeID;
-		// 	BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
-		// 	unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
-		// 	for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
-		// 		std::vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
-		// 		for (size_t k = 0; k < nodesInRegion.size(); k++) {
-		// 			if (optionalDistancesFromNode[nodesInRegion[k]] ==
-		// 				distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
-		// 				accessNodes[i].regionFlags[j] = true;
-		// 				break;
-		// 				}
-		// 		}
-		// 	}
-		// }
-	}
+	// else if (mode == TNRAFPreprocessingMode::FAST) {
+	// 	// for (size_t i = 0; i < accessNodes.size(); i++) {
+	// 	// 	std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
+	// 	// 	unsigned int accessNode = accessNodes[i].accessNodeID;
+	// 	// 	BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode);
+	// 	// 	unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
+	// 	// 	for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+	// 	// 		std::vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
+	// 	// 		for (size_t k = 0; k < nodesInRegion.size(); k++) {
+	// 	// 			if (optionalDistancesFromNode[nodesInRegion[k]] ==
+	// 	// 				distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
+	// 	// 				accessNodes[i].regionFlags[j] = true;
+	// 	// 				break;
+	// 	// 				}
+	// 	// 		}
+	// 	// 	}
+	// 	// }
+	// }
 	else {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
@@ -522,7 +520,7 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 
 	distances[source] = 0;
 
-	std::vector<AccessNodeData> accessNodesSuperset;
+	std::vector<AccessNodeDataArcFlags> accessNodesSuperset;
 
 	while (!backwardQ.empty()) {
 		unsigned int curNode = backwardQ.top().ID;
@@ -534,8 +532,10 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 		}
 
 		settled[curNode] = true;
-		if (transitNodes.count(curNode) == 1) {
-			accessNodesSuperset.push_back(AccessNodeData(curNode, curLen));
+		if (transitNodes.contains(curNode)) {
+			accessNodesSuperset.push_back(
+				AccessNodeDataArcFlags(curNode, curLen, regions.getRegionsCnt(), transitNodes.at(curNode))
+			);
 		} else {
 			backwardSearchSpace.push_back(curNode);
 
@@ -575,18 +575,14 @@ void TNRAFPreprocessor::findBackwardAccessNodes(
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
 			unsigned int realDistance = distanceMatrix->findDistance(source, accessNode);
 			if (realDistance == accessNodeDistance) {
-				accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID,
-															 accessNodesSuperset[i].distanceToNode,
-															 regions.getRegionsCnt()));
+				accessNodes.emplace_back(accessNodesSuperset[i]);
 			}
 		} else {
 			unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
 			unsigned int realDistance = distancesFromNode[accessNode];
 			if (realDistance == accessNodeDistance) {
-				accessNodes.push_back(AccessNodeDataArcFlags(accessNodesSuperset[i].accessNodeID,
-															 accessNodesSuperset[i].distanceToNode,
-															 regions.getRegionsCnt()));
+				accessNodes.emplace_back(accessNodesSuperset[i]);
 			}
 		}
 	}
@@ -617,25 +613,24 @@ void TNRAFPreprocessor::computeBackwardArcFlags(
 			}
 		}
 	}
-	else if (useDistanceMatrix == TNRAFPreprocessingMode::FAST) {
-		for (size_t i = 0; i < accessNodes.size(); i++) {
-			std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());
-			unsigned int accessNode = accessNodes[i].accessNodeID;
-			BasicDijkstra::computeOneToAllDistancesInReversedGraph(accessNode, originalGraph,
-																   distancesFromAccessNode);
-			unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
-			for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
-				std::vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
-				for (size_t k = 0; k < nodesInRegion.size(); k++) {
-					if (optionalDistancesFromNode[nodesInRegion[k]] ==
-						distancesFromAccessNode[nodesInRegion[k]] + distanceToAccessNode) {
-						accessNodes[i].regionFlags[j] = true;
-						break;
-					}
-				}
-			}
-		}
-	}
+	// else if (useDistanceMatrix == TNRAFPreprocessingMode::FAST) {
+	// 	for (size_t i = 0; i < accessNodes.size(); i++) {
+	// 		unsigned int accessNode = accessNodes[i].accessNodeID;
+	// 		unsigned int distanceToAccessNode = optionalDistancesFromNode[accessNode];
+	// 		for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+	// 			std::vector<unsigned int> &nodesInRegion = regions.nodesInRegion(j);
+	// 			for (size_t k = 0; k < nodesInRegion.size(); k++) {
+	// 				if (optionalDistancesFromNode[nodesInRegion[k]] == all_transit_dm->findDistance(
+	// 					accessNodes[i].tnr_index,
+	// 					nodesInRegion[k]
+	// 				) + distanceToAccessNode) {
+	// 					accessNodes[i].regionFlags[j] = true;
+	// 					break;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 	else {
 		for (size_t i = 0; i < accessNodes.size(); i++) {
 			std::vector<unsigned int> distancesFromAccessNode(originalGraph.nodes());

@@ -48,7 +48,7 @@ public:
     unsigned int accessNodeID;
     unsigned int distanceToNode;
 
-    bool operator==(const AccessNodeData &rhs) const = default;
+    virtual bool operator==(const AccessNodeData &rhs) const = default;
 };
 
 

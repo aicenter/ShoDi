@@ -53,6 +53,7 @@
 #include "DistanceMatrix/DistanceMatrixCsvOutputter.h"
 #include "DistanceMatrix/DistanceMatrixHdfOutputter.h"
 #include "TNRAF/TNRAFPreprocessingMode.h"
+#include "memory.h"
 
 constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the right format. If not sure,\n"
                                      "refer to 'README.md' for a complete overview of use cases for this application\n"
@@ -441,6 +442,8 @@ int main(int argc, char* argv[]) {
 				throw input_error("Invalid method name '" + *method + "'.\n");
 			}
 			delete graphLoader;
+
+			std::cout << "Max memory usage: " << get_max_memory_usage() << " Kib\n";
 		}
 		catch (input_error& e) {
 			std::cout << "Input Error: " << e.what();
