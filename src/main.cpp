@@ -260,7 +260,7 @@ void createTNRAF(
 	auto num_regions = std::min(graph.nodes(), 32u);
 
 	timer.begin();
-	TNRAFPreprocessor::preprocessUsingCH(
+	TNRAFPreprocessor().preprocessUsingCH(
 		graph, *originalGraph, outputFilePath, transitNodeSetSize,
 		    num_regions, dmIntSize, mode);
 	timer.finish();

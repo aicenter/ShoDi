@@ -77,7 +77,7 @@ public:
      * @param useDistanceMatrix[in] A flag indicating whether the slower or the faster but more memory consuming
      * preprocessing mode should be used.
      */
-    static void preprocessUsingCH(
+    void preprocessUsingCH(
             UpdateableGraph & graph,
             Graph & originalGraph,
             const std::string & outputFilenameprefix,
@@ -151,7 +151,7 @@ protected:
      * after this function finishes.
      * @param transitNodesCnt[in] The number denoting the transit node set size.
      */
-    static void fillTransitNodeDistanceTable(
+    void fillTransitNodeDistanceTable(
             std::vector<unsigned int> & transitNodes,
             std::vector<std::vector<unsigned int>> & distanceTable,
             unsigned int transitNodesCnt);
@@ -173,7 +173,7 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    static void findForwardAccessNodes(
+    void findForwardAccessNodes(
             unsigned int source,
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & forwardSearchSpace,
@@ -200,7 +200,7 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    static void findBackwardAccessNodes(
+    void findBackwardAccessNodes(
             unsigned int source,
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
@@ -227,7 +227,7 @@ protected:
      * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
      * matrix so this is not needed.
      */
-    static void computeForwardArcFlags(
+    void computeForwardArcFlags(
             unsigned int node,
             std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
@@ -249,7 +249,7 @@ protected:
      * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
      * matrix so this is not needed.
      */
-    static void computeBackwardArcFlags(
+    void computeBackwardArcFlags(
             unsigned int node,
             std::vector<AccessNodeDataArcFlags> & accessNodes,
             Graph & originalGraph,
@@ -300,18 +300,19 @@ protected:
      */
     static void initPowersOf2(std::vector<uint32_t> & powersOf2);
 
-    static DistanceMatrixInterface* distanceMatrix;
-
 private:
-	// DistanceMatrixInterface* all_transit_dm = nullptr; // Old non-static version
-    static DistanceMatrixInterface* all_transit_dm; // Changed to static
+	DistanceMatrixInterface* distanceMatrix = nullptr;
+
+	std::unique_ptr<DistanceMatrixInterface> all_transit_dm = nullptr;
 
     template<typename DataType>
-    static DistanceMatrixInterface* createAndFillAllToTransitDM(
-        Graph &originalGraph,
-        const std::vector<unsigned int>& transitNodes,
-        unsigned int transitNodesAmount, // This is effectively the number of columns
-        const std::string& dataTypeForLog
+    void createAndFillAllToTransitDM(
+	    Graph &originalGraph,
+	    const std::vector<unsigned int>& transitNodes,
+	    unsigned int transitNodesAmount,
+	    // This is effectively the number of columns
+	    const std::string& dataTypeForLog,
+	    bool forward
     ) {
         unsigned int num_rows = originalGraph.nodes();
         unsigned int num_cols = transitNodesAmount;
@@ -322,7 +323,12 @@ private:
 
         for (unsigned int c = 0; c < num_cols; ++c) { // Iterate by column (transit node index)
             unsigned int transit_node_id = transitNodes[c];
-            BasicDijkstra::computeOneToAllDistancesInReversedGraph(transit_node_id, originalGraph, distances_from_one_transit_node);
+            if(forward) {
+            	BasicDijkstra::computeOneToAllDistances(transit_node_id, originalGraph, distances_from_one_transit_node);
+            }
+        	else {
+        		BasicDijkstra::computeOneToAllDistancesInReversedGraph(transit_node_id, originalGraph, distances_from_one_transit_node);
+        	}
             for (unsigned int r = 0; r < num_rows; ++r) {
                 (*temp_2d_matrix)[r][c] = boost::numeric_cast<DataType>(distances_from_one_transit_node[r]);
             }
@@ -346,7 +352,7 @@ private:
         delete temp_2d_matrix;
 
         // 4. Create the provider using the 1D array
-        return new Distance_matrix_travel_time_provider<DataType>(std::move(one_d_array), num_rows, num_cols);
+        all_transit_dm = std::make_unique<Distance_matrix_travel_time_provider<DataType>>(std::move(one_d_array), num_rows, num_cols);
     }
 
 };
