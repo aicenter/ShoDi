@@ -131,7 +131,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 	}
 
     this->backward_access_nodes_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
-        &TNRAFPreprocessor::benchmarkableProcessBackwardAccessNodes, this,
+        &TNRAFPreprocessor::process_backward_access_nodes, this,
         originalGraph.nodes(), std::ref(backwardAccessNodes), std::ref(backwardSearchSpaces),
         std::ref(transitNodesMapping), std::ref(chGraph), std::ref(originalGraph), std::ref(regions), mode);
 
@@ -163,7 +163,7 @@ void TNRAFPreprocessor::process_forward_access_nodes(
         if (i % 100 == 0) {
             std::cout << "\rComputed forward access nodes for '" << i << "' nodes.";
         }
-        find_andprocess_forward_access_nodes_for_single_node(
+        find_and_process_forward_access_nodes_for_single_node(
 	        i,
 	        accessNodesVec[i],
 	        searchSpacesVec[i],
@@ -178,7 +178,7 @@ void TNRAFPreprocessor::process_forward_access_nodes(
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::benchmarkableProcessBackwardAccessNodes(
+void TNRAFPreprocessor::process_backward_access_nodes(
     unsigned int numNodes,
     std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
     std::vector<std::vector<unsigned int>>& searchSpacesVec,
@@ -192,7 +192,7 @@ void TNRAFPreprocessor::benchmarkableProcessBackwardAccessNodes(
         if (i % 100 == 0) {
             std::cout << "\rComputed backward access nodes for '" << i << "' nodes.";
         }
-        process_backward_access_nodes(i, accessNodesVec[i], searchSpacesVec[i], transitNodesMap, chGraphInstance,
+        find_and_process_backward_access_nodes_for_single_node(i, accessNodesVec[i], searchSpacesVec[i], transitNodesMap, chGraphInstance,
                                 origGraphInstance, regionsInstance, currentMode);
     }
     std::cout << "\rComputed backward access nodes for all nodes in the graph." << std::endl;
@@ -415,7 +415,7 @@ void TNRAFPreprocessor::outputGraph(
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::find_andprocess_forward_access_nodes_for_single_node(
+void TNRAFPreprocessor::find_and_process_forward_access_nodes_for_single_node(
 	unsigned int source,
 	std::vector<AccessNodeDataArcFlags>& accessNodes,
 	std::vector<unsigned int>& forwardSearchSpace,
@@ -501,17 +501,41 @@ void TNRAFPreprocessor::find_andprocess_forward_access_nodes_for_single_node(
 		}
 	}
 
-    if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
-        compute_arc_flags<TNRAFPreprocessingMode::DM>(source, accessNodes, originalGraph, regions, distancesFromNode, true);
-    } else if (useDistanceMatrix == TNRAFPreprocessingMode::FAST) {
-        compute_arc_flags<TNRAFPreprocessingMode::FAST>(source, accessNodes, originalGraph, regions, distancesFromNode, true);
-    } else { // SLOW
-        compute_arc_flags<TNRAFPreprocessingMode::SLOW>(source, accessNodes, originalGraph, regions, distancesFromNode, true);
-    }
+	if(useDistanceMatrix == TNRAFPreprocessingMode::DM) {
+		compute_arc_flags<TNRAFPreprocessingMode::DM>(
+			source,
+			accessNodes,
+			originalGraph,
+			regions,
+			distancesFromNode,
+			true
+		);
+	}
+	else if(useDistanceMatrix == TNRAFPreprocessingMode::FAST) {
+		compute_arc_flags<TNRAFPreprocessingMode::FAST>(
+			source,
+			accessNodes,
+			originalGraph,
+			regions,
+			distancesFromNode,
+			true
+		);
+	}
+	else {
+		// SLOW
+		compute_arc_flags<TNRAFPreprocessingMode::SLOW>(
+			source,
+			accessNodes,
+			originalGraph,
+			regions,
+			distancesFromNode,
+			true
+		);
+	}
 }
 
 //______________________________________________________________________________________________________________________
-void TNRAFPreprocessor::process_backward_access_nodes(
+void TNRAFPreprocessor::find_and_process_backward_access_nodes_for_single_node(
 	unsigned int source, std::vector<AccessNodeDataArcFlags> &accessNodes,
 	std::vector<unsigned int> &backwardSearchSpace,
 	std::unordered_map<unsigned int, unsigned int> &transitNodes,

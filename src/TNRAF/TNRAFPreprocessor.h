@@ -181,15 +181,16 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    void find_andprocess_forward_access_nodes_for_single_node(
-            unsigned int source,
-            std::vector <AccessNodeDataArcFlags> & accessNodes,
-            std::vector < unsigned int > & forwardSearchSpace,
-            std::unordered_map< unsigned int, unsigned int > & transitNodes,
-            FlagsGraph<NodeDataRegions>& graph,
-            Graph & originalGraph,
-            Regions_with_borders & regions,
-            TNRAFPreprocessingMode useDistanceMatrix);
+    void find_and_process_forward_access_nodes_for_single_node(
+        unsigned int source,
+        std::vector<AccessNodeDataArcFlags>& accessNodes,
+        std::vector<unsigned int>& forwardSearchSpace,
+        std::unordered_map<unsigned int, unsigned int>& transitNodes,
+        FlagsGraph<NodeDataRegions>& graph,
+        Graph& originalGraph,
+        Regions_with_borders& regions,
+        TNRAFPreprocessingMode useDistanceMatrix
+    );
 
     /**
      * Auxiliary function that will find backward access nodes for a given node. The process consists of first finding
@@ -208,7 +209,7 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    void process_backward_access_nodes(
+    void find_and_process_backward_access_nodes_for_single_node(
             unsigned int source,
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
@@ -413,7 +414,7 @@ private:
         TNRAFPreprocessingMode currentMode
     );
 
-    void benchmarkableProcessBackwardAccessNodes(
+    void process_backward_access_nodes(
         unsigned int numNodes,
         std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
         std::vector<std::vector<unsigned int>>& searchSpacesVec,
