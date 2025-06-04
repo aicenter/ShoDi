@@ -54,6 +54,7 @@
 #include "DistanceMatrix/DistanceMatrixHdfOutputter.h"
 #include "TNRAF/TNRAFPreprocessingMode.h"
 #include "memory.h"
+#include "benchmark.h"
 
 constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the right format. If not sure,\n"
                                      "refer to 'README.md' for a complete overview of use cases for this application\n"
@@ -252,18 +253,45 @@ void createTNRAF(
 	Graph* originalGraph = graph.createCopy();
 
 	timer.begin();
-	CHPreprocessor::preprocessForDDSG(graph);
+	auto ch_time_ms = benchmark(CHPreprocessor::preprocessForDDSG, graph);
 	timer.finish();
 
-	graphLoader.loadGraph(graph, scaling_factor);
+	graph.add_edges(*originalGraph);
+	// graphLoader.loadGraph(graph, scaling_factor);
 
 	auto num_regions = std::min(graph.nodes(), 32u);
 
 	timer.begin();
-	TNRAFPreprocessor().preprocessUsingCH(
-		graph, *originalGraph, outputFilePath, transitNodeSetSize,
-		    num_regions, dmIntSize, mode);
+	TNRAFPreprocessor tnraf_preprocessor;
+	auto tnraf_time_ms = benchmark(
+		&TNRAFPreprocessor::preprocessUsingCH,
+		&tnraf_preprocessor,
+		graph,
+		*originalGraph,
+		outputFilePath,
+		transitNodeSetSize,
+		num_regions,
+		dmIntSize,
+		mode
+	);
 	timer.finish();
+
+	std::cout << "CH preprocessing time: " << static_cast<double>(ch_time_ms.count()) / 1000 << " seconds" << std::endl;
+	std::cout << "TNR with Arc Flags preprocessing time: " << static_cast<double>(tnraf_time_ms.count()) / 1000 << " seconds" << std::endl;
+
+    // Print detailed benchmark times from TNRAFPreprocessor
+    if (tnraf_preprocessor.getForwardDmComputationTimeMs().count() > 0) {
+        std::string label = (mode == TNRAFPreprocessingMode::DM) ? "Forward DM computation time"
+                                                              : "Forward All-to-Transit DM computation time (FAST mode)";
+        std::cout << "  " << label << ": " << static_cast<double>(tnraf_preprocessor.getForwardDmComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
+    }
+    std::cout << "  Forward Access Nodes computation time: " << static_cast<double>(tnraf_preprocessor.getForwardAccessNodesComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
+    if (tnraf_preprocessor.getBackwardDmComputationTimeMs().count() > 0) {
+        std::string label = (mode == TNRAFPreprocessingMode::DM) ? "Backward DM computation time"
+                                                               : "Backward All-to-Transit DM computation time (FAST mode)";
+        std::cout << "  " << label << ": " << static_cast<double>(tnraf_preprocessor.getBackwardDmComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
+    }
+    std::cout << "  Backward Access Nodes computation time: " << static_cast<double>(tnraf_preprocessor.getBackwardAccessNodesComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
 
 	timer.printMeasuredTime();
 }
@@ -425,7 +453,8 @@ int main(int argc, char* argv[]) {
 				if (!preprocessingMode || !tnodesCnt) {
 					throw input_error("Missing one or more required options (--preprocessing-mode <slow/dm> / --tnodes-cnt <cnt>) for TNRAF creation.\n");
 				}
-				createTNRAF(*preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
+				auto total_time_ms = benchmark(createTNRAF, *preprocessingMode, *tnodesCnt, *dmIntSize, *graphLoader, *outputPath, *precisionLoss);
+				std::cout << "Total time: " << static_cast<double>(total_time_ms.count()) / 1000 << " seconds\n";
 			} else if (*method == "dm") {
 				if (!preprocessingMode || !outputFormat) {
 					throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");

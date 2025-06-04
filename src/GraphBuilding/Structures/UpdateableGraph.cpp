@@ -54,7 +54,7 @@ UpdateableGraph::UpdateableGraph(unsigned int n) {
 
 //______________________________________________________________________________________________________________________
 bool UpdateableGraph::addEdge(unsigned int from, unsigned int to, dist_t weight) {
-    if (followingNodes.at(from).count(to) == 1) {
+    if (followingNodes.at(from).contains(to)) {
         if (followingNodes.at(from).at(to).weight > weight) {
             followingNodes.at(from).at(to).weight = weight;
             previousNodes.at(to).at(from) = weight;
@@ -319,5 +319,16 @@ void UpdateableGraph::prepareEdgesForFlushingWithReinsert(std::vector < OutputEd
 
     for(size_t i = 0; i < removedEdges.size(); i++) {
         followingNodes[removedEdges[i].first.first].insert(std::make_pair(removedEdges[i].first.second, PreprocessingEdgeData(removedEdges[i].second)));
+    }
+}
+
+//______________________________________________________________________________________________________________________
+void UpdateableGraph::add_edges(const Graph& graph) {
+    const unsigned int num_nodes = graph.nodes();
+    for (unsigned int i = 0; i < num_nodes; ++i) {
+        const auto& edges = graph.outgoingEdges(i);
+        for (const auto& edge : edges) {
+            this->addEdge(i, edge.first, edge.second);
+        }
     }
 }

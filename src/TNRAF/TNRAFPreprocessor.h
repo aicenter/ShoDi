@@ -43,6 +43,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <chrono>
 
 /**
  * This class is responsible for creating a Transit Node Routing with Arc Flags data-structure based on a given
@@ -92,6 +93,13 @@ public:
      * @param[out] powersOf2
      */
     static void getPowersOf2(std::vector<uint32_t> & powersOf2);
+
+    // Getters for benchmark times
+    std::chrono::milliseconds getForwardDmComputationTimeMs() const { return forward_dm_computation_time_ms_; }
+    std::chrono::milliseconds getBackwardDmComputationTimeMs() const { return backward_dm_computation_time_ms_; }
+    std::chrono::milliseconds getForwardAccessNodesComputationTimeMs() const { return forward_access_nodes_computation_time_ms_; }
+    std::chrono::milliseconds getBackwardAccessNodesComputationTimeMs() const { return backward_access_nodes_computation_time_ms_; }
+
 protected:
 
     /**
@@ -301,9 +309,16 @@ protected:
     static void initPowersOf2(std::vector<uint32_t> & powersOf2);
 
 private:
+	void generateDistanceMatrix(Graph& originalGraph, unsigned int dmIntSize, bool forward);
 	DistanceMatrixInterface* distanceMatrix = nullptr;
 
 	std::unique_ptr<DistanceMatrixInterface> all_transit_dm = nullptr;
+
+    // Benchmarking timers
+    std::chrono::milliseconds forward_dm_computation_time_ms_{0};
+    std::chrono::milliseconds backward_dm_computation_time_ms_{0};
+    std::chrono::milliseconds forward_access_nodes_computation_time_ms_{0};
+    std::chrono::milliseconds backward_access_nodes_computation_time_ms_{0};
 
     template<typename DataType>
     void createAndFillAllToTransitDM(
@@ -355,8 +370,29 @@ private:
         all_transit_dm = std::make_unique<Distance_matrix_travel_time_provider<DataType>>(std::move(one_d_array), num_rows, num_cols);
     }
 
-};
+    void benchmarkableProcessForwardAccessNodes(
+        unsigned int numNodes,
+        std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
+        std::vector<std::vector<unsigned int>>& searchSpacesVec,
+        std::unordered_map<unsigned int, unsigned int>& transitNodesMap,
+        FlagsGraph<NodeDataRegions>& chGraphInstance,
+        Graph& origGraphInstance,
+        RegionsStructure& regionsInstance,
+        TNRAFPreprocessingMode currentMode
+    );
 
+    void benchmarkableProcessBackwardAccessNodes(
+        unsigned int numNodes,
+        std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
+        std::vector<std::vector<unsigned int>>& searchSpacesVec,
+        std::unordered_map<unsigned int, unsigned int>& transitNodesMap,
+        FlagsGraph<NodeDataRegions>& chGraphInstance,
+        Graph& origGraphInstance,
+        RegionsStructure& regionsInstance,
+        TNRAFPreprocessingMode currentMode
+    );
+
+};
 
 #endif //CONTRACTION_HIERARCHIES_TNRAFPREPROCESSOR_H
 

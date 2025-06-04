@@ -117,6 +117,13 @@ public:
     Graph *createCopy();
 
     /**
+     * Adds all edges from another graph instance to this graph.
+     *
+     * @param graph[in] The graph whose edges will be added.
+     */
+    void add_edges(const Graph& graph);
+
+    /**
      * Auxiliary function that fills the std::vectors with edges and shortcut edges that have to be output. This processes
      * the edges so that they fit the Contraction Hierarchies concept of only keeping each edge at the node with the
      * lower rank, so here bidirectional edges are only put in the corresponding std::vector once with the node with the
@@ -181,10 +188,7 @@ public:
      * in the graph connecting 'from' and 'to' with better weight. This ensures we will not end up with a multigraph,
      * as we always only keep one edge at most for each pair of nodes - the one with the lowest weight.
      */
-    bool addEdge(
-            unsigned int from,
-            unsigned int to,
-            dist_t weight) override;
+    bool addEdge(unsigned int from, unsigned int to, dist_t weight) override;
 
     /**
      * Tries to insert an shortcut edge from one node to another with the given weight into the graph. The edge is not

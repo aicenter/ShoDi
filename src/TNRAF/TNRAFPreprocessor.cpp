@@ -37,6 +37,7 @@
 #include "Structures/AccessNodeDataArcFlags.h"
 #include "../Dijkstra/DijkstraNode.h"
 #include "../Dijkstra/BasicDijkstra.h"
+#include "../benchmark.h"
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(
@@ -62,19 +63,8 @@ void TNRAFPreprocessor::preprocessUsingCH(
 		std::cout
 			<< "Computing the auxiliary distance matrix for transit node set distance matrix and access nodes forward direction."
 			<< std::endl;
-		if (dmIntSize == 16) {
-			DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
-			dmComputor.computeDistanceMatrix(originalGraph);
-			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
-		} else if (dmIntSize == 32) {
-			DistanceMatrixComputorSlow<uint_least32_t> dmComputor;
-			dmComputor.computeDistanceMatrix(originalGraph);
-			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
-		} else {
-			DistanceMatrixComputorSlow<dist_t> dmComputor;
-			dmComputor.computeDistanceMatrix(originalGraph);
-			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
-		}
+		this->forward_dm_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+            &TNRAFPreprocessor::generateDistanceMatrix, this, std::ref(originalGraph), dmIntSize, true);
 		std::cout << "Distance matrix computed." << std::endl;
 
 		fillTransitNodeDistanceTable(transitNodes, transitNodesDistanceTable, transitNodesAmount);
@@ -84,16 +74,17 @@ void TNRAFPreprocessor::preprocessUsingCH(
 
 	// compute dm from transit nodes to all nodes - this dm is computed only for fast mode
 	if (mode == TNRAFPreprocessingMode::FAST) {
-		std::cout << "Computing all-nodes to transit-nodes distance matrix (FAST mode)." << std::endl;
-
-		if (dmIntSize == 16) {
-			createAndFillAllToTransitDM<uint_least16_t>(originalGraph, transitNodes, transitNodesAmount, "16-bit", true);
-		} else if (dmIntSize == 32) {
-			createAndFillAllToTransitDM<uint_least32_t>(originalGraph, transitNodes, transitNodesAmount, "32-bit", true);
-		} else {
-			createAndFillAllToTransitDM<dist_t>(originalGraph, transitNodes, transitNodesAmount, "default-bit", true);
-		}
-		std::cout << "\nAll-nodes to transit-nodes distance matrix computed for " << transitNodesAmount << " transit nodes." << std::endl;
+		std::cout << "Computing all-nodes to transit-nodes distance matrix (FAST mode, forward)." << std::endl;
+        this->forward_dm_computation_time_ms_ = benchmark<std::chrono::milliseconds>([&]() {
+            if (dmIntSize == 16) {
+                createAndFillAllToTransitDM<uint_least16_t>(originalGraph, transitNodes, transitNodesAmount, "16-bit", true);
+            } else if (dmIntSize == 32) {
+                createAndFillAllToTransitDM<uint_least32_t>(originalGraph, transitNodes, transitNodesAmount, "32-bit", true);
+            } else {
+                createAndFillAllToTransitDM<dist_t>(originalGraph, transitNodes, transitNodesAmount, "default-bit", true);
+            }
+        });
+		std::cout << "\nAll-nodes to transit-nodes distance matrix computed for " << transitNodesAmount << " transit nodes (forward)." << std::endl;
 	}
 
 	RegionsStructure regions(graph.nodes(), regionsCnt);
@@ -108,23 +99,115 @@ void TNRAFPreprocessor::preprocessUsingCH(
 		transitNodesMapping.insert(std::make_pair(transitNodes[i], i));
 	}
 
-	for (unsigned int i = 0; i < graph.nodes(); i++) {
-		if (i % 100 == 0) {
-			std::cout << "\rComputed forward access nodes for '" << i << "' nodes.";
-		}
+    this->forward_access_nodes_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+        &TNRAFPreprocessor::benchmarkableProcessForwardAccessNodes, this,
+        originalGraph.nodes(), std::ref(forwardAccessNodes), std::ref(forwardSearchSpaces),
+        std::ref(transitNodesMapping), std::ref(chGraph), std::ref(originalGraph), std::ref(regions), mode);
 
-		findForwardAccessNodes(i, forwardAccessNodes[i], forwardSearchSpaces[i], transitNodesMapping, chGraph,
-							   originalGraph, regions, mode);
-	}
-
-	std::cout << "\rComputed forward access nodes for all nodes in the graph." << std::endl;
 
 	// BACKWARD ACCESS NODE COMPUTATION
 
 	if (mode == TNRAFPreprocessingMode::DM) {
 		std::cout << "Computing the auxiliary distance matrix for backward direction." << std::endl;
 		delete distanceMatrix;
+        distanceMatrix = nullptr; // Ensure it's null before potential reassignment
+		this->backward_dm_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+            &TNRAFPreprocessor::generateDistanceMatrix, this, std::ref(originalGraph), dmIntSize, false);
+		std::cout << "Distance matrix computed." << std::endl;
+	}
 
+	// compute dm from all nodes to transit nodes - this dm is computed only for fast mode
+	if (mode == TNRAFPreprocessingMode::FAST) {
+		std::cout << "Computing all-nodes to transit-nodes distance matrix (FAST mode, backward)." << std::endl;
+        this->backward_dm_computation_time_ms_ = benchmark<std::chrono::milliseconds>([&]() {
+            if (dmIntSize == 16) {
+                createAndFillAllToTransitDM<uint_least16_t>(originalGraph, transitNodes, transitNodesAmount, "16-bit", false);
+            } else if (dmIntSize == 32) {
+                createAndFillAllToTransitDM<uint_least32_t>(originalGraph, transitNodes, transitNodesAmount, "32-bit", false);
+            } else {
+                createAndFillAllToTransitDM<dist_t>(originalGraph, transitNodes, transitNodesAmount, "default-bit", false);
+            }
+        });
+		std::cout << "\nAll-nodes to transit-nodes distance matrix computed for " << transitNodesAmount << " transit nodes (backward)." << std::endl;
+	}
+
+    this->backward_access_nodes_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+        &TNRAFPreprocessor::benchmarkableProcessBackwardAccessNodes, this,
+        originalGraph.nodes(), std::ref(backwardAccessNodes), std::ref(backwardSearchSpaces),
+        std::ref(transitNodesMapping), std::ref(chGraph), std::ref(originalGraph), std::ref(regions), mode);
+
+	if (mode == TNRAFPreprocessingMode::DM) {
+		delete distanceMatrix;
+		distanceMatrix = NULL;
+	}
+
+	std::vector<std::pair<unsigned int, QueryEdge> > allEdges;
+	chGraph.getEdgesForFlushing(allEdges);
+
+	outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes,
+				backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount, regions,
+				regionsCnt);
+}
+
+//______________________________________________________________________________________________________________________
+void TNRAFPreprocessor::benchmarkableProcessForwardAccessNodes(
+    unsigned int numNodes,
+    std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
+    std::vector<std::vector<unsigned int>>& searchSpacesVec,
+    std::unordered_map<unsigned int, unsigned int>& transitNodesMap,
+    FlagsGraph<NodeDataRegions>& chGraphInstance,
+    Graph& origGraphInstance,
+    RegionsStructure& regionsInstance,
+    TNRAFPreprocessingMode currentMode
+) {
+    for (unsigned int i = 0; i < numNodes; i++) {
+        if (i % 100 == 0) {
+            std::cout << "\rComputed forward access nodes for '" << i << "' nodes.";
+        }
+        findForwardAccessNodes(i, accessNodesVec[i], searchSpacesVec[i], transitNodesMap, chGraphInstance,
+                               origGraphInstance, regionsInstance, currentMode);
+    }
+    std::cout << "\rComputed forward access nodes for all nodes in the graph." << std::endl;
+}
+
+//______________________________________________________________________________________________________________________
+void TNRAFPreprocessor::benchmarkableProcessBackwardAccessNodes(
+    unsigned int numNodes,
+    std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
+    std::vector<std::vector<unsigned int>>& searchSpacesVec,
+    std::unordered_map<unsigned int, unsigned int>& transitNodesMap,
+    FlagsGraph<NodeDataRegions>& chGraphInstance,
+    Graph& origGraphInstance,
+    RegionsStructure& regionsInstance,
+    TNRAFPreprocessingMode currentMode
+) {
+    for (unsigned int i = 0; i < numNodes; i++) {
+        if (i % 100 == 0) {
+            std::cout << "\rComputed backward access nodes for '" << i << "' nodes.";
+        }
+        findBackwardAccessNodes(i, accessNodesVec[i], searchSpacesVec[i], transitNodesMap, chGraphInstance,
+                                origGraphInstance, regionsInstance, currentMode);
+    }
+    std::cout << "\rComputed backward access nodes for all nodes in the graph." << std::endl;
+}
+
+//______________________________________________________________________________________________________________________
+void TNRAFPreprocessor::generateDistanceMatrix(Graph& originalGraph, unsigned int dmIntSize, bool forward) {
+	if (forward) {
+		if (dmIntSize == 16) {
+			DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
+			dmComputor.computeDistanceMatrix(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		} else if (dmIntSize == 32) {
+			DistanceMatrixComputorSlow<uint_least32_t> dmComputor;
+			dmComputor.computeDistanceMatrix(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		} else {
+			DistanceMatrixComputorSlow<dist_t> dmComputor;
+			dmComputor.computeDistanceMatrix(originalGraph);
+			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
+		}
+	} else {
 		if (dmIntSize == 16) {
 			DistanceMatrixComputorSlow<uint_least16_t> dmComputor;
 			dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
@@ -138,45 +221,7 @@ void TNRAFPreprocessor::preprocessUsingCH(
 			dmComputor.computeDistanceMatrixInReversedGraph(originalGraph);
 			distanceMatrix = new Distance_matrix_travel_time_provider(dmComputor.getDistanceMatrixInstance(), originalGraph.nodes());
 		}
-		std::cout << "Distance matrix computed." << std::endl;
 	}
-
-	// compute dm from all nodes to transit nodes - this dm is computed only for fast mode
-	if (mode == TNRAFPreprocessingMode::FAST) {
-		std::cout << "Computing all-nodes to transit-nodes distance matrix (FAST mode)." << std::endl;
-
-		if (dmIntSize == 16) {
-			createAndFillAllToTransitDM<uint_least16_t>(originalGraph, transitNodes, transitNodesAmount, "16-bit", false);
-		} else if (dmIntSize == 32) {
-			createAndFillAllToTransitDM<uint_least32_t>(originalGraph, transitNodes, transitNodesAmount, "32-bit", false);
-		} else {
-			createAndFillAllToTransitDM<dist_t>(originalGraph, transitNodes, transitNodesAmount, "default-bit", false);
-		}
-		std::cout << "\nAll-nodes to transit-nodes distance matrix computed for " << transitNodesAmount << " transit nodes." << std::endl;
-	}
-
-	for (unsigned int i = 0; i < graph.nodes(); i++) {
-		if (i % 100 == 0) {
-			std::cout << "\rComputed backward access nodes for '" << i << "' nodes.";
-		}
-
-		findBackwardAccessNodes(i, backwardAccessNodes[i], backwardSearchSpaces[i], transitNodesMapping, chGraph,
-								originalGraph, regions, mode);
-	}
-
-	std::cout << "\rComputed backward access nodes for all nodes in the graph." << std::endl;
-
-	if (mode == TNRAFPreprocessingMode::DM) {
-		delete distanceMatrix;
-		distanceMatrix = NULL;
-	}
-
-	std::vector<std::pair<unsigned int, QueryEdge> > allEdges;
-	chGraph.getEdgesForFlushing(allEdges);
-
-	outputGraph(outputPath, graph, allEdges, transitNodes, transitNodesDistanceTable, forwardAccessNodes,
-				backwardAccessNodes, forwardSearchSpaces, backwardSearchSpaces, transitNodesAmount, regions,
-				regionsCnt);
 }
 
 //______________________________________________________________________________________________________________________
@@ -750,4 +795,3 @@ void TNRAFPreprocessor::initPowersOf2(std::vector<uint32_t> &powersOf2) {
 		val = val * 2;
 	}
 }
-
