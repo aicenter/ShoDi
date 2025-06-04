@@ -131,7 +131,7 @@ protected:
             std::vector < std::vector < unsigned int > > & forwardSearchSpaces,
             std::vector < std::vector < unsigned int > > & backwardSearchSpaces,
             unsigned int transitNodesAmount,
-            RegionsStructure & regions,
+            Regions_with_borders & regions,
             unsigned int regionsCnt);
 
     /**
@@ -181,14 +181,14 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    void findForwardAccessNodes(
+    void find_andprocess_forward_access_nodes_for_single_node(
             unsigned int source,
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & forwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph<NodeDataRegions>& graph,
             Graph & originalGraph,
-            RegionsStructure & regions,
+            Regions_with_borders & regions,
             TNRAFPreprocessingMode useDistanceMatrix);
 
     /**
@@ -208,13 +208,13 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    void findBackwardAccessNodes(
+    void process_backward_access_nodes(
             unsigned int source,
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
             std::unordered_map< unsigned int, unsigned int > & transitNodes,
             FlagsGraph<NodeDataRegions>& graph, Graph & originalGraph,
-            RegionsStructure & regions,
+            Regions_with_borders & regions,
             TNRAFPreprocessingMode useDistanceMatrix);
 
     /**
@@ -229,41 +229,76 @@ protected:
      * @param accessNodes[in, out] The list of access nodes for which the flags need to be computed
      * @param originalGraph[in]
      * @param regions[in] The structure containing all the information about the regions for the Arc Flags.
-     * @param mode[in]
      * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The std::vector
      * contains distances from 'node' to all the other nodes in the graph. This is needed to set the Arc Flags
      * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
      * matrix so this is not needed.
+     * @param forward_direction
      */
-    void computeForwardArcFlags(
-            unsigned int node,
-            std::vector<AccessNodeDataArcFlags> & accessNodes,
-            Graph & originalGraph,
-            RegionsStructure & regions,
-            TNRAFPreprocessingMode mode,
-            std::vector<unsigned int> & optionalDistancesFromNode);
+    template<TNRAFPreprocessingMode mode>
+    void compute_arc_flags(
+        unsigned int node,
+        std::vector<AccessNodeDataArcFlags>& accessNodes,
+        Graph& originalGraph,
+        Regions_with_borders& regions,
+        std::vector<unsigned int>& optionalDistancesFromNode,
+        bool forward_direction
+    ) {
+        for (size_t i = 0; i < accessNodes.size(); i++) {
+            unsigned int accessNode = accessNodes[i].accessNodeID;
+            unsigned int distanceToAccessNode = accessNodes[i].distanceToNode;
 
-    /**
-     * Computes the backward Arc Flags for a set of access nodes of a given node.
-     * This is similar to the forward direction, so check computeForwardArcFlags for more information.
-     *
-     * @param node[in] The ID of the node for which the access nodes are being computed currently.
-     * @param accessNodes[in, out] The list of access nodes for which the flags need to be computed
-     * @param originalGraph[in]
-     * @param regions[in] The structure containing all the information about the regions for the Arc Flags.
-     * @param useDistanceMatrix[in]
-     * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The std::vector
-     * contains distances from 'node' to all the other nodes in the graph. This is needed to set the Arc Flags
-     * correctly. When using the distance matrix (the 'dm' mode), those distances can be obtained from the distance
-     * matrix so this is not needed.
-     */
-    void computeBackwardArcFlags(
-            unsigned int node,
-            std::vector<AccessNodeDataArcFlags> & accessNodes,
-            Graph & originalGraph,
-            RegionsStructure & regions,
-            TNRAFPreprocessingMode useDistanceMatrix,
-            std::vector<unsigned int> & optionalDistancesFromNode);
+            std::optional<std::vector<unsigned int>> distancesFromAccessNode;
+            if constexpr(mode == TNRAFPreprocessingMode::SLOW) {
+                distancesFromAccessNode.emplace(originalGraph.nodes());
+                if(forward_direction) {
+                    BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode.value());
+                }
+                else {
+                    BasicDijkstra::computeOneToAllDistancesInReversedGraph(
+                        accessNode,
+                        originalGraph,
+                        distancesFromAccessNode.value()
+                    );
+                }
+            }
+
+            for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+                // if the region is the region of the access node, set the flag to true and continue
+                if (regions.getRegion(accessNode) == j) {
+                    accessNodes[i].regionFlags[j] = true;
+                    continue;
+                }
+
+                auto border_nodes_in_region = regions.getBorderNodes(j);
+                for (unsigned int k = 0; k < border_nodes_in_region.size(); k++) {
+                    auto border_node = border_nodes_in_region[k];
+                    dist_t distance_from_node_to_border_node = 0;
+                    dist_t distance_from_access_node_to_border_node = 0;
+
+                    if constexpr(mode == TNRAFPreprocessingMode::DM) {
+                        distance_from_node_to_border_node = this->distanceMatrix->findDistance(node, border_node);
+                        distance_from_access_node_to_border_node = this->distanceMatrix->findDistance(
+                            accessNode,
+                            border_nodes_in_region[k]
+                        );
+                    }
+                    else if constexpr (mode == TNRAFPreprocessingMode::FAST) {
+                        distance_from_node_to_border_node = optionalDistancesFromNode[border_node];
+                        distance_from_access_node_to_border_node = this->all_transit_dm->findDistance(border_node, accessNodes[i].tnr_index);
+                    }
+                    else {
+                        distance_from_node_to_border_node = optionalDistancesFromNode[border_node];
+                        distance_from_access_node_to_border_node = distancesFromAccessNode.value()[border_node];
+                    }
+                    if (distance_from_node_to_border_node == distance_from_access_node_to_border_node + distanceToAccessNode) {
+                        accessNodes[i].regionFlags[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Generates a clustering that is used for the regions (and those are used for Arc Flags). The query algorithm will
@@ -277,13 +312,10 @@ protected:
      * This approach seems to give solid results.
      *
      * @param originalGraph[in] The original graph.
-     * @param regions[out] A structure that will contain all the information about the regions (which nodes corresponds
-     * to which regions).
      * @param clustersCnt[in] The number of clusters that need to be computed.
      */
-    static void generateClustering(
+    static Regions_with_borders generateClustering(
             Graph & originalGraph,
-            RegionsStructure & regions,
             unsigned int clustersCnt);
 
     /**
@@ -370,14 +402,14 @@ private:
         all_transit_dm = std::make_unique<Distance_matrix_travel_time_provider<DataType>>(std::move(one_d_array), num_rows, num_cols);
     }
 
-    void benchmarkableProcessForwardAccessNodes(
+    void process_forward_access_nodes(
         unsigned int numNodes,
         std::vector<std::vector<AccessNodeDataArcFlags>>& accessNodesVec,
         std::vector<std::vector<unsigned int>>& searchSpacesVec,
         std::unordered_map<unsigned int, unsigned int>& transitNodesMap,
         FlagsGraph<NodeDataRegions>& chGraphInstance,
         Graph& origGraphInstance,
-        RegionsStructure& regionsInstance,
+        Regions_with_borders& regionsInstance,
         TNRAFPreprocessingMode currentMode
     );
 
@@ -388,7 +420,7 @@ private:
         std::unordered_map<unsigned int, unsigned int>& transitNodesMap,
         FlagsGraph<NodeDataRegions>& chGraphInstance,
         Graph& origGraphInstance,
-        RegionsStructure& regionsInstance,
+        Regions_with_borders& regionsInstance,
         TNRAFPreprocessingMode currentMode
     );
 

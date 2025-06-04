@@ -27,16 +27,18 @@
 //
 
 #include "RegionsStructure.h"
+#include <stdexcept> // For std::out_of_range
 
 //______________________________________________________________________________________________________________________
-RegionsStructure::RegionsStructure(unsigned int nodesCnt, unsigned int regionsCnt) : regions(regionsCnt), mapping(nodesCnt), regionsCnt(regionsCnt) {
-
-}
-
-//______________________________________________________________________________________________________________________
-void RegionsStructure::addNode(unsigned int nodeId, unsigned int regionId) {
-    mapping[nodeId] = regionId;
-    regions[regionId].push_back(nodeId);
+RegionsStructure::RegionsStructure(const std::vector<unsigned int>& assignedClusters, unsigned int regionsCnt)
+    : regions(regionsCnt), mapping(assignedClusters), regionsCnt(regionsCnt) {
+    for (unsigned int nodeId = 0; nodeId < assignedClusters.size(); ++nodeId) {
+        unsigned int regionId = assignedClusters[nodeId];
+        if (regionId < regionsCnt) { // Ensure regionId is valid
+            regions[regionId].push_back(nodeId);
+        }
+        // Else: handle error or skip if regionId is out of bounds, though assignedClusters should be correct.
+    }
 }
 
 //______________________________________________________________________________________________________________________
@@ -52,4 +54,64 @@ unsigned int RegionsStructure::getRegion(unsigned int nodeId) {
 //______________________________________________________________________________________________________________________
 unsigned int RegionsStructure::getRegionsCnt() {
     return regionsCnt;
+}
+
+//______________________________________________________________________________________________________________________
+// Implementation for Regions_with_borders
+//______________________________________________________________________________________________________________________
+
+Regions_with_borders::Regions_with_borders(
+    const std::vector<unsigned int>& assignedClusters,
+    unsigned int regionsCnt,
+    Graph& originalGraph)
+    : RegionsStructure(assignedClusters, regionsCnt),
+      border_nodes_by_region_(regionsCnt) {
+    computeBorderNodes(originalGraph);
+}
+
+//______________________________________________________________________________________________________________________
+void Regions_with_borders::computeBorderNodes(Graph& originalGraph) {
+    for (unsigned int regionId = 0; regionId < getRegionsCnt(); ++regionId) {
+        const std::vector<unsigned int>& nodes_in_current_region = nodesInRegion(regionId);
+        for (unsigned int nodeId : nodes_in_current_region) {
+            bool is_border_node = false;
+
+            // Check outgoing edges
+            const auto& outgoing = originalGraph.outgoingEdges(nodeId);
+            for (const auto& edge_pair : outgoing) {
+                unsigned int neighborNodeId = edge_pair.first;
+                if (getRegion(neighborNodeId) != regionId) {
+                    is_border_node = true;
+                    break;
+                }
+            }
+
+            if (is_border_node) {
+                border_nodes_by_region_[regionId].push_back(nodeId);
+                continue; // Already identified as border node
+            }
+
+            // Check incoming edges if not already identified by an outgoing edge
+            const auto& incoming = originalGraph.incomingEdges(nodeId);
+            for (const auto& edge_pair : incoming) {
+                unsigned int neighborNodeId = edge_pair.first;
+                if (getRegion(neighborNodeId) != regionId) {
+                    is_border_node = true;
+                    break;
+                }
+            }
+
+            if (is_border_node) {
+                border_nodes_by_region_[regionId].push_back(nodeId);
+            }
+        }
+    }
+}
+
+//______________________________________________________________________________________________________________________
+const std::vector<unsigned int>& Regions_with_borders::getBorderNodes(unsigned int regionId) const {
+    if (regionId >= border_nodes_by_region_.size()) {
+        throw std::out_of_range("Region ID out of range in getBorderNodes.");
+    }
+    return border_nodes_by_region_[regionId];
 }

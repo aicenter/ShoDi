@@ -133,8 +133,18 @@ df_data = []
 mem, time, dijkstra_distances = run_benchmark("dijkstra", str(instance_path), queries_file_path, input_format="csv")
 df_data.append(["Dijkstra", mem, time])
 
-mem, time, distances = run_benchmark("tnraf", str(instance_path / "ttmodel-fast.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
-df_data.append(["TNRAF", mem, time])
+# mem, time, distances = run_benchmark("tnraf", str(instance_path / "ttmodel-fast.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
+# df_data.append(["TNRAF", mem, time])
+
+mem, time, tnraf_dm_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-dm.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
+df_data.append(["TNRAF-dm", mem, time])
+
+mem, time, tnraf_fast_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-fast.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
+df_data.append(["TNRAF-fast", mem, time])
+
+mem, time, tnraf_slow_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-slow.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
+df_data.append(["TNRAF-slow", mem, time])
+
 
 df = pandas.DataFrame(df_data, columns=["label", "memory", "time"])
 

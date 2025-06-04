@@ -30,8 +30,7 @@
 #define CONTRACTION_HIERARCHIES_REGIONSSTRUCTURE_H
 
 #include <vector>
-
-
+#include "../../GraphBuilding/Structures/Graph.h"
 
 /**
  * Auxiliary structure that is used during the Arc Flags computation. This structure gathers information about the
@@ -42,22 +41,12 @@ public:
     /**
      * Initializes the region structure.
      *
-     * @param nodesCnt[in] The amount of nodes in the graph.
+     * @param assignedClusters[in] A vector where the index is the node ID and the value is the region ID.
      * @param regionsCnt[in] The amount of regions we will be working with.
      */
     RegionsStructure(
-            unsigned int nodesCnt,
+            const std::vector<unsigned int>& assignedClusters,
             unsigned int regionsCnt);
-
-    /**
-     * Allows us to assign a certain node to a certain region.
-     *
-     * @param nodeId[in] The node we want to assign to some region.
-     * @param regionId[in] The region we are assigning the node to.
-     */
-    void addNode(
-            unsigned int nodeId,
-            unsigned int regionId);
 
     /**
      * Returns a std::vector of nodes assigned to a certain region.
@@ -83,10 +72,48 @@ public:
      * @return The number of regions.
      */
     unsigned int getRegionsCnt();
+
 private:
     std::vector < std::vector < unsigned int > > regions;
     std::vector < unsigned int > mapping;
     unsigned int regionsCnt;
+};
+
+/**
+ * Extends RegionsStructure to also identify and store border nodes for each region.
+ * A border node is a node within a region that has at least one edge (incoming or outgoing)
+ * connected to a node in a different region.
+ */
+class Regions_with_borders : public RegionsStructure {
+public:
+    /**
+     * Initializes the regions structure and computes border nodes.
+     *
+     * @param assignedClusters[in] A vector where the index is the node ID and the value is the region ID.
+     * @param regionsCnt[in] The amount of regions.
+     * @param originalGraph[in] The graph used to determine connectivity for border nodes.
+     */
+    Regions_with_borders(
+            const std::vector<unsigned int>& assignedClusters,
+            unsigned int regionsCnt,
+            Graph& originalGraph);
+
+    /**
+     * Returns a list of border nodes for a given region.
+     *
+     * @param regionId[in] The region we are interested in.
+     * @return Constant reference to a std::vector containing the border nodes of the given region.
+     */
+    const std::vector<unsigned int>& getBorderNodes(unsigned int regionId) const;
+
+private:
+    std::vector<std::vector<unsigned int>> border_nodes_by_region_;
+
+    /**
+     * Computes border nodes for all regions based on the original graph.
+     * @param originalGraph The graph to check for inter-region connectivity.
+     */
+    void computeBorderNodes(Graph& originalGraph);
 };
 
 
