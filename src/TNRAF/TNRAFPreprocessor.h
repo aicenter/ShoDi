@@ -44,6 +44,8 @@
 #include <string>
 #include <memory>
 #include <chrono>
+#include "melon/algorithm/dijkstra.hpp"
+#include "melon/container/static_digraph.hpp" // For static_digraph
 
 /**
  * This class is responsible for creating a Transit Node Routing with Arc Flags data-structure based on a given
@@ -180,6 +182,8 @@ protected:
      * @param originalGraph[in]
      * @param regions[in]
      * @param useDistanceMatrix[in]
+     * @param melon_graph_ptr Pointer to the pre-built melon graph (can be nullptr if useDistanceMatrix is DM).
+     * @param melon_length_map_ptr Pointer to the pre-built melon length map (can be nullptr if useDistanceMatrix is DM).
      */
     void find_and_process_forward_access_nodes_for_single_node(
         unsigned int source,
@@ -189,7 +193,9 @@ protected:
         FlagsGraph<NodeDataRegions>& graph,
         Graph& originalGraph,
         Regions_with_borders& regions,
-        TNRAFPreprocessingMode useDistanceMatrix
+        TNRAFPreprocessingMode useDistanceMatrix,
+        const fhamonic::melon::static_digraph* melon_graph_ptr,
+        const std::vector<unsigned>* melon_length_map_ptr
     );
 
     /**

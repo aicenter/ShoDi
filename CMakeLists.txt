@@ -113,6 +113,10 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+find_package(range-v3 CONFIG REQUIRED)
+
+add_subdirectory(dependencies/melon)
+
 
 # TARGETS
 
@@ -383,9 +387,11 @@ target_include_directories(func_test_runner PRIVATE src)
 
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(shortestPathsPreprocessor PRIVATE dependencies/melon/include)
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(benchmark PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(func_test_runner PRIVATE dependencies/melon/include)
 
 # include JNI dirs if found
 if(JNI_FOUND)
@@ -397,11 +403,14 @@ endif()
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE PROJ::proj)
+target_link_libraries(shortestPathsPreprocessor INTERFACE melon)
 target_link_libraries(benchmark PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(benchmark PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(benchmark PRIVATE PROJ::proj)
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+target_link_libraries(func_test_runner INTERFACE melon)
+
 
 
 # RESOURCES

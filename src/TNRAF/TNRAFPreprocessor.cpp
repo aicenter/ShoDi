@@ -38,6 +38,9 @@
 #include "../Dijkstra/DijkstraNode.h"
 #include "../Dijkstra/BasicDijkstra.h"
 #include "../benchmark.h"
+#include "melon/algorithm/dijkstra.hpp"
+#include "melon/container/static_digraph.hpp"
+#include "melon/utility/static_digraph_builder.hpp"
 
 //______________________________________________________________________________________________________________________
 void TNRAFPreprocessor::preprocessUsingCH(
@@ -159,19 +162,45 @@ void TNRAFPreprocessor::process_forward_access_nodes(
     Regions_with_borders& regionsInstance,
     TNRAFPreprocessingMode currentMode
 ) {
+    std::optional<fhamonic::melon::static_digraph> local_melon_graph_opt;
+    std::optional<std::vector<unsigned>> local_length_map_opt;
+
+    if (currentMode != TNRAFPreprocessingMode::DM) {
+        fhamonic::melon::static_digraph_builder<fhamonic::melon::static_digraph, dist_t> builder(origGraphInstance.nodes());
+        for(unsigned int i = 0; i < origGraphInstance.nodes(); i++) {
+            for (const auto& edge : origGraphInstance.outgoingEdges(i)) {
+                builder.add_arc(i, edge.first, edge.second);
+            }
+        }
+        auto [graph_obj, length_map_obj] = builder.build();
+        local_melon_graph_opt.emplace(std::move(graph_obj));
+        local_length_map_opt.emplace(std::move(length_map_obj));
+    }
+
     for (unsigned int i = 0; i < numNodes; i++) {
         if (i % 100 == 0) {
             std::cout << "\rComputed forward access nodes for '" << i << "' nodes.";
         }
+
+        const fhamonic::melon::static_digraph* melon_graph_to_pass = nullptr;
+        const std::vector<unsigned>* length_map_to_pass = nullptr;
+
+        if (local_melon_graph_opt.has_value()) {
+            melon_graph_to_pass = &(*local_melon_graph_opt);
+            length_map_to_pass = &(*local_length_map_opt);
+        }
+
         find_and_process_forward_access_nodes_for_single_node(
-	        i,
-	        accessNodesVec[i],
-	        searchSpacesVec[i],
-	        transitNodesMap,
-	        chGraphInstance,
-	        origGraphInstance,
-	        regionsInstance,
-	        currentMode
+            i,
+            accessNodesVec[i],
+            searchSpacesVec[i],
+            transitNodesMap,
+            chGraphInstance,
+            origGraphInstance,
+            regionsInstance,
+            currentMode,
+            melon_graph_to_pass,
+            length_map_to_pass
         );
     }
     std::cout << "\rComputed forward access nodes for all nodes in the graph." << std::endl;
@@ -423,7 +452,9 @@ void TNRAFPreprocessor::find_and_process_forward_access_nodes_for_single_node(
 	FlagsGraph<NodeDataRegions>& graph,
 	Graph& originalGraph,
 	Regions_with_borders& regions,
-	TNRAFPreprocessingMode useDistanceMatrix
+	TNRAFPreprocessingMode useDistanceMatrix,
+	const fhamonic::melon::static_digraph* melon_graph_ptr,
+	const std::vector<unsigned int>* melon_length_map_ptr
 ) {
 	auto cmp = [](DijkstraNode left, DijkstraNode right) { return (left.weight) > (right.weight); };
 	std::priority_queue<DijkstraNode, std::vector<DijkstraNode>, decltype(cmp)> forwardQ(cmp);
@@ -448,7 +479,12 @@ void TNRAFPreprocessor::find_and_process_forward_access_nodes_for_single_node(
 		settled[curNode] = true;
 		if (transitNodes.contains(curNode)) {
 			accessNodesSuperset.push_back(
-				AccessNodeDataArcFlags(curNode, curLen, regions.getRegionsCnt(), transitNodes.at(curNode))
+				AccessNodeDataArcFlags(
+					curNode,
+					curLen,
+					regions.getRegionsCnt(),
+					static_cast<unsigned short>(transitNodes.at(curNode))
+				)
 			);
 		} else {
 			forwardSearchSpace.push_back(curNode);
@@ -477,11 +513,26 @@ void TNRAFPreprocessor::find_and_process_forward_access_nodes_for_single_node(
 		}
 
 	}
-
-	std::vector<unsigned int> distancesFromNode;
+	// std::optional<fhamonic::melon::dijkstra<fhamonic::melon::graph_ref_view<fhamonic::melon::static_digraph>,
+	// 	fhamonic::melon::mapping_ref_view<std::vector<unsigned>>, fhamonic::melon::dijkstra_default_traits<
+	// 		fhamonic::melon::static_digraph&, unsigned>>> distances_from_source_to_all_nodes;
+	std::vector<unsigned int> distancesFromNode(originalGraph.nodes());
+	// std::optional<fhamonic::melon::static_digraph> melon_graph;
 	if (useDistanceMatrix != TNRAFPreprocessingMode::DM) {
-		distancesFromNode.resize(originalGraph.nodes());
-		BasicDijkstra::computeOneToAllDistances(source, originalGraph, distancesFromNode);
+		// distancesFromNode.resize(originalGraph.nodes());
+		// BasicDijkstra::computeOneToAllDistances(source, originalGraph, distancesFromNode);
+		// fhamonic::melon::static_digraph_builder<fhamonic::melon::static_digraph, dist_t> builder(originalGraph.nodes());
+		// for(unsigned i = 0; i < originalGraph.nodes(); i++) {
+		// 	for (const auto& edge : originalGraph.outgoingEdges(i)) {
+		// 		builder.add_arc(i, edge.first, edge.second);
+		// 	}
+		// }
+		// auto [melon_graph, length_map] = builder.build();
+		// melon_graph = melon_graph_2;
+		fhamonic::melon::dijkstra dijkstra(*melon_graph_ptr, *melon_length_map_ptr, source);
+		for(auto&& [vertex, distance] : dijkstra) {
+			distancesFromNode[vertex] = distance;
+		}
 	}
 	for (size_t i = 0; i < accessNodesSuperset.size(); i++) {
 		if (useDistanceMatrix == TNRAFPreprocessingMode::DM) {
@@ -494,7 +545,9 @@ void TNRAFPreprocessor::find_and_process_forward_access_nodes_for_single_node(
 		} else {
 			unsigned int accessNode = accessNodesSuperset[i].accessNodeID;
 			unsigned int accessNodeDistance = accessNodesSuperset[i].distanceToNode;
-			unsigned int realDistance = distancesFromNode[accessNode];
+			// melon_graph->vertices()[accessNode]
+			// distances_from_source_to_all_nodes->dist();
+			auto realDistance = distancesFromNode[accessNode];
 			if (realDistance == accessNodeDistance) {
 				accessNodes.push_back(accessNodesSuperset[i]);
 			}
@@ -565,7 +618,12 @@ void TNRAFPreprocessor::find_and_process_backward_access_nodes_for_single_node(
 		settled[curNode] = true;
 		if (transitNodes.contains(curNode)) {
 			accessNodesSuperset.push_back(
-				AccessNodeDataArcFlags(curNode, curLen, regions.getRegionsCnt(), transitNodes.at(curNode))
+				AccessNodeDataArcFlags(
+					curNode,
+					curLen,
+					regions.getRegionsCnt(),
+					static_cast<unsigned short>(transitNodes.at(curNode))
+				)
 			);
 		} else {
 			backwardSearchSpace.push_back(curNode);
