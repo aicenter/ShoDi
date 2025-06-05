@@ -48,8 +48,7 @@ template<class IntType> Distance_matrix_travel_time_provider<IntType>::Distance_
 //______________________________________________________________________________________________________________________
 template<class IntType> dist_t Distance_matrix_travel_time_provider<IntType>::findDistance(const unsigned int start_row, const unsigned int goal_col) const {
     if (start_row >= rowsCnt || goal_col >= colsCnt) {
-        // Handle out-of-bounds access, e.g., return max distance or throw error
-        return std::numeric_limits<dist_t>::max();
+        throw std::out_of_range("Requested distance is out of bounds of the distance matrix.");
     }
     return distances[static_cast<size_t>(start_row) * colsCnt + goal_col];
 }

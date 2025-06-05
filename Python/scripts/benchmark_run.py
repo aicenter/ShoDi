@@ -26,7 +26,8 @@ import pandas
 from pathlib import Path
 
 # instance_path = Path(r"C:\Google Drive\AIC Experiment Data\Shodi\Manhattan")
-instance_path = Path(r"D:\Google Drive AIC\AIC Experiment Data\Shodi\Manhattan")
+map_path = Path(r"D:\Google Drive AIC\AIC Experiment Data\Chaining\Instances\DC\map")
+instance_path = Path(r"D:\Google Drive AIC\AIC Experiment Data\Shodi\DC")
 
 # bin_folder = Path(".")
 # bin_folder = Path(r"C:\Workspaces\AIC\shortest-distances\cmake-build-release")
@@ -130,20 +131,20 @@ df_data = []
 
 
 # keep Dijkstra-computed distances and compare with other methods to confirm that the results are identic
-mem, time, dijkstra_distances = run_benchmark("dijkstra", str(instance_path), queries_file_path, input_format="csv")
+mem, time, dijkstra_distances = run_benchmark("dijkstra", str(map_path), queries_file_path, input_format="csv")
 df_data.append(["Dijkstra", mem, time])
 
 # mem, time, distances = run_benchmark("tnraf", str(instance_path / "ttmodel-fast.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
 # df_data.append(["TNRAF", mem, time])
 
-mem, time, tnraf_dm_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-dm.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
-df_data.append(["TNRAF-dm", mem, time])
+# mem, time, tnraf_dm_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-dm.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
+# df_data.append(["TNRAF-dm", mem, time])
 
 mem, time, tnraf_fast_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-fast.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
 df_data.append(["TNRAF-fast", mem, time])
 
-mem, time, tnraf_slow_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-slow.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
-df_data.append(["TNRAF-slow", mem, time])
+# mem, time, tnraf_slow_distances = run_benchmark("tnraf", str(instance_path / "ttmodel-slow.tgaf"), queries_file_path, dijkstra_distances, input_format="csv")
+# df_data.append(["TNRAF-slow", mem, time])
 
 
 df = pandas.DataFrame(df_data, columns=["label", "memory", "time"])

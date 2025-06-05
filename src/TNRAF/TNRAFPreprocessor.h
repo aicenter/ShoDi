@@ -179,9 +179,9 @@ protected:
      * @param graph[in]
      * @param originalGraph[in]
      * @param regions[in]
-     * @param useDistanceMatrix[in]
+     * @param mode[in]
      */
-    void find_and_process_forward_access_nodes_for_single_node(
+    void find_forward_access_nodes_for_single_node(
         unsigned int source,
         std::vector<AccessNodeDataArcFlags>& accessNodes,
         std::vector<unsigned int>& forwardSearchSpace,
@@ -189,7 +189,7 @@ protected:
         FlagsGraph<NodeDataRegions>& graph,
         Graph& originalGraph,
         Regions_with_borders& regions,
-        TNRAFPreprocessingMode useDistanceMatrix
+        TNRAFPreprocessingMode mode
     );
 
     /**
@@ -209,7 +209,7 @@ protected:
      * @param regions[in]
      * @param useDistanceMatrix[in]
      */
-    void find_and_process_backward_access_nodes_for_single_node(
+    void find_backward_access_nodes_for_single_node(
             unsigned int source,
             std::vector <AccessNodeDataArcFlags> & accessNodes,
             std::vector < unsigned int > & backwardSearchSpace,
@@ -227,7 +227,7 @@ protected:
      * on a shortest path, then the Arc Flag for this region can be set to false.
      *
      * @param node[in] The ID of the node for which the access nodes are being computed currently.
-     * @param accessNodes[in, out] The list of access nodes for which the flags need to be computed
+     * @param access_nodes[in, out] The list of access nodes for which the flags need to be computed
      * @param originalGraph[in]
      * @param regions[in] The structure containing all the information about the regions for the Arc Flags.
      * @param optionalDistancesFromNode[in] This is only used for the slower ('slow') preprocessing mode. The std::vector
@@ -238,67 +238,181 @@ protected:
      */
     template<TNRAFPreprocessingMode mode>
     void compute_arc_flags(
-        unsigned int node,
-        std::vector<AccessNodeDataArcFlags>& accessNodes,
+        std::vector<std::vector<AccessNodeDataArcFlags>>& access_nodes,
         Graph& originalGraph,
         Regions_with_borders& regions,
-        std::vector<unsigned int>& optionalDistancesFromNode,
         bool forward_direction
     ) {
-        for (size_t i = 0; i < accessNodes.size(); i++) {
-            unsigned int accessNode = accessNodes[i].accessNodeID;
-            unsigned int distanceToAccessNode = accessNodes[i].distanceToNode;
+        for (unsigned int region_index = 0; region_index < regions.getRegionsCnt(); region_index++) {
+            const auto& border_nodes_in_region = regions.getBorderNodes(region_index);
 
-            std::optional<std::vector<unsigned int>> distancesFromAccessNode;
-            if constexpr(mode == TNRAFPreprocessingMode::SLOW) {
-                distancesFromAccessNode.emplace(originalGraph.nodes());
-                if(forward_direction) {
-                    BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode.value());
-                }
-                else {
-                    BasicDijkstra::computeOneToAllDistancesInReversedGraph(
-                        accessNode,
-                        originalGraph,
-                        distancesFromAccessNode.value()
-                    );
+            // compute the DM of distances to border nodes from all other nodes for the current region
+            std::optional<std::vector<std::vector<dist_t>>> distances_to_border_nodes;
+            if constexpr(mode != TNRAFPreprocessingMode::DM) {
+                distances_to_border_nodes.emplace();
+                for (unsigned int bn_index = 0; bn_index < border_nodes_in_region.size(); bn_index++) {
+                    distances_to_border_nodes->emplace_back(originalGraph.nodes());
+                    auto border_node = border_nodes_in_region[bn_index];
+                    if(forward_direction) {
+                        BasicDijkstra::computeOneToAllDistancesInReversedGraph(
+                            border_node,
+                            originalGraph,
+                            distances_to_border_nodes.value()[bn_index]
+                        );
+                    }
+                    else {
+                        BasicDijkstra::computeOneToAllDistances(
+                            border_node,
+                            originalGraph,
+                            distances_to_border_nodes.value()[bn_index]
+                        );
+                    }
                 }
             }
 
-            for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
-                // if the region is the region of the access node, set the flag to true and continue
-                if (regions.getRegion(accessNode) == j) {
-                    accessNodes[i].regionFlags[j] = true;
-                    continue;
-                }
+            // std::optional<std::vector<std::vector<dist_t>>> distances_from_border_nodes;
+            // if constexpr(mode == TNRAFPreprocessingMode::SLOW) {
+            //     distances_to_border_nodes.emplace();
+            //     for (unsigned int bn_index = 0; bn_index < border_nodes_in_region.size(); bn_index++) {
+            //         distances_to_border_nodes->emplace_back(originalGraph.nodes());
+            //         auto border_node = border_nodes_in_region[bn_index];
+            //         if(forward_direction) {
+            //             BasicDijkstra::computeOneToAllDistancesInReversedGraph(
+            //                 border_node,
+            //                 originalGraph,
+            //                 distances_to_border_nodes.value()[bn_index]
+            //             );
+            //         }
+            //         else {
+            //             BasicDijkstra::computeOneToAllDistances(
+            //                 border_node,
+            //                 originalGraph,
+            //                 distances_to_border_nodes.value()[bn_index]
+            //             );
+            //         }
+            //     }
+            // }
 
-                auto border_nodes_in_region = regions.getBorderNodes(j);
-                for (unsigned int k = 0; k < border_nodes_in_region.size(); k++) {
-                    auto border_node = border_nodes_in_region[k];
-                    dist_t distance_from_node_to_border_node = 0;
-                    dist_t distance_from_access_node_to_border_node = 0;
+            for(unsigned node_index = 0; node_index < originalGraph.nodes(); node_index++) {
+                auto& access_nodes_per_node = access_nodes[node_index];
 
-                    if constexpr(mode == TNRAFPreprocessingMode::DM) {
-                        distance_from_node_to_border_node = this->distanceMatrix->findDistance(node, border_node);
-                        distance_from_access_node_to_border_node = this->distanceMatrix->findDistance(
-                            accessNode,
-                            border_nodes_in_region[k]
-                        );
+                for(size_t access_node_index = 0; access_node_index < access_nodes_per_node.size(); access_node_index++) {
+                    unsigned int access_node = access_nodes_per_node[access_node_index].accessNodeID;
+                    unsigned int distanceToAccessNode = access_nodes_per_node[access_node_index].distanceToNode;
+
+                    // std::optional<std::vector<unsigned int>> distancesFromAccessNode;
+                    // if constexpr(mode == TNRAFPreprocessingMode::SLOW) {
+                    //     distancesFromAccessNode.emplace(originalGraph.nodes());
+                    //     if(forward_direction) {
+                    //         BasicDijkstra::computeOneToAllDistances(access_node, originalGraph, distancesFromAccessNode.value());
+                    //     }
+                    //     else {
+                    //         BasicDijkstra::computeOneToAllDistancesInReversedGraph(
+                    //             access_node,
+                    //             originalGraph,
+                    //             distancesFromAccessNode.value()
+                    //         );
+                    //     }
+                    // }
+
+
+                    // if the region is the region of the access node, set the flag to true and continue
+                    if (regions.getRegion(access_node) == region_index) {
+                        access_nodes_per_node[access_node_index].regionFlags[region_index] = true;
+                        continue;
                     }
-                    else if constexpr (mode == TNRAFPreprocessingMode::FAST) {
-                        distance_from_node_to_border_node = optionalDistancesFromNode[border_node];
-                        distance_from_access_node_to_border_node = this->all_transit_dm->findDistance(border_node, accessNodes[i].tnr_index);
-                    }
-                    else {
-                        distance_from_node_to_border_node = optionalDistancesFromNode[border_node];
-                        distance_from_access_node_to_border_node = distancesFromAccessNode.value()[border_node];
-                    }
-                    if (distance_from_node_to_border_node == distance_from_access_node_to_border_node + distanceToAccessNode) {
-                        accessNodes[i].regionFlags[j] = true;
-                        break;
+
+                    for(unsigned int bn_index = 0; bn_index < border_nodes_in_region.size(); bn_index++) {
+                        auto border_node = border_nodes_in_region[bn_index];
+                        dist_t distance_from_node_to_border_node = 0;
+                        dist_t distance_from_access_node_to_border_node = 0;
+
+                        if constexpr(mode == TNRAFPreprocessingMode::DM) {
+                            distance_from_node_to_border_node = this->distanceMatrix->findDistance(
+                                node_index,
+                                border_node
+                            );
+                            distance_from_access_node_to_border_node = this->distanceMatrix->findDistance(
+                                access_node,
+                                border_node
+                            );
+                        }
+                        else {
+                            distance_from_node_to_border_node = distances_to_border_nodes.value()[bn_index][node_index];
+                            // distance_from_access_node_to_border_node = this->all_transit_dm->findDistance(
+                            //     border_node,
+                            //     access_nodes_per_node[access_node_index].tnr_index
+                            // );
+                            distance_from_access_node_to_border_node = distances_to_border_nodes.value()[bn_index][
+                                access_nodes_per_node[access_node_index].accessNodeID];
+                        }
+
+                        if(distance_from_node_to_border_node == distance_from_access_node_to_border_node +
+                            distanceToAccessNode)
+                        {
+                            access_nodes_per_node[access_node_index].regionFlags[region_index] = true;
+                            break;
+                        }
                     }
                 }
             }
         }
+
+
+        // for (size_t i = 0; i < access_nodes.size(); i++) {
+        //     unsigned int accessNode = access_nodes[i].accessNodeID;
+        //     unsigned int distanceToAccessNode = access_nodes[i].distanceToNode;
+        //
+        //     std::optional<std::vector<unsigned int>> distancesFromAccessNode;
+        //     if constexpr(mode == TNRAFPreprocessingMode::SLOW) {
+        //         distancesFromAccessNode.emplace(originalGraph.nodes());
+        //         if(forward_direction) {
+        //             BasicDijkstra::computeOneToAllDistances(accessNode, originalGraph, distancesFromAccessNode.value());
+        //         }
+        //         else {
+        //             BasicDijkstra::computeOneToAllDistancesInReversedGraph(
+        //                 accessNode,
+        //                 originalGraph,
+        //                 distancesFromAccessNode.value()
+        //             );
+        //         }
+        //     }
+        //
+        //     for (unsigned int j = 0; j < regions.getRegionsCnt(); j++) {
+        //         // if the region is the region of the access node, set the flag to true and continue
+        //         if (regions.getRegion(accessNode) == j) {
+        //             access_nodes[i].regionFlags[j] = true;
+        //             continue;
+        //         }
+        //
+        //         auto border_nodes_in_region = regions.getBorderNodes(j);
+        //         for (unsigned int k = 0; k < border_nodes_in_region.size(); k++) {
+        //             auto border_node = border_nodes_in_region[k];
+        //             dist_t distance_from_node_to_border_node = 0;
+        //             dist_t distance_from_access_node_to_border_node = 0;
+        //
+        //             if constexpr(mode == TNRAFPreprocessingMode::DM) {
+        //                 distance_from_node_to_border_node = this->distanceMatrix->findDistance(node, border_node);
+        //                 distance_from_access_node_to_border_node = this->distanceMatrix->findDistance(
+        //                     accessNode,
+        //                     border_nodes_in_region[k]
+        //                 );
+        //             }
+        //             else if constexpr (mode == TNRAFPreprocessingMode::FAST) {
+        //                 distance_from_node_to_border_node = optionalDistancesFromNode[border_node];
+        //                 distance_from_access_node_to_border_node = this->all_transit_dm->findDistance(border_node, access_nodes[i].tnr_index);
+        //             }
+        //             else {
+        //                 distance_from_node_to_border_node = optionalDistancesFromNode[border_node];
+        //                 distance_from_access_node_to_border_node = distancesFromAccessNode.value()[border_node];
+        //             }
+        //             if (distance_from_node_to_border_node == distance_from_access_node_to_border_node + distanceToAccessNode) {
+        //                 access_nodes[i].regionFlags[j] = true;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     /**
@@ -367,18 +481,18 @@ private:
 
         // 1. Create and populate the 2D matrix as before
         std::vector<std::vector<DataType>>* temp_2d_matrix = new std::vector<std::vector<DataType>>(num_rows, std::vector<DataType>(num_cols));
-        std::vector<unsigned int> distances_from_one_transit_node(num_rows);
+        std::vector<unsigned int> distances_per_one_transit_node(num_rows);
 
         for (unsigned int c = 0; c < num_cols; ++c) { // Iterate by column (transit node index)
             unsigned int transit_node_id = transitNodes[c];
             if(forward) {
-            	BasicDijkstra::computeOneToAllDistances(transit_node_id, originalGraph, distances_from_one_transit_node);
+            	BasicDijkstra::computeOneToAllDistancesInReversedGraph(transit_node_id, originalGraph, distances_per_one_transit_node);
             }
         	else {
-        		BasicDijkstra::computeOneToAllDistancesInReversedGraph(transit_node_id, originalGraph, distances_from_one_transit_node);
+        		BasicDijkstra::computeOneToAllDistances(transit_node_id, originalGraph, distances_per_one_transit_node);
         	}
             for (unsigned int r = 0; r < num_rows; ++r) {
-                (*temp_2d_matrix)[r][c] = boost::numeric_cast<DataType>(distances_from_one_transit_node[r]);
+                (*temp_2d_matrix)[r][c] = boost::numeric_cast<DataType>(distances_per_one_transit_node[r]);
             }
             if (c % 10 == 0 && num_cols > 10) {
                  std::cout << "\rProcessed " << c << "/" << num_cols << " transit nodes for all-to-transit DM (" << dataTypeForLog << ").";
