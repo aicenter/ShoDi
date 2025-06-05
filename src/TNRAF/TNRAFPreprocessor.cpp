@@ -105,10 +105,16 @@ void TNRAFPreprocessor::preprocessUsingCH(
 
 	// forward arc flags computation
 	if(mode == TNRAFPreprocessingMode::DM) {
-		compute_arc_flags<TNRAFPreprocessingMode::DM>(forwardAccessNodes, originalGraph, regions, true);
+		this->forward_arc_flags_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+			&TNRAFPreprocessor::compute_arc_flags<TNRAFPreprocessingMode::DM>, this,
+			std::ref(forwardAccessNodes), std::ref(originalGraph), std::ref(regions), true
+		);
 	}
 	else if(mode == TNRAFPreprocessingMode::FAST) {
-		compute_arc_flags<TNRAFPreprocessingMode::FAST>(forwardAccessNodes, originalGraph, regions, true);
+		this->forward_arc_flags_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+			&TNRAFPreprocessor::compute_arc_flags<TNRAFPreprocessingMode::FAST>, this,
+			std::ref(forwardAccessNodes), std::ref(originalGraph), std::ref(regions), true
+		);
 	}
 	// else {
 	// 	// SLOW
@@ -156,10 +162,16 @@ void TNRAFPreprocessor::preprocessUsingCH(
 
 	// backward arc flags computation
 	if(mode == TNRAFPreprocessingMode::DM) {
-		compute_arc_flags<TNRAFPreprocessingMode::DM>(backwardAccessNodes, originalGraph, regions, false);
+		this->backward_arc_flags_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+			&TNRAFPreprocessor::compute_arc_flags<TNRAFPreprocessingMode::DM>, this,
+			std::ref(backwardAccessNodes), std::ref(originalGraph), std::ref(regions), false
+		);
 	}
 	else if(mode == TNRAFPreprocessingMode::FAST) {
-		compute_arc_flags<TNRAFPreprocessingMode::FAST>(backwardAccessNodes, originalGraph, regions, false);
+		this->backward_arc_flags_computation_time_ms_ = benchmark<std::chrono::milliseconds>(
+			&TNRAFPreprocessor::compute_arc_flags<TNRAFPreprocessingMode::FAST>, this,
+			std::ref(backwardAccessNodes), std::ref(originalGraph), std::ref(regions), false
+		);
 	}
 
 	// FINAL STEPS

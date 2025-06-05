@@ -226,12 +226,13 @@ void createTNR(
  * @param outputFilePath[in] Contains the desired output file path for the precomputed data structure.
  */
 void createTNRAF(
-        const std::string& preprocessingMode,
-        unsigned int transitNodeSetSize,
-        unsigned int dmIntSize,
-        GraphLoader& graphLoader,
-        const std::string& outputFilePath,
-        int scaling_factor) {
+	const std::string& preprocessingMode,
+	unsigned int transitNodeSetSize,
+	unsigned int dmIntSize,
+	GraphLoader& graphLoader,
+	const std::string& outputFilePath,
+	int scaling_factor
+) {
 	TNRAFPreprocessingMode mode;
     if (preprocessingMode == "slow") {
 //        createTNRAFSlow(transitNodeSetSize, graphLoader, outputFilePath, scaling_factor);
@@ -257,7 +258,6 @@ void createTNRAF(
 	timer.finish();
 
 	graph.add_edges(*originalGraph);
-	// graphLoader.loadGraph(graph, scaling_factor);
 
 	auto num_regions = std::min(graph.nodes(), 32u);
 
@@ -286,12 +286,14 @@ void createTNRAF(
         std::cout << "  " << label << ": " << static_cast<double>(tnraf_preprocessor.getForwardDmComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
     }
     std::cout << "  Forward Access Nodes computation time: " << static_cast<double>(tnraf_preprocessor.getForwardAccessNodesComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
+    std::cout << "  Forward Arc Flags computation time: " << static_cast<double>(tnraf_preprocessor.getForwardArcFlagsComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
     if (tnraf_preprocessor.getBackwardDmComputationTimeMs().count() > 0) {
         std::string label = (mode == TNRAFPreprocessingMode::DM) ? "Backward DM computation time"
                                                                : "Backward All-to-Transit DM computation time (FAST mode)";
         std::cout << "  " << label << ": " << static_cast<double>(tnraf_preprocessor.getBackwardDmComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
     }
     std::cout << "  Backward Access Nodes computation time: " << static_cast<double>(tnraf_preprocessor.getBackwardAccessNodesComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
+    std::cout << "  Backward Arc Flags computation time: " << static_cast<double>(tnraf_preprocessor.getBackwardArcFlagsComputationTimeMs().count()) / 1000 << " seconds" << std::endl;
 
 	timer.printMeasuredTime();
 }
