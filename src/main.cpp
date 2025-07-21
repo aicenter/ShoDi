@@ -55,6 +55,7 @@
 #include "TNRAF/TNRAFPreprocessingMode.h"
 #include "memory.h"
 #include "benchmark.h"
+#include "logging.h"
 
 constexpr auto INVALID_FORMAT_INFO = "Please, make sure that your call has the right format. If not sure,\n"
                                      "refer to 'README.md' for a complete overview of use cases for this application\n"
@@ -441,6 +442,8 @@ int main(int argc, char* argv[]) {
 			if (!outputPath) {
 				outputPath.emplace("out");
 			}
+
+			set_up_logger(outputPath.get());
 
 			GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputPath);
 

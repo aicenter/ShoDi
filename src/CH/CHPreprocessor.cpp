@@ -34,6 +34,9 @@
 #include "../Dijkstra/DijkstraNode.h"
 #include "Structures/HopsDijkstraNode.h"
 #include "CHPreprocessor.h"
+
+#include <spdlog/spdlog.h>
+
 #include "EdgeDifferenceManager.h"
 
 
@@ -52,7 +55,7 @@ std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, unsigned in
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
-    printf("Started preprocessing!\n");
+    spdlog::info("CH Preprocessor: Started preprocessing");
     Timer preprocessTimer("Contraction Hierarchies preprocessing timer");
     preprocessTimer.begin();
 
@@ -81,7 +84,7 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
 
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, UpdateableGraph & graph) {
-    printf("Initializing priority queue.\n");
+    spdlog::info("CH Preprocessor: Initializing priority queue");
 
     for(unsigned int i = 0; i < graph.nodes(); i++) {
         getPossibleShortcuts(i, graph, true);
@@ -92,7 +95,7 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
         priorityQueue.pushOnly(i, edgeDifference);
     }
     priorityQueue.buildProperHeap();
-    printf("\rPriority queue initialized.\n");
+    spdlog::info("CH Preprocessor: Priority queue initialized");
 
 
 }
@@ -100,6 +103,7 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
 //______________________________________________________________________________________________________________________
 void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQueue, UpdateableGraph &graph) {
     unsigned int CHrank = 1;
+    constexpr unsigned log_step = 100'000;
 
     while( ! priorityQueue.empty() ) {
         CHNode current = priorityQueue.front();
@@ -125,8 +129,8 @@ void CHPreprocessor::contractNodesWithUnpackingData(CHpriorityQueue &priorityQue
                 if(CHrank % 10 == 0) {
                     printf("\rContracted %u nodes!", CHrank);
                 }
-            } else if(CHrank % 1000 == 0) {
-                printf("\rContracted %u nodes!", CHrank);
+            } else if(CHrank % log_step == 0) {
+                spdlog::info("Contracted {} nodes!", CHrank);
             }
         }
 

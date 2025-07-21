@@ -69,6 +69,7 @@ endif()
 ## CSV
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
 
+
 ## HDF5
 find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
 
@@ -112,6 +113,10 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+find_package(indicators CONFIG REQUIRED)
+
+find_package(spdlog CONFIG REQUIRED)
 
 
 # TARGETS
@@ -236,8 +241,6 @@ add_library(shortestPaths SHARED
 	src/DistanceMatrix/DistanceMatrixCsvOutputter.h
 	src/DistanceMatrix/DistanceMatrixXdmOutputter.h
 	src/DistanceMatrix/DistanceMatrixHdfOutputter.h
-	src/CLI/ProgressBar.cpp
-	src/CLI/ProgressBar.hpp
 	src/DistanceMatrix/Distance_matrix_reader.cpp src/DistanceMatrix/Distance_matrix_reader.h)
 target_link_libraries(shortestPaths PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 
@@ -257,7 +260,6 @@ add_executable(shortestPathsPreprocessor
 	src/CH/Structures/CHpriorityQueue.cpp
 	src/CH/Structures/HopsDijkstraNode.cpp
 	src/CH/Structures/NodeData.cpp
-	src/CLI/ProgressBar.cpp
 	src/Dijkstra/BasicDijkstra.cpp
 	src/Dijkstra/DijkstraNode.cpp
 	src/GraphBuilding/Loaders/AdjGraphLoader.cpp
@@ -276,6 +278,8 @@ add_executable(shortestPathsPreprocessor
 	src/GraphBuilding/Structures/SimpleGraph.cpp
 	src/GraphBuilding/Structures/TransitNodeRoutingGraphForPathQueries.cpp
 	src/GraphBuilding/Structures/UpdateableGraph.cpp
+	src/inout.cpp
+	src/logging.cpp
 	src/TNR/TNRPreprocessor.cpp
 	src/TNR/Structures/AccessNodeData.cpp
 	src/TNRAF/TNRAFPreprocessor.cpp
@@ -299,7 +303,6 @@ add_executable(benchmark
 	src/Benchmarking/memory.cpp
 	src/CH/CHDistanceQueryManagerWithMapping.cpp
 	src/CH/Structures/NodeData.cpp
-	src/CLI/ProgressBar.cpp
 	src/Dijkstra/BasicDijkstra.cpp
 	src/Dijkstra/DijkstraNode.cpp
 	src/GraphBuilding/Loaders/CsvGraphLoader.cpp
@@ -383,6 +386,7 @@ target_include_directories(func_test_runner PRIVATE src)
 
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(shortestPathsPreprocessor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/fast-cpp-csv-parser)
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(benchmark PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
@@ -397,11 +401,14 @@ endif()
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(shortestPathsPreprocessor PRIVATE PROJ::proj)
+target_link_libraries(shortestPathsPreprocessor PRIVATE indicators::indicators)
+target_link_libraries(shortestPathsPreprocessor PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
 target_link_libraries(benchmark PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(benchmark PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(benchmark PRIVATE PROJ::proj)
 target_link_libraries(func_test_runner PRIVATE ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
 target_link_libraries(func_test_runner PRIVATE GTest::gtest_main)
+
 
 
 # RESOURCES

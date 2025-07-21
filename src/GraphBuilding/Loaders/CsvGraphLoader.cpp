@@ -29,25 +29,27 @@
  *****************************************************************************/
 
 #include "CsvGraphLoader.h"
-#include "../../CLI/ProgressBar.hpp"
+
+#include <fstream>
+
 #include "../Structures/Graph.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <limits>
 #include <stdexcept>
 #include <iostream>
+#include <spdlog/spdlog.h>
+
+#include "csv.h"
+#include "inout.h"
+#include "progress_bar.h"
 
 
-CsvGraphLoader::CsvGraphLoader(const std::string& inputPath) : inputPath(inputPath) {
-	if (!nodeReader.mmap(inputPath + "/nodes.csv")) {
-		throw std::runtime_error(std::string("Error reading file ") + this->inputPath
-            + "/nodes.csv using mmap.\n");
-	}
+CsvGraphLoader::CsvGraphLoader(const fs::path& input_path) :
+	input_path(input_path),
+	nodes_path(check_path(input_path / "nodes.csv")),
+	edges_path(check_path(input_path / "edges.csv"))
+{};
 
-    if (!edgeReader.mmap(inputPath + "/edges.csv")) {
-        throw std::runtime_error(std::string("Error reading file ") + this->inputPath
-            + "/edges.csv using mmap.\n");
-    }
-}
 
 inline dist_t parse_distance(
 	const std::string& str, unsigned int nodeFrom, unsigned int nodeTo, int scaling_factor
@@ -81,93 +83,74 @@ inline dist_t parse_distance(
 }
 
 unsigned int CsvGraphLoader::nodes() {
-	return boost::numeric_cast<unsigned int>(nodeReader.rows() - 1);
+	spdlog::info("Counting nodes");
+
+	// return boost::numeric_cast<unsigned int>(nodeReader.rows() - 1);
+	std::ifstream in_stream(nodes_path);
+	auto count = std::count_if(std::istreambuf_iterator<char>{in_stream}, {}, [](char c) { return c == '\n'; });
+	--count;
+
+	spdlog::info("Found {} nodes", count);
+
+	return static_cast<unsigned>(count);
 }
 
 void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
-	const dist_t max = std::numeric_limits<dist_t>::max();
-	ProgressBar progress(edgeReader.rows(), "Loading CSV file:");
+	spdlog::info("Loading edges from {}", edges_path.string());
 
-    size_t from_col = SIZE_MAX, to_col = SIZE_MAX, cost_col = SIZE_MAX;
-    auto header = edgeReader.header();
-    size_t c = 0;
-    for (const auto& cell : header) {
-        std::string column_name;
-        cell.read_value(column_name);
-        if (column_name == "u") {
-            from_col = c;
-        } else if (column_name == "v") {
-            to_col = c;
-        } else if (column_name == "cost") {
-            cost_col = c;
-        }
-        ++c;
-    }
+	io::CSVReader<3, io::trim_chars<>, io::no_quote_escape<'\t'>> edge_reader(edges_path.string());
+	edge_reader.read_header(io::ignore_extra_column, "u", "v", "cost");
+	unsigned int from;
+	unsigned int to;
+	size_t cost;
+	unsigned counter = 0;
+	constexpr unsigned progress_bar_step = 1'000'000;
 
-	if (from_col == SIZE_MAX || to_col == SIZE_MAX || cost_col == SIZE_MAX) {
-		throw std::runtime_error("the 'edges.csv' file does not contain all columns 'u', 'v' and 'cost'.");
-	}
+	// count edges
+	spdlog::info("Counting edges");
+	std::ifstream in_stream(edges_path);
+	auto count = std::count_if(std::istreambuf_iterator<char>{in_stream}, {}, [](char c) { return c == '\n'; });
+	spdlog::info("Found {} edges", count);
 
-	for (const auto& row: edgeReader) {
-		unsigned int j = 0;
-        unsigned int from = 0, to = 0;
-		std::string cost_val;
-        dist_t dist;
-
-		for (const auto& cell: row) {
-			std::string val;
-			cell.read_value(val);
-
-            if (j == from_col) from = boost::numeric_cast<unsigned int>(std::stoul(val));
-            else if (j == to_col) to = boost::numeric_cast<unsigned int>(std::stoul(val));
-            else if (j == cost_col) cost_val = val;
-            ++j;
+	indicators::ProgressBar progress_bar{
+		indicators::option::BarWidth{70},
+		indicators::option::PostfixText{"Loading edges"},
+		indicators::option::MaxProgress{count / progress_bar_step}
+	};
+	while(edge_reader.read_row(from, to, cost)){
+		// 	dist = parse_distance(cost_val, from, to, scaling_factor);
+		auto dist = (dist_t) std::floor(cost / scaling_factor);
+		graph.addEdge(from, to, dist);
+		++counter;
+		if(counter % progress_bar_step == 0) {
+			progress_bar.tick();
 		}
-
-		++progress;
-		if (j == 0) continue; // empty row
-
-		dist = parse_distance(cost_val, from, to, scaling_factor);
-
-        if (dist != max)
-            graph.addEdge(from, to, dist);
 	}
 }
 
 void CsvGraphLoader::loadLocations(std::vector<std::pair<double, double>>& locations) {
-    size_t id_col = 0, x_col = 0, y_col = 0;
-    auto header = nodeReader.header();
-    size_t c = 0;
-    for (const auto& cell : header) {
-        std::string column_name;
-        cell.read_value(column_name);
-        if (column_name == "id") {
-            id_col = c;
-        } else if (column_name == "x") {
-            x_col = c;
-        } else if (column_name == "y") {
-            y_col = c;
-        }
-        ++c;
-    }
+	io::CSVReader<3, io::trim_chars<>, io::no_quote_escape<'\t'>> node_reader(edges_path.string());
+	node_reader.read_header(io::ignore_extra_column, "id", "x", "y");
+	unsigned int id;
+	double x;
+	double y;
+	unsigned counter = 0;
+	constexpr unsigned progress_bar_step = 1'000'000;
 
-    for (const auto& row: nodeReader) {
-        unsigned int j = 0;
-        unsigned int id = 0;
-        double x = 0.0, y = 0.0;
+	// count edges
+	std::ifstream in_stream(edges_path);
+	auto count = std::count_if(std::istreambuf_iterator<char>{in_stream}, {}, [](char c) { return c == '\n'; });
 
-        for (const auto& cell: row) {
-            std::string val;
-            cell.read_value(val);
-
-            if (j == id_col) id = boost::numeric_cast<unsigned int>(std::stoul(val));
-            else if (j == x_col) x = stod(val);
-            else if (j == y_col) y = stod(val);
-            ++j;
-        }
-
-        if (j == 0) continue; // empty row
-
-        locations[id] = {x, y};
+	indicators::ProgressBar progress_bar{
+		indicators::option::BarWidth{70},
+		indicators::option::PostfixText{"Loading nodes"},
+		indicators::option::MaxProgress{count / progress_bar_step}
+	};
+	while(node_reader.read_row(id, x, y)){
+		locations[id] = {x, y};
+		++counter;
+		if(counter % progress_bar_step == 0) {
+			progress_bar.tick();
+		}
     }
 }

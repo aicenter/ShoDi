@@ -7,7 +7,7 @@
 #include <random> // mt19937_64, uniform_x_distribution
 #include <vector>
 
-#include "../CLI/ProgressBar.hpp"
+#include "../progress_bar.h"
 
 using namespace johnson;
 
@@ -182,7 +182,14 @@ template<class IntType> void johnson::johnson_parallel(graph_t *gr, IntType *out
 
   JGraph G(gr->edge_array.data(), gr->edge_array.data() + gr->E, gr->weights.data(), V);
 
-  ProgressBar progress(V);
+  unsigned counter = 0;
+  constexpr unsigned progress_bar_step = 100;
+
+  indicators::ProgressBar progress_bar{
+      indicators::option::BarWidth{70},
+      indicators::option::PostfixText{"Computing shortest paths"},
+      indicators::option::MaxProgress{V / progress_bar_step}
+  };
 
 #pragma omp parallel for schedule(dynamic)
   for (int s = 0; s < V_uint; s++) {
@@ -191,7 +198,13 @@ template<class IntType> void johnson::johnson_parallel(graph_t *gr, IntType *out
     for (size_t v = 0; v < V; v++) {
       output[((size_t)s) * V + v] = boost::numeric_cast<IntType>(d[v] + h[v] - h[s] );
     }
-    ++progress;
+    
+    #pragma omp atomic
+    ++counter;
+    
+    if(counter % progress_bar_step == 0) {
+      progress_bar.tick();
+    }
   }
 
   delete[] h;

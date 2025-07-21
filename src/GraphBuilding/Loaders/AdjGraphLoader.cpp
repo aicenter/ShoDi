@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 #include "AdjGraphLoader.h"
-#include "../../CLI/ProgressBar.hpp"
+#include "../../progress_bar.h"
 #include "../Structures/Graph.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include <limits>
@@ -91,7 +91,14 @@ void AdjGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 								 std::to_string(size) + " cols.\n");
 
 	const dist_t max = std::numeric_limits<dist_t>::max();
-	ProgressBar progress(size, "Loading CSV file:");
+	unsigned counter = 0;
+	constexpr unsigned progress_bar_step = 1000;
+	
+	indicators::ProgressBar progress_bar{
+		indicators::option::BarWidth{70},
+		indicators::option::PostfixText{"Loading CSV file"},
+		indicators::option::MaxProgress{size / progress_bar_step}
+	};
 
 	unsigned int i = 0;
 	//const double multiplier = std::pow(10, scaling_factor);
@@ -105,7 +112,10 @@ void AdjGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 				graph.addEdge(i, j, dist);
 			++j;
 		}
-		++progress;
+		++counter;
+		if(counter % progress_bar_step == 0) {
+			progress_bar.tick();
+		}
 		++i;
 	}
 }

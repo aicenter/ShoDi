@@ -37,19 +37,25 @@
 #define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
 #include <string>
 #include <csv2/reader.hpp>
+#include <filesystem>
 
-typedef csv2::Reader<csv2::delimiter<'\t'>, csv2::quote_character<'"'>,
-                     csv2::first_row_is_header<true>,
-                     csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
-    DefaultCSVReader;
+namespace fs = std::filesystem;
+
+// typedef csv2::Reader<csv2::delimiter<'\t'>, csv2::quote_character<'"'>,
+//                      csv2::first_row_is_header<true>,
+//                      csv2::trim_policy::trim_characters<' ', '\t', '\r', '\n'>>
+//     DefaultCSVReader;
 
 class CsvGraphLoader : public GraphLoader {
 private:
-    DefaultCSVReader nodeReader;
-    DefaultCSVReader edgeReader;
-    std::string inputPath;
+    // DefaultCSVReader nodeReader;
+    // DefaultCSVReader edgeReader;
+    fs::path input_path;
+
+    fs::path nodes_path;
+    fs::path edges_path;
 public:
-    explicit CsvGraphLoader(const std::string& inputPath);
+    explicit CsvGraphLoader(const fs::path& input_path);
 
     using GraphLoader::loadGraph;
 

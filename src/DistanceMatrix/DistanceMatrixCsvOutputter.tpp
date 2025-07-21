@@ -7,7 +7,7 @@
 
 #include <fstream>
 #include <filesystem>
-#include "../CLI/ProgressBar.hpp"
+#include "../progress_bar.h"
 
 template <class IntType> void DistanceMatrixCsvOutputter<IntType>::store(Distance_matrix_travel_time_provider<IntType>& dm, const std::string &path) {
     const auto& distances = dm.getRawData();
@@ -31,14 +31,24 @@ template <class IntType> void DistanceMatrixCsvOutputter<IntType>::store(Distanc
         printf("Couldn't open file '%s'!", (path + ".csv").c_str());
     }
 
-    ProgressBar progress(nodesCnt);
+    unsigned counter = 0;
+    constexpr unsigned progress_bar_step = 1000;
+    
+    indicators::ProgressBar progress_bar{
+        indicators::option::BarWidth{70},
+        indicators::option::PostfixText{"Storing distance matrix"},
+        indicators::option::MaxProgress{nodesCnt / progress_bar_step}
+    };
     auto size = static_cast<size_t>(nodesCnt) * nodesCnt;
     for(size_t i = 0; i < size; i++) {
         output << distances[i];
 
         if ((i + 1) % nodesCnt == 0) {
             output << std::endl;
-            ++progress;
+            ++counter;
+            if(counter % progress_bar_step == 0) {
+                progress_bar.tick();
+            }
         } else {
             output << ",";
         }
