@@ -287,6 +287,8 @@ add_executable(shortestPathsPreprocessor
 	src/TNRAF/Structures/NodeDataRegions.cpp
 	src/TNRAF/Structures/RegionsStructure.cpp
 	src/Timer/Timer.cpp
+	src/CH/Structures/CH_Graph.cpp
+	src/CH/Structures/CH_Graph.h
 )
 
 add_executable(benchmark
@@ -334,6 +336,9 @@ add_executable(benchmark
 	src/TNRAF/Structures/NodeDataRegions.cpp
 	src/TNRAF/Structures/RegionsStructure.cpp
 	src/Timer/Timer.cpp
+	src/aliases.h
+	src/CH/Structures/CH_Edge.cpp
+	src/CH/Structures/CH_Edge.h
 )
 
 add_executable(func_test_runner

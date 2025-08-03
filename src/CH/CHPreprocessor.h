@@ -36,8 +36,7 @@
 #include "../GraphBuilding/Structures/ShortcutEdge.h"
 #include "Structures/CHNode.h"
 #include "Structures/CHpriorityQueue.h"
-
-
+#include "Structures/CH_Graph.h"
 
 
 /*
@@ -52,7 +51,7 @@ public:
      *
      * @param graph[in, out] The input graph that will be preprocessed.
      */
-    static void preprocessForDDSG(UpdateableGraph & graph);
+    static void preprocessForDDSG(CH_Graph& graph);
 
 private:
     /**
@@ -72,8 +71,8 @@ private:
      * @param graph[in] The graph that will be used to initialize the queue.
      */
     static void initializePriorityQueue(
-        CHpriorityQueue & priorityQueue,
-        UpdateableGraph & graph
+            CHpriorityQueue & priorityQueue,
+            CH_Graph& graph
     );
 
     /**
@@ -110,7 +109,8 @@ private:
      */
     static void getDistancesUsingNode(
             const unsigned int i,
-            UpdateableGraph & graph);
+            CH_Graph& graph
+    );
 
     /**
      * This function will get a longest shortcut from a specific source to one of the targets, which is then used as an
@@ -196,8 +196,9 @@ private:
      */
     static void getPossibleShortcuts(
             const unsigned int i,
-            UpdateableGraph & graph,
-            bool deep);
+            CH_Graph& graph,
+            bool deep
+    );
 
     /**
      * This function calculates how many of the shortcuts found by the getPossibleShortcuts() function are actually

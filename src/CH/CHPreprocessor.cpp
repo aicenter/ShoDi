@@ -54,17 +54,17 @@ std::unordered_set<unsigned int> CHPreprocessor::targetsSet;
 std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, unsigned int > > > CHPreprocessor::buckets;
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
+void CHPreprocessor::preprocessForDDSG(CH_Graph& graph) {
     spdlog::info("CH Preprocessor: Started preprocessing");
     Timer preprocessTimer("Contraction Hierarchies preprocessing timer");
     preprocessTimer.begin();
 
-    CHpriorityQueue priorityQueue(graph.nodes());
+    CHpriorityQueue priorityQueue(graph.get_node_count());
 
-    CHPreprocessor::contracted.resize(graph.nodes(), false);
-    CHPreprocessor::preprocessingDegrees.resize(graph.nodes());
-    CHPreprocessor::dijkstraDistance.resize(graph.nodes(), UINT_MAX);
-    EdgeDifferenceManager::init(graph.nodes());
+    CHPreprocessor::contracted.resize(graph.get_node_count(), false);
+    CHPreprocessor::preprocessingDegrees.resize(graph.get_node_count());
+    CHPreprocessor::dijkstraDistance.resize(graph.get_node_count(), UINT_MAX);
+    EdgeDifferenceManager::init(graph.get_node_count());
 
     initializePriorityQueue(priorityQueue, graph);
 
@@ -83,10 +83,10 @@ void CHPreprocessor::preprocessForDDSG(UpdateableGraph & graph) {
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, UpdateableGraph & graph) {
+void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, CH_Graph& graph) {
     spdlog::info("CH Preprocessor: Initializing priority queue");
 
-    for(unsigned int i = 0; i < graph.nodes(); i++) {
+    for(unsigned int i = 0; i < graph.get_node_count(); i++) {
         getPossibleShortcuts(i, graph, true);
         unsigned int shortcuts = calculateShortcutsAmount();
         clearStructures();
@@ -96,8 +96,6 @@ void CHPreprocessor::initializePriorityQueue(CHpriorityQueue & priorityQueue, Up
     }
     priorityQueue.buildProperHeap();
     spdlog::info("CH Preprocessor: Priority queue initialized");
-
-
 }
 
 //______________________________________________________________________________________________________________________
@@ -191,7 +189,7 @@ void CHPreprocessor::updateNeighboursPriorities(const unsigned int x, Updateable
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::getPossibleShortcuts(const unsigned int i, UpdateableGraph & graph, bool deep) {
+void CHPreprocessor::getPossibleShortcuts(const unsigned int i, CH_Graph& graph, bool deep) {
     getDistancesUsingNode(i, graph);
     CHPreprocessor::contracted[i] = true;
     manyToManyWithBuckets(graph, deep);
@@ -253,7 +251,7 @@ void CHPreprocessor::clearStructures() {
 }
 
 //______________________________________________________________________________________________________________________
-void CHPreprocessor::getDistancesUsingNode(const unsigned int i, UpdateableGraph & graph ) {
+void CHPreprocessor::getDistancesUsingNode(const unsigned int i, CH_Graph& graph) {
     std::unordered_map<unsigned int, unsigned int> i_sources = graph.incomingEdges(i);
     std::unordered_map<unsigned int, PreprocessingEdgeData> i_targets = graph.outgoingEdges(i);
     for(auto iter1 = i_sources.begin(); iter1 != i_sources.end(); ++iter1) {
