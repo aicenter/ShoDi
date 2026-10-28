@@ -20,6 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
+#include <cstdio>
 #include <fstream>
 #include <sstream>
 #include "gtest/gtest.h"
@@ -158,4 +159,14 @@ TEST(dm_hdf_test, from_csv_fast2) {
     // fast with precision loss
     run_preprocessor("--method dm --input-format csv --output-format hdf --preprocessing-mode fast --input-path functest/02_csv -o from_csv_fast2 --precision-loss 100");
     check_hdf("from_csv_fast2.hdf5", "functest/02_dm_div100.csv");
+}
+
+
+
+TEST(dm_hdf_test, from_csv_slow_secondary) {
+	run_preprocessor("--method dm -f csv --output-format hdf --preprocessing-mode slow -i functest/03_csv -o from_csv_slow_secondary --secondary-output-path from_csv_slow_secondary_dist");
+	check_hdf("from_csv_slow_secondary.hdf5", "functest/03_dm.csv");
+	check_hdf("from_csv_slow_secondary_dist.hdf5", "functest/03_dm_secondary.csv");
+	std::remove("from_csv_slow_secondary.hdf5");
+	std::remove("from_csv_slow_secondary_dist.hdf5");
 }

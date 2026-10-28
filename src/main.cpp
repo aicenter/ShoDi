@@ -48,6 +48,7 @@
 #include "GraphBuilding/Loaders/AdjGraphLoader.h"
 #include "GraphBuilding/Loaders/CsvGraphLoader.h"
 #include "DistanceMatrix/DistanceMatrixComputorSlow.h"
+#include "DistanceMatrix/Bicriteria_distance_matrix_computor.h"
 #include "DistanceMatrix/DistanceMatrixOutputter.h"
 #include "DistanceMatrix/DistanceMatrixXdmOutputter.h"
 #include "DistanceMatrix/DistanceMatrixCsvOutputter.h"
@@ -316,13 +317,26 @@ Distance_matrix_travel_time_provider<IntType>* computeDistanceMatrix(GraphLoader
 }*/
 
 template<class IntType>
+std::unique_ptr<DistanceMatrixOutputter<IntType>> newDMOutputter(const std::string& outputFormat) {
+    if (outputFormat == "xdm") {
+        return std::make_unique<DistanceMatrixXdmOutputter<IntType>>();
+    } else if (outputFormat == "csv") {
+        return std::make_unique<DistanceMatrixCsvOutputter<IntType>>();
+    } else if (outputFormat == "hdf") {
+        return std::make_unique<DistanceMatrixHdfOutputter<IntType>>();
+    } else {
+        throw input_error(std::string("Unknown output type '") + outputFormat +
+                          "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
+    }
+}
+
+template<class IntType>
 void createDM(
         const std::string& outputFormat,
         const std::string& preprocessingMode,
         GraphLoader& graphLoader,
         const std::string& outputFilePath,
         int scaling_factor) {
-    std::unique_ptr<DistanceMatrixOutputter<IntType>> outputter{nullptr};
     bool fast = false;
 
     if (preprocessingMode == "slow") {
@@ -334,18 +348,40 @@ void createDM(
                           "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
     }
 
-    if (outputFormat == "xdm") {
-        outputter = std::unique_ptr<DistanceMatrixXdmOutputter<IntType>> { new DistanceMatrixXdmOutputter<IntType>()};
-    } else if (outputFormat == "csv") {
-        outputter = std::unique_ptr<DistanceMatrixCsvOutputter<IntType>> { new DistanceMatrixCsvOutputter<IntType>()};
-    } else if (outputFormat == "hdf") {
-        outputter = std::unique_ptr<DistanceMatrixHdfOutputter<IntType>>{ new DistanceMatrixHdfOutputter<IntType>() };
-    } else {
-        throw input_error(std::string("Unknown output type '") + outputFormat +
-                          "' for Distance Matrix preprocessing.\n" + INVALID_FORMAT_INFO);
-    }
+    auto outputter = newDMOutputter<IntType>(outputFormat);
     auto dm = std::make_unique<Distance_matrix_travel_time_provider<IntType>>(fast, graphLoader, scaling_factor);
     outputter->store(*dm, outputFilePath);
+}
+
+/**
+ * Creates the distance matrix and the secondary distance matrix: the secondary edge weight accumulated along the
+ * shortest paths of the primary weight (see Bicriteria_distance_matrix_computor).
+ */
+template<class IntType>
+void createDMWithSecondary(
+        const std::string& outputFormat,
+        CsvGraphLoader& graphLoader,
+        const std::string& outputFilePath,
+        const std::string& secondaryOutputFilePath,
+        int scaling_factor) {
+    auto outputter = newDMOutputter<IntType>(outputFormat);
+    auto secondary_outputter = newDMOutputter<secondary_dist_t>(outputFormat);
+
+    Bicriteria_graph graph(graphLoader.nodes());
+    graphLoader.load_bicriteria_graph(graph, scaling_factor);
+
+    Timer timer("Distance Matrix preprocessing with the secondary weight");
+    timer.begin();
+    Bicriteria_distance_matrix_computor<IntType> computor;
+    computor.compute(graph);
+    timer.finish();
+    timer.printMeasuredTime();
+
+    const unsigned size = computor.get_size();
+    Distance_matrix_travel_time_provider<IntType> dm(computor.get_primary_matrix(), size);
+    outputter->store(dm, outputFilePath);
+    Distance_matrix_travel_time_provider<secondary_dist_t> secondary_dm(computor.get_secondary_matrix(), size);
+    secondary_outputter->store(secondary_dm, secondaryOutputFilePath);
 }
 
 
@@ -393,7 +429,7 @@ int main(int argc, char* argv[]) {
 		setvbuf(stdout, NULL, _IONBF, 0);
 
 		boost::optional<std::string> method, inputFormat, inputPath, outputFormat, outputPath, preprocessingMode,
-		inputStructure, querySet, mappingFile;
+		inputStructure, querySet, mappingFile, secondaryOutputPath;
 		boost::optional<unsigned int> tnodesCnt, dmIntSize, precisionLoss;
 
 		// Declare the supported options.
@@ -405,6 +441,7 @@ int main(int argc, char* argv[]) {
 				("input-path,i", boost::program_options::value(&inputPath))
 				("output-format", boost::program_options::value(&outputFormat))
 				("output-path,o", boost::program_options::value(&outputPath))
+				("secondary-output-path", boost::program_options::value(&secondaryOutputPath))
 				("preprocessing-mode", boost::program_options::value(&preprocessingMode))
 				("int-size", boost::program_options::value(&dmIntSize)->default_value(0))
 				("tnodes-cnt", boost::program_options::value(&tnodesCnt))
@@ -443,6 +480,10 @@ int main(int argc, char* argv[]) {
 				outputPath.emplace("out");
 			}
 
+			if (secondaryOutputPath && *method != "dm") {
+				throw input_error("The secondary distance matrix (--secondary-output-path) is supported only by the dm method.\n");
+			}
+
 			set_up_logger(outputPath.get());
 
 			GraphLoader* graphLoader = newGraphLoader(*inputFormat, *inputPath);
@@ -465,7 +506,20 @@ int main(int argc, char* argv[]) {
 					throw input_error("Missing one or more required options (--preprocessing-mode <fast/slow> / --output-format <xdm/csv/hdf>) for DM creation.\n");
 				}
 
-				if (*dmIntSize == 16) {
+				if (secondaryOutputPath) {
+					if (*preprocessingMode != "slow" || *inputFormat != "csv") {
+						throw input_error("The secondary distance matrix (--secondary-output-path) requires --preprocessing-mode slow and the csv input format.\n");
+					}
+					auto& csvLoader = dynamic_cast<CsvGraphLoader&>(*graphLoader);
+					const auto scaling_factor = boost::numeric_cast<int>(*precisionLoss);
+					if (*dmIntSize == 16) {
+						createDMWithSecondary<uint_least16_t>(*outputFormat, csvLoader, *outputPath, *secondaryOutputPath, scaling_factor);
+					} else if (*dmIntSize == 32) {
+						createDMWithSecondary<uint_least32_t>(*outputFormat, csvLoader, *outputPath, *secondaryOutputPath, scaling_factor);
+					} else {
+						createDMWithSecondary<dist_t>(*outputFormat, csvLoader, *outputPath, *secondaryOutputPath, scaling_factor);
+					}
+				} else if (*dmIntSize == 16) {
 					createDM<uint_least16_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));
 				} else if (*dmIntSize == 32) {
 					createDM<uint_least32_t>(*outputFormat, *preprocessingMode, *graphLoader, *outputPath, boost::numeric_cast<int>(*precisionLoss));

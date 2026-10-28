@@ -150,10 +150,16 @@ Method specific arguments:
 - `--output-format` is one of `xdm`, `csv`, `hdf`
 - `--int-size` (optional) is integer size to be used in the distance matrix during preprocessing (can be set to 16 or 32, default: native).
 Note that this is not the output size (in case of a binary output format), the output integer size is set automatically based on the maximum distance in the graph.
+- `--secondary-output-path` (optional) additionally writes the secondary distance matrix to the given path (the extension of the output format is appended). Each cell holds the `secondary_cost` of the edges summed along the shortest path by `cost`; ties in `cost` are broken by the smaller `secondary_cost`. The sums are rounded to integers once per cell. A typical use is the length of the fastest paths, with the travel time as `cost` and the length as `secondary_cost`. It requires the CSV input format and `--preprocessing-mode slow`; the rows are computed in parallel.
 
 Example Usage:
 ```console
 ./shortestPathsPreprocessor -m dm -f csv -i my_graph.csv -o my_graph --preprocessing-mode fast --output-format csv
+```
+
+Distance matrix of travel times and the matrix of the lengths along the fastest paths, from a CSV input directory with the columns `cost` (travel time) and `secondary_cost` (length):
+```console
+./shortestPathsPreprocessor -m dm -f csv -i my_graph_dir -o travel_time --secondary-output-path length --preprocessing-mode slow --output-format hdf
 ```
 
 #### Preprocessing Mode
@@ -296,6 +302,7 @@ A pair of files named `nodes.csv` and `edges.csv` located in the same directory.
 - `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
 (for A* benchmarking) columns `x` (longitude) and `y` (latitude).
 - `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `cost` (edge weight, non-negative integer).
+- The optional column `secondary_cost` (non-negative integer or floating point number) is a second edge weight, used only for the secondary distance matrix (see [Generation of Distance Matrix](#generation-of-distance-matrix)). Other columns are ignored.
 - In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
 and `v`, we must provide two lines, one for an edge from `u` to `v` and one for an edge from `v` to `u`, both with the same weight.
 - Values must be separated by a Tab character (`\t`).

@@ -20,6 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
+#include <cstdio>
 #include <fstream>
 #include "gtest/gtest.h"
 #include "common.h"
@@ -139,4 +140,16 @@ TEST(dm_test, from_csv_fast2) {
     // fast with precision loss
     run_preprocessor("-m dm --output-format csv --preprocessing-mode fast --input-path functest/02_csv -o from_csv_fast2 --precision-loss 100");
 	compare_dm_files("functest/02_dm_div100.csv", "from_csv_fast2.csv");
+}
+
+
+
+TEST(dm_test, from_csv_slow_secondary) {
+	// the fastest path 0 -> 3 is longer than the direct edge, and two fastest paths 0 -> 3 tie with different lengths;
+	// the lengths along 3 -> 4 -> 0 are rounded once, not per edge
+	run_preprocessor("--method dm -f csv --output-format csv --preprocessing-mode slow -i functest/03_csv -o from_csv_slow_secondary --secondary-output-path from_csv_slow_secondary_dist");
+	compare_dm_files("functest/03_dm.csv", "from_csv_slow_secondary.csv");
+	compare_dm_files("functest/03_dm_secondary.csv", "from_csv_slow_secondary_dist.csv");
+	std::remove("from_csv_slow_secondary.csv");
+	std::remove("from_csv_slow_secondary_dist.csv");
 }

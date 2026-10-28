@@ -34,6 +34,7 @@
 
 #include "../Structures/Graph.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include <cmath>
 #include <limits>
 #include <stdexcept>
 #include <iostream>
@@ -125,6 +126,24 @@ void CsvGraphLoader::loadGraph(BaseGraph& graph, int scaling_factor) {
 		if(counter % progress_bar_step == 0) {
 			progress_bar.tick();
 		}
+	}
+}
+
+void CsvGraphLoader::load_bicriteria_graph(Bicriteria_graph& graph, int scaling_factor) {
+	spdlog::info("Loading edges with the secondary weight from {}", edges_path.string());
+
+	io::CSVReader<4, io::trim_chars<>, io::no_quote_escape<'\t'>> edge_reader(edges_path.string());
+	edge_reader.read_header(io::ignore_extra_column, "u", "v", "cost", "secondary_cost");
+	unsigned int from;
+	unsigned int to;
+	size_t cost;
+	double secondary_cost;
+	while(edge_reader.read_row(from, to, cost, secondary_cost)){
+		if(secondary_cost < 0 || std::isnan(secondary_cost)) {
+			throw std::runtime_error(fmt::format(
+				"Invalid secondary_cost {} of the edge {} -> {} in {}", secondary_cost, from, to, edges_path.string()));
+		}
+		graph.add_edge(from, to, (dist_t) std::floor(cost / scaling_factor), secondary_cost);
 	}
 }
 

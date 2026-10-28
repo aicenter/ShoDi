@@ -50,6 +50,7 @@ A pair of files named `nodes.csv` and `edges.csv` located in the same directory.
 * `nodes.csv` represents a list of all `n` nodes identified by numbers from 0 to `n`-1 (`id` column) and optionally
   (for A* benchmarking) columns `x` (longitude) and `y` (latitude).
 * `edges.csv` is a list of edges. The required columns are `u` (source edge identifier), `v` (target edge identifier) and `cost` (edge weight, non-negative integer).
+* The optional column `secondary_cost` (non-negative integer or floating point number) is a second edge weight, used only for the secondary distance matrix (see the `--secondary-output-path` argument of the distance matrix generation in the README). Other columns are ignored.
 * In this format, each edge is considered to be a *directional* edge, so if we want a bidirectional edge between `u`
   and `v`, we must provide two lines, one for an edge from `u` to `v` and one for an edge from `v` to `u`, both with the same weight.
 * Values must be separated by a Tab character (`\t`).

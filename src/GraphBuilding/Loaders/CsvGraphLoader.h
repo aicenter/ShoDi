@@ -33,6 +33,7 @@
 
 
 #include "GraphLoader.h"
+#include "../Structures/Bicriteria_graph.h"
 
 #define NOMINMAX // prevents the min and max macro definitions from windows.h, which are introduced in p-ranav-csv2
 #include <string>
@@ -60,6 +61,12 @@ public:
     using GraphLoader::loadGraph;
 
     void loadGraph(BaseGraph &graph, int scaling_factor) override;
+
+    /**
+     * Loads the edges with both weights: the primary weight from the `cost` column (divided by \p scaling_factor as in
+     * loadGraph) and the secondary weight from the `secondary_cost` column (unscaled, fractional).
+     */
+    void load_bicriteria_graph(Bicriteria_graph &graph, int scaling_factor);
 
     unsigned int nodes() override;
 
