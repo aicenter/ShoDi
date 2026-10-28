@@ -68,6 +68,7 @@ endif()
 
 ## CSV
 find_path(P_RANAV_CSV2_INCLUDE_DIRS "csv2/mio.hpp")
+find_path(FAST_CPP_CSV_PARSER_INCLUDE_DIRS "csv.h" PATH_SUFFIXES fast-cpp-csv-parser REQUIRED)
 
 
 ## HDF5
@@ -386,7 +387,7 @@ target_include_directories(func_test_runner PRIVATE src)
 
 target_include_directories(shortestPathsPreprocessor PRIVATE ${P_RANAV_CSV2_INCLUDE_DIRS})
 target_include_directories(shortestPathsPreprocessor PRIVATE ${Boost_INCLUDE_DIRS})
-target_include_directories(shortestPathsPreprocessor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/fast-cpp-csv-parser)
+target_include_directories(shortestPathsPreprocessor PRIVATE ${FAST_CPP_CSV_PARSER_INCLUDE_DIRS})
 target_include_directories(shortestPaths PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(benchmark PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(func_test_runner PRIVATE ${Boost_INCLUDE_DIRS})
